@@ -1,0 +1,10 @@
+.env
+node_modules/
+ignorethis
+*.osu
+commands/embed.js
+beatmapsongs/
+extracted/
+mes/
+user-data.json
+prefixes.json
