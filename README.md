@@ -8,9 +8,14 @@ invite the bot to your server using [this link](https://discord.com/api/oauth2/a
 
 This bot has a variety of features, including:
 `osu` get a user's osu! profile
+
 `recent` get a user's most recent osu! score
+
 `osutop` get a user's osu! top plays
+
 `replay` render a user's replay
+
+
 
 do `?help` in your server for more information.
 
