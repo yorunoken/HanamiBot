@@ -7,6 +7,7 @@ invite the bot to your server using [this link](https://discord.com/api/oauth2/a
 ## Features
 
 This bot has a variety of features, including:
+
 `osu` get a user's osu! profile
 
 `recent` get a user's most recent osu! score
