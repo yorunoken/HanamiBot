@@ -196,10 +196,16 @@ exports.run = async (client, message, args, prefix) => {
                 await downloader.downloadSingle()
               }
 
-              // formatted values for user
-              let global_rank = user.statistics.global_rank.toLocaleString();
-              let country_rank = user.statistics.country_rank.toLocaleString();
-              let user_pp = user.statistics.pp.toLocaleString();
+              try{
+                // formatted values for user
+                global_rank = user.statistics.global_rank.toLocaleString();
+                country_rank = user.statistics.country_rank.toLocaleString();
+                user_pp = user.statistics.pp.toLocaleString();
+              }catch(err){
+                global_rank = 0
+                country_rank = 0
+                user_pp = 0
+              }
 
               //rosu pp setup
               const downloader = new Downloader({
@@ -369,10 +375,17 @@ exports.run = async (client, message, args, prefix) => {
           console.log('not defined')
           SendEmbed = async function (mapinfo, beatmapId) {
             try {
-              // formatted values for user
-              let global_rank = user.statistics.global_rank.toLocaleString();
-              let country_rank = user.statistics.country_rank.toLocaleString();
-              let user_pp = user.statistics.pp.toLocaleString();
+
+              try{
+                // formatted values for user
+                global_rank = user.statistics.global_rank.toLocaleString();
+                country_rank = user.statistics.country_rank.toLocaleString();
+                user_pp = user.statistics.pp.toLocaleString();
+              }catch(err){
+                global_rank = 0
+                country_rank = 0
+                user_pp = 0
+              }
 
               if (mapinfo.status == "unranked" || mapinfo.status == "graveyard") {
                 message.channel.send("**Unranked map, cannot parse scores**")
