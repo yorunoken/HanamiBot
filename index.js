@@ -14,6 +14,10 @@ const {
 } = require("discord.js");
 const fs = require("fs");
 require("dotenv/config");
+const MongoToken = process.env.database_token
+const { connect } = require('mongoose');
+
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -104,5 +108,8 @@ client.on("messageCreate", (message) => {
   }
 });
 client.login(process.env.TOKEN);
+(async () => {
+  await connect(MongoToken).catch(console.error)
+})()
 
 

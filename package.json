@@ -30,6 +30,7 @@
     "media": "^0.2.1",
     "minimist": "^1.2.7",
     "moment": "^2.29.4",
+    "mongoose": "^6.9.0",
     "node-fetch": "^2.6.7",
     "node-osu": "^2.2.1",
     "nodesu": "^0.7.3",

@@ -206,7 +206,6 @@ module.exports.run = async (client, message, args, prefix) => {
         X: "<:X_:1057763294707974215>",
         XH: "<:XH_:1057763296717045891>",
       }
-      const scoreCalculator = new ScoreCalculator();
 
 
 
@@ -221,100 +220,225 @@ module.exports.run = async (client, message, args, prefix) => {
 
       if (score[one]) {
         const Play_rank1 = scores.findIndex(play => play.id === score[one].id) + 1
-        let modsone = score[one].mods.join("");
-        if (!modsone.length) {
-          modsone = "NM";
-        }
+
         let grade = score[one].rank;
-        grade = grades[grade]
-        const result1 = await scoreCalculator.calculate({
-          beatmapId: score[one].beatmap.id,
-          mods: modsone,
-          fix: true,
-        })
-        const sr1 = result1.difficulty.starRating.toFixed(2)
+        grade = grades[grade];
+
+        if (!fs.existsSync(`./osuFiles/${score[one].beatmap.id}.osu`)) {
+          console.log("no file.")
+          const downloader = new Downloader({
+            rootPath: './osuFiles',
+
+            filesPerSecond: 0,
+          });
+
+          downloader.addSingleEntry(score[one].beatmap.id)
+          await downloader.downloadSingle()
+        }
+
+
+
+        let modsone = score[one].mods.join("")
+        let modsID = mods.id(modsone)
+        if (!modsone.length) {
+          modsone = "NM"
+          modsID = 0
+        }
+
+        let scoreParam = {
+          mode: RuleSetId,
+          mods: modsID,
+        }
+
+        let map = new Beatmap({ path: `./osuFiles/${score[one].beatmap.id}.osu` })
+        let calc = new Calculator(scoreParam)
+
+        //normal pp
+        let CurAttrs = calc.performance(map)
+
+
+        const sr1 = CurAttrs.difficulty.stars.toFixed(2)
         time1 = new Date(score[one].created_at).getTime() / 1000
 
 
-        scoreone = `**${Play_rank1}.** [**${score[one].beatmapset.title} [${score[one].beatmap.version}]**](https://osu.ppy.sh/b/${score[one].beatmap.id}) **+${modsone}** [${sr1}★]\n${grade} ▹ **${score[one].pp.toFixed(2)}PP** ▹ (${Number(score[one].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[one].max_combo)}x**/${result1.scoreInfo.maxCombo}x]\n${score[one].score.toLocaleString()} ▹ [**${score[one].statistics.count_300}**/${score[one].statistics.count_100}/${score[one].statistics.count_50}/${score[one].statistics.count_miss}] <t:${time1}:R>\n`
+        scoreone = `**${Play_rank1}.** [**${score[one].beatmapset.title} [${score[one].beatmap.version}]**](https://osu.ppy.sh/b/${score[one].beatmap.id}) **+${modsone}** [${sr1}★]\n${grade} ▹ **${score[one].pp.toFixed(2)}PP** ▹ (${Number(score[one].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[one].max_combo)}x**/${CurAttrs.difficulty.maxCombo}x]\n${score[one].score.toLocaleString()} ▹ [**${score[one].statistics.count_300}**/${score[one].statistics.count_100}/${score[one].statistics.count_50}/${score[one].statistics.count_miss}] <t:${time1}:R>\n`
       }
 
       if (score[two]) {
         const Play_rank2 = scores.findIndex(play => play.id === score[two].id) + 1;
-        let modstwo = score[two].mods.join("");
-        if (!modstwo.length) {
-          modstwo = "NM";
-        }
+
         let gradetwo = score[two].rank;
-        gradetwo = grades[gradetwo]
-        const result2 = await scoreCalculator.calculate({
-          beatmapId: score[two].beatmap.id,
-          mods: modstwo,
-          fix: true,
-        })
-        const sr2 = result2.difficulty.starRating.toFixed(2)
+        gradetwo = grades[gradetwo];
+
+        if (!fs.existsSync(`./osuFiles/${score[two].beatmap.id}.osu`)) {
+          console.log("no file.")
+          const downloader = new Downloader({
+            rootPath: './osuFiles',
+
+            filesPerSecond: 0,
+          });
+
+          downloader.addSingleEntry(score[two].beatmap.id)
+          await downloader.downloadSingle()
+        }
+
+
+
+        let modsone = score[two].mods.join("")
+        let modsID = mods.id(modsone)
+        if (!modsone.length) {
+          modsone = "NM"
+          modsID = 0
+        }
+
+        let scoreParam = {
+          mode: RuleSetId,
+          mods: modsID,
+        }
+
+        let map = new Beatmap({ path: `./osuFiles/${score[two].beatmap.id}.osu` })
+        let calc = new Calculator(scoreParam)
+
+        //normal pp
+        let CurAttrs = calc.performance(map)
+
+        const sr2 = CurAttrs.difficulty.stars.toFixed(2)
         time2 = new Date(score[two].created_at).getTime() / 1000
 
-        scoretwo = `**${Play_rank2}.** [**${score[two].beatmapset.title} [${score[two].beatmap.version}]**](https://osu.ppy.sh/b/${score[two].beatmap.id}) **+${modstwo}** [${sr2}★]\n${gradetwo} ▹ **${score[two].pp.toFixed(2)}PP** ▹ (${Number(score[two].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[two].max_combo)}x**/${result2.scoreInfo.maxCombo}x]\n${score[two].score.toLocaleString()} ▹ [**${score[two].statistics.count_300}**/${score[two].statistics.count_100}/${score[two].statistics.count_50}/${score[two].statistics.count_miss}] <t:${time2}:R>\n`
+        scoretwo = `**${Play_rank2}.** [**${score[two].beatmapset.title} [${score[two].beatmap.version}]**](https://osu.ppy.sh/b/${score[two].beatmap.id}) **+${modsone}** [${sr2}★]\n${gradetwo} ▹ **${score[two].pp.toFixed(2)}PP** ▹ (${Number(score[two].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[two].max_combo)}x**/${CurAttrs.difficulty.maxCombo}x]\n${score[two].score.toLocaleString()} ▹ [**${score[two].statistics.count_300}**/${score[two].statistics.count_100}/${score[two].statistics.count_50}/${score[two].statistics.count_miss}] <t:${time2}:R>\n`
       }
 
       if (score[three]) {
         const Play_rank3 = scores.findIndex(play => play.id === score[three].id) + 1;
-        let modsthree = score[three].mods.join("");
-        if (!modsthree.length) {
-          modsthree = "NM";
-        }
+
         let gradethree = score[three].rank;
-        gradethree = grades[gradethree]
-        const result3 = await scoreCalculator.calculate({
-          beatmapId: score[three].beatmap.id,
-          mods: modsthree,
-          fix: true,
-        })
-        const sr3 = result3.difficulty.starRating.toFixed(2)
+        gradethree = grades[gradethree];
+
+        if (!fs.existsSync(`./osuFiles/${score[three].beatmap.id}.osu`)) {
+          console.log("no file.")
+          const downloader = new Downloader({
+            rootPath: './osuFiles',
+
+            filesPerSecond: 0,
+          });
+
+          downloader.addSingleEntry(score[three].beatmap.id)
+          await downloader.downloadSingle()
+        }
+
+
+
+        let modsone = score[three].mods.join("")
+        let modsID = mods.id(modsone)
+        if (!modsone.length) {
+          modsone = "NM"
+          modsID = 0
+        }
+
+        let scoreParam = {
+          mode: RuleSetId,
+          mods: modsID,
+        }
+
+        let map = new Beatmap({ path: `./osuFiles/${score[three].beatmap.id}.osu` })
+        let calc = new Calculator(scoreParam)
+
+        //normal pp
+        let CurAttrs = calc.performance(map)
+
+        const sr3 = CurAttrs.difficulty.stars.toFixed(2)
         time3 = new Date(score[three].created_at).getTime() / 1000
 
-        scorethree = `**${Play_rank3}.** [**${score[three].beatmapset.title} [${score[three].beatmap.version}]**](https://osu.ppy.sh/b/${score[three].beatmap.id}) **+${modsthree}** [${sr3}★]\n${gradethree} ▹ **${score[three].pp.toFixed(2)}PP** ▹ (${Number(score[three].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[three].max_combo)}x**/${result3.scoreInfo.maxCombo}x]\n${score[three].score.toLocaleString()} ▹ [**${score[three].statistics.count_300}**/${score[three].statistics.count_100}/${score[three].statistics.count_50}/${score[three].statistics.count_miss}] <t:${time3}:R>\n`
+        scorethree = `**${Play_rank3}.** [**${score[three].beatmapset.title} [${score[three].beatmap.version}]**](https://osu.ppy.sh/b/${score[three].beatmap.id}) **+${modsone}** [${sr3}★]\n${gradethree} ▹ **${score[three].pp.toFixed(2)}PP** ▹ (${Number(score[three].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[three].max_combo)}x**/${CurAttrs.difficulty.maxCombo}x]\n${score[three].score.toLocaleString()} ▹ [**${score[three].statistics.count_300}**/${score[three].statistics.count_100}/${score[three].statistics.count_50}/${score[three].statistics.count_miss}] <t:${time3}:R>\n`
       }
 
       if (score[four]) {
         const Play_rank4 = scores.findIndex(play => play.id === score[four].id) + 1;
-        let modsfour = score[four].mods.join("");
-        if (!modsfour.length) {
-          modsfour = "NM";
-        }
 
         let gradefour = score[four].rank;
-        gradefour = grades[gradefour]
-        const result4 = await scoreCalculator.calculate({
-          beatmapId: score[four].beatmap.id,
-          mods: modsfour,
-          fix: true,
-        })
-        const sr4 = result4.difficulty.starRating.toFixed(2)
+        gradefour = grades[gradefour];
+
+        if (!fs.existsSync(`./osuFiles/${score[four].beatmap.id}.osu`)) {
+          console.log("no file.")
+          const downloader = new Downloader({
+            rootPath: './osuFiles',
+
+            filesPerSecond: 0,
+          });
+
+          downloader.addSingleEntry(score[four].beatmap.id)
+          await downloader.downloadSingle()
+        }
+
+
+
+        let modsone = score[four].mods.join("")
+        let modsID = mods.id(modsone)
+        if (!modsone.length) {
+          modsone = "NM"
+          modsID = 0
+        }
+
+        let scoreParam = {
+          mode: RuleSetId,
+          mods: modsID,
+        }
+
+        let map = new Beatmap({ path: `./osuFiles/${score[four].beatmap.id}.osu` })
+        let calc = new Calculator(scoreParam)
+
+        //normal pp
+        let CurAttrs = calc.performance(map)
+
+        const sr4 = CurAttrs.difficulty.stars.toFixed(2)
         time4 = new Date(score[four].created_at).getTime() / 1000
 
-        scorefour = `**${Play_rank4}.** [**${score[four].beatmapset.title} [${score[four].beatmap.version}]**](https://osu.ppy.sh/b/${score[four].beatmap.id}) **+${modsfour}** [${sr4}★]\n${gradefour} ▹ **${score[four].pp.toFixed(2)}PP** ▹ (${Number(score[four].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[four].max_combo)}x**/${result4.scoreInfo.maxCombo}x]\n${score[four].score.toLocaleString()} ▹ [**${score[four].statistics.count_300}**/${score[four].statistics.count_100}/${score[four].statistics.count_50}/${score[four].statistics.count_miss}] <t:${time4}:R>\n`
+        scorefour = `**${Play_rank4}.** [**${score[four].beatmapset.title} [${score[four].beatmap.version}]**](https://osu.ppy.sh/b/${score[four].beatmap.id}) **+${modsone}** [${sr4}★]\n${gradefour} ▹ **${score[four].pp.toFixed(2)}PP** ▹ (${Number(score[four].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[four].max_combo)}x**/${CurAttrs.difficulty.maxCombo}x]\n${score[four].score.toLocaleString()} ▹ [**${score[four].statistics.count_300}**/${score[four].statistics.count_100}/${score[four].statistics.count_50}/${score[four].statistics.count_miss}] <t:${time4}:R>\n`
       }
 
       if (score[five]) {
         const Play_rank5 = scores.findIndex(play => play.id === score[five].id) + 1;
-        let modsfive = score[five].mods.join("");
-        if (!modsfive.length) {
-          modsfive = "NM";
-        }
+
         let gradefive = score[five].rank;
-        gradefive = grades[gradefive]
-        const result5 = await scoreCalculator.calculate({
-          beatmapId: score[five].beatmap.id,
-          mods: modsfive,
-          fix: true,
-        })
-        const sr5 = result5.difficulty.starRating.toFixed(2)
+        gradefive = grades[gradefive];
+
+        if (!fs.existsSync(`./osuFiles/${score[five].beatmap.id}.osu`)) {
+          console.log("no file.")
+          const downloader = new Downloader({
+            rootPath: './osuFiles',
+
+            filesPerSecond: 0,
+          });
+
+          downloader.addSingleEntry(score[five].beatmap.id)
+          await downloader.downloadSingle()
+        }
+
+
+
+        let modsone = score[five].mods.join("")
+        let modsID = mods.id(modsone)
+        if (!modsone.length) {
+          modsone = "NM"
+          modsID = 0
+        }
+
+        let scoreParam = {
+          mode: RuleSetId,
+          mods: modsID,
+        }
+
+        let map = new Beatmap({ path: `./osuFiles/${score[five].beatmap.id}.osu` })
+        let calc = new Calculator(scoreParam)
+
+        //normal pp
+        let CurAttrs = calc.performance(map)
+
+        const sr5 = CurAttrs.difficulty.stars.toFixed(2)
 
         time5 = new Date(score[five].created_at).getTime() / 1000
 
-        scorefive = `**${Play_rank5}.** [**${score[five].beatmapset.title} [${score[five].beatmap.version}]**](https://osu.ppy.sh/b/${score[five].beatmap.id}) **+${modsfive}** [${sr5}★]\n${gradefive} ▹ **${score[five].pp.toFixed(2)}PP** ▹ (${Number(score[five].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[five].max_combo)}x**/${result5.scoreInfo.maxCombo}x]\n${score[five].score.toLocaleString()} ▹ [**${score[five].statistics.count_300}**/${score[five].statistics.count_100}/${score[five].statistics.count_50}/${score[five].statistics.count_miss}] <t:${time5}:R>`
+        scorefive = `**${Play_rank5}.** [**${score[five].beatmapset.title} [${score[five].beatmap.version}]**](https://osu.ppy.sh/b/${score[five].beatmap.id}) **+${modsone}** [${sr5}★]\n${gradefive} ▹ **${score[five].pp.toFixed(2)}PP** ▹ (${Number(score[five].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[five].max_combo)}x**/${CurAttrs.difficulty.maxCombo}x]\n${score[five].score.toLocaleString()} ▹ [**${score[five].statistics.count_300}**/${score[five].statistics.count_100}/${score[five].statistics.count_50}/${score[five].statistics.count_miss}] <t:${time5}:R>`
       }
 
 
