@@ -250,6 +250,9 @@ exports.run = async (client, message, args, prefix) => {
         try {
           if (i.user.id != message.author.id) {
           } else {
+            userargs = ''
+            userargs = userData[message.author.id].temp_osu
+
             if (i.customId == "more") {
               const user = await v2.user.details(userargs, mode)
               const tops = await v2.user.scores.category(user.id, "best", {

@@ -173,28 +173,28 @@ exports.run = async (client, message, args, prefix) => {
       const playstyle1 =
         first.charAt(0).toUpperCase() + first.slice(1).toLowerCase()
       playstyles += `${playstyle1} `
-    } catch (err) {}
+    } catch (err) { }
 
     try {
       const second = user.playstyle[1]
       const playstyle2 =
         second.charAt(0).toUpperCase() + second.slice(1).toLowerCase()
       playstyles += `${playstyle2} `
-    } catch (err) {}
+    } catch (err) { }
 
     try {
       const third = user.playstyle[2]
       const playstyle3 =
         third.charAt(0).toUpperCase() + third.slice(1).toLowerCase()
       playstyles += `${playstyle3} `
-    } catch (err) {}
+    } catch (err) { }
 
     try {
       const fourth = user.playstyle[3]
       const playstyle4 =
         fourth.charAt(0).toUpperCase() + fourth.slice(1).toLowerCase()
       playstyles += `${playstyle4} `
-    } catch (err) {}
+    } catch (err) { }
 
     if (playstyles.length === 0) {
       playstyles = "NaN"
@@ -229,19 +229,16 @@ exports.run = async (client, message, args, prefix) => {
       })
       .setThumbnail(user.avatar_url)
       .setDescription(
-        `**Accuracy:** \`${acc}%\` •  **Level:** \`${
-          user.statistics.level.current
-        }.${lvlprogress}\`\n**Peak Rank:** \`#${user.rank_highest.rank.toLocaleString()}\` • **Achieved:** <t:${time}:R>\n**Playcount:** \`${playcount}\` (\`${playhours.toFixed()} hrs\`)\n**Medals:** \`${medal_count}\` (\`${medal_percentage}%\`) •  **Followers:** \`${followers}\`\n**Max Combo:** \`${profile_maxcombo}\` •  **Replays Watched:** \`${replays_watched}\`\n**PP Spread:** \`${pp_spread_num}\` •  **HPP**: \`${hpp_count}\`\n**Plays With:** \`${playstyles}\`\n**Ranks:** ${
-          grades.XH
-        }\`${ssh}\`${grades.X}\`${ss}\`${grades.SH}\`${sh}\`${
-          grades.S
+        `**Accuracy:** \`${acc}%\` •  **Level:** \`${user.statistics.level.current
+        }.${lvlprogress}\`\n**Peak Rank:** \`#${user.rank_highest.rank.toLocaleString()}\` • **Achieved:** <t:${time}:R>\n**Playcount:** \`${playcount}\` (\`${playhours.toFixed()} hrs\`)\n**Medals:** \`${medal_count}\` (\`${medal_percentage}%\`) •  **Followers:** \`${followers}\`\n**Max Combo:** \`${profile_maxcombo}\` •  **Replays Watched:** \`${replays_watched}\`\n**PP Spread:** \`${pp_spread_num}\` •  **HPP**: \`${hpp_count}\`\n**Plays With:** \`${playstyles}\`\n**Ranks:** ${grades.XH
+        }\`${ssh}\`${grades.X}\`${ss}\`${grades.SH}\`${sh}\`${grades.S
         }\`${s}\`${grades.A}\`${a}\``
       )
       .setImage(user.cover_url)
       .setFooter({
         text: `Joined osu! ${formattedDate} (${user_joined_ago} years ago)`,
       })
-    message.channel.send({embeds: [embed], components: [button]})
+    message.channel.send({ embeds: [embed], components: [button] })
 
     const collector = message.channel.createMessageComponentCollector({
       time: 1000 * 30,
@@ -252,6 +249,9 @@ exports.run = async (client, message, args, prefix) => {
         try {
           if (i.user.id != message.author.id) {
           } else {
+            userargs = ''
+            userargs = userData[message.author.id].temp_osu
+
             if (i.customId == "more") {
               const user = await v2.user.details(userargs, mode)
               const tops = await v2.user.scores.category(user.id, "best", {
@@ -338,28 +338,28 @@ exports.run = async (client, message, args, prefix) => {
                 const playstyle1 =
                   first.charAt(0).toUpperCase() + first.slice(1).toLowerCase()
                 playstyles += `${playstyle1} `
-              } catch (err) {}
+              } catch (err) { }
 
               try {
                 const second = user.playstyle[1]
                 const playstyle2 =
                   second.charAt(0).toUpperCase() + second.slice(1).toLowerCase()
                 playstyles += `${playstyle2} `
-              } catch (err) {}
+              } catch (err) { }
 
               try {
                 const third = user.playstyle[2]
                 const playstyle3 =
                   third.charAt(0).toUpperCase() + third.slice(1).toLowerCase()
                 playstyles += `${playstyle3} `
-              } catch (err) {}
+              } catch (err) { }
 
               try {
                 const fourth = user.playstyle[3]
                 const playstyle4 =
                   fourth.charAt(0).toUpperCase() + fourth.slice(1).toLowerCase()
                 playstyles += `${playstyle4} `
-              } catch (err) {}
+              } catch (err) { }
 
               if (playstyles.length === 0) {
                 playstyles = "NaN"
@@ -380,15 +380,14 @@ exports.run = async (client, message, args, prefix) => {
                 })
                 .setThumbnail(user.avatar_url)
                 .setDescription(
-                  `safdg;lkal;asg' l ${userData[message.author.id].temp_osu} ${
-                    user.username
+                  `safdg;lkal;asg' l ${userData[message.author.id].temp_osu} ${user.username
                   }`
                 )
                 .setImage(user.cover_url)
                 .setFooter({
                   text: `Joined osu! ${formattedDate} (${user_joined_ago} years ago)`,
                 })
-              await i.update({embeds: [embed2dg], components: [button2]})
+              await i.update({ embeds: [embed2dg], components: [button2] })
             }
 
             if (i.customId == "less") {
@@ -478,28 +477,28 @@ exports.run = async (client, message, args, prefix) => {
                 const playstyle1 =
                   first.charAt(0).toUpperCase() + first.slice(1).toLowerCase()
                 playstyles += `${playstyle1} `
-              } catch (err) {}
+              } catch (err) { }
 
               try {
                 const second = user.playstyle[1]
                 const playstyle2 =
                   second.charAt(0).toUpperCase() + second.slice(1).toLowerCase()
                 playstyles += `${playstyle2} `
-              } catch (err) {}
+              } catch (err) { }
 
               try {
                 const third = user.playstyle[2]
                 const playstyle3 =
                   third.charAt(0).toUpperCase() + third.slice(1).toLowerCase()
                 playstyles += `${playstyle3} `
-              } catch (err) {}
+              } catch (err) { }
 
               try {
                 const fourth = user.playstyle[3]
                 const playstyle4 =
                   fourth.charAt(0).toUpperCase() + fourth.slice(1).toLowerCase()
                 playstyles += `${playstyle4} `
-              } catch (err) {}
+              } catch (err) { }
 
               if (playstyles.length === 0) {
                 playstyles = "NaN"
@@ -519,26 +518,23 @@ exports.run = async (client, message, args, prefix) => {
                 })
                 .setThumbnail(user.avatar_url)
                 .setDescription(
-                  `**Accuracy:** \`${acc}%\` •  **Level:** \`${
-                    user.statistics.level.current
-                  }.${lvlprogress}\`\n**Peak Rank:** \`#${user.rank_highest.rank.toLocaleString()}\` • **Achieved:** <t:${time}:R>\n**Playcount:** \`${playcount}\` (\`${playhours.toFixed()} hrs\`)\n**Medals:** \`${medal_count}\` (\`${medal_percentage}%\`) •  **Followers:** \`${followers}\`\n**Max Combo:** \`${profile_maxcombo}\` •  **Replays Watched:** \`${replays_watched}\`\n**PP Spread:** \`${pp_spread_num}\` •  **HPP**: \`${hpp_count}\`\n**Plays With:** \`${playstyles}\`\n**Ranks:** ${
-                    grades.XH
-                  }\`${ssh}\`${grades.X}\`${ss}\`${grades.SH}\`${sh}\`${
-                    grades.S
+                  `**Accuracy:** \`${acc}%\` •  **Level:** \`${user.statistics.level.current
+                  }.${lvlprogress}\`\n**Peak Rank:** \`#${user.rank_highest.rank.toLocaleString()}\` • **Achieved:** <t:${time}:R>\n**Playcount:** \`${playcount}\` (\`${playhours.toFixed()} hrs\`)\n**Medals:** \`${medal_count}\` (\`${medal_percentage}%\`) •  **Followers:** \`${followers}\`\n**Max Combo:** \`${profile_maxcombo}\` •  **Replays Watched:** \`${replays_watched}\`\n**PP Spread:** \`${pp_spread_num}\` •  **HPP**: \`${hpp_count}\`\n**Plays With:** \`${playstyles}\`\n**Ranks:** ${grades.XH
+                  }\`${ssh}\`${grades.X}\`${ss}\`${grades.SH}\`${sh}\`${grades.S
                   }\`${s}\`${grades.A}\`${a}\``
                 )
                 .setImage(user.cover_url)
                 .setFooter({
                   text: `Joined osu! ${formattedDate} (${user_joined_ago} years ago)`,
                 })
-              await i.update({embeds: [embedf], components: [button]})
+              await i.update({ embeds: [embedf], components: [button] })
             }
           }
         } catch (err) {
           console.log(err)
         }
       })
-    } catch (err) {}
+    } catch (err) { }
   })
 }
 exports.name = "ctb";
