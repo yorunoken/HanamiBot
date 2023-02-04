@@ -29,6 +29,14 @@ exports.run = async (client, message, args, prefix) => {
       //log into api
       await auth.login(process.env.client_id, process.env.client_secret);
       const user = await v2.user.details(userargs, "osu");
+
+      try {
+        if (user.id == undefined) throw new Error("The user doesn't exist")
+      } catch (err) {
+        message.reply(`**The user, \`${userargs}\`, doesn't exist**`)
+        return
+      }
+
       try {
         //set country code to lowercase
         let countrycode = user.country_code.toLowerCase();
