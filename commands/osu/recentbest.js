@@ -83,16 +83,17 @@ module.exports.run = async (client, message, args, prefix) => {
           RuleSetId = 2
         }
 
-
-
-        if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-l") || args.join(" ").startsWith("-list")) {
-          userargs = userData[message.author.id].osuUsername
-        }
-
-        if (args.join(" ").startsWith("-i")) {
-          userargs = userData[message.author.id].osuUsername
-        }
       }
+    }
+
+    let argValues = {};
+    for (const arg of args) {
+      const [key, value] = arg.split("=");
+      argValues[key] = value;
+    }
+
+    if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-l") || args.join(" ").startsWith("-list") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("+") || args.join(" ").startsWith("mods")) {
+      userargs = userData[message.author.id].osuUsername
     }
 
 
@@ -111,6 +112,18 @@ module.exports.run = async (client, message, args, prefix) => {
       message.reply(`**The user \`${userargs}\` doesn't exist**`)
       return;
     }
+
+    if (args.join(" ").includes("+")) {
+      const iIndex = args.indexOf("+")
+      modsArg = (args[iIndex + 1].slice(1)).toUpperCase().match(/[A-Z]{2}/g)
+      argValues['mods'] = modsArg.join("")
+    }
+
+
+
+    let filteredscore
+    let FilterMods = ""
+    sortmod = 0
 
 
     if (args.includes("-l") || args.includes("-list")) {
@@ -158,7 +171,7 @@ module.exports.run = async (client, message, args, prefix) => {
       five = numbers[4] - 1;
 
       //score set
-      const score = await v2.user.scores.category(user.id, 'best', {
+      let score = await v2.user.scores.category(user.id, 'best', {
         mode: mode,
         limit: "100",
         offset: "0",
@@ -173,6 +186,16 @@ module.exports.run = async (client, message, args, prefix) => {
 
       const scores = [...score]
       scores.sort((a, b) => b.weight.percentage - a.weight.percentage)
+
+
+
+
+      if (argValues["mods"] != undefined) {
+        sortmod = 1
+        filteredscore = score.filter(x => x.mods.join("").split("").sort().join("").toLowerCase() == argValues["mods"].split("").sort().join("").toLowerCase())
+        score = filteredscore
+        FilterMods = `**Filtering mod(s): ${score[value].mods.join("").toUpperCase()}**`
+      }
 
 
 
@@ -442,9 +465,7 @@ module.exports.run = async (client, message, args, prefix) => {
       }
 
 
-      //score rows
-
-
+      const pageTotal = Math.ceil(score.length / 5)
 
 
 
@@ -459,9 +480,9 @@ module.exports.run = async (client, message, args, prefix) => {
         })
         .setThumbnail(user.avatar_url)
         .setDescription(`${scoreone}${scoretwo}${scorethree}${scorefour}${scorefive}`)
-      // .setFooter({ text: `Page ${pageNumber}` });
+        .setFooter({ text: `Page ${pageNumber}/${pageTotal}` });
 
-      message.channel.send({ embeds: [embed] });
+      message.channel.send({ content: FilterMods, embeds: [embed] });
 
       console.log(value, userargs)
 
@@ -479,7 +500,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
 
       //score set
-      const score = await v2.user.scores.category(user.id, "best", {
+      let score = await v2.user.scores.category(user.id, "best", {
         mode: mode,
         limit: "100",
         offset: "0",
@@ -495,6 +516,14 @@ module.exports.run = async (client, message, args, prefix) => {
       const scores = [...score]
       scores.sort((a, b) => b.weight.percentage - a.weight.percentage)
       const Play_rank = scores.findIndex(play => play.id === score[value].id) + 1;
+
+
+      if (argValues["mods"] != undefined) {
+        sortmod = 1
+        filteredscore = score.filter(x => x.mods.join("").split("").sort().join("").toLowerCase() == argValues["mods"].split("").sort().join("").toLowerCase())
+        score = filteredscore
+        FilterMods = `**Filtering mod(s): ${score[value].mods.join("").toUpperCase()}**`
+      }
 
 
       if (!fs.existsSync(`./osuFiles/${score[value].beatmap.id}.osu`)) {
@@ -674,7 +703,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
 
       //send embed
-      message.channel.send({ embeds: [embed], });
+      message.channel.send({ content: FilterMods, embeds: [embed], });
     } catch (err) {
       console.error(err);
       message.channel.send(
