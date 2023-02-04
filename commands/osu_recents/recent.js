@@ -133,6 +133,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
         let filteredscore
         let FilterMods = ""
+        sortmod = 0
 
         if (argValues["mods"] != undefined) {
           sortmod = 1
@@ -140,7 +141,6 @@ module.exports.run = async (client, message, args, prefix) => {
           score = filteredscore
           FilterMods = `**Filtering mod(s): ${score[value].mods.join("").toUpperCase()}**`
         }
-        sortmod = 0
 
 
         if (!fs.existsSync(`./osuFiles/${score[value].beatmap.id}.osu`)) {

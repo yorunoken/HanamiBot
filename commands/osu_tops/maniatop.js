@@ -97,6 +97,29 @@ exports.run = async (client, message, args, prefix) => {
       }
 
 
+      if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
+        userargs = userData[message.author.id].osuUsername
+      }
+
+
+
+      let argValues = {};
+      for (const arg of args) {
+        const [key, value] = arg.split("=");
+        argValues[key] = value;
+      }
+
+      if (args.join(" ").includes("+")) {
+        const iIndex = args.indexOf("+")
+        modsArg = (args[iIndex + 1].slice(1)).toUpperCase().match(/[A-Z]{2}/g)
+        argValues['mods'] = modsArg.join("")
+      }
+
+      let filteredscore
+      let FilterMods = ""
+      sortmod = 0
+
+
 
       //log into api
       await auth.login(process.env.client_id, process.env.client_secret);
@@ -112,17 +135,23 @@ exports.run = async (client, message, args, prefix) => {
         user = await v2.user.details(userargs, ModeOsu)
 
 
-        
+
 
         //score set
-        const score = await v2.user.scores.category(user.id, "best", {
+        let score = await v2.user.scores.category(user.id, "best", {
           include_fails: "0",
           mode: ModeOsu,
           limit: "100",
           offset: "0",
         });
 
-        
+        if (argValues["mods"] != undefined) {
+          sortmod = 1
+          filteredscore = score.filter(x => x.mods.join("").split("").sort().join("").toLowerCase() == argValues["mods"].split("").sort().join("").toLowerCase())
+          score = filteredscore
+          FilterMods = `**Filtering mod(s): ${score[value].mods.join("").toUpperCase()}**`
+        }
+
 
         //formatted values for user
         try {
@@ -142,14 +171,14 @@ exports.run = async (client, message, args, prefix) => {
         let miss = Number(score[playNumber - 1].statistics.count_miss);
 
         //rosu pp setup
-        if(!fs.existsSync(`./osuFiles/${score[playNumber - 1].beatmap.id}.osu`)){
+        if (!fs.existsSync(`./osuFiles/${score[playNumber - 1].beatmap.id}.osu`)) {
           console.log("no file.")
           const downloader = new Downloader({
             rootPath: './osuFiles',
-    
+
             filesPerSecond: 0,
           });
-    
+
           downloader.addSingleEntry(score[playNumber - 1].beatmap.id)
           await downloader.downloadSingle()
         }
@@ -221,6 +250,8 @@ exports.run = async (client, message, args, prefix) => {
         let grade = score[playNumber - 1].rank;
         grade = grades[grade];
 
+        let objects = score[playNumber - 1].beatmap.count_circles + score[playNumber - 1].beatmap.count_sliders + score[playNumber - 1].beatmap.count_spinners
+
         //set title
         let title = `${score[playNumber - 1].beatmapset.artist} - ${score[playNumber - 1].beatmapset.title} [${score[playNumber - 1].beatmap.version}] [${CurAttrs.difficulty.stars.toFixed(2)}★]`;
 
@@ -234,7 +265,7 @@ exports.run = async (client, message, args, prefix) => {
             "katu": score[playNumber - 1].statistics.count_katu,
             "50": score[playNumber - 1].statistics.count_50,
             "0": 0,
-            mode: "osu"
+            mode: ModeOsu
           })
           console.log(FcAcc)
 
@@ -264,7 +295,7 @@ exports.run = async (client, message, args, prefix) => {
         } else if (score[playNumber - 1].passed == false) {
           sc_rank = " "
         }
-        let objects = score[playNumber - 1].beatmap.count_circles + score[playNumber - 1].beatmap.count_sliders + score[playNumber - 1].beatmap.count_spinners
+
         let status = score[playNumber - 1].beatmapset.status.charAt(0).toUpperCase() + score[playNumber - 1].beatmapset.status.slice(1)
 
         console.log(mapValues)
@@ -280,7 +311,7 @@ exports.run = async (client, message, args, prefix) => {
           .setTitle(title)
           .setURL(`https://osu.ppy.sh/b/${beatmap_id}`)
           .setDescription(`__**Personal Best #${playNumber}:**__\n${grade} ** +${modsone}** • ${map_score} • **(${acc
-            }%) ${sc_rank}**\n**${pps} \n[**${score[playNumber - 1].max_combo}**x/${CurAttrs.difficulty.maxCombo}x] • {**${three}**/${one}/${fifty}/${miss
+            }%) ${sc_rank}**\n${pps} \n[**${score[playNumber - 1].max_combo}**x/${CurAttrs.difficulty.maxCombo}x] • {**${three}**/${one}/${fifty}/${miss
             }}\nScore Set <t:${time1}:R>`)
           .setFields({ name: `**Beatmap info:**`, value: `BPM: \`${mapValues.bpm.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${mapValues.ar.toFixed(1).toString().replace(/\.0+$/, "")}\` OD: \`${mapValues.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\`` })
           .setThumbnail(`https://assets.ppy.sh/beatmaps/${score[playNumber - 1].beatmapset.id}/covers/list.jpg`)
@@ -288,9 +319,7 @@ exports.run = async (client, message, args, prefix) => {
 
 
         //send embed
-        message.channel.send({
-          embeds: [embed],
-        });
+        message.channel.send({ content: FilterMods, embeds: [embed] });
 
       } else {
         try {
@@ -319,15 +348,18 @@ exports.run = async (client, message, args, prefix) => {
           user = await v2.user.details(userargs, ModeOsu);
 
           //score set
-          const score = await v2.user.scores.category(user.id, 'best', {
+          let score = await v2.user.scores.category(user.id, 'best', {
             mode: ModeOsu,
             limit: "100",
             offset: "0",
           });
 
-
-          //beatmap
-
+          if (argValues["mods"] != undefined) {
+            sortmod = 1
+            filteredscore = score.filter(x => x.mods.join("").split("").sort().join("").toLowerCase() == argValues["mods"].split("").sort().join("").toLowerCase())
+            score = filteredscore
+            FilterMods = `**Filtering mod(s): ${score[value].mods.join("").toUpperCase()}**`
+          }
 
           //formatted values for user
           try {
@@ -363,14 +395,14 @@ exports.run = async (client, message, args, prefix) => {
 
           if (score[one]) {
 
-            if(!fs.existsSync(`./osuFiles/${score[one].beatmap.id}.osu`)){
+            if (!fs.existsSync(`./osuFiles/${score[one].beatmap.id}.osu`)) {
               console.log("no file.")
               const downloader = new Downloader({
                 rootPath: './osuFiles',
-        
+
                 filesPerSecond: 0,
               });
-        
+
               downloader.addSingleEntry(score[one].beatmap.id)
               await downloader.downloadSingle()
             }
@@ -385,7 +417,7 @@ exports.run = async (client, message, args, prefix) => {
 
             let scoreParam = {
               mode: ModeID,
-              mods: modsID, 
+              mods: modsID,
             }
 
             let map = new Beatmap({ path: `./osuFiles/${score[one].beatmap.id}.osu` })
@@ -407,14 +439,14 @@ exports.run = async (client, message, args, prefix) => {
           }
 
           if (score[two]) {
-            if(!fs.existsSync(`./osuFiles/${score[two].beatmap.id}.osu`)){
+            if (!fs.existsSync(`./osuFiles/${score[two].beatmap.id}.osu`)) {
               console.log("no file.")
               const downloader = new Downloader({
                 rootPath: './osuFiles',
-        
+
                 filesPerSecond: 0,
               });
-        
+
               downloader.addSingleEntry(score[two].beatmap.id)
               await downloader.downloadSingle()
             }
@@ -447,14 +479,14 @@ exports.run = async (client, message, args, prefix) => {
           }
 
           if (score[three]) {
-            if(!fs.existsSync(`./osuFiles/${score[three].beatmap.id}.osu`)){
+            if (!fs.existsSync(`./osuFiles/${score[three].beatmap.id}.osu`)) {
               console.log("no file.")
               const downloader = new Downloader({
                 rootPath: './osuFiles',
-        
+
                 filesPerSecond: 0,
               });
-        
+
               downloader.addSingleEntry(score[three].beatmap.id)
               await downloader.downloadSingle()
             }
@@ -468,8 +500,8 @@ exports.run = async (client, message, args, prefix) => {
             }
 
             let scoreParam = {
-              mode: ModeID, 
-              mods: modsID, 
+              mode: ModeID,
+              mods: modsID,
             }
 
             let map = new Beatmap({ path: `./osuFiles/${score[three].beatmap.id}.osu` })
@@ -488,19 +520,19 @@ exports.run = async (client, message, args, prefix) => {
           }
 
           if (score[four]) {
-            if(!fs.existsSync(`./osuFiles/${score[four].beatmap.id}.osu`)){
+            if (!fs.existsSync(`./osuFiles/${score[four].beatmap.id}.osu`)) {
               console.log("no file.")
               const downloader = new Downloader({
                 rootPath: './osuFiles',
-        
+
                 filesPerSecond: 0,
               });
-        
+
               downloader.addSingleEntry(score[four].beatmap.id)
               await downloader.downloadSingle()
             }
 
-            
+
             let modsfour = score[four].mods.join("");
             let modsID = mods.id(modsfour)
 
@@ -511,8 +543,8 @@ exports.run = async (client, message, args, prefix) => {
             }
 
             let scoreParam = {
-              mode: ModeID, 
-              mods: modsID, 
+              mode: ModeID,
+              mods: modsID,
             }
 
             let map = new Beatmap({ path: `./osuFiles/${score[four].beatmap.id}.osu` })
@@ -531,14 +563,14 @@ exports.run = async (client, message, args, prefix) => {
           }
 
           if (score[five]) {
-            if(!fs.existsSync(`./osuFiles/${score[five].beatmap.id}.osu`)){
+            if (!fs.existsSync(`./osuFiles/${score[five].beatmap.id}.osu`)) {
               console.log("no file.")
               const downloader = new Downloader({
                 rootPath: './osuFiles',
-        
+
                 filesPerSecond: 0,
               });
-        
+
               downloader.addSingleEntry(score[five].beatmap.id)
               await downloader.downloadSingle()
             }
@@ -553,8 +585,8 @@ exports.run = async (client, message, args, prefix) => {
             }
 
             let scoreParam = {
-              mode: ModeID, 
-              mods: modsID, 
+              mode: ModeID,
+              mods: modsID,
             }
 
             let map = new Beatmap({ path: `./osuFiles/${score[five].beatmap.id}.osu` })
@@ -572,6 +604,8 @@ exports.run = async (client, message, args, prefix) => {
             scorefive = `**${five + 1}.** [**${score[five].beatmapset.title} [${score[five].beatmap.version}]**](https://osu.ppy.sh/b/${score[five].beatmap.id}) **+${modsfive}** [${sr5}★]\n${gradefive} ▹ **${score[five].pp.toFixed(2)}PP** ▹ (${Number(score[five].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[five].max_combo)}x**/${maxComboMap}x]\n${score[five].score.toLocaleString()} ▹ [**${score[five].statistics.count_300}**/${score[five].statistics.count_100}/${score[five].statistics.count_50}/${score[five].statistics.count_miss}] <t:${time5}:R>`
           }
 
+          const TotalPage = Math.ceil(score.length/5)
+
 
 
 
@@ -587,15 +621,17 @@ exports.run = async (client, message, args, prefix) => {
             })
             .setThumbnail(user.avatar_url)
             .setDescription(`${scoreone}${scoretwo}${scorethree}${scorefour}${scorefive}`)
-          // .setFooter({ text: `Page ${pageNumber}` });
+            .setFooter({ text: `Page ${pageNumber}/${TotalPage}` });
 
-          message.channel.send({ embeds: [embed] });
+          message.channel.send({ content: FilterMods, embeds: [embed] });
         } catch (err) {
           //catch errors
           console.error(err);
           message.reply(`The user ${userargs} doesn't exist`);
         }
       }
+
+
     }
   });
 };
