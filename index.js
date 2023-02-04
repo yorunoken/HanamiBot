@@ -66,15 +66,21 @@ client.on("ready", async () => {
     `Logged in as ${client.user.tag}, in ${client.guilds.cache.size} servers!`
   );
   console.log(`server list:`);
-  // ${owner.username}
-  client.guilds.cache.forEach((guild) => {
-    guild.fetchOwner().then(owner => {
-      console.log(`${guild.name} `);
-    });
-  });
 
 
 });
+
+client.on('guildCreate', (guild) => {
+  // const guilds = guild.channels.cache.map(g => g.channels.cache.find(c => c.type === "text" && c.permissionsFor(guild.members.me).has("SendMessage") ))
+  const guilds = guild.channels.cache.find(g => g.type === 0)
+  guilds.send(`Hello, I'm Mia and thank you for inviting me! I am an osu! bot created by yoru#9267. my default prefix is \`?\`. To start using the bot, you can set your osu! username by doing \`?osuset "your username"\`. to get a full list of all of the commands I have, please do \`?help\`, and to search for what specific commands do, do \`?search commandname\`. hope you enjoy! `)
+  console.log(guilds)
+
+  // const channel = client.channels.cache.find(channel => channel.type === "text" && channel.permissionsFor(guild.members.me).has("SendMessages"))
+  // console.log(channel)
+  // channel.send("hisfgfsd")
+
+})
 
 
 client.on("messageCreate", (message) => {
@@ -108,8 +114,3 @@ client.on("messageCreate", (message) => {
   }
 });
 client.login(process.env.TOKEN);
-(async () => {
-  await connect(MongoToken).catch(console.error)
-})()
-
-
