@@ -82,7 +82,9 @@ exports.run = async (client, message, args, prefix) => {
     if (
       args.join(" ").startsWith("-mania") ||
       args.join(" ").startsWith("-ctb") ||
-      args.join(" ").startsWith("-taiko")
+      args.join(" ").startsWith("-taiko") ||
+      args.join(" ").startsWith("-d") ||
+      args.join(" ").startsWith("-details")
     ) {
       try {
         userargs = userData[message.author.id].osuUsername
@@ -142,17 +144,8 @@ exports.run = async (client, message, args, prefix) => {
 
 
 
-    async function getUserFirstPage(userargs) {
-      const user = await v2.user.details(userargs, mode)
+    async function getUserFirstPage(user) {
 
-      console.log(userargs)
-
-      try {
-        if (user.id == undefined) throw new Error("The user doesn't exist")
-      } catch (err) {
-        message.reply(`**The user, \`${userargs}\`, doesn't exist**`)
-        return
-      }
 
       try {
         global_rank = user.statistics.global_rank.toLocaleString()
@@ -189,9 +182,6 @@ exports.run = async (client, message, args, prefix) => {
         XH: "<:XH_:1057763296717045891>",
       }
 
-      if (userargs.length === 0) {
-        userargs = userData[message.author.id].osuUsername
-      }
 
       //join date
       const dateString = user.join_date
@@ -241,19 +231,10 @@ exports.run = async (client, message, args, prefix) => {
 
     }
 
-    async function getUserSecondPage(userargs) {
-      const user = await v2.user.details(userargs, mode)
-
-
-      try {
-        if (user.id == undefined) throw new Error("The user doesn't exist")
-      } catch (err) {
-        message.reply(`**The user, \`${userargs}\`, doesn't exist**`)
-        return
-      }
+    async function getUserSecondPage(user) {
 
       const tops = await v2.user.scores.category(user.id, "best", {
-        mode: "osu",
+        mode: mode,
         limit: "100",
         offset: "0",
       })
@@ -345,7 +326,8 @@ exports.run = async (client, message, args, prefix) => {
 
       const number_1s = user.scores_first_count
 
-
+      const totalScore = user.statistics.total_score.toLocaleString()
+      const rankedScore = user.statistics.ranked_score.toLocaleString()
 
       //embed
       const embed = new EmbedBuilder()
@@ -356,7 +338,7 @@ exports.run = async (client, message, args, prefix) => {
           url: `https://osu.ppy.sh/users/${user.id}`,
         })
         .setThumbnail(user.avatar_url)
-        .setDescription(`**Hits per play:** \`${hpp_count}\` • **Medals:** \`${medal_count}/289\` (\`${medal_percentage}%\`)\n**Plays with:** \`${playstyles}\`\n**Replays watched:** \`${replays_watched}\` • **#1 Scores:** \`${number_1s}\`\n**Posts:** \`${posts}\` • **Comments:** \`${comments}\``)
+        .setDescription(`**Hits per play:** \`${hpp_count}\` • **Medals:** \`${medal_count}/289\` (\`${medal_percentage}%\`)\n**Replays watched:** \`${replays_watched}\` • **#1 Scores:** \`${number_1s}\`\n**Total score:** \`${totalScore}\`\n**Ranked Score:** \`${rankedScore}\`\n**Plays with:** \`${playstyles}\`\n**Posts:** \`${posts}\` • **Comments:** \`${comments}\``)
         .setImage(user.cover_url)
         .setFooter({
           text: `Joined osu! ${formattedDate} (${user_joined_ago} years ago)`,
@@ -366,15 +348,47 @@ exports.run = async (client, message, args, prefix) => {
 
     }
 
-    const UserData = await getUserFirstPage(userargs)
 
-    message.channel.send({ embeds: [UserData.data], components: [button] })
+
+    if (args.join(" ").includes("-d") || args.join(" ").includes("-details")) {
+
+      const user = await v2.user.details(userargs, mode)
+
+
+      try {
+        if (user.id == undefined) throw new Error("The user doesn't exist")
+      } catch (err) {
+        message.reply(`**The user \`${userargs}\` doesn't exist**`)
+        return
+      }
+
+      const UserData = await getUserSecondPage(user)
+
+      message.channel.send({ embeds: [UserData.data], components: [button2] })
+
+    } else {
+
+      const user = await v2.user.details(userargs, mode)
+
+      try {
+        if (user.id == undefined) throw new Error("The user doesn't exist")
+      } catch (err) {
+        message.reply(`**The user \`${userargs}\` doesn't exist**`)
+        return
+      }
+
+      const UserData = await getUserFirstPage(user)
+
+      message.channel.send({ embeds: [UserData.data], components: [button] })
+
+    }
+
 
 
 
 
     const collector = message.channel.createMessageComponentCollector({
-      time: 1000 * 30,
+      time: 1000 * 15,
     })
 
     try {
@@ -385,18 +399,42 @@ exports.run = async (client, message, args, prefix) => {
           } else if (i.user.id != message.author.id) {
 
           }
-          else {
+          else if (i.user.id === message.author.id) {
             userargs = ''
             userargs = userData[message.author.id].temp_osu
 
             if (i.customId == "more") {
-              const userData = await getUserSecondPage(userargs)
+
+              const user = await v2.user.details(userargs, mode)
+
+              try {
+                if (user.id == undefined) throw new Error("The user doesn't exist")
+              } catch (err) {
+                message.reply(`**The user \`${userargs}\` doesn't exist**`)
+                return
+              }
+
+              const userData = await getUserSecondPage(user)
               await i.update({ embeds: [userData.data], components: [button2] })
+
+
             }
 
             if (i.customId == "less") {
-              const userData = await getUserFirstPage(userargs)
+
+              const user = await v2.user.details(userargs, mode)
+
+              try {
+                if (user.id == undefined) throw new Error("The user doesn't exist")
+              } catch (err) {
+                message.reply(`**The user \`${userargs}\` doesn't exist**`)
+                return
+              }
+
+              const userData = await getUserFirstPage(user)
               await i.update({ embeds: [userData.data], components: [button] })
+
+
             }
           }
         } catch (err) {
@@ -408,8 +446,6 @@ exports.run = async (client, message, args, prefix) => {
 }
 exports.name = "osu"
 exports.aliases = ["osu", "o"]
-exports.description = [
-  "Displays the stats of a user\n\n**Parameters:**\n`username` get the stats from a username\n`-(gamemode)` get the stats of a particular gamemode",
-]
+exports.description = ["Displays the stats of a user\n\n**Parameters:**\n`username` get the stats from a username\n`-(gamemode)` get the stats of a particular gamemode",]
 exports.usage = [`osu JustinNF -taiko\nosu YoruNoKen -taiko\nosu mrekk`]
 exports.category = ["osu"]
