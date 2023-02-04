@@ -97,14 +97,13 @@ exports.run = async (client, message, args, prefix) => {
       let map = new Beatmap({ path: `./osuFiles/${beatmapId}.osu` })
 
       const mapinfo = await v2.beatmap.diff(beatmapId)
-      let maxAttrs
 
       const totalPageRaw = scores.scores.length / 5
       const totalPage = Math.ceil(totalPageRaw)
-      if(pagenum > totalPage){
+      if (pagenum > totalPage) {
         message.reply(`**Please provide a page value not greater than **\`${totalPage}\``)
         return;
-      }else{
+      } else {
         console.log("smaller")
       }
 
@@ -118,7 +117,7 @@ exports.run = async (client, message, args, prefix) => {
           Mods1 = ""
           modsID = 0
         }
-        
+
         // std
         if (scores.scores[one].statistics.great === undefined) scores.scores[one].statistics.great = 0
         if (scores.scores[one].statistics.ok === undefined) scores.scores[one].statistics.ok = 0
@@ -138,7 +137,7 @@ exports.run = async (client, message, args, prefix) => {
         let calc = new Calculator(scoreParam)
 
         // ss pp
-        maxAttrs = calc.performance(map)
+        const maxAttrs = calc.performance(map)
 
         //normal pp
         let CurAttrs = calc
@@ -177,7 +176,7 @@ exports.run = async (client, message, args, prefix) => {
           Mods2 = ""
           modsID = 0
         }
-        
+
         // std
         if (scores.scores[two].statistics.great === undefined) scores.scores[two].statistics.great = 0
         if (scores.scores[two].statistics.ok === undefined) scores.scores[two].statistics.ok = 0
@@ -195,6 +194,9 @@ exports.run = async (client, message, args, prefix) => {
         }
 
         let calc = new Calculator(scoreParam)
+
+        // ss pp
+        const maxAttrs = calc.performance(map)
 
         //normal pp
         let CurAttrs = calc
@@ -232,7 +234,7 @@ exports.run = async (client, message, args, prefix) => {
           Mods3 = ""
           modsID = 0
         }
-        
+
         // std
         if (scores.scores[three].statistics.great === undefined) scores.scores[three].statistics.great = 0
         if (scores.scores[three].statistics.ok === undefined) scores.scores[three].statistics.ok = 0
@@ -250,6 +252,9 @@ exports.run = async (client, message, args, prefix) => {
         }
 
         let calc = new Calculator(scoreParam)
+
+        // ss pp
+        const maxAttrs = calc.performance(map)
 
         //normal pp
         let CurAttrs = calc
@@ -287,7 +292,7 @@ exports.run = async (client, message, args, prefix) => {
           Mods4 = ""
           modsID = 0
         }
-        
+
         // std
         if (scores.scores[four].statistics.great === undefined) scores.scores[four].statistics.great = 0
         if (scores.scores[four].statistics.ok === undefined) scores.scores[four].statistics.ok = 0
@@ -305,6 +310,9 @@ exports.run = async (client, message, args, prefix) => {
         }
 
         let calc = new Calculator(scoreParam)
+
+        // ss pp
+        const maxAttrs = calc.performance(map)
 
         //normal pp
         let CurAttrs = calc
@@ -342,7 +350,7 @@ exports.run = async (client, message, args, prefix) => {
           Mods5 = ""
           modsID = 0
         }
-        
+
         // std
         if (scores.scores[five].statistics.great === undefined) scores.scores[five].statistics.great = 0
         if (scores.scores[five].statistics.ok === undefined) scores.scores[five].statistics.ok = 0
@@ -360,6 +368,9 @@ exports.run = async (client, message, args, prefix) => {
         }
 
         let calc = new Calculator(scoreParam)
+
+        // ss pp
+        const maxAttrs = calc.performance(map)
 
         //normal pp
         let CurAttrs = calc
@@ -400,7 +411,7 @@ exports.run = async (client, message, args, prefix) => {
         .setDescription(`${first_score}${second_score}${third_score}${fourth_score}${fifth_score}`)
         .setThumbnail(`https://osuflags.omkserver.nl/TR-256.png`)
         .setImage(`https://assets.ppy.sh/beatmaps/${mapinfo.beatmapset_id}/covers/cover.jpg`)
-        .setFooter({text: `Page: ${pagenum}/${totalPage}`})
+        .setFooter({ text: `Page: ${pagenum}/${totalPage}` })
       message.channel.send({ content: ModsSort, embeds: [embed] })
       return;
     } catch (err) {
@@ -521,20 +532,20 @@ exports.run = async (client, message, args, prefix) => {
       }
     } catch (err) {
 
-      try{
+      try {
         if (embedMessages) {
-          do{
-            if(!embedMessages[EmbedValue].embeds[0]) break;
+          do {
+            if (!embedMessages[EmbedValue].embeds[0]) break;
             const embed = embedMessages[EmbedValue].embeds[0];
             await EmbedFetch(embed)
             console.log(GoodToGo)
           }
-          while(!GoodToGo)
-  
+          while (!GoodToGo)
+
         } else {
           await message.channel.send('No embeds found in the last 100 messages');
         }
-      }catch(err){
+      } catch (err) {
         message.channel.send("**No maps found**")
       }
 

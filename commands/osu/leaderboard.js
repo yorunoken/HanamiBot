@@ -118,7 +118,7 @@ exports.run = async (client, message, args, prefix) => {
           Mods1 = ""
           modsID = 0
         }
-        
+
         // std
         if (scores.scores[one].statistics.great === undefined) scores.scores[one].statistics.great = 0
         if (scores.scores[one].statistics.ok === undefined) scores.scores[one].statistics.ok = 0
@@ -138,7 +138,7 @@ exports.run = async (client, message, args, prefix) => {
         let calc = new Calculator(scoreParam)
 
         // ss pp
-        maxAttrs = calc.performance(map)
+        const maxAttrs = calc.performance(map)
 
         //normal pp
         let CurAttrs = calc
@@ -177,7 +177,7 @@ exports.run = async (client, message, args, prefix) => {
           Mods2 = ""
           modsID = 0
         }
-        
+
         // std
         if (scores.scores[two].statistics.great === undefined) scores.scores[two].statistics.great = 0
         if (scores.scores[two].statistics.ok === undefined) scores.scores[two].statistics.ok = 0
@@ -195,6 +195,9 @@ exports.run = async (client, message, args, prefix) => {
         }
 
         let calc = new Calculator(scoreParam)
+
+        // ss pp
+        const maxAttrs = calc.performance(map)
 
         //normal pp
         let CurAttrs = calc
@@ -232,7 +235,7 @@ exports.run = async (client, message, args, prefix) => {
           Mods3 = ""
           modsID = 0
         }
-        
+
         // std
         if (scores.scores[three].statistics.great === undefined) scores.scores[three].statistics.great = 0
         if (scores.scores[three].statistics.ok === undefined) scores.scores[three].statistics.ok = 0
@@ -250,6 +253,9 @@ exports.run = async (client, message, args, prefix) => {
         }
 
         let calc = new Calculator(scoreParam)
+
+        // ss pp
+        const maxAttrs = calc.performance(map)
 
         //normal pp
         let CurAttrs = calc
@@ -287,7 +293,7 @@ exports.run = async (client, message, args, prefix) => {
           Mods4 = ""
           modsID = 0
         }
-        
+
         // std
         if (scores.scores[four].statistics.great === undefined) scores.scores[four].statistics.great = 0
         if (scores.scores[four].statistics.ok === undefined) scores.scores[four].statistics.ok = 0
@@ -305,6 +311,9 @@ exports.run = async (client, message, args, prefix) => {
         }
 
         let calc = new Calculator(scoreParam)
+
+        // ss pp
+        const maxAttrs = calc.performance(map)
 
         //normal pp
         let CurAttrs = calc
@@ -342,7 +351,7 @@ exports.run = async (client, message, args, prefix) => {
           Mods5 = ""
           modsID = 0
         }
-        
+
         // std
         if (scores.scores[five].statistics.great === undefined) scores.scores[five].statistics.great = 0
         if (scores.scores[five].statistics.ok === undefined) scores.scores[five].statistics.ok = 0
@@ -360,6 +369,9 @@ exports.run = async (client, message, args, prefix) => {
         }
 
         let calc = new Calculator(scoreParam)
+
+        // ss pp
+        const maxAttrs = calc.performance(map)
 
         //normal pp
         let CurAttrs = calc
