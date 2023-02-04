@@ -10,7 +10,14 @@ exports.run = async (client, message, args, prefix) => {
     } else {
       const userData = JSON.parse(data);
       if (args[0] === undefined) {
-        userargs = userData[message.author.id].osuUsername;
+        try{
+          userargs = userData[message.author.id].osuUsername;
+        }catch(err){
+          message.reply(
+            `Set your osu! username by using "${prefix}osuset **your username**"`
+          )
+          return
+        }
       } else {
         let string = args.join(" ").match(/"(.*?)"/)
         if (string) {
