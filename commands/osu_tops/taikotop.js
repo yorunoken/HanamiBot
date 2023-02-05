@@ -14,7 +14,7 @@ exports.run = async (client, message, args, prefix) => {
       value = 1
       play_number = undefined
       ModeOsu = "taiko"
-      ModeID = 1
+      ModeID = 0
 
       if (message.mentions.users.size > 0) {
         const mentionedUser = message.mentions.users.first();
@@ -54,9 +54,7 @@ exports.run = async (client, message, args, prefix) => {
             userargs = userData[message.author.id].osuUsername;
           } catch (err) {
             console.error(err);
-            message.reply(
-              `Set your osu! username by using "${prefix}osuset **your username**"`
-            );
+            message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`);
             return;
           }
         } else {
@@ -100,23 +98,43 @@ exports.run = async (client, message, args, prefix) => {
         ModeID = 3
         ModeOsu = "mania"
       }
-      if (args.join(" ").startsWith("-mania")) userargs = userData[message.author.id].osuUsername
+      if (args.join(" ").startsWith("-mania")) try {
+        userargs = userData[message.author.id].osuUsername
+      } catch (err) {
+        message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`);
+        return;
+      }
 
 
       if (args.includes("-taiko")) {
         ModeID = 1
         ModeOsu = "taiko"
       }
-      if (args.join(" ").startsWith("-taiko")) userargs = userData[message.author.id].osuUsername
+      if (args.join(" ").startsWith("-taiko")) try {
+        userargs = userData[message.author.id].osuUsername
+      } catch (err) {
+        message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`);
+        return;
+      }
 
       if (args.includes("-ctb")) {
         ModeID = 2
         ModeOsu = "ctb"
       }
-      if (args.join(" ").startsWith("-ctb")) userargs = userData[message.author.id].osuUsername
+      if (args.join(" ").startsWith("-ctb")) try {
+        userargs = userData[message.author.id].osuUsername
+      } catch (err) {
+        message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`);
+        return;
+      }
 
       if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
-        userargs = userData[message.author.id].osuUsername
+        try {
+          userargs = userData[message.author.id].osuUsername
+        } catch (err) {
+          message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`);
+          return;
+        }
       }
 
 
@@ -294,7 +312,7 @@ exports.run = async (client, message, args, prefix) => {
             "katu": score[playNumber - 1].statistics.count_katu,
             "50": score[playNumber - 1].statistics.count_50,
             "0": 0,
-            mode: "osu"
+            mode: ModeOsu
           })
           console.log(FcAcc)
 
@@ -649,7 +667,7 @@ exports.run = async (client, message, args, prefix) => {
             scorefive = `**${Play_rank5}.** [**${score[five].beatmapset.title} [${score[five].beatmap.version}]**](https://osu.ppy.sh/b/${score[five].beatmap.id}) **+${modsfive}** [${sr5}★]\n${gradefive} ▹ **${score[five].pp.toFixed(2)}PP** ▹ (${Number(score[five].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[five].max_combo)}x**/${maxComboMap}x]\n${score[five].score.toLocaleString()} ▹ [**${score[five].statistics.count_300}**/${score[five].statistics.count_100}/${score[five].statistics.count_50}/${score[five].statistics.count_miss}] <t:${time5}:R>`
           }
 
-          const TotalPage = Math.ceil(score.length/5)
+          const TotalPage = Math.ceil(score.length / 5)
 
 
 
