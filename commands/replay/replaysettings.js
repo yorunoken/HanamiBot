@@ -87,7 +87,6 @@ exports.run = async (client, message, args, prefix) => {
 
 
 
-
         // strict number variables
         if (args[0] == ("-cursor_size") || args[0] == ("cursor_size")) {
             if (isNaN(args[1])) {
@@ -109,7 +108,6 @@ exports.run = async (client, message, args, prefix) => {
                 }
             });
         }
-
 
 
 
@@ -290,8 +288,12 @@ exports.run = async (client, message, args, prefix) => {
         if (args[0] == ("-self") || args[0] == ("self")) {
 
             const embed = new EmbedBuilder()
+            .setColor('Purple')
             .setTitle(`${message.author.username}'s current skin settings:`)
-            .setDescription(`parallax: ${userData[message.author.id].parallax}\ncursor_ripples: ${userData[message.author.id].cursor_ripples}\ncursor_size: ${userData[message.author.id].cursor_size}\nbg_dim: ${userData[message.author.id].bg_dim}\nstoryboard: ${userData[message.author.id].storyboard}\nbg_video: ${userData[message.author.id].bg_video}\nkey_overlay: ${userData[message.author.id].key_overlay}\nmusic_volume: ${userData[message.author.id].music_volume}\nhitsound_volume: ${userData[message.author.id].hitsound_volume}\ndanser_logo: ${userData[message.author.id].danser_logo}\naim_ur: ${userData[message.author.id].aim_ur}`)
+            .setThumbnail(`${message.author.displayAvatarURL()}?size=1024`)
+            .setDescription(`**parallax:** \`${userData[message.author.id].parallax}\`\n**cursor_ripples:** \`${userData[message.author.id].cursor_ripples}\`\n**cursor_size:** \`${userData[message.author.id].cursor_size}\`\n**bg_dim:** \`${userData[message.author.id].bg_dim}\`\n**storyboard:** \`${userData[message.author.id].storyboard}\`\n**bg_video:** \`${userData[message.author.id].bg_video}\`\n**key_overlay:** \`${userData[message.author.id].key_overlay}\`\n**music_volume:** \`${userData[message.author.id].music_volume}\`\n**hitsound_volume:** \`${userData[message.author.id].hitsound_volume}\`\n**danser_logo:** \`${userData[message.author.id].danser_logo}\`\n**aim_ur:** \`${userData[message.author.id].aim_ur}\``)
+
+            message.channel.send({ embeds: [embed] })
 
             return;
         }
