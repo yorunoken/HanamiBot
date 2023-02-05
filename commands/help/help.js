@@ -8,7 +8,8 @@ exports.run = async (client, message, args, prefix) => {
     help: [],
     osu: [],
     general: [],
-    chess: []
+    chess: [],
+    fun: []
   };
 
 
@@ -17,16 +18,17 @@ exports.run = async (client, message, args, prefix) => {
     categories[command.category].push(name);
   });
 
-  const response = await fetch('https://official-joke-api.appspot.com/random_joke');
-  const joke = await response.json();
+  // const response = await fetch('https://official-joke-api.appspot.com/random_joke');
+  // const joke = await response.json();
 
   const embed = new EmbedBuilder()
     .setColor('Purple')
-    .setTitle(`Available in ${client.guilds.cache.size} servers!`)
+    .setTitle(`Available in ${client.guilds.cache.size} servers, with ${categories.osu.length+categories.general.length+categories.fun.length+categories.help.length+categories.chess.length} commands!`)
     //.setDescription(`${joke.setup}\n${joke.punchline}`)
     .addFields(
-      { name: "**general commands**", value: categories.general.join(', '), inline: false },
       { name: "**osu! commands**", value: categories.osu.join(', '), inline: false },
+      { name: "**general commands**", value: categories.general.join(', '), inline: false },
+      { name: "**fun commands**", value: categories.fun.join(', '), inline: false },
       { name: "**chess commands**", value: categories.chess.join(', '), inline: false },
       { name: "**help commands**", value: categories.help.join(', '), inline: false },
     )

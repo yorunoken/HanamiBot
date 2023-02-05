@@ -59,7 +59,6 @@ for (const folder of commandFolders) {
 
 
 
-//log
 client.on("ready", async () => {
 
   console.log(`Logged in as ${client.user.tag}, in ${client.guilds.cache.size} servers!`);

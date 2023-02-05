@@ -13,4 +13,4 @@ exports.name = "owoify";
 exports.aliases = ["owoify"]
 exports.description = ["Converts text into owo format"]
 exports.usage = [`owoify The greatest glory in living lies not in never falling, but in rising every time we fall.`]
-exports.category = ["general"]
+exports.category = ["fun"]

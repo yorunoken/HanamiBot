@@ -97,4 +97,4 @@ exports.name = "manga";
 exports.aliases = ["manga"]
 exports.description = ["Returns a manga. you can search by title or get a random manga by leaving the arguments blank. do not include special characters like \`!, #, @, ^\` when you're searching by title.\n**Parameters:**\n\`-random\` gets a random manga\nPowered by [MangaDex](https://mangadex.org/)"]
 exports.usage = [`manga kimetsu no yaiba`]
-exports.category = ["general"]
+exports.category = ["fun"]

@@ -16,4 +16,4 @@ exports.name = "say";
 exports.aliases = ["say"]
 exports.description = ["Makes the bot repeat whatever you say"]
 exports.usage = [`say hello my name is gustavo`]
-exports.category = ["general"]
+exports.category = ["fun"]
