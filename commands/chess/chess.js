@@ -23,6 +23,7 @@ exports.run = async (client, message, args, prefix) => {
 
   } catch (err) {
     message.reply(`**Invalid user.**`)
+    return
   }
 
   const playerstats = await chessAPI.getPlayerStats(player.body.username)

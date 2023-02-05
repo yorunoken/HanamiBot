@@ -1,4 +1,4 @@
-//modules export
+
 exports.run = async (client, message, args, prefix) => { 
   // await message.channel.sendTyping()
     

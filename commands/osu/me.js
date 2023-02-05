@@ -1,5 +1,4 @@
 const fs = require("fs");
-const { EmbedBuilder } = require("discord.js");
 const { v2, auth } = require("osu-api-extended");
 exports.run = async (client, message, args, prefix) => {
   await message.channel.sendTyping()
