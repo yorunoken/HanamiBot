@@ -3,7 +3,7 @@ const { EmbedBuilder } = require("discord.js");
 const { Client } = require("ordr.js")
 let inProgress = false
 let DoneForNow = false
-let timeLeft = 60
+let timeLeft = 5
 
 exports.run = async (client, message, args, prefix) => {
     fs.readFile("./user-data.json", async (error, data) => {
@@ -11,7 +11,13 @@ exports.run = async (client, message, args, prefix) => {
             console.log(error);
         } else {
             const userData = JSON.parse(data);
-            let Idskin = userData[message.author.id].ID_skin
+            let Idskin
+            try{
+                Idskin = userData[message.author.id].ID_skin
+            }catch(err){
+                message.reply("**No default skin set. set it using replayskin {skinID}. reverting to 1st skin**")
+                Idskin = 1
+            }
             console.log(Idskin)
             if (!Idskin) {
                 Idskin = "3"
@@ -27,7 +33,7 @@ exports.run = async (client, message, args, prefix) => {
                 }
 
                 if (timeLeft > 1 && DoneForNow) {
-                    message.channel.send("**Already rendering a replay, please try again later.**")
+                    message.channel.send("**Already rendering a replay, please try again later. See https://ordr.issou.best/renders if it's taking too long**")
                     return
                 }
                 message.channel.send(`**Please wait ${timeLeft} seconds before trying again.**`)
