@@ -11,13 +11,13 @@ exports.run = async (client, message, args, prefix) => {
         const data = await ordrclient.skins({ pageSize: 20, page: page });
         const presentationNames = data.skins.map(x => x.presentationName)
         const SkinID = data.skins.map(x => x.id)
-        return { presentationNames, SkinID }
+        return { presentationNames, SkinID, data }
     }
 
     const getSkinsFull = async () => {
         const data = await ordrclient.skins({ pageSize: 460, page: 1 });
         const Ids_skin = data.skins.map(x => x.id)
-        return { Ids_skin }
+        return { Ids_skin, data }
     }
     if (args.join(" ").includes('-set')) {
         fs.readFile("./user-data.json", async (error, data) => {
@@ -52,6 +52,58 @@ exports.run = async (client, message, args, prefix) => {
         })
         return;
     }
+
+
+    if (args[0] == ("-self") || args[0] == ("self")) {
+        fs.readFile("./user-data.json", async (error, data) => {
+            if (error) {
+                console.log(error);
+                return
+            }
+            const userData = JSON.parse(data);
+
+
+            const Values_skin = await getSkinsFull()
+
+            const usedSkin = Values_skin.data.skins.find(x => x.id == Number(userData[message.author.id].ID_skin))
+
+            const embed = new EmbedBuilder()
+                .setColor('Purple')
+                .setTitle(`${message.author.username}'s current skin:`)
+                .setThumbnail(`${message.author.displayAvatarURL()}?size=1024`)
+                .setDescription(`**Name:** ${usedSkin.presentationName}\n**Author:** ${usedSkin.author}\n**[Download the skin](${usedSkin.url})**`)
+                .setImage(usedSkin.highResPreview)
+
+            message.channel.send({ embeds: [embed] })
+
+        })
+        return;
+    }
+
+    if (!isNaN( Number(args[0]) )) {
+            const Values_skin = await getSkinsFull()
+
+            const usedSkin = Values_skin.data.skins.find(x => x.id == Number(args[0]))
+            if(usedSkin == undefined){
+                message.reply("**Please provide a valid skin ID**")
+                return
+            }
+
+            const embed = new EmbedBuilder()
+                .setColor('Purple')
+                .setTitle(`Skin ID ${args[0]}`)
+                .setThumbnail(`${message.author.displayAvatarURL()}?size=1024`)
+                .setDescription(`**Name:** ${usedSkin.presentationName}\n**Author:** ${usedSkin.author}\n**[Download the skin](${usedSkin.url})**`)
+                .setImage(usedSkin.highResPreview)
+
+            message.channel.send({ embeds: [embed] })
+
+        return;
+    }
+
+
+
+
 
     let page
     if (args.includes('-p')) {
