@@ -4,29 +4,34 @@ const { BeatmapCalculator } = require('@kionell/osu-pp-calculator')
 
 exports.run = async (client, message, args, prefix) => {
     await message.channel.sendTyping()
-    await auth.login(process.env.client_id, process.env.client_secret);
+    
+    await auth.login_lazer(process.env.userd, process.env.pass);
 
     let value
     let QueryResults = 0
     const beatmapCalculator = new BeatmapCalculator();
 
-    const beatmap = await v2.beatmap.search({
-        query: args.join(" "),
-        mode: "osu"
+    
+    const query = args.join(" ")
+
+    const SearchMap = await v2.beatmap.search({
+        query: query,
+        mode: 'osu',
+        nsfw: true
     })
 
 
 
-    const Map = beatmap.beatmapsets[0]
-    const Map2 = beatmap.beatmapsets[1]
-    const Map3 = beatmap.beatmapsets[2]
-    const Map4 = beatmap.beatmapsets[3]
-    const Map5 = beatmap.beatmapsets[4]
-    const Map6 = beatmap.beatmapsets[5]
-    const Map7 = beatmap.beatmapsets[6]
-    const Map8 = beatmap.beatmapsets[7]
-    const Map9 = beatmap.beatmapsets[8]
-    const Map10 = beatmap.beatmapsets[9]
+    const Map = SearchMap.beatmapsets[0]
+    const Map2 = SearchMap.beatmapsets[1]
+    const Map3 = SearchMap.beatmapsets[2]
+    const Map4 = SearchMap.beatmapsets[3]
+    const Map5 = SearchMap.beatmapsets[4]
+    const Map6 = SearchMap.beatmapsets[5]
+    const Map7 = SearchMap.beatmapsets[6]
+    const Map8 = SearchMap.beatmapsets[7]
+    const Map9 = SearchMap.beatmapsets[8]
+    const Map10 = SearchMap.beatmapsets[9]
 
     if (Map == undefined) {
         message.reply("**No maps could be found with the Query, try again with another one.**")
@@ -43,7 +48,11 @@ exports.run = async (client, message, args, prefix) => {
 
     let Query2
     if (Map2 == undefined) {
-        Query2 = ""
+        Query2 = {
+            label: `-----------`,
+            description: `----------`,
+            value: 'mapf2',
+        }
     } else {
         QueryResults++
         const DiffNumber = Map2.beatmaps.length - 1
@@ -57,14 +66,18 @@ exports.run = async (client, message, args, prefix) => {
 
         Query2 = {
             label: `${Map2.title} [${Map2.beatmaps[Map2.beatmaps.length - 1].version}]`,
-            description: `${diff2.difficulty_rating}★ | ${minutes2}:${seconds2} | BPM:${diff2.bpm} | AR${diff2.ar} | ${diff2.status} |  by ${Map2.creator}`,
+            description: `by ${Map2.creator} | ${diff2.difficulty_rating}★ | ${minutes2}:${seconds2} | BPM:${diff2.bpm} | AR${diff2.ar} | OD${diff2.accuracy} | CS${diff2.cs} | HP${diff2.drain} | ${diff2.status}`,
             value: 'map2',
         }
     }
 
     let Query3
     if (Map3 == undefined) {
-        Query3 = ""
+        Query3 = {
+            label: `-----------`,
+            description: `----------`,
+            value: 'mapf3',
+        }
     } else {
         QueryResults++
         const DiffNumber = Map3.beatmaps.length - 1
@@ -78,14 +91,18 @@ exports.run = async (client, message, args, prefix) => {
 
         Query3 = {
             label: `${Map3.title} [${Map3.beatmaps[Map3.beatmaps.length - 1].version}]`,
-            description: `${diff3.difficulty_rating}★ | ${minutes3}:${seconds3} | BPM:${diff3.bpm} | AR${diff3.ar} | ${diff3.status} | by ${Map3.creator}`,
+            description: `by ${Map3.creator} | ${diff3.difficulty_rating}★ | ${minutes3}:${seconds3} | BPM:${diff3.bpm} | AR${diff3.ar} | OD${diff3.accuracy} | CS${diff3.cs} | HP${diff3.drain} | ${diff3.status}`,
             value: 'map3',
         }
     }
 
     let Query4
     if (Map4 == undefined) {
-        Query4 = ""
+        Query4 = {
+            label: `-----------`,
+            description: `----------`,
+            value: 'mapf4',
+        }
     } else {
         QueryResults++
         const DiffNumber = Map4.beatmaps.length - 1
@@ -100,14 +117,18 @@ exports.run = async (client, message, args, prefix) => {
 
         Query4 = {
             label: ` ${Map4.title} [${Map4.beatmaps[Map4.beatmaps.length - 1].version}]`,
-            description: `${diff4.difficulty_rating}★ | ${minutes4}:${seconds4} | BPM:${diff4.bpm} | AR${diff4.ar} | ${diff4.status} | by ${Map4.creator}`,
+            description: `by ${Map4.creator} | ${diff4.difficulty_rating}★ | ${minutes4}:${seconds4} | BPM:${diff4.bpm} | AR${diff4.ar} | OD${diff4.accuracy} | CS${diff4.cs} | HP${diff4.drain} | ${diff4.status}`,
             value: 'map4',
         }
     }
 
     let Query5
     if (Map5 == undefined) {
-        Query5 = ""
+        Query5 = {
+            label: `-----------`,
+            description: `----------`,
+            value: 'mapf5',
+        }
     } else {
         QueryResults++
         const DiffNumber = Map5.beatmaps.length - 1
@@ -122,14 +143,18 @@ exports.run = async (client, message, args, prefix) => {
 
         Query5 = {
             label: `${Map5.title} [${Map5.beatmaps[Map5.beatmaps.length - 1].version}]`,
-            description: `${diff5.difficulty_rating}★ | ${minutes5}:${seconds5} | BPM:${diff5.bpm} | AR${diff5.ar} | ${diff5.status} | by ${Map5.creator}`,
+            description: `by ${Map5.creator} | ${diff5.difficulty_rating}★ | ${minutes5}:${seconds5} | BPM:${diff5.bpm} | AR${diff5.ar} | OD${diff5.accuracy} | CS${diff5.cs} | HP${diff5.drain} | ${diff5.status}`,
             value: 'map5',
         }
     }
 
     let Query6
     if (Map6 == undefined) {
-        Query6 = ""
+        Query6 = {
+            label: `-----------`,
+            description: `----------`,
+            value: 'mapf6',
+        }
     } else {
         QueryResults++
         const DiffNumber = Map6.beatmaps.length - 1
@@ -144,14 +169,18 @@ exports.run = async (client, message, args, prefix) => {
 
         Query6 = {
             label: `${Map6.title} [${Map6.beatmaps[Map6.beatmaps.length - 1].version}]`,
-            description: `${diff6.difficulty_rating}★ | ${minutes6}:${seconds6} | BPM:${diff6.bpm} | AR${diff6.ar} | ${diff6.status} | by ${Map6.creator}`,
+            description: `by ${Map6.creator} | ${diff6.difficulty_rating}★ | ${minutes6}:${seconds6} | BPM:${diff6.bpm} | AR${diff6.ar} | OD${diff6.accuracy} | CS${diff6.cs} | HP${diff6.drain} | ${diff6.status}`,
             value: 'map6',
         }
     }
 
     let Query7
     if (Map7 == undefined) {
-        Query7 = ""
+        Query7 = {
+            label: `-----------`,
+            description: `----------`,
+            value: 'mapf7',
+        }
     } else {
         QueryResults++
         const DiffNumber = Map7.beatmaps.length - 1
@@ -166,14 +195,18 @@ exports.run = async (client, message, args, prefix) => {
 
         Query7 = {
             label: `${Map7.title} [${Map7.beatmaps[Map7.beatmaps.length - 1].version}]`,
-            description: `${diff7.difficulty_rating}★ | ${minutes7}:${seconds7} | BPM:${diff7.bpm} | AR${diff7.ar} | ${diff7.status} | by ${Map7.creator}`,
+            description: `by ${Map7.creator} | ${diff7.difficulty_rating}★ | ${minutes7}:${seconds7} | BPM:${diff7.bpm} | AR${diff7.ar} | OD${diff7.accuracy} | CS${diff7.cs} | HP${diff7.drain} | ${diff7.status}`,
             value: 'map7',
         }
     }
 
     let Query8
     if (Map8 == undefined) {
-        Query8 = ""
+        Query8 = {
+            label: `-----------`,
+            description: `----------`,
+            value: 'mapf8',
+        }
     } else {
         QueryResults++
         const DiffNumber = Map8.beatmaps.length - 1
@@ -188,14 +221,18 @@ exports.run = async (client, message, args, prefix) => {
 
         Query8 = {
             label: `${Map8.title} [${Map8.beatmaps[Map8.beatmaps.length - 1].version}]`,
-            description: `${diff8.difficulty_rating}★ | ${minutes8}:${seconds8} | BPM:${diff8.bpm} | AR${diff8.ar} | ${diff8.status} | by ${Map8.creator}`,
+            description: `by ${Map8.creator} | ${diff8.difficulty_rating}★ | ${minutes8}:${seconds8} | BPM:${diff8.bpm} | AR${diff8.ar} | OD${diff8.accuracy} | CS${diff8.cs} | HP${diff8.drain} | ${diff8.status}`,
             value: 'map8',
         }
     }
 
     let Query9
     if (Map9 == undefined) {
-        Query9 = ""
+        Query9 = {
+            label: `-----------`,
+            description: `----------`,
+            value: 'mapf9',
+        }
     } else {
         QueryResults++
         const DiffNumber = Map9.beatmaps.length - 1
@@ -210,14 +247,18 @@ exports.run = async (client, message, args, prefix) => {
 
         Query9 = {
             label: `${Map9.title} [${Map9.beatmaps[Map9.beatmaps.length - 1].version}]`,
-            description: `${diff9.difficulty_rating}★ | ${minutes9}:${seconds9} | BPM:${diff9.bpm} | AR${diff9.ar} | ${diff9.status} | by ${Map9.creator}`,
+            description: `by ${Map9.creator} | ${diff9.difficulty_rating}★ | ${minutes9}:${seconds9} | BPM:${diff9.bpm} | AR${diff9.ar} | OD${diff9.accuracy} | CS${diff9.cs} | HP${diff9.drain} | ${diff9.status}`,
             value: 'map9',
         }
     }
 
     let Query10
     if (Map10 == undefined) {
-        Query10 = ""
+        Query10 = {
+            label: `-----------`,
+            description: `----------`,
+            value: 'mapf10',
+        }
     } else {
         QueryResults++
         const DiffNumber = Map10.beatmaps.length - 1
@@ -232,7 +273,7 @@ exports.run = async (client, message, args, prefix) => {
 
         Query10 = {
             label: `${Map10.title} [${Map10.beatmaps[Map10.beatmaps.length - 1].version}]`,
-            description: `${diff10.difficulty_rating}★ | ${minutes10}:${seconds10} | BPM:${diff10.bpm} | AR${diff10.ar} | ${diff10.status} | by ${Map10.creator}`,
+            description: `by ${Map10.creator} | ${diff10.difficulty_rating}★ | ${minutes10}:${seconds10} | BPM:${diff10.bpm} | AR${diff10.ar} | OD${diff10.accuracy} | CS${diff10.cs} | HP${diff10.drain} | ${diff10.status}`,
             value: 'map10',
         }
     }
@@ -245,7 +286,7 @@ exports.run = async (client, message, args, prefix) => {
                 .addOptions(
                     {
                         label: `${Map.title} [${Map.beatmaps[Map.beatmaps.length - 1].version}]`,
-                        description: `${diff.difficulty_rating}★ | ${minutes}:${seconds} | BPM:${diff.bpm} | AR${diff.ar} | ${diff.status} | by ${Map.creator}`,
+                        description: `by ${Map.creator} | ${diff.difficulty_rating}★ | ${minutes}:${seconds} | BPM:${diff.bpm} | AR${diff.ar} | OD${diff.accuracy} | CS${diff.cs} | HP${diff.drain} | ${diff.status}`,
                         value: 'map1',
                     },
                     Query2,
@@ -263,7 +304,7 @@ exports.run = async (client, message, args, prefix) => {
     async function GetMap(value) {
 
         try {
-            const Map = beatmap.beatmapsets[value]
+            const Map = SearchMap.beatmapsets[value]
             const diff = Map.beatmaps[Map.beatmaps.length - 1]
 
             let length = diff.total_length.toFixed(0)
