@@ -109,7 +109,12 @@ exports.run = async (client, message, args, prefix) => {
                             });
                         } else {
                             message.channel.messages.fetch(messageId).then(messageToEdit => {
-                                messageToEdit.edit(`${data.progress}`);
+                                messageToEdit.edit(`${data.progress}`)
+                                if(messageToEdit.content == "Finalizing..."){
+                                    setTimeout(() =>{
+                                        messageToEdit.delete()
+                                    }, 2000)
+                                }
                             });
                         }
                         replay_description = data.description
@@ -120,7 +125,9 @@ exports.run = async (client, message, args, prefix) => {
                     if (data.renderID === replay.renderID) {
                         const embed = new EmbedBuilder()
                         .setTitle("Replay rendering is done")
+                        .setColor("Purple")
                         .setDescription(replay_description)
+
                         message.channel.send(`<@${sender.id}> ${data.videoUrl}`)
                         message.channel.send({ embeds: [embed]})
                         DoneForNow = false
