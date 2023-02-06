@@ -409,7 +409,6 @@ exports.run = async (client, message, args, prefix) => {
         .setTitle(`${mapinfo.beatmapset.title} [${mapinfo.version}]`) // [${starRating.difficulty.starRating.toFixed(2)}★]
         .setURL(`https://osu.ppy.sh/b/${mapinfo.id}`)
         .setDescription(`${first_score}${second_score}${third_score}${fourth_score}${fifth_score}`)
-        .setThumbnail(`https://osuflags.omkserver.nl/TR-256.png`)
         .setImage(`https://assets.ppy.sh/beatmaps/${mapinfo.beatmapset_id}/covers/cover.jpg`)
         .setFooter({ text: `Page: ${pagenum}/${totalPage}` })
       message.channel.send({ content: ModsSort, embeds: [embed] })
