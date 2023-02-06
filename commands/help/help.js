@@ -18,13 +18,26 @@ exports.run = async (client, message, args, prefix) => {
     categories[command.category].push(name);
   });
 
-  // const response = await fetch('https://official-joke-api.appspot.com/random_joke');
-  // const joke = await response.json();
+  if(args[0]){
+    const commandName = args[0];
+    if (commands[commandName]) {
+        const embed = new EmbedBuilder()
+        .setColor('Purple')
+        .setTitle(`${prefix}${commandName}`)
+        .setDescription(`${commands[commandName].description}`)
+        .setFields({name: `Usage`, value: `\`${commands[commandName].usage}\``, inline: true}, {name: `Aliases`, value: `\`${commands[commandName].aliases}\``, inline: true})
+        message.channel.send({embeds: [embed]})
+    } else {
+        message.channel.send(`**Such a command doesn't exist! see a list of all the commands using \`${prefix}help\`**`);
+    }
+    return;
+  }
+
 
   const embed = new EmbedBuilder()
     .setColor('Purple')
     .setTitle(`Available in ${client.guilds.cache.size} servers, with ${categories.osu.length+categories.general.length+categories.fun.length+categories.help.length+categories.chess.length} commands!`)
-    //.setDescription(`${joke.setup}\n${joke.punchline}`)
+
     .addFields(
       { name: "**osu! commands**", value: categories.osu.join(', '), inline: false },
       { name: "**general commands**", value: categories.general.join(', '), inline: false },
