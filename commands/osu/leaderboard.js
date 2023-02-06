@@ -162,7 +162,7 @@ exports.run = async (client, message, args, prefix) => {
 
 
 
-        first_score = `**${one + 1}.** ${grade} [**${scores.scores[one].user.username}**](https://osu.ppy.sh/users/${scores.scores[one].user.id}) (${(scores.scores[one].accuracy * 100).toFixed(2)}%) • ${PP} **${scores.scores[one].statistics.miss}**<:hit00:1061254490075955231>\n▹${scores.scores[one].total_score.toLocaleString()} • [ **${scores.scores[one].max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] ${Mods1} • [${CurAttrs.difficulty.stars.toFixed(2)}★]\n▹**Score Set:** <t:${UnixDate}:R>\n`
+        first_score = `**${one + 1}.** ${grade} [**${scores.scores[one].user.username}**](https://osu.ppy.sh/users/${scores.scores[one].user.id}) (${(scores.scores[one].accuracy * 100).toFixed(2)}%) • ${scores.scores[one].total_score.toLocaleString()} **${scores.scores[one].statistics.miss}**<:hit00:1061254490075955231>\n▹${PP} • [ **${scores.scores[one].max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] ${Mods1} • [${CurAttrs.difficulty.stars.toFixed(2)}★]\n▹**Score Set:** <t:${UnixDate}:R>\n`
       } else {
         first_score = "**No scores found.**"
       }
@@ -219,7 +219,7 @@ exports.run = async (client, message, args, prefix) => {
         const date = new Date(scores.scores[two].ended_at)
         const UnixDate = date.getTime() / 1000
 
-        second_score = `**${two + 1}.** ${grade2} [**${scores.scores[two].user.username}**](https://osu.ppy.sh/users/${scores.scores[two].user.id}) (${(scores.scores[two].accuracy * 100).toFixed(2)}%) • ${PP2} **${scores.scores[two].statistics.miss}**<:hit00:1061254490075955231>\n▹${scores.scores[two].total_score.toLocaleString()} • [ **${scores.scores[two].max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] ${Mods2} • [${CurAttrs.difficulty.stars.toFixed(2)}★]\n▹**Score Set:** <t:${UnixDate}:R>\n`
+        second_score = `**${two + 1}.** ${grade2} [**${scores.scores[two].user.username}**](https://osu.ppy.sh/users/${scores.scores[two].user.id}) (${(scores.scores[two].accuracy * 100).toFixed(2)}%) • ${scores.scores[two].total_score.toLocaleString()} **${scores.scores[two].statistics.miss}**<:hit00:1061254490075955231>\n▹${PP2} • [ **${scores.scores[two].max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] ${Mods2} • [${CurAttrs.difficulty.stars.toFixed(2)}★]\n▹**Score Set:** <t:${UnixDate}:R>\n`
 
       } else {
         second_score = ""
@@ -277,7 +277,7 @@ exports.run = async (client, message, args, prefix) => {
         const date = new Date(scores.scores[three].ended_at)
         const UnixDate = date.getTime() / 1000
 
-        third_score = `**${three + 1}.** ${grade3} [**${scores.scores[three].user.username}**](https://osu.ppy.sh/users/${scores.scores[three].user.id}) (${(scores.scores[three].accuracy * 100).toFixed(2)}%) • ${PP3} **${scores.scores[three].statistics.miss}**<:hit00:1061254490075955231>\n▹${scores.scores[three].total_score.toLocaleString()} • [ **${scores.scores[three].max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] ${Mods3} • [${CurAttrs.difficulty.stars.toFixed(2)}★]\n▹**Score Set:** <t:${UnixDate}:R>\n`
+        third_score = `**${three + 1}.** ${grade3} [**${scores.scores[three].user.username}**](https://osu.ppy.sh/users/${scores.scores[three].user.id}) (${(scores.scores[three].accuracy * 100).toFixed(2)}%) • ${scores.scores[three].total_score.toLocaleString()} **${scores.scores[three].statistics.miss}**<:hit00:1061254490075955231>\n▹${PP3} • [ **${scores.scores[three].max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] ${Mods3} • [${CurAttrs.difficulty.stars.toFixed(2)}★]\n▹**Score Set:** <t:${UnixDate}:R>\n`
 
       } else {
         third_score = ""
@@ -335,7 +335,7 @@ exports.run = async (client, message, args, prefix) => {
         const date = new Date(scores.scores[four].ended_at)
         const UnixDate = date.getTime() / 1000
 
-        fourth_score = `**${four + 1}.** ${grade4} [**${scores.scores[four].user.username}**](https://osu.ppy.sh/users/${scores.scores[four].user.id}) (${(scores.scores[four].accuracy * 100).toFixed(2)}%) • ${PP4} **${scores.scores[four].statistics.miss}**<:hit00:1061254490075955231>\n▹${scores.scores[four].total_score.toLocaleString()} • [ **${scores.scores[four].max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] ${Mods4} • [${CurAttrs.difficulty.stars.toFixed(2)}★]\n▹**Score Set:** <t:${UnixDate}:R>\n`
+        fourth_score = `**${four + 1}.** ${grade4} [**${scores.scores[four].user.username}**](https://osu.ppy.sh/users/${scores.scores[four].user.id}) (${(scores.scores[four].accuracy * 100).toFixed(2)}%) • ${scores.scores[four].total_score.toLocaleString()} **${scores.scores[four].statistics.miss}**<:hit00:1061254490075955231>\n▹${PP4} • [ **${scores.scores[four].max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] ${Mods4} • [${CurAttrs.difficulty.stars.toFixed(2)}★]\n▹**Score Set:** <t:${UnixDate}:R>\n`
 
       } else {
         fourth_score = ""
@@ -393,11 +393,12 @@ exports.run = async (client, message, args, prefix) => {
         const date = new Date(scores.scores[five].ended_at)
         const UnixDate = date.getTime() / 1000
 
-        fifth_score = `**${five + 1}.** ${grade5} [**${scores.scores[five].user.username}**](https://osu.ppy.sh/users/${scores.scores[five].user.id}) (${(scores.scores[five].accuracy * 100).toFixed(2)}%) • ${PP5} **${scores.scores[five].statistics.miss}**<:hit00:1061254490075955231>\n▹${scores.scores[five].total_score.toLocaleString()} • [ **${scores.scores[five].max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] ${Mods5} • [${CurAttrs.difficulty.stars.toFixed(2)}★]\n▹**Score Set:** <t:${UnixDate}:R>`
+        fifth_score = `**${five + 1}.** ${grade5} [**${scores.scores[five].user.username}**](https://osu.ppy.sh/users/${scores.scores[five].user.id}) (${(scores.scores[five].accuracy * 100).toFixed(2)}%) • ${scores.scores[five].total_score.toLocaleString()} **${scores.scores[five].statistics.miss}**<:hit00:1061254490075955231>\n▹${PP5} • [ **${scores.scores[five].max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] ${Mods5} • [${CurAttrs.difficulty.stars.toFixed(2)}★]\n▹**Score Set:** <t:${UnixDate}:R>`
 
       } else {
         fifth_score = ""
       }
+
 
 
       if (modifiedMods.startsWith("&mods")) {
