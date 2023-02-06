@@ -92,13 +92,20 @@ module.exports.run = async (client, message, args, prefix) => {
       argValues[key] = value;
     }
 
-    if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-l") || args.join(" ").startsWith("-list") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("+") || args.join(" ").startsWith("mods")) {
-      userargs = userData[message.author.id].osuUsername
+    try {
+      if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-l") || args.join(" ").startsWith("-list") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("+") || args.join(" ").startsWith("mods")) {
+        userargs = userData[message.author.id].osuUsername
+      }
+    } catch (err) {
+      message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
     }
 
-
-    if (userargs.length === 0) {
-      userargs = userData[message.author.id].osuUsername;
+    try {
+      if (userargs.length === 0) {
+        userargs = userData[message.author.id].osuUsername;
+      }
+    } catch (err) {
+      message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
     }
 
 
@@ -144,10 +151,14 @@ module.exports.run = async (client, message, args, prefix) => {
       } else {
         userargs = args[0]
       }
-
-      if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-l") || args.join(" ").startsWith("-list")) {
-        userargs = userData[message.author.id].osuUsername
+      try {
+        if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-l") || args.join(" ").startsWith("-list")) {
+          userargs = userData[message.author.id].osuUsername
+        }
+      } catch (err) {
+        message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
       }
+
 
       let pageNumber = Number(value)
       if (args === undefined) {
@@ -155,7 +166,11 @@ module.exports.run = async (client, message, args, prefix) => {
       }
       if (args[0] === "-p") {
         pageNumber = Number(value)
-        userargs = userData[message.author.id].osuUsername;
+        try {
+          userargs = userData[message.author.id].osuUsername;
+        } catch (err) {
+          message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
+        }
       }
 
       const start = (pageNumber - 1) * 5 + 1;

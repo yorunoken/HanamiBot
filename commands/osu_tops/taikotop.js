@@ -165,7 +165,11 @@ exports.run = async (client, message, args, prefix) => {
         let playNumber = Number(play_number)
         if (args[0] === "-i") {
           playNumber = Number(play_number)
-          userargs = userData[message.author.id].osuUsername;
+          try{
+            userargs = userData[message.author.id].osuUsername
+          }catch(err){
+            message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
+          }
         }
 
         user = await v2.user.details(userargs, ModeOsu)
@@ -374,7 +378,11 @@ exports.run = async (client, message, args, prefix) => {
           }
           if (args[0] === "-p") {
             pageNumber = Number(value)
-            userargs = userData[message.author.id].osuUsername;
+            try{
+              userargs = userData[message.author.id].osuUsername
+            }catch(err){
+              message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
+            }
           }
 
           //determine the page of the osutop

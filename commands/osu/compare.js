@@ -92,28 +92,33 @@ exports.run = async (client, message, args, prefix) => {
 
 
 
+          try{
+            
+            if (args.includes("-mania")) {
+              RuleSetId = 3
+              ModeOsu = "mania"
+            }
+            if (args.join(" ").startsWith("-mania")) userargs = userData[message.author.id].osuUsername
+  
+  
+            if (args.includes("-taiko")) {
+              RuleSetId = 1
+              ModeOsu = "taiko"
+            }
+            if (args.join(" ").startsWith("-taiko")) userargs = userData[message.author.id].osuUsername
+  
+            if (args.includes("-ctb")) {
+              RuleSetId = 2
+              ModeOsu = "ctb"
+            }
+            if (args.join(" ").startsWith("-ctb")) userargs = userData[message.author.id].osuUsername
+  
+            if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("-p")) {
+              userargs = userData[message.author.id].osuUsername
+            }
 
-          if (args.includes("-mania")) {
-            RuleSetId = 3
-            ModeOsu = "mania"
-          }
-          if (args.join(" ").startsWith("-mania")) userargs = userData[message.author.id].osuUsername
-
-
-          if (args.includes("-taiko")) {
-            RuleSetId = 1
-            ModeOsu = "taiko"
-          }
-          if (args.join(" ").startsWith("-taiko")) userargs = userData[message.author.id].osuUsername
-
-          if (args.includes("-ctb")) {
-            RuleSetId = 2
-            ModeOsu = "ctb"
-          }
-          if (args.join(" ").startsWith("-ctb")) userargs = userData[message.author.id].osuUsername
-
-          if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("-p")) {
-            userargs = userData[message.author.id].osuUsername
+          }catch(err){
+            message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`);
           }
 
         }

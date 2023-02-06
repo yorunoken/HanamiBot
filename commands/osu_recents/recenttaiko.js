@@ -24,7 +24,11 @@ module.exports.run = async (client, message, args, prefix) => {
             if (message.content.includes(`<@${mentionedUser.id}>`)) {
               userargs = userData[mentionedUser.id].osuUsername;
             } else {
-              userargs = userData[message.author.id].osuUsername;
+              try{
+                userargs = userData[message.author.id].osuUsername
+              }catch(err){
+                message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
+              }
             }
           }
         } catch (err) {
@@ -78,7 +82,11 @@ module.exports.run = async (client, message, args, prefix) => {
           }
 
           if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("-pass") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
-            userargs = userData[message.author.id].osuUsername
+            try{
+              userargs = userData[message.author.id].osuUsername
+            }catch(err){
+              message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
+            }
           }
         }
       }
@@ -90,7 +98,11 @@ module.exports.run = async (client, message, args, prefix) => {
       }
 
       if (userargs.length === 0) {
-        userargs = userData[message.author.id].osuUsername;
+        try{
+          userargs = userData[message.author.id].osuUsername
+        }catch(err){
+          message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
+        };
       }
       //log in
       await auth.login(process.env.client_id, process.env.client_secret);

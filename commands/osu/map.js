@@ -1,5 +1,4 @@
 const { EmbedBuilder } = require("discord.js");
-const fs = require("fs");
 const { v2, auth } = require("osu-api-extended");
 const { BeatmapCalculator, ScoreCalculator } = require('@kionell/osu-pp-calculator')
 const scoreCalculator = new ScoreCalculator()
