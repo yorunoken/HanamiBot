@@ -341,7 +341,7 @@ exports.run = async (client, message, args, prefix) => {
 
 
     const collector = message.channel.createMessageComponentCollector({
-        time: 1000 * 30
+        time: 1000 * 20
     });
 
     collector.on("collect", async i => {
@@ -369,7 +369,11 @@ exports.run = async (client, message, args, prefix) => {
         console.log(value)
         const Map = await GetMap(value)
         console.log(Map.embed)
-        await i.update({ embeds: [Map.embed], components: [row] })
+        try{
+            await i.update({ embeds: [Map.embed], components: [row] })
+        }catch(err){
+
+        }
 
 
     })
