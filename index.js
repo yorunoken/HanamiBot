@@ -69,7 +69,7 @@ client.on("ready", async () => {
 client.on('guildCreate', (guild) => {
   
   const guilds = guild.channels.cache.find(g => g.type === 0)
-  guilds.send(`Hello, I'm Mia and thank you for inviting me! I am an osu! bot created by yoru#9267. my default prefix is \`?\`. To start using the bot, you can set your osu! username by doing \`?osuset "your username"\`. to get a full list of all of the commands I have, please do \`?help\`, and to search for what specific commands do, do \`?search commandname\`. hope you enjoy! `)
+  guilds.send(`Hello, I'm Mia and thank you for inviting me! I am an osu! bot created by yoru#9267. my default prefix is \`?\`. To start using the bot, you can set your osu! username by doing \`?osuset "your username"\`. to get a full list of all of the commands I have, please do \`?help\`, and to search for what specific commands do, do \`?help commandname\`. hope you enjoy! `)
 
 })
 

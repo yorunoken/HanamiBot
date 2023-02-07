@@ -46,7 +46,7 @@ exports.run = async (client, message, args, prefix) => {
       { name: "**help commands**", value: categories.help.join(', '), inline: false },
     )
     .setThumbnail(message.author.displayAvatarURL())
-    .setFooter({ text: `for more information on a command, do: ${prefix}search {commandname}` });
+    .setFooter({ text: `for more information on a command, do: ${prefix}help {commandname}` });
   message.channel.send({ embeds: [embed] });
 
 };
