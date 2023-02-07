@@ -499,7 +499,7 @@ module.exports.run = async (client, message, args, prefix) => {
         .setDescription(`${scoreone}${scoretwo}${scorethree}${scorefour}${scorefive}`)
         .setFooter({ text: `Page ${pageNumber}/${pageTotal}` });
 
-      message.channel.send({ content: FilterMods, embeds: [embed], components: [row] });
+      message.channel.send({ content: FilterMods, embeds: [embed] });
 
       console.log(value, userargs)
 
