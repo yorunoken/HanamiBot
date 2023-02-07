@@ -1145,9 +1145,7 @@ module.exports.run = async (client, message, args, prefix) => {
     }
 
 
-    const collector = message.channel.createMessageComponentCollector({
-      max: 1
-    })
+    const collector = message.channel.createMessageComponentCollector()
 
 
     try {
