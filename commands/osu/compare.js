@@ -970,6 +970,8 @@ exports.run = async (client, message, args, prefix) => {
 
                 await SendEmbed(mapinfo, beatmapId, user)
 
+                return;
+
               }
 
             } catch (err) {

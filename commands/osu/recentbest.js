@@ -1157,6 +1157,7 @@ module.exports.run = async (client, message, args, prefix) => {
             const mapinfo = await v2.beatmap.diff(beatmapId)
 
             await SendEmbed(mapinfo, beatmapId, user)
+            return;
 
           }
 
