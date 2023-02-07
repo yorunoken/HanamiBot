@@ -145,6 +145,15 @@ module.exports.run = async (client, message, args, prefix) => {
           .setStyle(ButtonStyle.Success)
       )
 
+    const disabledrow = new ActionRowBuilder()
+      .addComponents(
+        new ButtonBuilder()
+          .setCustomId("mine")
+          .setLabel("Compare")
+          .setStyle(ButtonStyle.Success)
+          .setDisabled()
+      )
+
 
     if (args.includes("-l") || args.includes("-list")) {
       if (args.includes('-p')) {
@@ -1136,21 +1145,22 @@ module.exports.run = async (client, message, args, prefix) => {
     }
 
 
-    const collector = message.channel.createMessageComponentCollector()
+    const collector = message.channel.createMessageComponentCollector({
+      max: 1
+    })
 
 
     try {
       collector.on("collect", async (i) => {
         try {
-
           if (i.customId == "mine") {
+            await i.update({ embeds: [i.message.embeds[0]], components: [disabledrow] })
+            console.log("hi")
             const userargs = userData[i.user.id].osuUsername
             if (userargs == undefined) {
               message.channel.send(`<@${i.user.id}> Please set your osu! username by typing **${prefix}link "your username"**`);
               return
             }
-
-            console.log(userargs)
 
             const user = await v2.user.details(userargs, "osu")
             const beatmapId = i.message.embeds[0].url.match(/\d+/)[0]

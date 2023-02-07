@@ -125,6 +125,23 @@ module.exports.run = async (client, message, args, prefix) => {
         return;
       }
 
+      const row = new ActionRowBuilder()
+      .addComponents(
+        new ButtonBuilder()
+          .setCustomId("mine")
+          .setLabel("Compare")
+          .setStyle(ButtonStyle.Success)
+      )
+
+      const disabledrow = new ActionRowBuilder()
+      .addComponents(
+        new ButtonBuilder()
+          .setCustomId("mine")
+          .setLabel("Compare")
+          .setStyle(ButtonStyle.Success)
+          .setDisabled()
+      )
+
       async function SendEmbed(mapinfo, beatmapId, user) {
         try {
 
@@ -506,10 +523,10 @@ module.exports.run = async (client, message, args, prefix) => {
             thing5 = `**${five + 1}.**${grade2} **+${modstwo}** [${maxAttrs2.difficulty.stars.toFixed(2)}★] **∙** **(${(score[five].accuracy * 100).toFixed(2)
               }%)** **${score[five].statistics.count_miss}**<:hit00:1061254490075955231>\n▹**${CurAttrs2.pp.toFixed(2)}**/${FCAttrs2.pp.toFixed(2)}PP **∙** [**${score[five].max_combo}**x/${FCAttrs2.difficulty.maxCombo}x] <t:${time2}:R>\n`
           }
-
-
-
-
+          
+          
+          
+          
           //embed
           const embed = new EmbedBuilder()
             .setColor('Purple')
@@ -524,22 +541,16 @@ module.exports.run = async (client, message, args, prefix) => {
             .setImage(`https://assets.ppy.sh/beatmaps/${mapinfo.beatmapset_id}/covers/cover.jpg`)
             .setThumbnail(user.avatar_url)
             .setFooter({ text: `${status} map by ${mapinfo.beatmapset.creator}`, iconURL: `https://a.ppy.sh/${mapinfo.beatmapset.user_id}?1668890819.jpeg` })
-
-          message.channel.send({ embeds: [embed], components: [row] })
-          return;
-        } catch (err) {
+            
+            message.channel.send({ embeds: [embed], components: [row] })
+            return;
+          } catch (err) {
           console.log(err)
         }
       }
-
-      const row = new ActionRowBuilder()
-        .addComponents(
-          new ButtonBuilder()
-            .setCustomId("mine")
-            .setLabel("Compare")
-            .setStyle(ButtonStyle.Success)
-        )
-
+      
+      
+      
 
       let sortmod = 0
       try {
@@ -771,21 +782,21 @@ module.exports.run = async (client, message, args, prefix) => {
         message.channel.send(`**No recent plays for \`${user.username}\`**`);
       }
 
-      const collector = message.channel.createMessageComponentCollector()
-
-
+      const collector = message.channel.createMessageComponentCollector({
+        max: 1
+      })
+  
+  
       try {
         collector.on("collect", async (i) => {
           try {
-
             if (i.customId == "mine") {
+              await i.update({ embeds: [i.message.embeds[0]], components: [disabledrow] })
               const userargs = userData[i.user.id].osuUsername
               if (userargs == undefined) {
                 message.channel.send(`<@${i.user.id}> Please set your osu! username by typing **${prefix}link "your username"**`);
                 return
               }
-
-              console.log(userargs)
 
               const user = await v2.user.details(userargs, "osu")
               const beatmapId = i.message.embeds[0].url.match(/\d+/)[0]
