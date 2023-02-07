@@ -771,9 +771,7 @@ module.exports.run = async (client, message, args, prefix) => {
         message.channel.send(`**No recent plays for \`${user.username}\`**`);
       }
 
-      const collector = message.channel.createMessageComponentCollector({
-        time: 1000 * 15,
-      })
+      const collector = message.channel.createMessageComponentCollector()
 
 
       try {

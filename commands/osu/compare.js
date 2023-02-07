@@ -947,9 +947,7 @@ exports.run = async (client, message, args, prefix) => {
           }
         }
 
-        const collector = message.channel.createMessageComponentCollector({
-          time: 1000 * 15,
-        })
+        const collector = message.channel.createMessageComponentCollector()
 
 
     
