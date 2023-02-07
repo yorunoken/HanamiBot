@@ -1,7 +1,11 @@
-const { EmbedBuilder } = require("discord.js");
+const {
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+} = require("discord.js")
 const fs = require("fs");
 const { v2, auth, tools, mods } = require("osu-api-extended");
-const { BeatmapCalculator, ScoreCalculator } = require('@kionell/osu-pp-calculator')
 const { Beatmap, Calculator } = require('rosu-pp')
 const { Downloader, DownloadEntry } = require("osu-downloader")
 
@@ -92,32 +96,32 @@ exports.run = async (client, message, args, prefix) => {
 
 
 
-          try{
-            
+          try {
+
             if (args.includes("-mania")) {
               RuleSetId = 3
               ModeOsu = "mania"
             }
             if (args.join(" ").startsWith("-mania")) userargs = userData[message.author.id].osuUsername
-  
-  
+
+
             if (args.includes("-taiko")) {
               RuleSetId = 1
               ModeOsu = "taiko"
             }
             if (args.join(" ").startsWith("-taiko")) userargs = userData[message.author.id].osuUsername
-  
+
             if (args.includes("-ctb")) {
               RuleSetId = 2
               ModeOsu = "ctb"
             }
             if (args.join(" ").startsWith("-ctb")) userargs = userData[message.author.id].osuUsername
-  
+
             if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("-p")) {
               userargs = userData[message.author.id].osuUsername
             }
 
-          }catch(err){
+          } catch (err) {
             message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`);
           }
 
@@ -146,7 +150,7 @@ exports.run = async (client, message, args, prefix) => {
       await auth.login(process.env.client_id, process.env.client_secret);
       let user = await v2.user.details(userargs, ModeOsu)
 
-      if(user.id == undefined){
+      if (user.id == undefined) {
         message.reply(`**The user ${userargs} doesn't exist.**`)
         return;
       }
@@ -177,12 +181,23 @@ exports.run = async (client, message, args, prefix) => {
           }
         }
 
+        const row = new ActionRowBuilder()
+          .addComponents(
+            new ButtonBuilder()
+              .setCustomId("mine")
+              .setLabel("Compare with my score")
+              .setStyle(ButtonStyle.Success),
+          )
+
+
 
 
         let SendEmbed
         if (value >= 0) {
           console.log('value')
-          SendEmbed = async function (mapinfo, beatmapId) {
+
+
+          SendEmbed = async function (mapinfo, beatmapId, user) {
             try {
               if (mapinfo.status == "unranked" || mapinfo.status == "graveyard") {
                 message.channel.send("**Unranked map, cannot parse scores**")
@@ -201,12 +216,12 @@ exports.run = async (client, message, args, prefix) => {
                 await downloader.downloadSingle()
               }
 
-              try{
+              try {
                 // formatted values for user
                 global_rank = user.statistics.global_rank.toLocaleString();
                 country_rank = user.statistics.country_rank.toLocaleString();
                 user_pp = user.statistics.pp.toLocaleString();
-              }catch(err){
+              } catch (err) {
                 global_rank = 0
                 country_rank = 0
                 user_pp = 0
@@ -367,7 +382,7 @@ exports.run = async (client, message, args, prefix) => {
                 .setThumbnail(user.avatar_url)
                 .setFooter({ text: `${status} map by ${mapinfo.beatmapset.creator}`, iconURL: `https://a.ppy.sh/${mapinfo.beatmapset.user_id}?1668890819.jpeg` })
 
-              message.channel.send({ embeds: [embed] })
+              message.channel.send({ embeds: [embed], components: [row] })
 
               return;
             } catch (err) {
@@ -376,17 +391,21 @@ exports.run = async (client, message, args, prefix) => {
             }
 
           }
+
+
         } else {
+
+
           console.log('not defined')
-          SendEmbed = async function (mapinfo, beatmapId) {
+          SendEmbed = async function (mapinfo, beatmapId, user) {
             try {
 
-              try{
+              try {
                 // formatted values for user
                 global_rank = user.statistics.global_rank.toLocaleString();
                 country_rank = user.statistics.country_rank.toLocaleString();
                 user_pp = user.statistics.pp.toLocaleString();
-              }catch(err){
+              } catch (err) {
                 global_rank = 0
                 country_rank = 0
                 user_pp = 0
@@ -458,14 +477,14 @@ exports.run = async (client, message, args, prefix) => {
               let thing4 = ""
               let thing5 = ""
 
-              const pagenumraw = score.length/5
+              const pagenumraw = score.length / 5
               const pagenum = Math.ceil(pagenumraw)
 
               let pageCount = ``
 
 
               if (score[one]) {
-                pageCount = `**Page:** \`${one+1}/${pagenum}\``
+                pageCount = `**Page:** \`${one + 1}/${pagenum}\``
 
                 let modsone = score[one].mods.join("")
                 let modsID
@@ -752,7 +771,7 @@ exports.run = async (client, message, args, prefix) => {
                 thing5 = `**${five + 1}.**${grade2} **+${modstwo}** [${maxAttrs2.difficulty.stars.toFixed(2)}★] **∙** **(${(score[five].accuracy * 100).toFixed(2)
                   }%)** **${score[five].statistics.count_miss}**<:hit00:1061254490075955231>\n▹**${CurAttrs2.pp.toFixed(2)}**/${FCAttrs2.pp.toFixed(2)}PP **∙** [**${score[five].max_combo}**x/${FCAttrs2.difficulty.maxCombo}x] <t:${time2}:R>\n`
               }
-              
+
 
 
 
@@ -771,13 +790,15 @@ exports.run = async (client, message, args, prefix) => {
                 .setThumbnail(user.avatar_url)
                 .setFooter({ text: `${status} map by ${mapinfo.beatmapset.creator}`, iconURL: `https://a.ppy.sh/${mapinfo.beatmapset.user_id}?1668890819.jpeg` })
 
-              message.channel.send({ embeds: [embed] })
+              message.channel.send({ embeds: [embed], components: [row] })
               return;
             } catch (err) {
               ErrCount++
               console.log(err)
             }
           }
+
+
         }
 
 
@@ -791,7 +812,7 @@ exports.run = async (client, message, args, prefix) => {
 
             if (mapinfo.id == undefined) throw new Error("No Author")
             //send the embed
-            await SendEmbed(mapinfo, beatmapId)
+            await SendEmbed(mapinfo, beatmapId, user)
             GoodToGo = true
 
 
@@ -811,7 +832,7 @@ exports.run = async (client, message, args, prefix) => {
               if (mapinfo.id == undefined) throw new Error("No Author")
 
               //send the embed
-              await SendEmbed(mapinfo, beatmapId)
+              await SendEmbed(mapinfo, beatmapId, user)
               GoodToGo = true
 
             } catch (err) {
@@ -829,7 +850,7 @@ exports.run = async (client, message, args, prefix) => {
 
                 if (mapinfo.id == undefined) throw new Error("No Author")
                 //send the embed
-                await SendEmbed(mapinfo, beatmapId)
+                await SendEmbed(mapinfo, beatmapId, user)
                 GoodToGo = true
                 return;
 
@@ -895,7 +916,7 @@ exports.run = async (client, message, args, prefix) => {
               const mapinfo = await v2.beatmap.diff(beatmapId)
 
               // send the embed
-              await SendEmbed(mapinfo, beatmapId)
+              await SendEmbed(mapinfo, beatmapId, user)
 
               if (ErrCount >= 1) {
                 message.reply(`**No Scores Found For \`${user.username}\`.**`)
@@ -925,6 +946,41 @@ exports.run = async (client, message, args, prefix) => {
             message.channel.send("**No maps found**")
           }
         }
+
+        const collector = message.channel.createMessageComponentCollector({
+          time: 1000 * 15,
+        })
+
+
+    
+        try {
+          collector.on("collect", async (i) => {
+            try {
+
+              if(i.customId == "mine"){
+                const userargs = userData[i.user.id].osuUsername
+                if(userargs == undefined){
+                  message.channel.send(`<@${i.user.id}> Please set your osu! username by typing **${prefix} "your username"**`);
+                  return
+                }
+
+                console.log(userargs)
+                
+                const user = await v2.user.details(userargs, "osu")
+                const beatmapId = i.message.embeds[0].url.match(/\d+/)[0]
+                const mapinfo = await v2.beatmap.diff(beatmapId)
+
+                await SendEmbed(mapinfo, beatmapId, user)
+
+              }
+
+            } catch (err) {
+              console.log(err)
+            }
+          })
+        } catch (err) { }
+
+
       });
     }
   })
