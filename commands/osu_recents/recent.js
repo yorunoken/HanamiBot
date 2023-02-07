@@ -536,7 +536,7 @@ module.exports.run = async (client, message, args, prefix) => {
         .addComponents(
           new ButtonBuilder()
             .setCustomId("mine")
-            .setLabel("Compare with my score")
+            .setLabel("Compare")
             .setStyle(ButtonStyle.Success)
         )
 
