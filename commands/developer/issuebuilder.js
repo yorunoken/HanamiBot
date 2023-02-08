@@ -62,7 +62,7 @@ exports.run = async (client, message, args, prefix, EmbedBuilder) => {
 
 }
 exports.name = "issuebuilder"
-exports.aliases = ["issuebuilder", "issuebuilder"]
+exports.aliases = ["issuebuilder", "ib", "builder"]
 exports.description = ["issue builder for github (developer only)"]
 exports.usage = [`invite`]
-exports.category = ["general"]
+exports.category = ["developer"]
