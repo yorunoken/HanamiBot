@@ -76,7 +76,7 @@ exports.run = async (client, message, args, prefix) => {
           .setAuthor({
             name: `Profile Avatar of ${user.username}`,
             iconURL: `https://flagcdn.com/h80/${countrycode}.png`,
-            url: `https://osu.ppy.sh/users/${user.id}`,
+            url: `https://osu.ppy.sh/u/${user.id}`,
           })
           .setImage(`https://a.ppy.sh/${user.id}?1668890819.jpeg`);
         message.channel.send({ embeds: [embed] });

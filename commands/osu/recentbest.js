@@ -535,7 +535,7 @@ module.exports.run = async (client, message, args, prefix) => {
         .setAuthor({
           name: `${user.username}: ${pp}pp (#${global_rank} ${user.country.code}#${country_rank})`,
           iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
-          url: `https://osu.ppy.sh/users/${user.id}`,
+          url: `https://osu.ppy.sh/u/${user.id}`,
         })
         .setThumbnail(user.avatar_url)
         .setDescription(`${scoreone}${scoretwo}${scorethree}${scorefour}${scorefive}`)
@@ -750,7 +750,7 @@ module.exports.run = async (client, message, args, prefix) => {
         .setAuthor({
           name: `${user.username} ${user_pp}pp (#${global_rank} ${user.country_code}#${country_rank}) `,
           iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
-          url: `https://osu.ppy.sh/users/${user.id}`,
+          url: `https://osu.ppy.sh/u/${user.id}`,
         })
         .setTitle(title)
         .setURL(`https://osu.ppy.sh/b/${score[value].beatmap.id}`)
