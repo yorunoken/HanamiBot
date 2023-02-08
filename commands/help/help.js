@@ -9,7 +9,8 @@ exports.run = async (client, message, args, prefix) => {
     osu: [],
     general: [],
     chess: [],
-    fun: []
+    fun: [],
+    developer: [],
   };
 
 
@@ -44,6 +45,7 @@ exports.run = async (client, message, args, prefix) => {
       { name: "**fun commands**", value: categories.fun.join(', '), inline: false },
       { name: "**chess commands**", value: categories.chess.join(', '), inline: false },
       { name: "**help commands**", value: categories.help.join(', '), inline: false },
+      { name: "**Developer commands**", value: categories.developer.join(', '), inline: false },
     )
     .setThumbnail(message.author.displayAvatarURL())
     .setFooter({ text: `for more information on a command, do: ${prefix}help {commandname}` });
