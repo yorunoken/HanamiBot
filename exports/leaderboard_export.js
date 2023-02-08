@@ -27,10 +27,10 @@ async function LbSend(beatmapId, scores) {
         const mapinfo = await v2.beatmap.diff(beatmapId)
 
         one = 0
-        two = 2
-        three = 3
-        four = 4
-        five = 5
+        two = 1
+        three = 2
+        four = 3
+        five = 4
 
         const grades = {
             A: "<:A_:1057763284327080036>",
@@ -105,6 +105,7 @@ async function LbSend(beatmapId, scores) {
         } else {
             first_score = "**No scores found.**"
         }
+
 
         if (scores.scores[two]) {
 
