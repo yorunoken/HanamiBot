@@ -35,26 +35,32 @@ exports.run = async (client, message, args, prefix, EmbedBuilder) => {
     if (args.includes("-wontfix")) labels.push("wontfix")
 
 
+
+
+    
+    
     if (message.reference.messageId) {
         message.channel.messages.fetch(message.reference.messageId).then(async Content => {
-
+            
             const issuebuilder = await octokit.request('POST /repos/YoruNoKen/miaosu/issues', {
                 owner: 'YoruNoKen',
                 repo: 'miaosu',
                 title: `${Title}`,
-                body: `> ${Content.content}\n[Original Message by @${Content.author.tag}](https://canary.discord.com/channels/${Content.guildId}/${Content.channelId}/${Content.id})`,
+                body: `> ${Content.content}\n\n[Original Message by @${Content.author.tag}](https://canary.discord.com/channels/${Content.guildId}/${Content.channelId}/${Content.id})`,
                 labels: labels
             })
-
+            
+            const labelNames = issuebuilder.data.labels.map(x => x.name).join(", ")
             const embed = new EmbedBuilder()
                 .setTitle("Successful!")
-                .setDescription(`Successfully created Issue #${issuebuilder.data.number}\n[Click here to go to issue](${issuebuilder.data.url})`)
+                .setColor("Purple")
+                .setDescription(`Successfully created Issue #${issuebuilder.data.number}\n[Click here to go to issue](https://github.com/YoruNoKen/miaosu/issues/${issuebuilder.data.number})`)
                 .setFields(
-                    { name: `Added Labels:`, value: issuebuilder.data.labels.join(", ") },
+                    { name: `Added Labels:`, value: labelNames },
                     { name: `Assigned:`, value: `YoruNoKen` }
                 )
 
-                    message.channel.send({ embeds: [embed] })
+            message.channel.send({ embeds: [embed] })
         })
     }
 
