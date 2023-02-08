@@ -9,6 +9,36 @@ exports.run = async (client, message, args, prefix) => {
       console.log(error);
     } else {
       const userData = JSON.parse(data);
+      if (message.mentions.users.size > 0) {
+        const mentionedUser = message.mentions.users.first();
+        try {
+          if (message.content.includes(`<@${mentionedUser.id}>`)) {
+            userargs = userData[mentionedUser.id].osuUsername;
+          }
+
+        } catch (err) {
+          console.error(err);
+          if (mentionedUser) {
+            if (message.content.includes(`<@${mentionedUser.id}>`)) {
+              try {
+                userData[mentionedUser.id].osuUsername;
+              } catch (err) {
+                message.reply(`No osu! user found for ${mentionedUser.tag}`);
+              }
+            } else {
+              try {
+                userData[message.author.id].osuUsername;
+              } catch (err) {
+                message.reply(
+                  `Set your osu! username by using "${prefix}osuset **your username**"`
+                );
+              }
+            }
+          }
+          return;
+        }
+      }
+
       if (args[0] === undefined) {
         try{
           userargs = userData[message.author.id].osuUsername;

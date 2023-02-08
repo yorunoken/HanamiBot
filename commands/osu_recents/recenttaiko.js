@@ -1,8 +1,20 @@
-const { EmbedBuilder } = require("discord.js");
+const {
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+} = require("discord.js")
+const axios = require('axios');
+
+// importing osu functions
+const { CompareEmbed } = require('../../exports/compare_export.js')
+const { LbSend } = require('../../exports/leaderboard_export.js')
+
 const fs = require("fs");
 const { v2, auth, tools, mods } = require("osu-api-extended")
 const { Beatmap, Calculator } = require('rosu-pp')
 const { Downloader, DownloadEntry } = require("osu-downloader")
+
 module.exports.run = async (client, message, args, prefix) => {
   await message.channel.sendTyping()
 
@@ -14,7 +26,7 @@ module.exports.run = async (client, message, args, prefix) => {
       let userargs
       let value = 0
       let mode = "taiko"
-      let RuleSetId = 1
+      let RuleSetId = undefined
       let PassDetermine = 1
 
       if (message.mentions.users.size > 0) {
@@ -24,11 +36,7 @@ module.exports.run = async (client, message, args, prefix) => {
             if (message.content.includes(`<@${mentionedUser.id}>`)) {
               userargs = userData[mentionedUser.id].osuUsername;
             } else {
-              try{
-                userargs = userData[message.author.id].osuUsername
-              }catch(err){
-                message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
-              }
+              userargs = userData[message.author.id].osuUsername;
             }
           }
         } catch (err) {
@@ -77,14 +85,15 @@ module.exports.run = async (client, message, args, prefix) => {
             value = 0
           }
 
+          
           if (args.includes('-pass')) {
             PassDetermine = 0
           }
 
           if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("-pass") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
-            try{
+            try {
               userargs = userData[message.author.id].osuUsername
-            }catch(err){
+            } catch (err) {
               message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
             }
           }
@@ -98,11 +107,11 @@ module.exports.run = async (client, message, args, prefix) => {
       }
 
       if (userargs.length === 0) {
-        try{
-          userargs = userData[message.author.id].osuUsername
-        }catch(err){
+        try {
+          userargs = userData[message.author.id].osuUsername;
+        } catch (err) {
           message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
-        };
+        }
       }
       //log in
       await auth.login(process.env.client_id, process.env.client_secret);
@@ -111,6 +120,52 @@ module.exports.run = async (client, message, args, prefix) => {
         message.channel.send(`**The player, \`${userargs}\` does not exist**`)
         return;
       }
+
+      const row = new ActionRowBuilder()
+        .addComponents(
+          new ButtonBuilder()
+            .setCustomId("mine")
+            .setLabel("Compare")
+            .setStyle(ButtonStyle.Success),
+
+          new ButtonBuilder()
+            .setEmoji("🇹🇷")
+            .setCustomId("ctlb")
+            .setLabel("TR Leaderboard")
+            .setStyle(ButtonStyle.Secondary),
+
+          new ButtonBuilder()
+            .setEmoji("🌐")
+            .setCustomId("lb")
+            .setLabel("Leaderboard")
+            .setStyle(ButtonStyle.Secondary)
+        )
+
+      const disabledrow = new ActionRowBuilder()
+        .addComponents(
+          new ButtonBuilder()
+            .setCustomId("mine")
+            .setLabel("Compare")
+            .setStyle(ButtonStyle.Success)
+            .setDisabled(),
+
+          new ButtonBuilder()
+            .setEmoji("🇹🇷")
+            .setCustomId("ctlb")
+            .setLabel("TR Leaderboard")
+            .setStyle(ButtonStyle.Secondary)
+            .setDisabled(),
+
+          new ButtonBuilder()
+            .setEmoji("🌐")
+            .setCustomId("lb")
+            .setLabel("Leaderboard")
+            .setStyle(ButtonStyle.Secondary)
+            .setDisabled()
+        )
+
+
+
 
       let sortmod = 0
       try {
@@ -130,6 +185,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
         let filteredscore
         let FilterMods = ""
+        sortmod = 0
 
         if (argValues["mods"] != undefined) {
           sortmod = 1
@@ -137,7 +193,6 @@ module.exports.run = async (client, message, args, prefix) => {
           score = filteredscore
           FilterMods = `**Filtering mod(s): ${score[value].mods.join("").toUpperCase()}**`
         }
-        sortmod = 0
 
 
         if (!fs.existsSync(`./osuFiles/${score[value].beatmap.id}.osu`)) {
@@ -283,7 +338,7 @@ module.exports.run = async (client, message, args, prefix) => {
             "katu": score[value].statistics.count_katu,
             "50": score[value].statistics.count_50,
             "0": 0,
-            mode: "osu"
+            mode: mode
           })
 
           pps = `**${CurAttrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}PP ▹ (**${FCAttrs.pp.toFixed(2)}**PP for **${FcAcc}%**)`
@@ -332,7 +387,7 @@ module.exports.run = async (client, message, args, prefix) => {
           .setThumbnail(user.avatar_url)
           .setFooter({ text: `${status} map by ${score[value].beatmapset.creator}`, iconURL: `https://a.ppy.sh/${score[value].beatmapset.user_id}?1668890819.jpeg` })
         //send embed
-        message.channel.send({ content: FilterMods, embeds: [embed] });
+        message.channel.send({ content: FilterMods, embeds: [embed], components: [row] });
       } catch (err) {
         console.error(err);
         if (sortmod == 1) {
@@ -341,8 +396,73 @@ module.exports.run = async (client, message, args, prefix) => {
         }
         message.channel.send(`**No recent plays for \`${user.username}\`**`);
       }
+
+      const collector = message.channel.createMessageComponentCollector()
+
+
+      try {
+        collector.on("collect", async (i) => {
+          try {
+
+            await i.update({ embeds: [i.message.embeds[0]], components: [disabledrow] })
+
+            const userargs = userData[i.user.id].osuUsername
+
+            if (userargs == undefined) {
+              message.channel.send(`<@${i.user.id}> Please set your osu! username by typing **${prefix} "your username"**`);
+              return;
+            }
+
+            const ModeString = "taiko"
+            if (i.customId == "mine") {
+
+              const user = await v2.user.details(userargs, ModeString)
+              const beatmapId = i.message.embeds[0].url.match(/\d+/)[0]
+              const mapinfo = await v2.beatmap.diff(beatmapId)
+
+
+              const compareEmbed = await CompareEmbed(mapinfo, beatmapId, user, ModeString)
+              message.channel.send({ embeds: [compareEmbed.embed.data], components: [row] })
+              return;
+            }
+
+            if (i.customId == "lb") {
+              const beatmapId = i.message.embeds[0].url.match(/\d+/)[0]
+              const response = await axios.get(`https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${ModeString}&type=global`, { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } })
+              const scores = response.data
+              if (scores.length == 0) {
+                message.reply("**No plays were found.**")
+                return;
+              }
+
+              const LB = await LbSend(beatmapId, scores)
+              message.channel.send({ content: "**Leaderboard**", embeds: [LB.embed.data], components: [row] })
+            }
+
+            if (i.customId == "ctlb") {
+              const beatmapId = i.message.embeds[0].url.match(/\d+/)[0]
+              const response = await axios.get(`https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${ModeString}&type=country`, { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } })
+              const scores = response.data
+              if (scores.length == 0) {
+                message.reply("**No plays were found.**")
+                return;
+              }
+
+              const LB = await LbSend(beatmapId, scores)
+              message.channel.send({ content: "**TR Leaderboard**", embeds: [LB.embed.data], components: [row] })
+            }
+
+          } catch (err) {
+            console.log(err)
+          }
+        })
+      } catch (err) { }
+
+
+
     }
   });
+
 };
 exports.name = ["recenttaiko"];
 exports.aliases = ["recenttaiko", "rt", "rst", "rtaiko"]
