@@ -1,19 +1,7 @@
 // require('fetch')
 const axios = require('axios');
-const {
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-} = require("discord.js")
+const { EmbedBuilder } = require("discord.js")
 const fs = require('fs')
-
-
-// importing osu functions
-const { CompareEmbed } = require('../../exports/compare_export.js')
-const { LbSend } = require('../../exports/leaderboard_export.js')
-
-
 const { v2, auth, mods, tools } = require("osu-api-extended");
 const { Beatmap, Calculator } = require('rosu-pp')
 const { Downloader, DownloadEntry } = require("osu-downloader")
@@ -88,48 +76,6 @@ exports.run = async (client, message, args, prefix) => {
     modifiedMods = ""
   }
 
-  const row = new ActionRowBuilder()
-  .addComponents(
-    new ButtonBuilder()
-      .setCustomId("mine")
-      .setLabel("Compare")
-      .setStyle(ButtonStyle.Success),
-
-    new ButtonBuilder()
-      .setEmoji("🇹🇷")
-      .setCustomId("ctlb")
-      .setLabel("TR Leaderboard")
-      .setStyle(ButtonStyle.Secondary),
-
-    new ButtonBuilder()
-      .setEmoji("🌐")
-      .setCustomId("lb")
-      .setLabel("Leaderboard")
-      .setStyle(ButtonStyle.Secondary)
-  )
-
-const disabledrow = new ActionRowBuilder()
-  .addComponents(
-    new ButtonBuilder()
-      .setCustomId("mine")
-      .setLabel("Compare")
-      .setStyle(ButtonStyle.Success)
-      .setDisabled(),
-
-    new ButtonBuilder()
-      .setEmoji("🇹🇷")
-      .setCustomId("ctlb")
-      .setLabel("TR Leaderboard")
-      .setStyle(ButtonStyle.Secondary)
-      .setDisabled(),
-
-    new ButtonBuilder()
-      .setEmoji("🌐")
-      .setCustomId("lb")
-      .setLabel("Leaderboard")
-      .setStyle(ButtonStyle.Secondary)
-      .setDisabled()
-  )
 
 
 
@@ -459,9 +405,9 @@ const disabledrow = new ActionRowBuilder()
 
       if (modifiedMods.startsWith("&mods")) {
         modifiedMods = modsArg
-        ModsSort = `**Leaderboard, Sorting by mod(s): \`${modifiedMods}\`**`
+        ModsSort = `**Global leaderboard, Sorting by mod(s): \`${modifiedMods}\`**`
       }
-      if (modifiedMods == "") ModsSort = `**Leaderboard**`
+      if (modifiedMods == "") ModsSort = `**Global leaderboard**`
 
       const embed = new EmbedBuilder()
         .setColor("Purple")
@@ -470,7 +416,7 @@ const disabledrow = new ActionRowBuilder()
         .setDescription(`${first_score}${second_score}${third_score}${fourth_score}${fifth_score}`)
         .setImage(`https://assets.ppy.sh/beatmaps/${mapinfo.beatmapset_id}/covers/cover.jpg`)
         .setFooter({ text: `Page: ${pagenum}/${totalPage}` })
-      message.channel.send({ content: ModsSort, embeds: [embed], components: [row] })
+      message.channel.send({ content: ModsSort, embeds: [embed] })
       return;
     } catch (err) {
       console.log(err)
@@ -612,70 +558,6 @@ const disabledrow = new ActionRowBuilder()
 
 
   });
-
-  fs.readFile("./user-data.json", async (error, data) => {
-    if (error) {
-      console.log(error);
-      return;
-    }
-    const userData = JSON.parse(data);
-
-
-
-
-    const collector = message.channel.createMessageComponentCollector()
-
-
-    try {
-      collector.on("collect", async (i) => {
-        try {
-
-          await i.update({ embeds: [i.message.embeds[0]], components: [disabledrow] })
-
-          const userargs = userData[i.user.id].osuUsername
-
-          if (userargs == undefined) {
-            message.channel.send(`<@${i.user.id}> Please set your osu! username by typing **${prefix} "your username"**`);
-            return;
-          }
-
-          const ModeString = "osu"
-          if (i.customId == "mine") {
-
-            const user = await v2.user.details(userargs, ModeString)
-            const beatmapId = i.message.embeds[0].url.match(/\d+/)[0]
-            const mapinfo = await v2.beatmap.diff(beatmapId)
-
-
-            const compareEmbed = await CompareEmbed(mapinfo, beatmapId, user, ModeString)
-            message.channel.send({ embeds: [compareEmbed.embed.data], components: [row] })
-            return;
-          }
-
-          if (i.customId == "ctlb") {
-            const beatmapId = i.message.embeds[0].url.match(/\d+/)[0]
-            const response = await axios.get(`https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${ModeString}&type=country`, { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } })
-            const scores = response.data
-            if (scores.length == 0) {
-              message.reply("**No plays were found.**")
-              return;
-            }
-
-            const LB = await LbSend(beatmapId, scores)
-            message.channel.send({ content: "**TR Leaderboard**", embeds: [LB.embed.data], components: [row] })
-          }
-
-        } catch (err) {
-          console.log(err)
-        }
-      })
-    } catch (err) { }
-
-
-
-  })
-
-
 
 
 };

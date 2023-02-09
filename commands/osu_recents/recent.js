@@ -1,21 +1,8 @@
-const {
-  EmbedBuilder,
-  ActionRowBuilder,
-  SelectMenuBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-} = require("discord.js")
-const axios = require('axios');
-
-// importing osu functions
-const { CompareEmbed } = require('../../exports/compare_export.js')
-const { LbSend } = require('../../exports/leaderboard_export.js')
-
+const { EmbedBuilder } = require("discord.js")
 const fs = require("fs");
 const { v2, auth, tools, mods } = require("osu-api-extended")
 const { Beatmap, Calculator } = require('rosu-pp')
 const { Downloader, DownloadEntry } = require("osu-downloader")
-
 module.exports.run = async (client, message, args, prefix) => {
   await message.channel.sendTyping()
 
@@ -133,71 +120,6 @@ module.exports.run = async (client, message, args, prefix) => {
         return;
       }
 
-      let row = new ActionRowBuilder()
-        .addComponents(
-
-          new ButtonBuilder()
-            .setCustomId("previous")
-            .setLabel("<")
-            .setStyle(ButtonStyle.Secondary),
-
-          new ButtonBuilder()
-            .setCustomId("next")
-            .setLabel(">")
-            .setStyle(ButtonStyle.Success),
-
-          new ButtonBuilder()
-            .setCustomId("mine")
-            .setLabel("Compare")
-            .setStyle(ButtonStyle.Danger)
-        )
-
-      let rowCompareDisabled = new ActionRowBuilder()
-        .addComponents(
-
-          new ButtonBuilder()
-            .setCustomId("previous")
-            .setLabel("<")
-            .setStyle(ButtonStyle.Secondary),
-
-          new ButtonBuilder()
-            .setCustomId("next")
-            .setLabel(">")
-            .setStyle(ButtonStyle.Success),
-
-          new ButtonBuilder()
-            .setCustomId("mine")
-            .setLabel("Compare")
-            .setStyle(ButtonStyle.Danger)
-        )
-
-      let row2nd = new ActionRowBuilder()
-        .addComponents(
-          new ButtonBuilder()
-            .setCustomId("ctlb")
-            .setEmoji("🇹🇷")
-            .setStyle(ButtonStyle.Secondary),
-
-          new ButtonBuilder()
-            .setCustomId("lb")
-            .setEmoji("🌐")
-            .setStyle(ButtonStyle.Secondary)
-        )
-
-      let disabledrow2nd = new ActionRowBuilder()
-        .addComponents(
-          new ButtonBuilder()
-            .setCustomId("ctlb")
-            .setEmoji("🇹🇷")
-            .setStyle(ButtonStyle.Secondary)
-            .setDisabled(),
-
-          new ButtonBuilder()
-            .setCustomId("lb")
-            .setEmoji("🌐")
-            .setStyle(ButtonStyle.Secondary)
-            .setDisabled()
-        )
 
 
       let sortmod = 0
@@ -436,97 +358,11 @@ module.exports.run = async (client, message, args, prefix) => {
 
       const Recent = await GetRecent(value, user, mode)
 
-      message.channel.send({ content: Recent.FilterMods, embeds: [Recent.embed.data], components: [row, row2nd] });
-
-
-      const collector = message.channel.createMessageComponentCollector()
-
-
-      try {
-        collector.on("collect", async (i) => {
-          try {
-
-
-            if (i.customId == "previous") {
-              value--
-              const user = await v2.user.details(i.message.embeds[0].author.url.match(/\d+/)[0], mode)
-              console.log(i.message.embeds[0].author.url.match(/\d+/)[0])
-
-              console.log(user.id)
-              const Recent = await GetRecent(value, user, mode)
-
-              await i.update({ embeds: [Recent.embed.data], components: [row, row2nd] })
-              return;
-            }
-
-            if (i.customId == "next") {
-              value++
-
-              const user = await v2.user.details(i.message.embeds[0].author.url.match(/\d+/)[0], mode)
-
-              const Recent = await GetRecent(value, user, mode)
-
-              await i.update({ embeds: [Recent.embed.data], components: [row, row2nd] })
-              return;
-            }
+      message.channel.send({ content: Recent.FilterMods, embeds: [Recent.embed.data] });
 
 
 
-            const userargs = userData[i.user.id].osuUsername
 
-            if (userargs == undefined) {
-              message.channel.send(`<@${i.user.id}> Please set your osu! username by typing **${prefix} "your username"**`);
-              return;
-            }
-            const ModeString = "osu"
-            if (i.customId == "mine") {
-
-              const user = await v2.user.details(userargs, ModeString)
-              const beatmapId = i.message.embeds[0].url.match(/\d+/)[0]
-              const mapinfo = await v2.beatmap.diff(beatmapId)
-
-
-              const compareEmbed = await CompareEmbed(mapinfo, beatmapId, user, ModeString)
-              message.channel.send({ embeds: [compareEmbed.embed.data], components: [row2nd] })
-              await i.update({ embeds: [i.message.embeds[0]], components: [rowCompareDisabled, row2nd] })
-              return;
-            }
-
-            if (i.customId == "lb") {
-              const beatmapId = i.message.embeds[0].url.match(/\d+/)[0]
-              const response = await axios.get(`https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${ModeString}&type=global`, { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } })
-              const scores = response.data
-              if (scores.length == 0) {
-                message.reply("**No plays were found.**")
-                return;
-              }
-
-              const LB = await LbSend(beatmapId, scores)
-              message.channel.send({ content: "**Leaderboard**", embeds: [LB.embed.data], components: [row2nd] })
-              await i.update({ embeds: [i.message.embeds[0]], components: [disabledrow2nd] })
-              return;
-            }
-
-            if (i.customId == "ctlb") {
-              const beatmapId = i.message.embeds[0].url.match(/\d+/)[0]
-              const response = await axios.get(`https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${ModeString}&type=country`, { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } })
-              const scores = response.data
-              if (scores.length == 0) {
-                message.reply("**No plays were found.**")
-                return;
-              }
-
-              const LB = await LbSend(beatmapId, scores)
-              message.channel.send({ content: "**TR Leaderboard**", embeds: [LB.embed.data], components: [row2nd] })
-              await i.update({ embeds: [i.message.embeds[0]], components: [disabledrow2nd] })
-              return;
-            }
-
-          } catch (err) {
-            console.log(err)
-          }
-        })
-      } catch (err) { }
 
 
 
