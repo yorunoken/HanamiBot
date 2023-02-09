@@ -47,7 +47,7 @@
     "reddit": "^1.2.1",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.9",
-    "rosu-pp": "^0.9.3",
+    "rosu-pp": "^0.9.4",
     "rust": "^0.1.6",
     "strftime": "^0.10.1",
     "tenorjs": "^1.0.10",

@@ -133,7 +133,7 @@ module.exports.run = async (client, message, args, prefix) => {
         return;
       }
 
-      const row = new ActionRowBuilder()
+      let row = new ActionRowBuilder()
         .addComponents(
 
           new ButtonBuilder()
@@ -145,58 +145,59 @@ module.exports.run = async (client, message, args, prefix) => {
             .setCustomId("next")
             .setLabel(">")
             .setStyle(ButtonStyle.Success),
+
+          new ButtonBuilder()
+            .setCustomId("mine")
+            .setLabel("Compare")
+            .setStyle(ButtonStyle.Danger)
         )
 
-      const rowMenu = new ActionRowBuilder()
+      let rowCompareDisabled = new ActionRowBuilder()
         .addComponents(
-          new SelectMenuBuilder()
-            .setCustomId('select')
-            .setPlaceholder(`Extra options for the map`)
-            .addOptions(
-              {
-                label: `Turkish Leaderboard`,
-                description: `Displays the Turkish Leaderboard of the map.`,
-                value: 'ctlb',
-              },
-              {
-                label: `Global Leaderboard`,
-                description: `Displays the Global Leaderboard of the map.`,
-                value: 'lb',
-              },
-              {
-                label: `Compare`,
-                description: `Compare your score with the play.`,
-                value: 'mine',
-              }
-            ),
-        );
 
-      const disabledrowMenu = new ActionRowBuilder()
+          new ButtonBuilder()
+            .setCustomId("previous")
+            .setLabel("<")
+            .setStyle(ButtonStyle.Secondary),
+
+          new ButtonBuilder()
+            .setCustomId("next")
+            .setLabel(">")
+            .setStyle(ButtonStyle.Success),
+
+          new ButtonBuilder()
+            .setCustomId("mine")
+            .setLabel("Compare")
+            .setStyle(ButtonStyle.Danger)
+        )
+
+      let row2nd = new ActionRowBuilder()
         .addComponents(
-          new SelectMenuBuilder()
-            .setCustomId('select')
-            .setPlaceholder(`Extra options for the map.`)
+          new ButtonBuilder()
+            .setCustomId("ctlb")
+            .setEmoji("🇹🇷")
+            .setStyle(ButtonStyle.Secondary),
+
+          new ButtonBuilder()
+            .setCustomId("lb")
+            .setEmoji("🌐")
+            .setStyle(ButtonStyle.Secondary)
+        )
+
+      let disabledrow2nd = new ActionRowBuilder()
+        .addComponents(
+          new ButtonBuilder()
+            .setCustomId("ctlb")
+            .setEmoji("🇹🇷")
+            .setStyle(ButtonStyle.Secondary)
+            .setDisabled(),
+
+          new ButtonBuilder()
+            .setCustomId("lb")
+            .setEmoji("🌐")
+            .setStyle(ButtonStyle.Secondary)
             .setDisabled()
-            .addOptions(
-              {
-                label: `Turkish Leaderboard`,
-                description: `Displays the Turkish Leaderboard of the map.`,
-                value: 'ctlb',
-              },
-              {
-                label: `Global Leaderboard`,
-                description: `Displays the Global Leaderboard of the map.`,
-                value: 'lb',
-              },
-              {
-                label: `Compare`,
-                description: `Compare your score with the play.`,
-                value: 'mine',
-              }
-            ),
-        );
-
-
+        )
 
 
       let sortmod = 0
@@ -211,7 +212,7 @@ module.exports.run = async (client, message, args, prefix) => {
             offset: "0",
           });
 
-        
+
           if (args.join(" ").includes("+")) {
             const iIndex = args.indexOf("+")
             modsArg = (args[iIndex + 1].slice(1)).toUpperCase().match(/[A-Z]{2}/g)
@@ -435,7 +436,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
       const Recent = await GetRecent(value, user, mode)
 
-      message.channel.send({ content: Recent.FilterMods, embeds: [Recent.embed.data], components: [row, rowMenu] });
+      message.channel.send({ content: Recent.FilterMods, embeds: [Recent.embed.data], components: [row, row2nd] });
 
 
       const collector = message.channel.createMessageComponentCollector()
@@ -450,11 +451,11 @@ module.exports.run = async (client, message, args, prefix) => {
               value--
               const user = await v2.user.details(i.message.embeds[0].author.url.match(/\d+/)[0], mode)
               console.log(i.message.embeds[0].author.url.match(/\d+/)[0])
-              
+
               console.log(user.id)
               const Recent = await GetRecent(value, user, mode)
 
-              await i.update({ embeds: [Recent.embed.data], components: [row, disabledrowMenu] })
+              await i.update({ embeds: [Recent.embed.data], components: [row, row2nd] })
               return;
             }
 
@@ -465,12 +466,11 @@ module.exports.run = async (client, message, args, prefix) => {
 
               const Recent = await GetRecent(value, user, mode)
 
-              await i.update({ embeds: [Recent.embed.data], components: [row, disabledrowMenu] })
+              await i.update({ embeds: [Recent.embed.data], components: [row, row2nd] })
               return;
             }
 
 
-            await i.update({ embeds: [i.message.embeds[0]], components: [row, disabledrowMenu] })
 
             const userargs = userData[i.user.id].osuUsername
 
@@ -479,7 +479,7 @@ module.exports.run = async (client, message, args, prefix) => {
               return;
             }
             const ModeString = "osu"
-            if (i.values == "mine") {
+            if (i.customId == "mine") {
 
               const user = await v2.user.details(userargs, ModeString)
               const beatmapId = i.message.embeds[0].url.match(/\d+/)[0]
@@ -487,11 +487,12 @@ module.exports.run = async (client, message, args, prefix) => {
 
 
               const compareEmbed = await CompareEmbed(mapinfo, beatmapId, user, ModeString)
-              message.channel.send({ embeds: [compareEmbed.embed.data], components: [rowMenu] })
+              message.channel.send({ embeds: [compareEmbed.embed.data], components: [row2nd] })
+              await i.update({ embeds: [i.message.embeds[0]], components: [rowCompareDisabled, row2nd] })
               return;
             }
 
-            if (i.values == "lb") {
+            if (i.customId == "lb") {
               const beatmapId = i.message.embeds[0].url.match(/\d+/)[0]
               const response = await axios.get(`https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${ModeString}&type=global`, { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } })
               const scores = response.data
@@ -501,10 +502,12 @@ module.exports.run = async (client, message, args, prefix) => {
               }
 
               const LB = await LbSend(beatmapId, scores)
-              message.channel.send({ content: "**Leaderboard**", embeds: [LB.embed.data], components: [rowMenu] })
+              message.channel.send({ content: "**Leaderboard**", embeds: [LB.embed.data], components: [row2nd] })
+              await i.update({ embeds: [i.message.embeds[0]], components: [disabledrow2nd] })
+              return;
             }
 
-            if (i.values == "ctlb") {
+            if (i.customId == "ctlb") {
               const beatmapId = i.message.embeds[0].url.match(/\d+/)[0]
               const response = await axios.get(`https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${ModeString}&type=country`, { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } })
               const scores = response.data
@@ -514,7 +517,9 @@ module.exports.run = async (client, message, args, prefix) => {
               }
 
               const LB = await LbSend(beatmapId, scores)
-              message.channel.send({ content: "**TR Leaderboard**", embeds: [LB.embed.data], components: [rowMenu] })
+              message.channel.send({ content: "**TR Leaderboard**", embeds: [LB.embed.data], components: [row2nd] })
+              await i.update({ embeds: [i.message.embeds[0]], components: [disabledrow2nd] })
+              return;
             }
 
           } catch (err) {
