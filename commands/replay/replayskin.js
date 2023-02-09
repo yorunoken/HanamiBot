@@ -160,38 +160,44 @@ exports.run = async (client, message, args, prefix) => {
 
     try {
         collector.on('collect', async i => {
-            page = page
-
-            if (i.customId == "prev_page") {
-                if (page == 1) {
-                    page == 1
-                } else {
-                    page--
+            try{
+                
+                page = page
+    
+                if (i.customId == "prev_page") {
+                    if (page == 1) {
+                        page == 1
+                    } else {
+                        page--
+                    }
                 }
-            }
-
-            if (i.customId == "next_page") {
-                if (page == 23) {
-                    page == 23
-                } else {
-                    page++
+    
+                if (i.customId == "next_page") {
+                    if (page == 23) {
+                        page == 23
+                    } else {
+                        page++
+                    }
                 }
+    
+                const newskinvalues = await getSkins(page)
+                const newSkinName = newskinvalues.presentationNames
+                const newSkinID = newskinvalues.SkinID
+    
+                const embedg = new EmbedBuilder()
+                    .setColor('Purple')
+                    .setTitle("Available skins:")
+                    .setFields(
+                        { name: "ID", value: `${newSkinID.join("\n")}`, inline: true },
+                        { name: "Name", value: `${newSkinName.join("\n")}`, inline: true },
+                    )
+                    .setFooter({ text: `Page: ${page}/23` })
+    
+                await i.update({ embeds: [embedg], components: [buttons] })
+
+            }catch(err){
+
             }
-
-            const newskinvalues = await getSkins(page)
-            const newSkinName = newskinvalues.presentationNames
-            const newSkinID = newskinvalues.SkinID
-
-            const embedg = new EmbedBuilder()
-                .setColor('Purple')
-                .setTitle("Available skins:")
-                .setFields(
-                    { name: "ID", value: `${newSkinID.join("\n")}`, inline: true },
-                    { name: "Name", value: `${newSkinName.join("\n")}`, inline: true },
-                )
-                .setFooter({ text: `Page: ${page}/23` })
-
-            await i.update({ embeds: [embedg], components: [buttons] })
         })
     } catch (err) {
 

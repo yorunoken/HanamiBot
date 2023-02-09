@@ -7,7 +7,7 @@ exports.run = async (client, message, args, prefix) => {
         const embed = new EmbedBuilder()
             .setColor("Purple")
             .setTitle("A list of settings for replay configuration:")
-            .setDescription(`**parallax**: (true-false) \`Default => false\`\n**cursor_ripples**: (true/false) \`Default => false\`\n**cursor_size**: (0.5-2) \`Default => 1\`\n**bg_dim**: (1-100) \`Default => 75\`\n**storyboard**: (true/false) \`Default => true\`\n**bg_video**: (true/false) \`Default => true\`\n**key_overlay**: (true/false) \`Default => true\`\n**music_volume**: (1-100) \`Default => 50\`\n**hitsound_volume**: (1-100) \`Default => 50\`\n**danser_logo**: (true/false) \`Default => true\`\n**aim_ur**: (true/false) \`Default => false\`\n**ur**: (true/false) \`Default => true\`\n**pp_counter**: (true/false) \`Default => true\`\n**snaking_slider**: (true/false) \`Default => true\`\n\n**To configure a setting, do: \`${prefix}replaysettings -setting_name true/false/number\`**`)
+            .setDescription(`**parallax**: (true-false) \`Default => false\`\n**cursor_ripples**: (true/false) \`Default => false\`\n**cursor_size**: (0.5-2) \`Default => 1\`\n**bg_dim**: (1-100) \`Default => 75\`\n**storyboard**: (true/false) \`Default => true\`\n**bg_video**: (true/false) \`Default => true\`\n**skin_colors:** (true/false) \`Default => false\`\n**nightcore_hs:** (true/false) \`Default => true\`\n**skip_intro:** (true/false) \`Default => true\`\n**skip_intro:** (true/false) \`Default => true\`\n**key_overlay**: (true/false) \`Default => true\`\n**music_volume**: (1-100) \`Default => 50\`\n**hitsound_volume**: (1-100) \`Default => 50\`\n**danser_logo**: (true/false) \`Default => true\`\n**aim_ur**: (true/false) \`Default => false\`\n**ur**: (true/false) \`Default => true\`\n**pp_counter**: (true/false) \`Default => true\`\n**snaking_slider**: (true/false) \`Default => true\`\n\n**To configure a setting, do: \`${prefix}replaysettings -setting_name true/false/number\`**`)
 
         message.channel.send({ embeds: [embed] })
         return;
@@ -130,7 +130,7 @@ exports.run = async (client, message, args, prefix) => {
             message.reply(`**Please provide a boolean**`)
         }
 
-        if (args[0] == ("-cursor_ripples")) {
+        if (args[0] == ("-cursor_ripples") || args[0] == ("cursor_ripples")) {
             if (args[1] === "true" || args[1] === "false") {
 
                 userData[message.author.id] = { ...userData[message.author.id], cursor_ripples: `${args[1]}` }
@@ -267,7 +267,7 @@ exports.run = async (client, message, args, prefix) => {
             message.reply(`**Please provide a boolean**`)
         }
 
-        if (args[0] == ("-snaking_slider") || args[0] == ("-snaking_slider")) {
+        if (args[0] == ("-snaking_slider") || args[0] == ("snaking_slider")) {
             if (args[1] === "true" || args[1] === "false") {
 
                 userData[message.author.id] = { ...userData[message.author.id], snaking_slider: `${args[1]}` }
@@ -276,6 +276,57 @@ exports.run = async (client, message, args, prefix) => {
                         console.log(error);
                     } else {
                         message.reply(`**Successfully set snaking_slider to** \`${args[1]}\``)
+                    }
+                });
+
+                return;
+            }
+            message.reply(`**Please provide a boolean**`)
+        }
+
+        if (args[0] == ("-skin_colors") || args[0] == ("skin_colors")) {
+            if (args[1] === "true" || args[1] === "false") {
+
+                userData[message.author.id] = { ...userData[message.author.id], skin_colors: `${args[1]}` }
+                fs.writeFile("./user-data.json", JSON.stringify(userData), (error) => {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        message.reply(`**Successfully set skin_colors to** \`${args[1]}\``)
+                    }
+                });
+
+                return;
+            }
+            message.reply(`**Please provide a boolean**`)
+        }
+
+        if (args[0] == ("-nightcore_hs") || args[0] == ("nightcore_hs")) {
+            if (args[1] === "true" || args[1] === "false") {
+
+                userData[message.author.id] = { ...userData[message.author.id], nightcore_hs: `${args[1]}` }
+                fs.writeFile("./user-data.json", JSON.stringify(userData), (error) => {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        message.reply(`**Successfully set nightcore_hs to** \`${args[1]}\``)
+                    }
+                });
+
+                return;
+            }
+            message.reply(`**Please provide a boolean**`)
+        }
+
+        if (args[0] == ("-skip_intro") || args[0] == ("skip_intro")) {
+            if (args[1] === "true" || args[1] === "false") {
+
+                userData[message.author.id] = { ...userData[message.author.id], skip_intro: `${args[1]}` }
+                fs.writeFile("./user-data.json", JSON.stringify(userData), (error) => {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        message.reply(`**Successfully set skip_intro to** \`${args[1]}\``)
                     }
                 });
 
