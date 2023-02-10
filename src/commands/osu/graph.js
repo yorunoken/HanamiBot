@@ -14,6 +14,7 @@ exports.run = async (client, message, args, prefix) => {
         const userData = JSON.parse(data);
         let userargs
         let mode = userData[message.author.id].osumode
+        if(mode == undefined) mode = "osu"
   
   
         if (message.mentions.users.size > 0) {

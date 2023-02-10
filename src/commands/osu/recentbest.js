@@ -16,6 +16,7 @@ module.exports.run = async (client, message, args, prefix) => {
     let value = 0
     play_number = undefined
     let mode = userData[message.author.id].osumode
+    if(mode == undefined) mode = "osu"
     let RuleSetId = 0
     let string
 

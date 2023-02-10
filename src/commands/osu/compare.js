@@ -16,6 +16,8 @@ exports.run = async (client, message, args, prefix) => {
       let value = undefined
       let pagenum = 1
       let ModeOsu = userData[message.author.id].osumode
+      if(ModeOsu == undefined) ModeOsu = "osu"
+
       let ErrCount = 0
       let RuleSetId = 0
 

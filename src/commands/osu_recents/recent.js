@@ -3,7 +3,7 @@ const fs = require("fs");
 const { v2, auth } = require("osu-api-extended")
 
 // importing GetRecent
-const { GetRecent } = require('../../../exports/recent_export.js')
+const { GetRecent } = require('../../exports/recent_export')
 
 module.exports.run = async (client, message, args, prefix) => {
   await message.channel.sendTyping()
@@ -16,7 +16,9 @@ module.exports.run = async (client, message, args, prefix) => {
       let userargs
       let value = 0
       let mode = userData[message.author.id].osumode
-      let RuleSetId = undefined
+      if(mode == undefined) mode = "osu"
+
+      let RuleSetId = 0
       let PassDetermine = 1
 
       if (message.mentions.users.size > 0) {
@@ -125,7 +127,7 @@ module.exports.run = async (client, message, args, prefix) => {
         return;
       }
 
-      const Recent = await GetRecent(value, user, mode, PassDetermine, args)
+      const Recent = await GetRecent(value, user, mode, PassDetermine, args, RuleSetId)
       console.log(Recent.FilterMods)
 
       message.channel.send({ content: Recent.FilterMods, embeds: [Recent.embed.data] });
