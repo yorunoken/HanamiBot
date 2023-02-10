@@ -15,7 +15,7 @@ module.exports.run = async (client, message, args, prefix) => {
     let userargs
     let value = 0
     play_number = undefined
-    let mode = "osu"
+    let mode = userData[message.author.id].osumode
     let RuleSetId = 0
     let string
 
@@ -69,6 +69,10 @@ module.exports.run = async (client, message, args, prefix) => {
           userargs = args[0]
         }
 
+        if (args.includes("-osu")) {
+          mode = "osu"
+          RuleSetId = 0
+        }
 
         if (args.includes("-mania")) {
           mode = "mania"

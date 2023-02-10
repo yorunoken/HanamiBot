@@ -15,7 +15,7 @@ exports.run = async (client, message, args, prefix) => {
       let userargs
       let value = undefined
       let pagenum = 1
-      let ModeOsu = "osu"
+      let ModeOsu = userData[message.author.id].osumode
       let ErrCount = 0
       let RuleSetId = 0
 
@@ -92,6 +92,13 @@ exports.run = async (client, message, args, prefix) => {
 
 
           try {
+
+            
+            if (args.includes("-osu")) {
+              RuleSetId = 0
+              ModeOsu = "osu"
+            }
+            if (args.join(" ").startsWith("-osu")) userargs = userData[message.author.id].osuUsername
 
             if (args.includes("-mania")) {
               RuleSetId = 3

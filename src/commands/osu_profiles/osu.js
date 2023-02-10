@@ -16,7 +16,7 @@ exports.run = async (client, message, args, prefix) => {
     }
     const userData = JSON.parse(data)
     let userargs
-    let mode = "osu"
+    let mode = userData[message.author.id].osumode
 
     if (message.mentions.users.size > 0) {
       const mentionedUser = message.mentions.users.first()
@@ -79,10 +79,15 @@ exports.run = async (client, message, args, prefix) => {
       mode = "fruits"
     }
 
+    if (args.includes("-osu")) {
+      mode = "osu"
+    }
+
     if (
       args.join(" ").startsWith("-mania") ||
       args.join(" ").startsWith("-ctb") ||
       args.join(" ").startsWith("-taiko") ||
+      args.join(" ").startsWith("-osu") ||
       args.join(" ").startsWith("-d") ||
       args.join(" ").startsWith("-details")
     ) {

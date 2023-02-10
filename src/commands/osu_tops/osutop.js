@@ -13,7 +13,7 @@ exports.run = async (client, message, args, prefix) => {
       const userData = JSON.parse(data);
       value = 1
       play_number = undefined
-      ModeOsu = "osu"
+      ModeOsu = userData[message.author.id].osumode
       ModeID = 0
 
       if (message.mentions.users.size > 0) {
@@ -99,6 +99,17 @@ exports.run = async (client, message, args, prefix) => {
         ModeOsu = "mania"
       }
       if (args.join(" ").startsWith("-mania")) try {
+        userargs = userData[message.author.id].osuUsername
+      } catch (err) {
+        message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`);
+        return;
+      }
+
+      if (args.includes("-osu")) {
+        ModeID = 0
+        ModeOsu = "osu"
+      }
+      if (args.join(" ").startsWith("-osu")) try {
         userargs = userData[message.author.id].osuUsername
       } catch (err) {
         message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`);

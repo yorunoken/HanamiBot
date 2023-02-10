@@ -15,7 +15,7 @@ module.exports.run = async (client, message, args, prefix) => {
       const userData = JSON.parse(data);
       let userargs
       let value = 0
-      let mode = "osu"
+      let mode = userData[message.author.id].osumode
       let RuleSetId = undefined
       let PassDetermine = 1
 
@@ -75,6 +75,12 @@ module.exports.run = async (client, message, args, prefix) => {
             value = 0
           }
 
+
+          if (args.includes("-osu")) {
+            mode = "osu"
+            RuleSetId = 0
+          }
+
           if (args.includes("-mania")) {
             mode = "mania"
             RuleSetId = 3
@@ -91,7 +97,7 @@ module.exports.run = async (client, message, args, prefix) => {
             PassDetermine = 0
           }
 
-          if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-pass") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
+          if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-osu") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-pass") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
             try {
               userargs = userData[message.author.id].osuUsername
             } catch (err) {
