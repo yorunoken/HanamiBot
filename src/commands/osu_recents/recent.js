@@ -128,7 +128,12 @@ module.exports.run = async (client, message, args, prefix) => {
       }
 
       const Recent = await GetRecent(value, user, mode, PassDetermine, args, RuleSetId)
-      console.log(Recent.FilterMods)
+      try{
+        console.log(Recent.FilterMods)
+      }catch(err){
+        message.reply(`**No recent plays for \`${user.username}\`**`)
+        return;
+      }
 
       message.channel.send({ content: Recent.FilterMods, embeds: [Recent.embed.data] });
     }
