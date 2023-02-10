@@ -13,8 +13,8 @@ exports.run = async (client, message, args, prefix) => {
   //log into api
   await auth.login(process.env.client_id, process.env.client_secret);
   const user = await v2.user.details(username, "osu");
-  if(user.id == undefined){
-    message.reply(`**The user, \`${username}\`, does not exist in the database.**`)
+  if (user.id == undefined) {
+    message.reply(`**The user \`${username}\` does not exist in the database.**`)
     return
   }
   user_id = user.id
@@ -36,15 +36,13 @@ exports.run = async (client, message, args, prefix) => {
           }
         });
       } catch (err) {
-        message.reply(
-          `The username ${username} doesn't exist in the Bancho database.`
-        );
+        message.reply(`The username ${username} doesn't exist in the Bancho database.`);
       }
     }
   });
 };
-exports.name = "osuset";
-exports.aliases = ["osuset", "link"]
-exports.description = ["Sets a nickname as your default**Parameters:**\n\`username\` set your username to the argument"]
-exports.usage = [`osuset aetrna`]
+exports.name = "link";
+exports.aliases = ["link"]
+exports.description = ["Sets a nickname as your default**Parameters:**\n\`username\` set your username to the argument\n To set your default gamemode, see \`setmode\`"]
+exports.usage = [`link YoruNoKen`]
 exports.category = ["osu"]
