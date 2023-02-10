@@ -16,7 +16,7 @@ module.exports.run = async (client, message, args, prefix) => {
     let value = 0
     play_number = undefined
     let mode = "osu"
-    let RuleSetId = undefined
+    let RuleSetId = 0
     let string
 
     if (message.mentions.users.size > 0) {
@@ -79,7 +79,7 @@ module.exports.run = async (client, message, args, prefix) => {
           RuleSetId = 1
         }
         if (args.includes("-ctb")) {
-          mode = "ctb"
+          mode = "fruits"
           RuleSetId = 2
         }
 
@@ -589,6 +589,8 @@ module.exports.run = async (client, message, args, prefix) => {
         .nKatu(score[value].statistics.count_katu)
         .performance(map)
 
+      console.log(CurAttrs)
+
 
       //formatted values for user
       try {
@@ -702,7 +704,7 @@ module.exports.run = async (client, message, args, prefix) => {
         .setURL(`https://osu.ppy.sh/b/${score[value].beatmap.id}`)
         .setDescription(`${grade} **${percentage} +${modsone}** ${sc_rank} (**🤵#${Play_rank}**) \n▹${pps} \n▹${map_score} • ${acc}\n▹[ **${score[value].max_combo}**x/${maxAttrs.difficulty.maxCombo}x ] • { **${three}**/${one}/${fifty}/${miss} } \n▹Score Set <t:${time1}:R>`)
         .setFields({
-          name: `**Beatmap info:**`, value: `BPM: \`${mapValues.bpm.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${maxAttrs.difficulty.ar.toFixed(1).toString().replace(/\.0+$/, "")}\` OD: \`${maxAttrs.difficulty.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\``
+          name: `**Beatmap info:**`, value: `BPM: \`${mapValues.bpm?.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${maxAttrs.difficulty.ar?.toFixed(1).toString().replace(/\.0+$/, "")}\` OD: \`${maxAttrs.difficulty.od?.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs?.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp?.toFixed(2).toString().replace(/\.0+$/, "")}\``
         })
         .setThumbnail(`https://assets.ppy.sh/beatmaps/${score[value].beatmapset.id}/covers/list.jpg`)
         .setFooter({ text: `${status} map by ${score[value].beatmapset.creator}`, iconURL: `https://a.ppy.sh/${score[value].beatmapset.user_id}?1668890819.jpeg` })
@@ -711,7 +713,7 @@ module.exports.run = async (client, message, args, prefix) => {
       message.channel.send({ content: FilterMods, embeds: [embed] })
 
     } catch (err) {
-      console.error(err);
+      console.log(err);
       message.channel.send(`the user **${userargs}** doesn't exist, or no recent plays`);
       return;
     }
