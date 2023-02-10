@@ -3,7 +3,7 @@ const fs = require("fs");
 const { v2, auth } = require("osu-api-extended")
 
 // importing GetRecent
-const { GetRecent } = require('../../exports/recent_export.js')
+const { GetRecent } = require('../../../exports/recent_export.js')
 
 module.exports.run = async (client, message, args, prefix) => {
   await message.channel.sendTyping()

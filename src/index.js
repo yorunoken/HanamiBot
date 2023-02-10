@@ -30,9 +30,9 @@ const client = new Client({
 // command handler
 client.commands = new Map();
 const commands = {};
-const commandFolders = fs.readdirSync("./commands")
+const commandFolders = fs.readdirSync("src/commands")
 for (const folder of commandFolders) {
-  const commandFiles = fs.readdirSync(`./commands/${folder}`).filter((file) => file.endsWith(".js") || file.endsWith(".ts"));
+  const commandFiles = fs.readdirSync(`./src/commands/${folder}`).filter((file) => file.endsWith(".js") || file.endsWith(".ts"));
 
   for (const file of commandFiles) {
     const commandFile = require(`./commands/${folder}/${file}`);
