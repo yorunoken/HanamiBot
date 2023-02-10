@@ -27,7 +27,7 @@ const client = new Client({
   ],
 });
 
-//command handler
+// command handler
 client.commands = new Map();
 const commands = {};
 const commandFolders = fs.readdirSync("./commands")
@@ -56,7 +56,8 @@ for (const folder of commandFolders) {
 }
 
 
-
+// user cooldown checker
+const cooldowns = new Map();
 
 
 client.on("ready", async () => {
@@ -67,7 +68,7 @@ client.on("ready", async () => {
 });
 
 client.on('guildCreate', (guild) => {
-  
+
   const guilds = guild.channels.cache.find(g => g.type === 0)
   guilds.send(`Hello, I'm Mia and thank you for inviting me! I am an osu! bot created by yoru#9267. my default prefix is \`?\`. To start using the bot, you can set your osu! username by doing \`?osuset "your username"\`. to get a full list of all of the commands I have, please do \`?help\`, and to search for what specific commands do, do \`?help commandname\`. hope you enjoy! `)
 
@@ -101,7 +102,25 @@ client.on("messageCreate", (message) => {
     const command = client.commands.get(commandName);
     if (!command)
       return
+
+
+    // check if the user is still in cooldown period
+    const cooldownAmount = (command.cooldown || 5) * 1000;
+    if (cooldowns.has(commandName)) {
+      const expirationTime = cooldowns.get(commandName) + cooldownAmount;
+      if (Date.now() < expirationTime) {
+        const timeLeft = (expirationTime - Date.now()) / 1000;
+        message.reply(`**You're on cooldown, please wait ${timeLeft.toFixed(1)} more seconds and try again.**`);
+        return;
+      }
+    }
+
+    // execute the command
     command.run(client, message, args, prefix, EmbedBuilder);
+
+    // setting the cooldown
+    cooldowns.set(commandName, Date.now());
+    setTimeout(() => cooldowns.delete(commandName), cooldownAmount);
   }
 });
 client.login(process.env.TOKEN);
