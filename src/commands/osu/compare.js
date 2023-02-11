@@ -16,7 +16,7 @@ exports.run = async (client, message, args, prefix) => {
       let value = undefined
       let pagenum = 1
       let ModeOsu = userData[message.author.id].osumode
-      if(ModeOsu == undefined) ModeOsu = "osu"
+      if (ModeOsu == undefined) ModeOsu = "osu"
 
       let ErrCount = 0
       let RuleSetId = 0
@@ -71,7 +71,7 @@ exports.run = async (client, message, args, prefix) => {
                 userData[message.author.id].osuUsername;
               } catch (err) {
                 message.reply(
-                  `Set your osu! username by using "${prefix}osuset **your username**"`
+                  `Set your osu! username by using "${prefix}link **your username**"`
                 );
               }
             }
@@ -85,7 +85,7 @@ exports.run = async (client, message, args, prefix) => {
           } catch (err) {
             console.error(err);
             message.reply(
-              `Set your osu! username by using "${prefix}osuset **your username**"`
+              `Set your osu! username by using "${prefix}link **your username**"`
             );
             return;
           }
@@ -95,7 +95,7 @@ exports.run = async (client, message, args, prefix) => {
 
           try {
 
-            
+
             if (args.includes("-osu")) {
               RuleSetId = 0
               ModeOsu = "osu"
@@ -126,7 +126,7 @@ exports.run = async (client, message, args, prefix) => {
             }
 
           } catch (err) {
-            message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`);
+            message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
           }
 
         }

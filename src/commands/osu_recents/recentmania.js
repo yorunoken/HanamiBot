@@ -41,7 +41,7 @@ module.exports.run = async (client, message, args, prefix) => {
                 userargs = userData[message.author.id].osuUsername;
               } catch (err) {
                 message.reply(
-                  `Set your osu! username by using "${prefix}osuset **your username**"`
+                  `Set your osu! username by using "${prefix}link **your username**"`
                 );
               }
             }
@@ -55,7 +55,7 @@ module.exports.run = async (client, message, args, prefix) => {
           } catch (err) {
             console.error(err);
             message.reply(
-              `Set your osu! username by using "${prefix}osuset **your username**"`
+              `Set your osu! username by using "${prefix}link **your username**"`
             );
             return;
           }
@@ -342,6 +342,12 @@ module.exports.run = async (client, message, args, prefix) => {
       }
 
       const Recent = await GetRecent(value, user, mode)
+      try{
+        console.log(Recent.FilterMods)
+      }catch(err){
+        // message.reply(`**No recent mania plays for \`${user.username}\`**`)
+        return;
+      }
 
       message.channel.send({ content: Recent.FilterMods, embeds: [Recent.embed.data] });
 

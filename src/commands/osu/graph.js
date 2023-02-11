@@ -41,7 +41,7 @@ exports.run = async (client, message, args, prefix) => {
                   userargs = userData[message.author.id].osuUsername;
                 } catch (err) {
                   message.reply(
-                    `Set your osu! username by using "${prefix}osuset **your username**"`
+                    `Set your osu! username by using "${prefix}link **your username**"`
                   );
                 }
               }
@@ -55,7 +55,7 @@ exports.run = async (client, message, args, prefix) => {
             } catch (err) {
               console.error(err);
               message.reply(
-                `Set your osu! username by using "${prefix}osuset **your username**"`
+                `Set your osu! username by using "${prefix}link **your username**"`
               );
               return;
             }
@@ -74,7 +74,7 @@ exports.run = async (client, message, args, prefix) => {
           try {
             userargs = userData[message.author.id].osuUsername
           } catch (err) {
-            message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`)
+            message.reply(`Set your osu! username by using "${prefix}link **your username**"`)
           }
         }
 
@@ -96,7 +96,7 @@ exports.run = async (client, message, args, prefix) => {
           try {
             userargs = userData[message.author.id].osuUsername
           } catch (err) {
-            message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`)
+            message.reply(`Set your osu! username by using "${prefix}link **your username**"`)
           }
         }
   

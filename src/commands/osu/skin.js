@@ -36,7 +36,7 @@ exports.run = async (client, message, args, prefix, EmbedBuilder) => {
             Skin = userData[message.author.id].Url_skin
           } catch (err) {
             console.error(err);
-            message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`)
+            message.reply(`Set your osu! username by using "${prefix}link **your username**"`)
             return;
           }
         } else {

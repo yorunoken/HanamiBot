@@ -14,6 +14,7 @@ exports.run = async (client, message, args, prefix) => {
       value = 1
       play_number = undefined
       ModeOsu = userData[message.author.id].osumode
+      if(ModeOsu == undefined) ModeOsu = "osu"
       ModeID = 0
 
       if (message.mentions.users.size > 0) {
@@ -40,7 +41,7 @@ exports.run = async (client, message, args, prefix) => {
                 userargs = userData[message.author.id].osuUsername;
               } catch (err) {
                 message.reply(
-                  `Set your osu! username by using "${prefix}osuset **your username**"`
+                  `Set your osu! username by using "${prefix}link **your username**"`
                 );
               }
             }
@@ -54,7 +55,7 @@ exports.run = async (client, message, args, prefix) => {
             userargs = userData[message.author.id].osuUsername;
           } catch (err) {
             console.error(err);
-            message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`);
+            message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
             return;
           }
         } else {
@@ -101,7 +102,7 @@ exports.run = async (client, message, args, prefix) => {
       if (args.join(" ").startsWith("-mania")) try {
         userargs = userData[message.author.id].osuUsername
       } catch (err) {
-        message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`);
+        message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
         return;
       }
 
@@ -112,7 +113,7 @@ exports.run = async (client, message, args, prefix) => {
       if (args.join(" ").startsWith("-osu")) try {
         userargs = userData[message.author.id].osuUsername
       } catch (err) {
-        message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`);
+        message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
         return;
       }
 
@@ -124,7 +125,7 @@ exports.run = async (client, message, args, prefix) => {
       if (args.join(" ").startsWith("-taiko")) try {
         userargs = userData[message.author.id].osuUsername
       } catch (err) {
-        message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`);
+        message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
         return;
       }
 
@@ -135,7 +136,7 @@ exports.run = async (client, message, args, prefix) => {
       if (args.join(" ").startsWith("-ctb")) try {
         userargs = userData[message.author.id].osuUsername
       } catch (err) {
-        message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`);
+        message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
         return;
       }
 
@@ -147,7 +148,7 @@ exports.run = async (client, message, args, prefix) => {
             message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
           }
         } catch (err) {
-          message.reply(`Set your osu! username by using "${prefix}osuset **your username**"`);
+          message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
           return;
         }
       }
