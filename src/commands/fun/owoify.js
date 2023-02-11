@@ -6,7 +6,15 @@ exports.run = async (client, message, args, prefix) => {
   console.log(phrase);
   if (!phrase) return message.reply("**please enter a phrase**");
   let owophrase = owoify(phrase, "uvu");
-  message.channel.send(owophrase);
+
+  if(owophrase.length >= 4000){
+    message.reply(`Outcome must not be greater than 4000 characters. Please try again with a different text.`);
+    return;
+  }
+
+
+    message.channel.send(owophrase);
+
   
 };
 exports.name = "owoify";
