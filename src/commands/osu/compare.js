@@ -193,7 +193,7 @@ exports.run = async (client, message, args, prefix) => {
           console.log('value')
 
 
-          SendEmbed = async function (mapinfo, beatmapId, user) {
+          SendEmbed = async function (mapinfo, beatmapId, user, ModeOsu) {
             try {
               if (mapinfo.status == "unranked" || mapinfo.status == "graveyard") {
                 message.channel.send("**Unranked map, cannot parse scores**")
@@ -391,7 +391,7 @@ exports.run = async (client, message, args, prefix) => {
 
         } else {
           console.log('not defined')
-          SendEmbed = async function (mapinfo, beatmapId, user) {
+          SendEmbed = async function (mapinfo, beatmapId, user, ModeOsu) {
             try {
 
               try {
@@ -803,8 +803,10 @@ exports.run = async (client, message, args, prefix) => {
             const mapinfo = await v2.beatmap.diff(beatmapId)
 
             if (mapinfo.id == undefined) throw new Error("No Author")
+            ModeOsu = mapinfo.mode
+
             //send the embed
-            await SendEmbed(mapinfo, beatmapId, user)
+            await SendEmbed(mapinfo, beatmapId, user, ModeOsu)
             GoodToGo = true
 
 
@@ -822,9 +824,10 @@ exports.run = async (client, message, args, prefix) => {
               const mapinfo = await v2.beatmap.diff(beatmapId)
 
               if (mapinfo.id == undefined) throw new Error("No Author")
+              ModeOsu = mapinfo.mode
 
               //send the embed
-              await SendEmbed(mapinfo, beatmapId, user)
+              await SendEmbed(mapinfo, beatmapId, user, ModeOsu)
               GoodToGo = true
 
             } catch (err) {
@@ -839,10 +842,11 @@ exports.run = async (client, message, args, prefix) => {
 
 
                 const mapinfo = await v2.beatmap.diff(beatmapId)
+                ModeOsu = mapinfo.mode
 
                 if (mapinfo.id == undefined) throw new Error("No Author")
                 //send the embed
-                await SendEmbed(mapinfo, beatmapId, user)
+                await SendEmbed(mapinfo, beatmapId, user, ModeOsu)
                 GoodToGo = true
                 return;
 
@@ -906,12 +910,13 @@ exports.run = async (client, message, args, prefix) => {
               user = await v2.user.details(userargs, ModeOsu)
 
               const mapinfo = await v2.beatmap.diff(beatmapId)
+              ModeOsu = mapinfo.mode
 
               // send the embed
-              await SendEmbed(mapinfo, beatmapId, user)
+              await SendEmbed(mapinfo, beatmapId, user, ModeOsu)
 
               if (ErrCount >= 1) {
-                message.reply(`**No Scores Found For \`${user.username}\`.**`)
+                // message.reply(`**No Scores Found For \`${user.username}\`.**`)
                 return;
               }
 

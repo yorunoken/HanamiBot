@@ -520,6 +520,9 @@ exports.run = async (client, message, args, prefix) => {
         if (!args[0].startsWith("https:")) {
           beatmapId = args[0]
         }
+
+        console.log(beatmapId)
+
         const map = await v2.beatmap.diff(beatmapId)
         map.id
 
