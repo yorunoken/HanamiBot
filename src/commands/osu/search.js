@@ -16,7 +16,7 @@ exports.run = async (client, message, args, prefix) => {
 
     const SearchMap = await v2.beatmap.search({
         query: query,
-        mode: 'osu',
+        section: 'any',
         nsfw: true
     })
 
