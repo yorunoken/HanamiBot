@@ -14,7 +14,7 @@ exports.run = async (client, message, args, prefix) => {
       value = 1
       play_number = undefined
       ModeOsu = "fruits"
-      ModeID = 0
+      ModeID = 2
 
       if (message.mentions.users.size > 0) {
         const mentionedUser = message.mentions.users.first();
@@ -94,39 +94,6 @@ exports.run = async (client, message, args, prefix) => {
         }
       }
 
-      if (args.includes("-mania")) {
-        ModeID = 3
-        ModeOsu = "mania"
-      }
-      if (args.join(" ").startsWith("-mania")) try {
-        userargs = userData[message.author.id].osuUsername
-      } catch (err) {
-        message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
-        return;
-      }
-
-
-      if (args.includes("-taiko")) {
-        ModeID = 1
-        ModeOsu = "taiko"
-      }
-      if (args.join(" ").startsWith("-taiko")) try {
-        userargs = userData[message.author.id].osuUsername
-      } catch (err) {
-        message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
-        return;
-      }
-
-      if (args.includes("-ctb")) {
-        ModeID = 2
-        ModeOsu = "ctb"
-      }
-      if (args.join(" ").startsWith("-ctb")) try {
-        userargs = userData[message.author.id].osuUsername
-      } catch (err) {
-        message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
-        return;
-      }
 
       if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
         try {
@@ -688,7 +655,7 @@ exports.run = async (client, message, args, prefix) => {
             .setAuthor({
               name: `${user.username}: ${pp}pp (#${global_rank} ${user.country.code}#${country_rank})`,
               iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
-              url: `https://osu.ppy.sh/u/${user.id}`,
+              url: `https://osu.ppy.sh/u/${user.id}/${ModeOsu}`,
             })
             .setThumbnail(user.avatar_url)
             .setDescription(`${scoreone}${scoretwo}${scorethree}${scorefour}${scorefive}`)

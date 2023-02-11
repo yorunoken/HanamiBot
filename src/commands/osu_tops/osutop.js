@@ -704,7 +704,7 @@ exports.run = async (client, message, args, prefix) => {
             .setAuthor({
               name: `${user.username}: ${pp}pp (#${global_rank} ${user.country.code}#${country_rank})`,
               iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
-              url: `https://osu.ppy.sh/u/${user.id}`,
+              url: `https://osu.ppy.sh/u/${user.id}/${ModeOsu}`,
             })
             .setThumbnail(user.avatar_url)
             .setDescription(`${scoreone}${scoretwo}${scorethree}${scorefour}${scorefive}`)
