@@ -17,6 +17,8 @@ require("dotenv/config");
 const MongoToken = process.env.database_token
 const { connect } = require('mongoose');
 
+let commandCount = 0
+
 
 const client = new Client({
   intents: [
@@ -65,14 +67,21 @@ client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}, in ${client.guilds.cache.size} servers!`);
   console.log(`server list:`)
 
+  try {
+    commandCount = parseInt(fs.readFileSync("commandCount.txt"), 10);
+  } catch (error) {
+    console.error(`Error reading command count from file: ${error}`);
+  }
+
 });
 
 client.on('guildCreate', (guild) => {
 
   const guilds = guild.channels.cache.find(g => g.type === 0)
-  guilds.send(`Hello, I'm Mia and thank you for inviting me! I am an osu! bot created by yoru#9267. my default prefix is \`?\`. To start using the bot, you can set your osu! username by doing \`?osuset "your username"\`. to get a full list of all of the commands I have, please do \`?help\`, and to search for what specific commands do, do \`?help commandname\`. hope you enjoy! `)
+  guilds.send(`Hello, I'm Mia and thank you for inviting me! I am an osu! bot created by yoru#9267. my default prefix is \`?\`. To start using the bot, you can set your osu! username by doing \`?link "your username"\`. to get a full list of all of the commands I have, please do \`?help\`, and to search for what specific commands do, do \`?help commandname\`. hope you enjoy! `)
 
 })
+
 
 
 client.on("messageCreate", (message) => {
@@ -118,9 +127,21 @@ client.on("messageCreate", (message) => {
     // execute the command
     command.run(client, message, args, prefix, EmbedBuilder);
 
+    if(isNaN(commandCount)) commandCount = 0
+
+    commandCount++
+
+
+    console.log(commandCount)
+
+    fs.writeFileSync("commandCount.txt", commandCount.toString());
+
+
+
     // setting the cooldown
     cooldowns.set(commandName, Date.now());
     setTimeout(() => cooldowns.delete(commandName), cooldownAmount);
   }
 });
+
 client.login(process.env.TOKEN);

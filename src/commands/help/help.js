@@ -1,5 +1,6 @@
-const fetch = require('node-fetch')
+// const fetch = require('node-fetch')
 const { EmbedBuilder } = require("discord.js");
+const fs = require("fs");
 const commands = require('../../index.js');
 exports.run = async (client, message, args, prefix) => {
   await message.channel.sendTyping()
@@ -34,10 +35,18 @@ exports.run = async (client, message, args, prefix) => {
     return;
   }
 
+  let commandCount = 0
+
+  try {
+    commandCount = parseInt(fs.readFileSync("commandCount.txt"), 10);
+  } catch (error) {
+    console.error(`Error reading command count from file: ${error}`);
+  }
+
 
   const embed = new EmbedBuilder()
     .setColor('Purple')
-    .setTitle(`Available in ${client.guilds.cache.size} servers, with ${categories.osu.length+categories.general.length+categories.fun.length+categories.help.length+categories.chess.length} commands!`)
+    // .setTitle(`Available in ${client.guilds.cache.size} servers, with ${categories.osu.length+categories.general.length+categories.fun.length+categories.help.length+categories.chess.length} commands!`)
 
     .addFields(
       { name: "**osu! commands**", value: categories.osu.join(', '), inline: false },
@@ -46,6 +55,9 @@ exports.run = async (client, message, args, prefix) => {
       { name: "**chess commands**", value: categories.chess.join(', '), inline: false },
       { name: "**help commands**", value: categories.help.join(', '), inline: false },
       { name: "**Developer commands**", value: categories.developer.join(', '), inline: false },
+      { name: "**Number of servers:**", value: `${client.guilds.cache.size}`, inline: true },
+      { name: "**Number of commands:**", value: `${categories.osu.length+categories.general.length+categories.fun.length+categories.help.length+categories.chess.length}`, inline: true },
+      { name: "**Executed commands:**", value: `${commandCount}`, inline: true },
     )
     .setThumbnail(message.author.displayAvatarURL())
     .setFooter({ text: `for more information on a command, do: ${prefix}help {commandname}` });
