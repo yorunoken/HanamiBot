@@ -13,8 +13,14 @@ exports.run = async (client, message, args, prefix) => {
       try{
         const userData = JSON.parse(data);
         let userargs
-        let mode = userData[message.author.id].osumode
-        if(mode == undefined) mode = "osu"
+
+        let mode
+        try{
+          mode = userData[message.author.id].osumode
+          if (mode == undefined) mode = "osu"
+        }catch(err){
+          mode = "osu"
+        }
   
   
         if (message.mentions.users.size > 0) {
