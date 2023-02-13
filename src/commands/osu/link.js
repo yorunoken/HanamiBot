@@ -14,7 +14,7 @@ exports.run = async (client, message, args, prefix) => {
   await auth.login(process.env.client_id, process.env.client_secret);
   const user = await v2.user.details(username, "osu");
   if (user.id == undefined) {
-    message.reply(`**The user \`${username}\` does not exist in the database.**`)
+    message.reply(`**The user \`${username}\` does not exist in the Bancho database.**`)
     return
   }
   user_id = user.id
