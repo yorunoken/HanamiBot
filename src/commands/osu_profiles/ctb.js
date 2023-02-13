@@ -192,7 +192,12 @@ exports.run = async (client, message, args, prefix) => {
       const formattedDate = date.toLocaleDateString("en-US", options)
 
       //time get
-      time = new Date(user.rank_highest.updated_at).getTime() / 1000
+      let time
+      try{
+        time = `**Peak Rank:** \`#${user.rank_highest.rank.toLocaleString()}\` • **Achieved:** <t:${new Date(user.rank_highest.updated_at).getTime() / 1000}:R>\n`
+      }catch(err){
+        time = ""
+      }
 
 
       //embed
