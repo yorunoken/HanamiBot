@@ -16,8 +16,14 @@ exports.run = async (client, message, args, prefix) => {
     }
     const userData = JSON.parse(data)
     let userargs
-    let mode = userData[message.author.id].osumode
-    if(mode == undefined) mode = "osu"
+
+    let mode
+    try{
+      mode = userData[message.author.id].osumode
+      if (mode == undefined) mode = "osu"
+    }catch(err){
+      mode = "osu"  
+    }
 
     if (message.mentions.users.size > 0) {
       const mentionedUser = message.mentions.users.first()
@@ -211,7 +217,12 @@ exports.run = async (client, message, args, prefix) => {
       const formattedDate = date.toLocaleDateString("en-US", options)
 
       //time get
-      time = new Date(user.rank_highest.updated_at).getTime() / 1000
+      let time
+      try{
+        time = `**Peak Rank:** \`#${user.rank_highest.rank.toLocaleString()}\` • **Achieved:** <t:${new Date(user.rank_highest.updated_at).getTime() / 1000}:R>\n`
+      }catch(err){
+        time = ""
+      }
 
 
       //embed
@@ -225,7 +236,7 @@ exports.run = async (client, message, args, prefix) => {
         .setThumbnail(user.avatar_url)
         .setDescription(
           `**Accuracy:** \`${acc}%\` •  **Level:** \`${user.statistics.level.current
-          }.${lvlprogress}\`\n**Peak Rank:** \`#${user.rank_highest.rank.toLocaleString()}\` • **Achieved:** <t:${time}:R>\n**Playcount:** \`${playcount}\` (\`${playhours.toFixed()} hrs\`)\n**Followers:** \`${followers}\` • **Max Combo:** \`${profile_maxcombo}\`\n**Ranks:** ${grades.XH
+          }.${lvlprogress}\`\n${time}**Playcount:** \`${playcount}\` (\`${playhours.toFixed()} hrs\`)\n**Followers:** \`${followers}\` • **Max Combo:** \`${profile_maxcombo}\`\n**Ranks:** ${grades.XH
           }\`${ssh}\`${grades.X}\`${ss}\`${grades.SH}\`${sh}\`${grades.S
           }\`${s}\`${grades.A}\`${a}\``
         )
