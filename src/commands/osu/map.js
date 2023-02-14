@@ -96,7 +96,7 @@ exports.run = async (client, message, args, prefix) => {
       //embed
       const embed = new EmbedBuilder()
         .setColor('Purple')
-        .setAuthor({ name: `Beatmap by ${map.beatmapInfo.creator}`, url: `https://osu.ppy.sh/u/${ranked.user_id}`, iconURL: `https://a.ppy.sh/${ranked.user_id}?1668890819.jpeg` })
+        .setAuthor({ name: `Beatmap by ${map.beatmapInfo.creator}`, url: `https://osu.ppy.sh/users/${ranked.user_id}`, iconURL: `https://a.ppy.sh/${ranked.user_id}?1668890819.jpeg` })
         .setTitle(`${map.beatmapInfo.artist} - ${map.beatmapInfo.title}`)
         .setDescription(`Stars: \`${map.difficulty.starRating.toFixed(2)}★\` BPM: \`${map.beatmapInfo.bpmMode.toFixed()}\` Mods: \`${map.difficulty.mods}\`\n 🗺️ **[${map.beatmapInfo.version}]**\n - Combo: \`${map.difficulty.maxCombo.toLocaleString()}x\` Length: \`${minutes}:${seconds}\` Objects: \`${(map.beatmapInfo.hittable + map.beatmapInfo.slidable + map.beatmapInfo.spinnable).toLocaleString()}\`\n - AR: \`${map.difficulty.approachRate.toFixed(1)}\` OD: \`${map.difficulty.overallDifficulty.toFixed(1)}\` CS: \`${map.beatmapInfo.circleSize.toFixed(2)}\` HP: \`${map.difficulty.drainRate.toFixed(1)
           }\`\n \`\`\`Acc:|  95%  |  97%  |  99%  |  100% ${acc}\n-------------------------------------\nPP: |  ${map.performance[0].totalPerformance.toFixed(1)} | ${map.performance[1].totalPerformance.toFixed(1)} | ${map.performance[2].totalPerformance.toFixed(1)} | ${map.performance[3].totalPerformance.toFixed(1)} ${theacc}\`\`\``)

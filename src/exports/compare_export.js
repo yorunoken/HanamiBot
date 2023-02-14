@@ -43,7 +43,7 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString) {
         .setAuthor({
           name: `${user.username} ${user_pp}pp (#${global_rank} ${user.country_code}#${country_rank}) `,
           iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
-          url: `https://osu.ppy.sh/u/${user.id}`,
+          url: `https://osu.ppy.sh/users/${user.id}`,
         })
         .setTitle(`${mapinfo.beatmapset.artist} - ${mapinfo.beatmapset.title} [${mapinfo.version}] [${maxAttrs.difficulty.stars.toFixed(2)}★]`)
         .setDescription("**No scores found**")
@@ -393,7 +393,7 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString) {
       .setAuthor({
         name: `${user.username} ${user_pp}pp (#${global_rank} ${user.country_code}#${country_rank}) `,
         iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
-        url: `https://osu.ppy.sh/u/${user.id}`,
+        url: `https://osu.ppy.sh/users/${user.id}`,
       })
       .setTitle(`${mapinfo.beatmapset.artist} - ${mapinfo.beatmapset.title} [${mapinfo.version}]`)
       .setDescription(`${thing1}${thing2}${thing3}${thing4}${thing5}${pageCount}`)
