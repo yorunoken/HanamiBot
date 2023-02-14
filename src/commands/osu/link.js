@@ -10,6 +10,11 @@ exports.run = async (client, message, args, prefix) => {
     username = args[0]
   }
 
+  if(username == undefined){
+    message.reply("**Please provide a username.**")
+    return;
+  }
+
   //log into api
   await auth.login(process.env.client_id, process.env.client_secret);
   const user = await v2.user.details(username, "osu");
