@@ -1,4 +1,4 @@
-const {Octokit} = require("octokit")
+const { Octokit } = require("octokit")
 const {
   EmbedBuilder,
   ButtonBuilder,
@@ -36,7 +36,7 @@ exports.run = async (client, message, args, prefix) => {
             .setDescription(
               `Preview of issue:\n\n**${Title}**\n${Content.content}`
             )
-            .setFields({name: `Added labels:`, value: addedlabels})
+            .setFields({ name: `Added labels:`, value: addedlabels })
 
           const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
@@ -79,10 +79,7 @@ exports.run = async (client, message, args, prefix) => {
               .setStyle(ButtonStyle.Danger)
           )
 
-          message.channel.send({
-            embeds: [confirm],
-            components: [row, row2, row3],
-          })
+          message.channel.send({ embeds: [confirm], components: [row, row2, row3] })
 
           const collector = message.channel.createMessageComponentCollector()
 
@@ -109,7 +106,7 @@ exports.run = async (client, message, args, prefix) => {
                       value: addLabels.join(", "),
                     })
 
-                  i.update({embeds: [confirm], components: [row, row2, row3]})
+                  i.update({ embeds: [confirm], components: [row, row2, row3] })
                 }
 
                 if (i.customId == "suggestion") {
@@ -120,15 +117,13 @@ exports.run = async (client, message, args, prefix) => {
                   const confirm = new EmbedBuilder()
                     .setTitle("Issue builder v2")
                     .setThumbnail(`${user.displayAvatarURL()}?size=1024`)
-                    .setDescription(
-                      `Preview of issue:\n\n**${Title}**\n${Content.content}`
-                    )
+                    .setDescription(`Preview of issue:\n\n**${Title}**\n${Content.content}`)
                     .setFields({
                       name: `Added labels:`,
                       value: addLabels.join(", "),
                     })
 
-                  i.update({embeds: [confirm], components: [row, row2, row3]})
+                  i.update({ embeds: [confirm], components: [row, row2, row3] })
                 }
 
                 if (i.customId == "priority") {
@@ -147,7 +142,7 @@ exports.run = async (client, message, args, prefix) => {
                       value: addLabels.join(", "),
                     })
 
-                  i.update({embeds: [confirm], components: [row, row2, row3]})
+                  i.update({ embeds: [confirm], components: [row, row2, row3] })
                 }
 
                 if (i.customId == "new") {
@@ -166,7 +161,7 @@ exports.run = async (client, message, args, prefix) => {
                       value: addLabels.join(", "),
                     })
 
-                  i.update({embeds: [confirm], components: [row, row2, row3]})
+                  i.update({ embeds: [confirm], components: [row, row2, row3] })
                 }
 
                 if (i.customId == "first") {
@@ -185,7 +180,7 @@ exports.run = async (client, message, args, prefix) => {
                       value: addLabels.join(", "),
                     })
 
-                  i.update({embeds: [confirm], components: [row, row2, row3]})
+                  i.update({ embeds: [confirm], components: [row, row2, row3] })
                 }
 
                 if (i.customId == "cancel") {
@@ -199,13 +194,32 @@ exports.run = async (client, message, args, prefix) => {
                 }
 
                 if (i.customId == "confirm") {
+                  const Attachments = Content.attachments.map(x => x.url);
+
+                  let AttachmentsImage;
+                  let AttachmentsImage1 = "";
+                  let AttachmentsImage2 = "";
+                  let AttachmentsImage3 = "";
+                  let AttachmentsImage4 = "";
+        
+                  if(Attachments.length == 0) AttachmentsImage = "";
+                  else {
+                    if(Attachments[0]) AttachmentsImage1 = `(${Attachments[0]})`
+                    if(Attachments[1]) AttachmentsImage2 = `\n![](${Attachments[1]})`
+                    if(Attachments[2]) AttachmentsImage3 `\n![](${Attachments[2]})`
+                    if(Attachments[3]) AttachmentsImage4 `\n![](${Attachments[3]})`
+        
+                    AttachmentsImage = `![Attachments:]${AttachmentsImage1}${AttachmentsImage2}${AttachmentsImage3}${AttachmentsImage4}`
+                  }
+        
+
                   const issuebuilder = await octokit.request(
                     "POST /repos/YoruNoKen/miaosu/issues",
                     {
                       owner: "YoruNoKen",
                       repo: "miaosu",
                       title: `${Title}`,
-                      body: `> ${Content.content}\n\n[Original Message by @${Content.author.tag}](https://canary.discord.com/channels/${Content.guildId}/${Content.channelId}/${Content.id})`,
+                      body: `> ${Content.content}\n\n${AttachmentsImage}\n[Original Message by @${Content.author.tag}](https://canary.discord.com/channels/${Content.guildId}/${Content.channelId}/${Content.id})`,
                       labels: addLabels,
                     }
                   )
@@ -216,15 +230,13 @@ exports.run = async (client, message, args, prefix) => {
                   const embed = new EmbedBuilder()
                     .setTitle("Issue builder v2")
                     .setColor("Purple")
-                    .setDescription(
-                      `Successfully created Issue #${issuebuilder.data.number}\n[Click here to go to issue](https://github.com/YoruNoKen/miaosu/issues/${issuebuilder.data.number})`
-                    )
+                    .setDescription(`Successfully created Issue #${issuebuilder.data.number}\n[Click here to go to issue](https://github.com/YoruNoKen/miaosu/issues/${issuebuilder.data.number})`)
                     .setFields(
-                      {name: `Added Labels:`, value: labelNames},
-                      {name: `Assigned:`, value: `YoruNoKen`}
+                      { name: `Added Labels:`, value: labelNames },
+                      { name: `Assigned:`, value: `YoruNoKen` }
                     )
 
-                  i.update({embeds: [embed], components: []})
+                  i.update({ embeds: [embed], components: [] })
 
                   addLabels = []
                 }
@@ -232,7 +244,7 @@ exports.run = async (client, message, args, prefix) => {
                 console.log(err)
               }
             })
-          } catch (err) {}
+          } catch (err) { }
         })
     }
   } catch (err) {
