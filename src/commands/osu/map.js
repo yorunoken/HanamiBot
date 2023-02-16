@@ -67,7 +67,7 @@ exports.run = async (client, message, args, prefix) => {
         bpm: bpm,
       })
 
-      let theacc;
+      let AccPP;
       if (argValues['acc']) {
         const mapacc = await beatmapCalculator.calculate({
           beatmapId: beatmapId,
@@ -78,12 +78,9 @@ exports.run = async (client, message, args, prefix) => {
           overallDifficulty: od,
           bpm: bpm,
         })
-        theacc = `  (${mapacc.performance[0].totalPerformance.toFixed(1)})`
-        asd = argValues['acc']
-        acc = `  (${Number(asd).toFixed(2)}%)`
+        AccPP = ` ${Number(asd).toFixed(2)}%: ${mapacc.performance[0].totalPerformance.toFixed(1)}`
       } else {
-        theacc = ""
-        acc = ""
+        AccPP = ""
       }
       //length
       let length = map.beatmapInfo.length.toFixed(0)
@@ -98,8 +95,11 @@ exports.run = async (client, message, args, prefix) => {
         .setColor('Purple')
         .setAuthor({ name: `Beatmap by ${map.beatmapInfo.creator}`, url: `https://osu.ppy.sh/users/${ranked.user_id}`, iconURL: `https://a.ppy.sh/${ranked.user_id}?1668890819.jpeg` })
         .setTitle(`${map.beatmapInfo.artist} - ${map.beatmapInfo.title}`)
-        .setDescription(`Stars: \`${map.difficulty.starRating.toFixed(2)}★\` BPM: \`${map.beatmapInfo.bpmMode.toFixed()}\` Mods: \`${map.difficulty.mods}\`\n 🗺️ **[${map.beatmapInfo.version}]**\n - Combo: \`${map.difficulty.maxCombo.toLocaleString()}x\` Length: \`${minutes}:${seconds}\` Objects: \`${(map.beatmapInfo.hittable + map.beatmapInfo.slidable + map.beatmapInfo.spinnable).toLocaleString()}\`\n - AR: \`${map.difficulty.approachRate.toFixed(1)}\` OD: \`${map.difficulty.overallDifficulty.toFixed(1)}\` CS: \`${map.beatmapInfo.circleSize.toFixed(2)}\` HP: \`${map.difficulty.drainRate.toFixed(1)
-          }\`\n \`\`\`Acc:|  95%  |  97%  |  99%  |  100% ${acc}\n-------------------------------------\nPP: |  ${map.performance[0].totalPerformance.toFixed(1)} | ${map.performance[1].totalPerformance.toFixed(1)} | ${map.performance[2].totalPerformance.toFixed(1)} | ${map.performance[3].totalPerformance.toFixed(1)} ${theacc}\`\`\``)
+        .setDescription(`Stars: \`${map.difficulty.starRating.toFixed(2)}★\` BPM: \`${map.beatmapInfo.bpmMode.toFixed()}\` Mods: \`${map.difficulty.mods}\`\n 🗺️ **[${map.beatmapInfo.version}]**\n- Combo: \`${map.difficulty.maxCombo.toLocaleString()}x\` Length: \`${minutes}:${seconds}\` Objects: \`${(map.beatmapInfo.hittable + map.beatmapInfo.slidable + map.beatmapInfo.spinnable).toLocaleString()}\`\n - AR: \`${map.difficulty.approachRate.toFixed(1)}\` OD: \`${map.difficulty.overallDifficulty.toFixed(1)}\` CS: \`${map.beatmapInfo.circleSize.toFixed(2)}\` HP: \`${map.difficulty.drainRate.toFixed(1)}\``)
+        .setFields(
+          { name: 'PP', value: `\`\`\`Acc  | PP\n95%: ${map.performance[0].totalPerformance.toFixed(1)}\n97%: ${map.performance[1].totalPerformance.toFixed(1)}\n99%: ${map.performance[2].totalPerformance.toFixed(1)}\n100%: ${map.performance[3].totalPerformance.toFixed(1)}${AccPP}\`\`\``, inline: true },
+          { name: 'Links', value: '[Song Preview](https://b.ppy.sh/preview/${map.beatmapInfo.beatmapsetId}.mp3)\n[Download Mapset](https://osu.ppy.sh/beatmapsets/${map.beatmapInfo.beatmapsetId}/download)\n[Beatconnect](https://beatconnect.io/b/${map.beatmapInfo.beatmapsetId})', inline: true }
+        )
         .setURL(`https://osu.ppy.sh/b/${map.beatmapInfo.id}`)
         .setImage(`https://assets.ppy.sh/beatmaps/${map.beatmapInfo.beatmapsetId}/covers/cover.jpg`)
         .setFooter({ text: `${status} | ${ranked.beatmapset.favourite_count} ♥` })
@@ -232,20 +232,20 @@ exports.run = async (client, message, args, prefix) => {
       }
     } catch (err) {
 
-      try{
+      try {
         if (embedMessages) {
-          do{
-            if(!embedMessages[EmbedValue].embeds[0]) break;
+          do {
+            if (!embedMessages[EmbedValue].embeds[0]) break;
             const embed = embedMessages[EmbedValue].embeds[0];
             await EmbedFetch(embed)
             console.log(GoodToGo)
           }
-          while(!GoodToGo)
-  
+          while (!GoodToGo)
+
         } else {
           await message.channel.send('No embeds found in the last 100 messages');
         }
-      }catch(err){
+      } catch (err) {
         message.channel.send("**No maps found**")
       }
 
