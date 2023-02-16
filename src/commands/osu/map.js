@@ -78,7 +78,7 @@ exports.run = async (client, message, args, prefix) => {
           overallDifficulty: od,
           bpm: bpm,
         })
-        AccPP = ` ${Number(asd).toFixed(2)}%: ${mapacc.performance[0].totalPerformance.toFixed(1)}`
+        AccPP = ` ${Number(argValues['acc']).toFixed(2)}%: ${mapacc.performance[0].totalPerformance.toFixed(1)}`
       } else {
         AccPP = ""
       }
@@ -97,8 +97,8 @@ exports.run = async (client, message, args, prefix) => {
         .setTitle(`${map.beatmapInfo.artist} - ${map.beatmapInfo.title}`)
         .setDescription(`Stars: \`${map.difficulty.starRating.toFixed(2)}★\` BPM: \`${map.beatmapInfo.bpmMode.toFixed()}\` Mods: \`${map.difficulty.mods}\`\n 🗺️ **[${map.beatmapInfo.version}]**\n- Combo: \`${map.difficulty.maxCombo.toLocaleString()}x\` Length: \`${minutes}:${seconds}\` Objects: \`${(map.beatmapInfo.hittable + map.beatmapInfo.slidable + map.beatmapInfo.spinnable).toLocaleString()}\`\n - AR: \`${map.difficulty.approachRate.toFixed(1)}\` OD: \`${map.difficulty.overallDifficulty.toFixed(1)}\` CS: \`${map.beatmapInfo.circleSize.toFixed(2)}\` HP: \`${map.difficulty.drainRate.toFixed(1)}\``)
         .setFields(
-          { name: 'PP', value: `\`\`\`Acc  | PP\n95%: ${map.performance[0].totalPerformance.toFixed(1)}\n97%: ${map.performance[1].totalPerformance.toFixed(1)}\n99%: ${map.performance[2].totalPerformance.toFixed(1)}\n100%: ${map.performance[3].totalPerformance.toFixed(1)}${AccPP}\`\`\``, inline: true },
-          { name: 'Links', value: '[Song Preview](https://b.ppy.sh/preview/${map.beatmapInfo.beatmapsetId}.mp3)\n[Download Mapset](https://osu.ppy.sh/beatmapsets/${map.beatmapInfo.beatmapsetId}/download)\n[Beatconnect](https://beatconnect.io/b/${map.beatmapInfo.beatmapsetId})', inline: true }
+          { name: 'PP', value: `\`\`\`Acc | PP\n95%: ${map.performance[0].totalPerformance.toFixed(1)}\n97%: ${map.performance[1].totalPerformance.toFixed(1)}\n99%: ${map.performance[2].totalPerformance.toFixed(1)}\n100%: ${map.performance[3].totalPerformance.toFixed(1)}${AccPP}\`\`\``, inline: true },
+          { name: 'Links', value: `:notes:[Song Preview](https://b.ppy.sh/preview/${map.beatmapInfo.beatmapsetId}.mp3)\n🖼️[Full Background](https://assets.ppy.sh/beatmaps/${map.beatmapInfo.beatmapsetId}/covers/raw.jpg)\n<:beatconnect:1075915329512931469>[Beatconnect](https://beatconnect.io/b/${map.beatmapInfo.beatmapsetId})\n<:kitsu:1075915745973776405>[Kitsu](https://kitsu.moe/d/${map.beatmapInfo.beatmapsetId})`, inline: true },
         )
         .setURL(`https://osu.ppy.sh/b/${map.beatmapInfo.id}`)
         .setImage(`https://assets.ppy.sh/beatmaps/${map.beatmapInfo.beatmapsetId}/covers/cover.jpg`)
