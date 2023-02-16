@@ -211,7 +211,7 @@ exports.run = async (client, message, args, prefix) => {
         .setThumbnail(user.avatar_url)
         .setDescription(
           `**Accuracy:** \`${acc}%\` •  **Level:** \`${user.statistics.level.current
-          }.${lvlprogress}\`\n**Peak Rank:** \`#${user.rank_highest.rank.toLocaleString()}\` • **Achieved:** <t:${time}:R>\n**Playcount:** \`${playcount}\` (\`${playhours.toFixed()} hrs\`)\n**Followers:** \`${followers}\` • **Max Combo:** \`${profile_maxcombo}\`\n**Ranks:** ${grades.XH
+          }.${lvlprogress}\`\n${time}**Playcount:** \`${playcount}\` (\`${playhours.toFixed()} hrs\`)\n**Followers:** \`${followers}\` • **Max Combo:** \`${profile_maxcombo}\`\n**Ranks:** ${grades.XH
           }\`${ssh}\`${grades.X}\`${ss}\`${grades.SH}\`${sh}\`${grades.S
           }\`${s}\`${grades.A}\`${a}\``
         )
