@@ -219,7 +219,7 @@ exports.run = async (client, message, args, prefix) => {
                       owner: "YoruNoKen",
                       repo: "miaosu",
                       title: `${Title}`,
-                      body: `> ${Content.content}\n\n${AttachmentsImage}\n[Original Message by @${Content.author.tag}](https://canary.discord.com/channels/${Content.guildId}/${Content.channelId}/${Content.id})`,
+                      body: `> ${Content.content}\n\n${AttachmentsImage}\n[Original Message by @${Content.author.username}](https://canary.discord.com/channels/${Content.guildId}/${Content.channelId}/${Content.id})`,
                       labels: addLabels,
                     }
                   )
