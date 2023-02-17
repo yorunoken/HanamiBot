@@ -14,7 +14,7 @@ module.exports.run = async (client, message, args, prefix) => {
       let userargs
       let value = 0
       let mode = "fruits"
-      let RuleSetId = undefined
+      let RuleSetId = 2
       let PassDetermine = 1
 
       if (message.mentions.users.size > 0) {

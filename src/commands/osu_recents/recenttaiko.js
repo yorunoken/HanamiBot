@@ -13,8 +13,8 @@ module.exports.run = async (client, message, args, prefix) => {
       const userData = JSON.parse(data);
       let userargs
       let value = 0
-      let mode = "osu"
-      let RuleSetId = undefined
+      let mode = "taiko"
+      let RuleSetId = 1
       let PassDetermine = 1
 
       if (message.mentions.users.size > 0) {
