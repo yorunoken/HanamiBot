@@ -1,12 +1,12 @@
 const { EmbedBuilder } = require("discord.js");
-const { v2, auth } = require("osu-api-extended");
-const { BeatmapCalculator, ScoreCalculator } = require('@kionell/osu-pp-calculator')
-const scoreCalculator = new ScoreCalculator()
-const beatmapCalculator = new BeatmapCalculator();
+const fs = require("fs");
+const { v2, auth, tools, mods } = require("osu-api-extended");
+const { Beatmap, Calculator } = require('rosu-pp')
+const { Downloader, DownloadEntry } = require("osu-downloader")
+
 exports.run = async (client, message, args, prefix) => {
   await message.channel.sendTyping()
 
-  let ErrCount = 0
   let EmbedValue = 0
   let GoodToGo = false
 
@@ -31,61 +31,70 @@ exports.run = async (client, message, args, prefix) => {
 
   async function SendEmbed(ranked, beatmapId) {
     try {
-      //map
 
+      if (!fs.existsSync(`./osuFiles/${beatmapId}.osu`)) {
+        console.log("no file.")
+        const downloader = new Downloader({
+          rootPath: './osuFiles',
 
-      if (!argValues['cs']) {
-        cs = undefined
-      } else {
-        cs = Number(argValues['cs'])
+          filesPerSecond: 0,
+        });
+
+        downloader.addSingleEntry(beatmapId)
+        await downloader.downloadSingle()
       }
 
-      if (!argValues['ar']) {
-        ar = undefined
-      } else {
-        ar = Number(argValues['ar'])
+      if (args.join(" ").includes("-a")) {
+        const iIndex = args.indexOf("-a")
+        modsArg = args[iIndex + 1]
+        argValues['acc'] = modsArg
       }
 
-      if (!argValues['od']) {
-        od = undefined
-      } else {
-        od = Number(argValues['od'])
+      if (!argValues["mods"]) argValues["mods"] = "NM";
+      const modsID = mods.id(argValues["mods"]);
+
+      const RuleSetId = ranked.mode_int;
+      let scoreParam = {
+        mode: RuleSetId,
+        mods: modsID,
       }
 
-      if (!argValues['bpm']) {
-        bpm = undefined
-      } else {
-        bpm = Number(argValues['bpm'])
-      }
-      const map = await beatmapCalculator.calculate({
-        beatmapId: beatmapId,
-        mods: argValues['mods'],
-        accuracy: [95, 97, 99, 100],
-        circleSize: cs,
-        approachRate: ar,
-        overallDifficulty: od,
-        bpm: bpm,
-      })
+      let map = new Beatmap({ path: `./osuFiles/${beatmapId}.osu` })
+      let calc = new Calculator(scoreParam)
 
-      let AccPP;
+      const mapValues = calc.mapAttributes(map)
+
+      const PP100 = calc.acc(100).performance(map)
+      const PP99 = calc.acc(99).performance(map)
+      const PP97 = calc.acc(97).performance(map)
+      const PP95 = calc.acc(95).performance(map)
+
+      let AccPP = ""
       if (argValues['acc']) {
-        const mapacc = await beatmapCalculator.calculate({
-          beatmapId: beatmapId,
-          mods: argValues['mods'],
-          accuracy: [Number(argValues['acc'])],
-          circleSize: cs,
-          approachRate: ar,
-          overallDifficulty: od,
-          bpm: bpm,
-        })
-        AccPP = ` ${Number(argValues['acc']).toFixed(2)}%: ${mapacc.performance[0].totalPerformance.toFixed(1)}`
-      } else {
-        AccPP = ""
+        const PPif = calc.acc(Number(argValues['acc'])).performance(map)
+        AccPP = `\n${Number(argValues['acc'])}%: ${PPif.pp.toFixed(1)}`
       }
+      if (Number(argValues['acc']) < 16.67) {
+        const PPif = calc.acc(16.67).performance(map)
+        AccPP = `\n16.67%: ${PPif.pp.toFixed(1)}`
+      }
+
+
+      if (!PP100.difficulty.nCircles) PP100.difficulty.nCircles = 0
+      if (!PP100.difficulty.nSliders) PP100.difficulty.nSliders = 0
+      if (!PP100.difficulty.nSpinners) PP100.difficulty.nSpinners = 0
+      if (!PP100.difficulty.nFruits) PP100.difficulty.nFruits = 0
+
+      let osuEmote
+      if (ranked.mode == "osu") osuEmote = "<:osu:1075928459014066286>"
+      if (ranked.mode == "mania") osuEmote = "<:mania:1075928451602718771>"
+      if (ranked.mode == "taiko") osuEmote = "<:taiko:1075928454651969606>"
+      if (ranked.mode == "fruits") osuEmote = "<:ctb:1075928456367444018>"
+
       //length
-      let length = map.beatmapInfo.length.toFixed(0)
+      let length = ranked.total_length.toFixed(0)
       let minutes = Math.floor(length / 60)
-      let seconds = (length % 60).toString().padStart(2, "0");
+      let seconds = (length % 60).toString().padStart(2, "0")
 
       //ranked or not
       let status = (ranked.status.charAt(0)).toUpperCase() + ranked.status.slice(1)
@@ -93,15 +102,15 @@ exports.run = async (client, message, args, prefix) => {
       //embed
       const embed = new EmbedBuilder()
         .setColor('Purple')
-        .setAuthor({ name: `Beatmap by ${map.beatmapInfo.creator}`, url: `https://osu.ppy.sh/users/${ranked.user_id}`, iconURL: `https://a.ppy.sh/${ranked.user_id}?1668890819.jpeg` })
-        .setTitle(`${map.beatmapInfo.artist} - ${map.beatmapInfo.title}`)
-        .setDescription(`Stars: \`${map.difficulty.starRating.toFixed(2)}★\` BPM: \`${map.beatmapInfo.bpmMode.toFixed()}\` Mods: \`${map.difficulty.mods}\`\n 🗺️ **[${map.beatmapInfo.version}]**\n- Combo: \`${map.difficulty.maxCombo.toLocaleString()}x\` Length: \`${minutes}:${seconds}\` Objects: \`${(map.beatmapInfo.hittable + map.beatmapInfo.slidable + map.beatmapInfo.spinnable).toLocaleString()}\`\n - AR: \`${map.difficulty.approachRate.toFixed(1)}\` OD: \`${map.difficulty.overallDifficulty.toFixed(1)}\` CS: \`${map.beatmapInfo.circleSize.toFixed(2)}\` HP: \`${map.difficulty.drainRate.toFixed(1)}\``)
+        .setAuthor({ name: `Beatmap by ${ranked.beatmapset.creator}`, url: `https://osu.ppy.sh/users/${ranked.user_id}`, iconURL: `https://a.ppy.sh/${ranked.user_id}?1668890819.jpeg` })
+        .setTitle(`${ranked.beatmapset.artist} - ${ranked.beatmapset.title}`)
         .setFields(
-          { name: 'PP', value: `\`\`\`Acc | PP\n95%: ${map.performance[0].totalPerformance.toFixed(1)}\n97%: ${map.performance[1].totalPerformance.toFixed(1)}\n99%: ${map.performance[2].totalPerformance.toFixed(1)}\n100%: ${map.performance[3].totalPerformance.toFixed(1)}${AccPP}\`\`\``, inline: true },
-          { name: 'Links', value: `:notes:[Song Preview](https://b.ppy.sh/preview/${map.beatmapInfo.beatmapsetId}.mp3)\n🖼️[Full Background](https://assets.ppy.sh/beatmaps/${map.beatmapInfo.beatmapsetId}/covers/raw.jpg)\n<:beatconnect:1075915329512931469>[Beatconnect](https://beatconnect.io/b/${map.beatmapInfo.beatmapsetId})\n<:kitsu:1075915745973776405>[Kitsu](https://kitsu.moe/d/${map.beatmapInfo.beatmapsetId})`, inline: true },
+          { name: `${osuEmote} **[${ranked.version}]**`, value: `Stars: \`${PP100.difficulty.stars.toFixed(2)}★\` Mods: \`${argValues["mods"]}\` BPM: \`${mapValues.bpm.toFixed()}\`\nLength: \`${minutes}:${seconds}\` Max Combo: \`${PP100.difficulty.maxCombo.toLocaleString()}x\` Objects: \`${PP100.difficulty.nCircles + PP100.difficulty.nSliders + PP100.difficulty.nSpinners + PP100.difficulty.nFruits}\`\nAR: \`${mapValues.ar.toFixed(1)}\` OD: \`${mapValues.od.toFixed(1)}\` CS: \`${mapValues.cs.toFixed(2)}\` HP: \`${mapValues.hp.toFixed(1)}\`` },
+          { name: 'PP', value: `\`\`\`Acc | PP\n95%: ${PP95.pp.toFixed(1)}\n97%: ${PP97.pp.toFixed(1)}\n99%: ${PP99.pp.toFixed(1)}\n100%: ${PP100.pp.toFixed(1)}${AccPP}\`\`\``, inline: true },
+          { name: 'Links', value: `:notes:[Song Preview](https://b.ppy.sh/preview/${ranked.beatmapset_id}.mp3)\n🖼️[Full Background](https://assets.ppy.sh/beatmaps/${ranked.beatmapset_id}/covers/raw.jpg)\n<:beatconnect:1075915329512931469>[Beatconnect](https://beatconnect.io/b/${ranked.beatmapset_id})\n<:kitsu:1075915745973776405>[Kitsu](https://kitsu.moe/d/${ranked.beatmapset_id})`, inline: true },
         )
-        .setURL(`https://osu.ppy.sh/b/${map.beatmapInfo.id}`)
-        .setImage(`https://assets.ppy.sh/beatmaps/${map.beatmapInfo.beatmapsetId}/covers/cover.jpg`)
+        .setURL(`https://osu.ppy.sh/b/${ranked.id}`)
+        .setImage(`https://assets.ppy.sh/beatmaps/${ranked.beatmapset_id}/covers/cover.jpg`)
         .setFooter({ text: `${status} | ${ranked.beatmapset.favourite_count} ♥` })
 
       message.channel.send({ embeds: [embed] })
@@ -119,7 +128,6 @@ exports.run = async (client, message, args, prefix) => {
       console.log(beatmapId)
 
       const ranked = await v2.beatmap.diff(beatmapId)
-
       if (ranked.id == undefined) throw new Error("No URL")
       //send the embed
       await SendEmbed(ranked, beatmapId)
