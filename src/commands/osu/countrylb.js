@@ -105,7 +105,7 @@ exports.run = async (client, message, args, prefix) => {
 
       const totalPageRaw = scores.scores.length / 5
       const totalPage = Math.ceil(totalPageRaw)
-      if (pagenum > totalPage) {
+      if (pagenum > totalPage && pagenum != 1) {
         message.reply(`**Please provide a page value not greater than **\`${totalPage}\``)
         return;
       } else {
