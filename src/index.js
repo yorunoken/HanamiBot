@@ -14,11 +14,8 @@ const {
 } = require("discord.js");
 const fs = require("fs");
 require("dotenv/config");
-const MongoToken = process.env.database_token
-const { connect } = require('mongoose');
 
 let commandCount = 0
-
 
 const client = new Client({
   intents: [
@@ -28,6 +25,40 @@ const client = new Client({
     GatewayIntentBits.GuildPresences,
   ],
 });
+
+// check if nessecary folders exist
+
+console.log("checking for folders..")
+if (!fs.existsSync("mes")){
+  console.log("mes folder not found, creating folder..")
+  fs.mkdirSync("mes")
+} 
+else console.log("mes ✔");
+
+if (!fs.existsSync("cache")){
+  console.log("cache folder not found, creating folder..")
+  fs.mkdirSync("cache")
+} 
+else console.log("cache ✔");
+
+if (!fs.existsSync("bin")){
+  console.log("bin folder not found, creating folder..")
+  fs.mkdirSync("bin")
+} 
+else console.log("bin ✔");
+
+if (!fs.existsSync("beatmapsongs")){
+  console.log("beatmapsongs folder not found, creating folder..")
+  fs.mkdirSync("beatmapsongs")
+} 
+else console.log("beatmapsongs ✔");
+
+if (!fs.existsSync("osuFiles")){
+  console.log("osuFiles folder not found, creating folder..")
+  fs.mkdirSync("osuFiles")
+} 
+else console.log("osuFiles ✔");
+
 
 // command handler
 client.commands = new Map();
@@ -127,7 +158,7 @@ client.on("messageCreate", (message) => {
     // execute the command
     command.run(client, message, args, prefix, EmbedBuilder);
 
-    if(isNaN(commandCount)) commandCount = 0
+    if (isNaN(commandCount)) commandCount = 0
 
     commandCount++
 
