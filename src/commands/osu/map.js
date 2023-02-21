@@ -50,6 +50,12 @@ exports.run = async (client, message, args, prefix) => {
         argValues['acc'] = modsArg
       }
 
+      if (args.join(" ").includes("-acc")) {
+        const iIndex = args.indexOf("-acc")
+        modsArg = args[iIndex + 1]
+        argValues['acc'] = modsArg
+      }
+
       if (!argValues["mods"]) argValues["mods"] = "NM";
       const modsID = mods.id(argValues["mods"]);
 
