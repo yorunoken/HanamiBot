@@ -78,7 +78,7 @@ exports.run = async (client, message, args, prefix) => {
       let AccPP = ""
       if (argValues['acc']) {
         const PPif = calc.acc(Number(argValues['acc'])).performance(map)
-        AccPP = `\n${Number(argValues['acc'])}%: ${PPif.pp.toFixed(1)}`
+        AccPP = `\n(${Number(argValues['acc'])}%: ${PPif.pp.toFixed(1)})`
       }
       if (Number(argValues['acc']) < 16.67) {
         const PPif = calc.acc(16.67).performance(map)
