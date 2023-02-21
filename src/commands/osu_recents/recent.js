@@ -15,7 +15,7 @@ module.exports.run = async (client, message, args, prefix) => {
       const userData = JSON.parse(data);
       let userargs
       let value = 0
-      
+
       let mode = "osu"
 
       let RuleSetId = 0
@@ -128,9 +128,9 @@ module.exports.run = async (client, message, args, prefix) => {
       }
 
       const Recent = await GetRecent(value, user, mode, PassDetermine, args, RuleSetId)
-      try{
+      try {
         console.log(Recent.FilterMods)
-      }catch(err){
+      } catch (err) {
         message.reply(`**No recent plays for \`${user.username}\`**`)
         return;
       }
