@@ -16,13 +16,7 @@ module.exports.run = async (client, message, args, prefix) => {
       let userargs
       let value = 0
       
-      let mode
-      try{
-        mode = userData[message.author.id].osumode
-        if (mode == undefined) mode = "osu"
-      }catch(err){
-        mode = "osu"
-      }
+      let mode = "osu"
 
       let RuleSetId = 0
       let PassDetermine = 1
