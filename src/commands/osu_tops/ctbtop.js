@@ -13,7 +13,8 @@ exports.run = async (client, message, args, prefix) => {
       const userData = JSON.parse(data);
       value = 1
       play_number = undefined
-      ModeOsu = "fruits"
+      let ModeOsu = "fruits"
+      let string = args.join(" ").match(/"(.*?)"/)
       ModeID = 2
 
       if (message.mentions.users.size > 0) {
@@ -59,8 +60,6 @@ exports.run = async (client, message, args, prefix) => {
           }
         } else {
 
-          let string = args.join(" ").match(/"(.*?)"/)
-
           if (args.includes('-i')) {
             singleArgument = args.slice(0, args.indexOf('-i')).join(' ')
             const iIndex = args.indexOf('-i');
@@ -94,10 +93,13 @@ exports.run = async (client, message, args, prefix) => {
         }
       }
 
-
       if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
         try {
-          userargs = userData[message.author.id].osuUsername
+          try{
+            userargs = userData[message.author.id].osuUsername
+          }catch(err){
+            message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
+          }
         } catch (err) {
           message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
           return;
@@ -112,12 +114,6 @@ exports.run = async (client, message, args, prefix) => {
         argValues[key] = value;
       }
 
-      if (args.join(" ").includes("+")) {
-        const iIndex = args.indexOf("+")
-        modsArg = (args[iIndex + 1].slice(1)).toUpperCase().match(/[A-Z]{2}/g)
-        argValues['mods'] = modsArg.join("")
-      }
-
       let filteredscore
       let FilterMods = ""
       sortmod = 0
@@ -126,6 +122,13 @@ exports.run = async (client, message, args, prefix) => {
 
       //log into api
       await auth.login(process.env.client_id, process.env.client_secret);
+
+      const user = await v2.user.details(userargs, ModeOsu);
+
+      if(user.id == undefined){
+        message.reply(`**The user ${userargs} does not exist.**`);
+        return;
+      }
 
       if (play_number) {
 
@@ -138,11 +141,6 @@ exports.run = async (client, message, args, prefix) => {
             message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
           }
         }
-
-        user = await v2.user.details(userargs, ModeOsu)
-
-
-
 
         //score set
         let score = await v2.user.scores.category(user.id, "best", {
@@ -364,8 +362,6 @@ exports.run = async (client, message, args, prefix) => {
           three = numbers[2] - 1;
           four = numbers[3] - 1;
           five = numbers[4] - 1;
-
-          user = await v2.user.details(userargs, ModeOsu);
 
           //score set
           let score = await v2.user.scores.category(user.id, 'best', {
@@ -644,11 +640,6 @@ exports.run = async (client, message, args, prefix) => {
 
           const TotalPage = Math.ceil(score.length / 5)
 
-
-
-
-
-
           //embed
           const embed = new EmbedBuilder()
             .setColor('Purple')
@@ -665,7 +656,7 @@ exports.run = async (client, message, args, prefix) => {
         } catch (err) {
           //catch errors
           console.error(err);
-          message.reply(`The user ${userargs} doesn't exist`);
+          message.reply(`**There was an error. Check for spelling.**`);
         }
       }
 

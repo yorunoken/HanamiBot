@@ -13,7 +13,8 @@ exports.run = async (client, message, args, prefix) => {
       const userData = JSON.parse(data);
       value = 1
       play_number = undefined
-      ModeOsu = "mania"
+      let ModeOsu = "mania"
+      let string = args.join(" ").match(/"(.*?)"/)
       ModeID = 3
 
       if (message.mentions.users.size > 0) {
@@ -59,8 +60,6 @@ exports.run = async (client, message, args, prefix) => {
           }
         } else {
 
-          let string = args.join(" ").match(/"(.*?)"/)
-
           if (args.includes('-i')) {
             singleArgument = args.slice(0, args.indexOf('-i')).join(' ')
             const iIndex = args.indexOf('-i');
@@ -94,7 +93,6 @@ exports.run = async (client, message, args, prefix) => {
         }
       }
 
-
       if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
         try {
           try{
@@ -116,12 +114,6 @@ exports.run = async (client, message, args, prefix) => {
         argValues[key] = value;
       }
 
-      if (args.join(" ").includes("+")) {
-        const iIndex = args.indexOf("+")
-        modsArg = (args[iIndex + 1].slice(1)).toUpperCase().match(/[A-Z]{2}/g)
-        argValues['mods'] = modsArg.join("")
-      }
-
       let filteredscore
       let FilterMods = ""
       sortmod = 0
@@ -130,6 +122,13 @@ exports.run = async (client, message, args, prefix) => {
 
       //log into api
       await auth.login(process.env.client_id, process.env.client_secret);
+
+      const user = await v2.user.details(userargs, ModeOsu);
+
+      if(user.id == undefined){
+        message.reply(`**The user ${userargs} does not exist.**`);
+        return;
+      }
 
       if (play_number) {
 
@@ -142,11 +141,6 @@ exports.run = async (client, message, args, prefix) => {
             message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
           }
         }
-
-        user = await v2.user.details(userargs, ModeOsu)
-
-
-
 
         //score set
         let score = await v2.user.scores.category(user.id, "best", {
@@ -187,9 +181,7 @@ exports.run = async (client, message, args, prefix) => {
         }
 
         //hits
-        let perfect = score[playNumber - 1].statistics.count_geki
-        let three = score[playNumber - 1].statistics.count_geki
-        let katu = score[playNumber - 1].statistics.count_katu
+        let three = score[playNumber - 1].statistics.count_300
         let one = score[playNumber - 1].statistics.count_100
         let fifty = score[playNumber - 1].statistics.count_50
         let miss = Number(score[playNumber - 1].statistics.count_miss);
@@ -333,7 +325,7 @@ exports.run = async (client, message, args, prefix) => {
           .setTitle(title)
           .setURL(`https://osu.ppy.sh/b/${beatmap_id}`)
           .setDescription(`__**Personal Best #${play_rank_1}:**__\n${grade} ** +${modsone}** • ${map_score} • **(${acc
-            }%) ${sc_rank}**\n${pps} \n[**${score[playNumber - 1].max_combo}**x/${CurAttrs.difficulty.maxCombo}x] • {**${perfect}**/${three}/${katu}/${one}/${fifty}/${miss
+            }%) ${sc_rank}**\n${pps} \n[**${score[playNumber - 1].max_combo}**x/${CurAttrs.difficulty.maxCombo}x] • {**${three}**/${one}/${fifty}/${miss
             }}\nScore Set <t:${time1}:R>`)
           .setFields({ name: `**Beatmap info:**`, value: `BPM: \`${mapValues.bpm.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${mapValues.ar.toFixed(1).toString().replace(/\.0+$/, "")}\` OD: \`${mapValues.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\`` })
           .setThumbnail(`https://assets.ppy.sh/beatmaps/${score[playNumber - 1].beatmapset.id}/covers/list.jpg`)
@@ -370,8 +362,6 @@ exports.run = async (client, message, args, prefix) => {
           three = numbers[2] - 1;
           four = numbers[3] - 1;
           five = numbers[4] - 1;
-
-          user = await v2.user.details(userargs, ModeOsu);
 
           //score set
           let score = await v2.user.scores.category(user.id, 'best', {
@@ -471,7 +461,7 @@ exports.run = async (client, message, args, prefix) => {
 
             time1 = new Date(score[one].created_at).getTime() / 1000
 
-            scoreone = `**${Play_rank1}.** [**${score[one].beatmapset.title} [${score[one].beatmap.version}]**](https://osu.ppy.sh/b/${score[one].beatmap.id}) **+${modsone}** [${sr1}★]\n${grade} ▹ **${score[one].pp.toFixed(2)}PP** ▹ (${Number(score[one].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[one].max_combo)}x**/${maxComboMap}x]\n${score[one].score.toLocaleString()} ▹ {**${score[one].statistics.count_geki}**/${score[one].statistics.count_300}/${score[one].statistics.count_katu}/${score[one].statistics.count_100}/${score[one].statistics.count_50}/${score[one].statistics.count_miss}} <t:${time1}:R>\n`
+            scoreone = `**${Play_rank1}.** [**${score[one].beatmapset.title} [${score[one].beatmap.version}]**](https://osu.ppy.sh/b/${score[one].beatmap.id}) **+${modsone}** [${sr1}★]\n${grade} ▹ **${score[one].pp.toFixed(2)}PP** ▹ (${Number(score[one].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[one].max_combo)}x**/${maxComboMap}x]\n${score[one].score.toLocaleString()} ▹ [**${score[one].statistics.count_300}**/${score[one].statistics.count_100}/${score[one].statistics.count_50}/${score[one].statistics.count_miss}] <t:${time1}:R>\n`
           }
 
           if (score[two]) {
@@ -513,7 +503,7 @@ exports.run = async (client, message, args, prefix) => {
 
             time2 = new Date(score[two].created_at).getTime() / 1000
 
-            scoretwo = `**${Play_rank2}.** [**${score[two].beatmapset.title} [${score[two].beatmap.version}]**](https://osu.ppy.sh/b/${score[two].beatmap.id}) **+${modstwo}** [${sr2}★]\n${gradetwo} ▹ **${score[two].pp.toFixed(2)}PP** ▹ (${Number(score[two].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[two].max_combo)}x**/${maxComboMap}x]\n${score[two].score.toLocaleString()} ▹ {**${score[two].statistics.count_geki}**/${score[two].statistics.count_300}/${score[two].statistics.count_katu}/${score[two].statistics.count_100}/${score[two].statistics.count_50}/${score[two].statistics.count_miss}} <t:${time2}:R>\n`
+            scoretwo = `**${Play_rank2}.** [**${score[two].beatmapset.title} [${score[two].beatmap.version}]**](https://osu.ppy.sh/b/${score[two].beatmap.id}) **+${modstwo}** [${sr2}★]\n${gradetwo} ▹ **${score[two].pp.toFixed(2)}PP** ▹ (${Number(score[two].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[two].max_combo)}x**/${maxComboMap}x]\n${score[two].score.toLocaleString()} ▹ [**${score[two].statistics.count_300}**/${score[two].statistics.count_100}/${score[two].statistics.count_50}/${score[two].statistics.count_miss}] <t:${time2}:R>\n`
           }
 
           if (score[three]) {
@@ -556,7 +546,7 @@ exports.run = async (client, message, args, prefix) => {
 
             time3 = new Date(score[three].created_at).getTime() / 1000
 
-            scorethree = `**${Play_rank3}.** [**${score[three].beatmapset.title} [${score[three].beatmap.version}]**](https://osu.ppy.sh/b/${score[three].beatmap.id}) **+${modsthree}** [${sr3}★]\n${gradethree} ▹ **${score[three].pp.toFixed(2)}PP** ▹ (${Number(score[three].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[three].max_combo)}x**/${maxComboMap}x]\n${score[three].score.toLocaleString()} ▹ {**${score[three].statistics.count_geki}**/${score[three].statistics.count_300}/${score[three].statistics.count_katu}/${score[three].statistics.count_100}/${score[three].statistics.count_50}/${score[three].statistics.count_miss}} <t:${time3}:R>\n`
+            scorethree = `**${Play_rank3}.** [**${score[three].beatmapset.title} [${score[three].beatmap.version}]**](https://osu.ppy.sh/b/${score[three].beatmap.id}) **+${modsthree}** [${sr3}★]\n${gradethree} ▹ **${score[three].pp.toFixed(2)}PP** ▹ (${Number(score[three].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[three].max_combo)}x**/${maxComboMap}x]\n${score[three].score.toLocaleString()} ▹ [**${score[three].statistics.count_300}**/${score[three].statistics.count_100}/${score[three].statistics.count_50}/${score[three].statistics.count_miss}] <t:${time3}:R>\n`
           }
 
           if (score[four]) {
@@ -601,7 +591,7 @@ exports.run = async (client, message, args, prefix) => {
 
             time4 = new Date(score[four].created_at).getTime() / 1000
 
-            scorefour = `**${Play_rank4}.** [**${score[four].beatmapset.title} [${score[four].beatmap.version}]**](https://osu.ppy.sh/b/${score[four].beatmap.id}) **+${modsfour}** [${sr4}★]\n${gradefour} ▹ **${score[four].pp.toFixed(2)}PP** ▹ (${Number(score[four].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[four].max_combo)}x**/${maxComboMap}x]\n${score[four].score.toLocaleString()} ▹ {**${score[four].statistics.count_geki}**/${score[four].statistics.count_300}/${score[four].statistics.count_katu}/${score[four].statistics.count_100}/${score[four].statistics.count_50}/${score[four].statistics.count_miss}} <t:${time4}:R>\n`
+            scorefour = `**${Play_rank4}.** [**${score[four].beatmapset.title} [${score[four].beatmap.version}]**](https://osu.ppy.sh/b/${score[four].beatmap.id}) **+${modsfour}** [${sr4}★]\n${gradefour} ▹ **${score[four].pp.toFixed(2)}PP** ▹ (${Number(score[four].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[four].max_combo)}x**/${maxComboMap}x]\n${score[four].score.toLocaleString()} ▹ [**${score[four].statistics.count_300}**/${score[four].statistics.count_100}/${score[four].statistics.count_50}/${score[four].statistics.count_miss}] <t:${time4}:R>\n`
           }
 
           if (score[five]) {
@@ -645,15 +635,10 @@ exports.run = async (client, message, args, prefix) => {
 
             time5 = new Date(score[five].created_at).getTime() / 1000
 
-            scorefive = `**${Play_rank5}.** [**${score[five].beatmapset.title} [${score[five].beatmap.version}]**](https://osu.ppy.sh/b/${score[five].beatmap.id}) **+${modsfive}** [${sr5}★]\n${gradefive} ▹ **${score[five].pp.toFixed(2)}PP** ▹ (${Number(score[five].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[five].max_combo)}x**/${maxComboMap}x]\n${score[five].score.toLocaleString()} ▹ {**${score[five].statistics.count_geki}**/${score[five].statistics.count_300}/${score[five].statistics.count_katu}/${score[five].statistics.count_100}/${score[five].statistics.count_50}/${score[five].statistics.count_miss}} <t:${time5}:R>`
+            scorefive = `**${Play_rank5}.** [**${score[five].beatmapset.title} [${score[five].beatmap.version}]**](https://osu.ppy.sh/b/${score[five].beatmap.id}) **+${modsfive}** [${sr5}★]\n${gradefive} ▹ **${score[five].pp.toFixed(2)}PP** ▹ (${Number(score[five].accuracy * 100).toFixed(2)}%) ▹ [**${Number(score[five].max_combo)}x**/${maxComboMap}x]\n${score[five].score.toLocaleString()} ▹ [**${score[five].statistics.count_300}**/${score[five].statistics.count_100}/${score[five].statistics.count_50}/${score[five].statistics.count_miss}] <t:${time5}:R>`
           }
 
           const TotalPage = Math.ceil(score.length / 5)
-
-
-
-
-
 
           //embed
           const embed = new EmbedBuilder()
@@ -671,7 +656,7 @@ exports.run = async (client, message, args, prefix) => {
         } catch (err) {
           //catch errors
           console.error(err);
-          message.reply(`The user ${userargs} doesn't exist`);
+          message.reply(`**There was an error. Check for spelling.**`);
         }
       }
 
