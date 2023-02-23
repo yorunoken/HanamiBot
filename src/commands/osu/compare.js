@@ -150,7 +150,11 @@ exports.run = async (client, message, args, prefix) => {
       console.log(userargs)
 
       if (userargs?.length === 0 || userargs === undefined) {
-        userargs = userData[message.author.id].osuUsername;
+        try {
+          userargs = userData[mentionedUser.id].osuUsername;
+        } catch (err) {
+          message.reply(`No osu! user found for ${mentionedUser.tag}`);
+        }
       }
 
       console.log(value, pagenum, userargs)
