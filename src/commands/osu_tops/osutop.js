@@ -15,10 +15,10 @@ exports.run = async (client, message, args, prefix) => {
       play_number = undefined
       let ModeOsu
       let string = args.join(" ").match(/"(.*?)"/)
-      try{
+      try {
         ModeOsu = userData[message.author.id].osumode
         if (ModeOsu == undefined) ModeOsu = "osu"
-      }catch(err){
+      } catch (err) {
         ModeOsu = "osu"
       }
       ModeID = 0
@@ -144,11 +144,11 @@ exports.run = async (client, message, args, prefix) => {
         return;
       }
 
-      if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
+      if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+") || args.join(" ").startsWith("-g") || args.join(" ").startsWith("-am") || args.join(" ").startsWith("-amount")) {
         try {
-          try{
+          try {
             userargs = userData[message.author.id].osuUsername
-          }catch(err){
+          } catch (err) {
             message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
           }
         } catch (err) {
@@ -176,19 +176,51 @@ exports.run = async (client, message, args, prefix) => {
 
       const user = await v2.user.details(userargs, ModeOsu);
 
-      if(user.id == undefined){
+      if (user.id == undefined) {
         message.reply(`**The user ${userargs} does not exist.**`);
         return;
       }
+
+
+      if (args.join(" ").includes("-am") || args.join(" ").includes("-g")) {
+
+        if (args.join(" ").includes("-am")) query = "-am"
+        if (args.join(" ").includes("-amount")) query = "-amount"
+        if (args.join(" ").includes("-g")) query = "-g"
+
+        const iIndex = args.indexOf(query);
+        const GIndex = Number(args[iIndex + 1]);
+
+
+        //score set
+        const score = await v2.user.scores.category(user.id, "best", {
+          include_fails: "0",
+          mode: ModeOsu,
+          limit: "100",
+          offset: "0",
+        });
+
+        const Number_bigger = score.filter(x => x.pp > GIndex)
+
+        const embed = new EmbedBuilder()
+          .setColor("Purple")
+          .setDescription(`${user.username} has **\`${Number_bigger.length}\`** plays worth more than ${GIndex.toFixed(1)}PP`)
+
+        message.channel.send({ embeds: [embed] })
+
+        return;
+      }
+
+
 
       if (play_number) {
 
         let playNumber = Number(play_number)
         if (args[0] === "-i") {
           playNumber = Number(play_number)
-          try{
+          try {
             userargs = userData[message.author.id].osuUsername
-          }catch(err){
+          } catch (err) {
             message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
           }
         }
@@ -394,9 +426,9 @@ exports.run = async (client, message, args, prefix) => {
           }
           if (args[0] === "-p") {
             pageNumber = Number(value)
-            try{
+            try {
               userargs = userData[message.author.id].osuUsername
-            }catch(err){
+            } catch (err) {
               message.reply(`Set your osu! username by using "${prefix}link **your username**"`);
             }
           }
