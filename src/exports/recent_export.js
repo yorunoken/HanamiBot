@@ -204,7 +204,10 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId) {
         let minutesTotal = Math.floor(Total / 60).toFixed()
         let secondsTotal = (Total % 60).toString().padStart(2, "0")
 
-        let scorerank = await v2.scores.details(score[value].best_id, 'osu')
+        let scorerank = await v2.scores.details(score[value].best_id, 'osu');
+
+        let sc_rank = "";
+        let replayLink = "";
         if (score[value].passed == true) {
             if (scorerank.rank_global != undefined) {
                 sc_rank = ` 🌐 #${scorerank.rank_global}`
@@ -212,8 +215,11 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId) {
                 sc_rank = " "
             }
 
-        } else if (score[value].passed == false) {
-            sc_rank = " "
+            console.log("file: recent_export.js:219 ~ GetRecent ~ rank_global:", scorerank.rank_global);
+            if(scorerank.rank_global < 1000){
+                replayLink = ` • [Replay](https://osu.ppy.sh/scores/osu/${scorerank.id}/download)`
+            }
+
         }
         let status = score[value].beatmapset.status.charAt(0).toUpperCase() + score[value].beatmapset.status.slice(1)
         //score embed
@@ -226,7 +232,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId) {
             })
             .setTitle(title)
             .setURL(`https://osu.ppy.sh/b/${beatmap_id}`)
-            .setDescription(`${grade} ${percentage}${modsone} • **__[${maxAttrs.difficulty.stars.toFixed(2)}★]__** \n▹${pps} \n▹${map_score} • ${acc} ${sc_rank}\n▹[ **${score[value].max_combo}**x/${maxAttrs.difficulty.maxCombo}x ] • { **${three}**/${one}/${fifty}/${miss} } \n▹Score Set <t:${time1}:R> • **Try #${retryCounter}**`)
+            .setDescription(`${grade} ${percentage}${modsone} • **__[${maxAttrs.difficulty.stars.toFixed(2)}★]__** ${sc_rank}\n▹${pps} \n▹${map_score} • ${acc}\n▹[ **${score[value].max_combo}**x/${maxAttrs.difficulty.maxCombo}x ] • { **${three}**/${one}/${fifty}/${miss} } ${replayLink}\n▹Score Set <t:${time1}:R> • **Try #${retryCounter}**`)
             .setFields({ name: `**Beatmap info:**`, value: `BPM: \`${mapValues.bpm.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${mapValues.ar.toFixed(1).toString().replace(/\.0+$/, "")}\` OD: \`${mapValues.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\`` })
             .setImage(`https://assets.ppy.sh/beatmaps/${score[value].beatmapset.id}/covers/cover.jpg`)
             .setThumbnail(user.avatar_url)

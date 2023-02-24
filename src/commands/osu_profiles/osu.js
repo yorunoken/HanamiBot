@@ -265,6 +265,9 @@ exports.run = async (client, message, args, prefix) => {
         pp_spread_num = "0"
       }
 
+      const user_pp_statr = Math.pow(user.statistics.pp, 0.4)
+      const recc_stars = (user_pp_statr*0.195).toFixed(2)
+
       replays_watched = user.statistics.replays_watched_by_others.toLocaleString()
       medal_count = user.user_achievements.length
       medal_percentage_number = (medal_count / 289) * 100
@@ -350,7 +353,7 @@ exports.run = async (client, message, args, prefix) => {
           url: `https://osu.ppy.sh/users/${user.id}/${mode}`,
         })
         .setThumbnail(user.avatar_url)
-        .setDescription(`**Hits per play:** \`${hpp_count}\` • **Medals:** \`${medal_count}/289\` (\`${medal_percentage}%\`)\n**Replays watched:** \`${replays_watched}\` • **#1 Scores:** \`${number_1s}\`\n**Total score:** \`${totalScore}\`\n**Ranked Score:** \`${rankedScore}\`\n**Plays with:** \`${playstyles}\`\n**Posts:** \`${posts}\` • **Comments:** \`${comments}\``)
+        .setDescription(`**Hits per play:** \`${hpp_count}\` • **Medals:** \`${medal_count}/289\` (\`${medal_percentage}%\`)\n**Replays watched:** \`${replays_watched}\` • **#1 Scores:** \`${number_1s}\`\n**Recommended difficulty:** \`${recc_stars}★\`\n**Total score:** \`${totalScore}\`\n**Ranked Score:** \`${rankedScore}\`\n**Plays with:** \`${playstyles}\`\n**Posts:** \`${posts}\` • **Comments:** \`${comments}\``)
         .setImage(user.cover_url)
         .setFooter({
           text: `Joined osu! ${formattedDate} (${user_joined_ago} years ago)`,
