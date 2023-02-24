@@ -29,7 +29,7 @@ exports.run = async (client, message, args, prefix) => {
     argValues['mods'] = modsArg.join("")
   }
 
-  async function SendEmbed(ranked, beatmapId) {
+  async function SendEmbed(DiffValues, beatmapId) {
     try {
 
       if (!fs.existsSync(`./osuFiles/${beatmapId}.osu`)) {
@@ -56,29 +56,64 @@ exports.run = async (client, message, args, prefix) => {
         argValues['acc'] = modsArg
       }
 
+      //if mods is undefined, set it to NM
+      if (typeof argValues['bpm'] === 'undefined' || argValues['bpm'] === '') {
+        argValues['bpm'] = DiffValues.bpm
+      }
+
+      if (args.join(" ").includes("-bpm")) {
+        const iIndex = args.indexOf("-bpm")
+        modsArg = args[iIndex + 1]
+        argValues['bpm'] = modsArg
+      }
+
+      var clock_rate = argValues['bpm'] / DiffValues.bpm;
+
+      argValues['cr'] = clock_rate
+      argValues['clockrate'] = clock_rate
+
+      if(argValues["mods"].toUpperCase().includes("DT") || argValues["mods"].toUpperCase().includes("NC")) clock_rate = 1.5
+      if(argValues["mods"].toUpperCase().includes("HT")) clock_rate = 0.75
+      console.log("file: map.js:77 ~ SendEmbed ~ clock_rate:", clock_rate);
+
+
       if (!argValues["mods"]) argValues["mods"] = "NM";
       const modsID = mods.id(argValues["mods"]);
 
-      const RuleSetId = ranked.mode_int;
+
+      if (isNaN(Number(argValues['ar']))) argValues['ar'] = DiffValues.ar;
+      if (isNaN(Number(argValues['cs']))) argValues['cs'] = DiffValues.cs;
+      if (isNaN(Number(argValues['hp']))) argValues['hp'] = DiffValues.drain;
+      if (isNaN(Number(argValues['od']))) argValues['od'] = DiffValues.accuracy;
+
+      const RuleSetId = DiffValues.mode_int;
+      let mapParam = {
+        path: `./osuFiles/${beatmapId}.osu`,
+        ar: Number(argValues['ar']),
+        cs: Number(argValues['cs']),
+        hp: Number(argValues['hp']),
+        od: Number(argValues['od']),
+      }
+
       let scoreParam = {
         mode: RuleSetId,
         mods: modsID,
       }
 
-      let map = new Beatmap({ path: `./osuFiles/${beatmapId}.osu` })
+      let map = new Beatmap(mapParam)
       let calc = new Calculator(scoreParam)
 
-      const mapValues = calc.mapAttributes(map)
+      const mapValues = calc.clockRate(clock_rate).mapAttributes(map)
 
-      const PP100 = calc.acc(100).performance(map)
-      const PP99 = calc.acc(99).performance(map)
-      const PP97 = calc.acc(97).performance(map)
-      const PP95 = calc.acc(95).performance(map)
+      const PP100 = calc.clockRate(clock_rate).acc(100).performance(map)
+      const PP99 = calc.clockRate(clock_rate).acc(99).performance(map)
+      const PP97 = calc.clockRate(clock_rate).acc(97).performance(map)
+      const PP95 = calc.clockRate(clock_rate).acc(95).performance(map)
 
       let AccPP = ""
       if (argValues['acc']) {
         const PPif = calc.acc(Number(argValues['acc'])).performance(map)
-        AccPP = `\n(${Number(argValues['acc'])}%: ${PPif.pp.toFixed(1)})`
+        AccPP = `\n(${Number(argValues['acc'])}%:  ${PPif.pp.toFixed(1)})`
       }
       if (Number(argValues['acc']) < 16.67) {
         const PPif = calc.acc(16.67).performance(map)
@@ -92,32 +127,32 @@ exports.run = async (client, message, args, prefix) => {
       if (!PP100.difficulty.nFruits) PP100.difficulty.nFruits = 0
 
       let osuEmote
-      if (ranked.mode == "osu") osuEmote = "<:osu:1075928459014066286>"
-      if (ranked.mode == "mania") osuEmote = "<:mania:1075928451602718771>"
-      if (ranked.mode == "taiko") osuEmote = "<:taiko:1075928454651969606>"
-      if (ranked.mode == "fruits") osuEmote = "<:ctb:1075928456367444018>"
+      if (DiffValues.mode == "osu") osuEmote = "<:osu:1075928459014066286>"
+      if (DiffValues.mode == "mania") osuEmote = "<:mania:1075928451602718771>"
+      if (DiffValues.mode == "taiko") osuEmote = "<:taiko:1075928454651969606>"
+      if (DiffValues.mode == "fruits") osuEmote = "<:ctb:1075928456367444018>"
 
       //length
-      let length = ranked.total_length.toFixed(0)
+      let length = (DiffValues.total_length/mapValues.clockRate).toFixed(0)
       let minutes = Math.floor(length / 60)
       let seconds = (length % 60).toString().padStart(2, "0")
 
       //ranked or not
-      let status = (ranked.status.charAt(0)).toUpperCase() + ranked.status.slice(1)
+      let status = (DiffValues.status.charAt(0)).toUpperCase() + DiffValues.status.slice(1)
 
       //embed
       const embed = new EmbedBuilder()
         .setColor('Purple')
-        .setAuthor({ name: `Beatmap by ${ranked.beatmapset.creator}`, url: `https://osu.ppy.sh/users/${ranked.user_id}`, iconURL: `https://a.ppy.sh/${ranked.user_id}?1668890819.jpeg` })
-        .setTitle(`${ranked.beatmapset.artist} - ${ranked.beatmapset.title}`)
+        .setAuthor({ name: `Beatmap by ${DiffValues.beatmapset.creator}`, url: `https://osu.ppy.sh/users/${DiffValues.user_id}`, iconURL: `https://a.ppy.sh/${DiffValues.user_id}?1668890819.jpeg` })
+        .setTitle(`${DiffValues.beatmapset.artist} - ${DiffValues.beatmapset.title}`)
         .setFields(
-          { name: `${osuEmote} **[${ranked.version}]**`, value: `Stars: \`${PP100.difficulty.stars.toFixed(2)}★\` Mods: \`${argValues["mods"]}\` BPM: \`${mapValues.bpm.toFixed()}\`\nLength: \`${minutes}:${seconds}\` Max Combo: \`${PP100.difficulty.maxCombo.toLocaleString()}x\` Objects: \`${PP100.difficulty.nCircles + PP100.difficulty.nSliders + PP100.difficulty.nSpinners + PP100.difficulty.nFruits}\`\nAR: \`${mapValues.ar.toFixed(1)}\` OD: \`${mapValues.od.toFixed(1)}\` CS: \`${mapValues.cs.toFixed(2)}\` HP: \`${mapValues.hp.toFixed(1)}\`` },
-          { name: 'PP', value: `\`\`\`Acc | PP\n95%: ${PP95.pp.toFixed(1)}\n97%: ${PP97.pp.toFixed(1)}\n99%: ${PP99.pp.toFixed(1)}\n100%: ${PP100.pp.toFixed(1)}${AccPP}\`\`\``, inline: true },
-          { name: 'Links', value: `:notes:[Song Preview](https://b.ppy.sh/preview/${ranked.beatmapset_id}.mp3)\n🖼️[Full Background](https://assets.ppy.sh/beatmaps/${ranked.beatmapset_id}/covers/raw.jpg)\n<:beatconnect:1075915329512931469>[Beatconnect](https://beatconnect.io/b/${ranked.beatmapset_id})\n<:kitsu:1075915745973776405>[Kitsu](https://kitsu.moe/d/${ranked.beatmapset_id})`, inline: true },
+          { name: `${osuEmote} **[${DiffValues.version}]**`, value: `Stars: \`${PP100.difficulty.stars.toFixed(2)}★\` Mods: \`${argValues["mods"].toUpperCase()}\` BPM: \`${mapValues.bpm.toFixed()}\`\nLength: \`${minutes}:${seconds}\` Max Combo: \`${PP100.difficulty.maxCombo.toLocaleString()}x\` Objects: \`${PP100.difficulty.nCircles + PP100.difficulty.nSliders + PP100.difficulty.nSpinners + PP100.difficulty.nFruits}\`\nAR: \`${mapValues.ar.toFixed(1)}\` OD: \`${mapValues.od.toFixed(1)}\` CS: \`${mapValues.cs.toFixed(2)}\` HP: \`${mapValues.hp.toFixed(1)}\`` },
+          { name: 'PP', value: `\`\`\`Acc | PP\n95%:  ${PP95.pp.toFixed(1)}\n97%:  ${PP97.pp.toFixed(1)}\n99%:  ${PP99.pp.toFixed(1)}\n100%: ${PP100.pp.toFixed(1)}${AccPP}\`\`\``, inline: true },
+          { name: 'Links', value: `:notes:[Song Preview](https://b.ppy.sh/preview/${DiffValues.beatmapset_id}.mp3)\n🖼️[Full Background](https://assets.ppy.sh/beatmaps/${DiffValues.beatmapset_id}/covers/raw.jpg)\n<:beatconnect:1075915329512931469>[Beatconnect](https://beatconnect.io/b/${DiffValues.beatmapset_id})\n<:kitsu:1075915745973776405>[Kitsu](https://kitsu.moe/d/${DiffValues.beatmapset_id})`, inline: true },
         )
-        .setURL(`https://osu.ppy.sh/b/${ranked.id}`)
-        .setImage(`https://assets.ppy.sh/beatmaps/${ranked.beatmapset_id}/covers/cover.jpg`)
-        .setFooter({ text: `${status} | ${ranked.beatmapset.favourite_count} ♥` })
+        .setURL(`https://osu.ppy.sh/b/${DiffValues.id}`)
+        .setImage(`https://assets.ppy.sh/beatmaps/${DiffValues.beatmapset_id}/covers/cover.jpg`)
+        .setFooter({ text: `${status} | ${DiffValues.beatmapset.favourite_count} ♥` })
 
       message.channel.send({ embeds: [embed] })
       return;
