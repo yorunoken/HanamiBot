@@ -15,8 +15,8 @@ exports.run = async (client, message, args, prefix) => {
 
     const userData = JSON.parse(data)
     let userargs
-    let mode = "osu"
-    let RuleSetId = 0
+    let mode = "fruits"
+    let RuleSetId = 2
     let value = 0
     let PageNum = 1;
 
@@ -79,23 +79,7 @@ exports.run = async (client, message, args, prefix) => {
           PageNum = args[iIndex + 1]
         }
 
-        if (args.includes("-mania")) {
-          mode = "mania"
-          RuleSetId = 3
-        }
-        if (args.includes("-taiko")) {
-          mode = "taiko"
-          RuleSetId = 1
-        }
-        if (args.includes("-ctb")) {
-          mode = "fruits"
-          RuleSetId = 2
-        }
-
         if (
-          args.join(" ").startsWith("-mania") ||
-          args.join(" ").startsWith("-ctb") ||
-          args.join(" ").startsWith("-taiko") ||
           args.join(" ").startsWith("-i") ||
           args.join(" ").startsWith("-p")
         ) {
@@ -134,8 +118,8 @@ exports.run = async (client, message, args, prefix) => {
 
   })
 }
-exports.name = "pinned"
-exports.aliases = ["pinned", "p"]
+exports.name = "pinnedmania"
+exports.aliases = ["pinnedctb", "pctb", "pc"]
 exports.description = ["Shows a player's pinned plays."]
 exports.usage = ["pinned Whitecat"]
 exports.category = ["osu"]
