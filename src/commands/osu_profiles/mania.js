@@ -261,6 +261,7 @@ exports.run = async (client, message, args, prefix) => {
 
       const user_pp_statr = Math.pow(user.statistics.pp, 0.4)
       const recc_stars = (user_pp_statr * 0.195).toFixed(2)
+      if(recc_stars == 0) recc_stars = 1
 
       replays_watched = user.statistics.replays_watched_by_others.toLocaleString()
       medal_count = user.user_achievements.length
