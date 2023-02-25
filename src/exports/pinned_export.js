@@ -73,8 +73,10 @@ async function GetPinned(value, user, mode, RuleSetId, pageNumber) {
     const time_set = `<t:${new Date(pin.created_at).getTime() / 1000}:R>`
 
     let AccValues
-    if (pin.mode_int == "0")
-      AccValues = `{**${pin.statistics.count_300}**/${pin.statistics.count_100}/${pin.statistics.count_50}/${pin.statistics.count_miss}}`
+    if (pin.mode_int == "0") AccValues = `{**${pin.statistics.count_300}**/${pin.statistics.count_100}/${pin.statistics.count_50}/${pin.statistics.count_miss}}`
+    if (pin.mode_int == "1") AccValues = `{**${pin.statistics.count_300}**/${pin.statistics.count_100}}/${pin.statistics.count_miss}}`
+    if (pin.mode_int == "2") AccValues = `{**${pin.statistics.count_300}**/${pin.statistics.count_100}/${pin.statistics.count_50}/${pin.statistics.count_miss}}`
+    if (pin.mode_int == "3") AccValues = `{**${pin.statistics.count_geki}/${pin.statistics.count_300}**/${pin.statistics.count_katu}/${pin.statistics.count_100}/${pin.statistics.count_50}/${pin.statistics.count_miss}}`
 
     const first_row = `**${num + 1}. [${pin.beatmapset.title} [${
       pin.beatmap.version
