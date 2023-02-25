@@ -8,7 +8,6 @@ const {
 const { v2, auth } = require("osu-api-extended")
 exports.run = async (client, message, args, prefix) => {
   await message.channel.sendTyping()
-
   fs.readFile("./user-data.json", async (error, data) => {
     if (error) {
       console.log(error)
@@ -16,7 +15,6 @@ exports.run = async (client, message, args, prefix) => {
     }
     const userData = JSON.parse(data)
     let userargs
-    
     const mode = "osu"
 
 
@@ -79,10 +77,6 @@ exports.run = async (client, message, args, prefix) => {
     }
     if (args.includes("-ctb")) {
       mode = "fruits"
-    }
-
-    if (args.includes("-osu")) {
-      mode = "osu"
     }
 
     if (
@@ -266,7 +260,7 @@ exports.run = async (client, message, args, prefix) => {
       }
 
       const user_pp_statr = Math.pow(user.statistics.pp, 0.4)
-      const recc_stars = (user_pp_statr*0.195).toFixed(2)
+      const recc_stars = (user_pp_statr * 0.195).toFixed(2)
 
       replays_watched = user.statistics.replays_watched_by_others.toLocaleString()
       medal_count = user.user_achievements.length

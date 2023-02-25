@@ -171,7 +171,7 @@ exports.run = async (client, message, args, prefix) => {
         first_score = "**No scores found.**"
       }
 
-      if (scores.scores[two]) {
+    if (scores.scores[two]) {
 
         let ModsRaw = scores.scores[two].mods.map(mod => mod.acronym).join('')
         let modsID = mods.id(ModsRaw)

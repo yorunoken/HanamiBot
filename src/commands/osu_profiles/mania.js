@@ -8,7 +8,6 @@ const {
 const { v2, auth } = require("osu-api-extended");
 exports.run = async (client, message, args, prefix) => {
   await message.channel.sendTyping()
-
   fs.readFile("./user-data.json", async (error, data) => {
     if (error) {
       console.log(error)
@@ -16,7 +15,8 @@ exports.run = async (client, message, args, prefix) => {
     }
     const userData = JSON.parse(data)
     let userargs
-    let mode = "mania"
+    const mode = "mania"
+
 
     if (message.mentions.users.size > 0) {
       const mentionedUser = message.mentions.users.first()
@@ -69,9 +69,21 @@ exports.run = async (client, message, args, prefix) => {
       }
     }
 
-
+    if (args.includes("-mania")) {
+      mode = "mania"
+    }
+    if (args.includes("-taiko")) {
+      mode = "taiko"
+    }
+    if (args.includes("-ctb")) {
+      mode = "fruits"
+    }
 
     if (
+      args.join(" ").startsWith("-mania") ||
+      args.join(" ").startsWith("-ctb") ||
+      args.join(" ").startsWith("-taiko") ||
+      args.join(" ").startsWith("-osu") ||
       args.join(" ").startsWith("-d") ||
       args.join(" ").startsWith("-details")
     ) {
@@ -195,9 +207,9 @@ exports.run = async (client, message, args, prefix) => {
 
       //time get
       let time
-      try{
+      try {
         time = `**Peak Rank:** \`#${user.rank_highest.rank.toLocaleString()}\` • **Achieved:** <t:${new Date(user.rank_highest.updated_at).getTime() / 1000}:R>\n`
-      }catch(err){
+      } catch (err) {
         time = ""
       }
 
@@ -246,6 +258,9 @@ exports.run = async (client, message, args, prefix) => {
         pp_spread_raw = "0"
         pp_spread_num = "0"
       }
+
+      const user_pp_statr = Math.pow(user.statistics.pp, 0.4)
+      const recc_stars = (user_pp_statr * 0.195).toFixed(2)
 
       replays_watched = user.statistics.replays_watched_by_others.toLocaleString()
       medal_count = user.user_achievements.length
@@ -332,7 +347,7 @@ exports.run = async (client, message, args, prefix) => {
           url: `https://osu.ppy.sh/users/${user.id}/${mode}`,
         })
         .setThumbnail(user.avatar_url)
-        .setDescription(`**Hits per play:** \`${hpp_count}\` • **Medals:** \`${medal_count}/289\` (\`${medal_percentage}%\`)\n**Replays watched:** \`${replays_watched}\` • **#1 Scores:** \`${number_1s}\`\n**Total score:** \`${totalScore}\`\n**Ranked Score:** \`${rankedScore}\`\n**Plays with:** \`${playstyles}\`\n**Posts:** \`${posts}\` • **Comments:** \`${comments}\``)
+        .setDescription(`**Hits per play:** \`${hpp_count}\` • **Medals:** \`${medal_count}/289\` (\`${medal_percentage}%\`)\n**Replays watched:** \`${replays_watched}\` • **#1 Scores:** \`${number_1s}\`\n**Recommended difficulty:** \`${recc_stars}★\`\n**Total score:** \`${totalScore}\`\n**Ranked Score:** \`${rankedScore}\`\n**Plays with:** \`${playstyles}\`\n**Posts:** \`${posts}\` • **Comments:** \`${comments}\``)
         .setImage(user.cover_url)
         .setFooter({
           text: `Joined osu! ${formattedDate} (${user_joined_ago} years ago)`,
