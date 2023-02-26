@@ -1,8 +1,5 @@
-const { EmbedBuilder } = require("discord.js")
 const fs = require("fs");
 const { v2, auth, tools, mods } = require("osu-api-extended");
-const { Beatmap, Calculator } = require('rosu-pp')
-const { Downloader, DownloadEntry } = require("osu-downloader")
 
 // importing CompareEmbed
 const { CompareEmbed } = require('../../exports/compare_export.js')
