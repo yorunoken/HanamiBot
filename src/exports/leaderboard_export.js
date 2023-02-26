@@ -7,17 +7,18 @@ const {Downloader, DownloadEntry} = require("osu-downloader")
 async function LbSend(beatmapId, scores, pagenum) {
   await auth.login(process.env.client_id, process.env.client_secret)
 
+  
   const start = (pagenum - 1) * 5 + 1
   const end = pagenum * 5
   const numbers = []
   for (let i = start; i <= end; i++) {
     numbers.push(i)
   }
-  one = numbers[0] - 1
-  two = numbers[1] - 1
-  three = numbers[2] - 1
-  four = numbers[3] - 1
-  five = numbers[4] - 1
+  const one = numbers[0] - 1
+  const two = numbers[1] - 1
+  const three = numbers[2] - 1
+  const four = numbers[3] - 1
+  const five = numbers[4] - 1
 
   try {
     if (!fs.existsSync(`./osuFiles/${beatmapId}.osu`)) {
@@ -50,7 +51,7 @@ async function LbSend(beatmapId, scores, pagenum) {
     const totalPage = Math.ceil(totalPageRaw)
 
     async function ScoreGet(score, num) {
-      let ModsRaw = score.mods.map((mod) => mod.acronym).join("")
+      const ModsRaw = score.mods.map((mod) => mod.acronym).join("")
       let modsID = mods.id(ModsRaw)
       if (ModsRaw != "") {
         Mods1 = `\`+${ModsRaw}\``
@@ -69,18 +70,18 @@ async function LbSend(beatmapId, scores, pagenum) {
       if (score.statistics.good === undefined) score.statistics.good = 0 // katu
       if (score.statistics.perfect === undefined) score.statistics.perfect = 0 // geki
 
-      let scoreParam = {
+      const scoreParam = {
         mode: 0,
         mods: modsID,
       }
 
-      let calc = new Calculator(scoreParam)
+      const calc = new Calculator(scoreParam)
 
       // ss pp
       const maxAttrs = calc.performance(map)
 
       //normal pp
-      let CurAttrs = calc
+      const CurAttrs = calc
         .n100(score.statistics.ok)
         .n300(score.statistics.great)
         .n50(score.statistics.meh)
