@@ -6,8 +6,21 @@ const { v2, auth, mods, tools } = require("osu-api-extended");
 const { Beatmap, Calculator } = require('rosu-pp')
 const { Downloader, DownloadEntry } = require("osu-downloader")
 
-async function LbSend(beatmapId, scores, userargs) {
+async function LbSend(beatmapId, scores, pagenum) {
     await auth.login(process.env.client_id, process.env.client_secret);
+
+    const start = (pagenum - 1) * 5 + 1;
+    const end = pagenum * 5;
+    const numbers = [];
+    for (let i = start; i <= end; i++) {
+        numbers.push(i);
+    }
+    one = numbers[0] - 1;
+    two = numbers[1] - 1;
+    three = numbers[2] - 1;
+    four = numbers[3] - 1;
+    five = numbers[4] - 1;
+
     try {
 
         if (!fs.existsSync(`./osuFiles/${beatmapId}.osu`)) {
@@ -17,13 +30,11 @@ async function LbSend(beatmapId, scores, userargs) {
 
                 filesPerSecond: 0,
             });
-
             downloader.addSingleEntry(beatmapId)
             await downloader.downloadSingle()
         }
 
         let map = new Beatmap({ path: `./osuFiles/${beatmapId}.osu` })
-
         const mapinfo = await v2.beatmap.diff(beatmapId)
 
         one = 0
@@ -52,7 +63,7 @@ async function LbSend(beatmapId, scores, userargs) {
             let ModsRaw = score.mods.map(mod => mod.acronym).join('')
             let modsID = mods.id(ModsRaw)
             if (ModsRaw != "") {
-                Mods1 = `+**${ModsRaw}**`
+                Mods1 = `+${ModsRaw}`
             } else {
                 Mods1 = ""
                 modsID = 0
@@ -99,23 +110,27 @@ async function LbSend(beatmapId, scores, userargs) {
             const date = new Date(score.ended_at)
             const UnixDate = date.getTime() / 1000
 
-            return `**${one + 1}.** ${grade} [**${score.user.username}**](https://osu.ppy.sh/users/${score.user.id}) (${(score.accuracy * 100).toFixed(2)}%) • ${score.total_score.toLocaleString()} **${score.statistics.miss}**<:hit00:1061254490075955231>\n▹${PP} • [ **${score.max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] ${Mods1} • [${CurAttrs.difficulty.stars.toFixed(2)}★]\n▹**Score Set:** <t:${UnixDate}:R>\n`
+            const first_row = `**${num + 1}.** ${grade} [**${score.user.username}**](https://osu.ppy.sh/users/${score.user.id}) (${(score.accuracy * 100).toFixed(2)}%) • ${score.total_score.toLocaleString()} **${score.statistics.miss}**<:hit00:1061254490075955231>\n`
+            const second_row = `▹${PP} • [ **${score.max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] \`${Mods1}\` • [${CurAttrs.difficulty.stars.toFixed(2)}★]\n`
+            const third_row = `▹Score Set: <t:${UnixDate}:R>`
+
+            return `${first_row}${second_row}${third_row}`
         }
 
         first_score = "**No scores found.**"
-        if (scores.scores[one]) first_score = `${ScoreGet(scores.scores[one], 1)}\n`
+        if (scores.scores[one]) first_score = `${await ScoreGet(scores.scores[one], pagenum)}\n`
 
         second_score = ""
-        if (scores.scores[two]) second_score = `${ScoreGet(scores.scores[two], 2)}\n`
+        if (scores.scores[two]) second_score = `${await ScoreGet(scores.scores[two], pagenum)}\n`
 
         third_score = ""
-        if (scores.scores[three]) third_score = `${ScoreGet(scores.scores[three], 3)}\n`
+        if (scores.scores[three]) third_score = `${await ScoreGet(scores.scores[three], pagenum)}\n`
 
         fourth_score = ""
-        if (scores.scores[four]) fourth_score = `${ScoreGet(scores.scores[four], 4)}\n`
+        if (scores.scores[four]) fourth_score = `${await ScoreGet(scores.scores[four], pagenum)}\n`
 
         fifth_score = ""
-        if (scores.scores[five]) fourth_score = `${ScoreGet(scores.scores[fifth_score], 5)}`
+        if (scores.scores[five]) fifth_score = `${await ScoreGet(scores.scores[five], pagenum)}`
 
 
         const embed = new EmbedBuilder()
@@ -126,9 +141,8 @@ async function LbSend(beatmapId, scores, userargs) {
             .setImage(`https://assets.ppy.sh/beatmaps/${mapinfo.beatmapset_id}/covers/cover.jpg`)
             .setFooter({ text: `Page: 1/${totalPage}` })
 
-        return { embed }
+        return embed
     } catch (err) {
-        const err_message = `**No recent plays for ${userargs}.**`
         console.log(err)
     }
 }
