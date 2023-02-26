@@ -1,4 +1,3 @@
-const { EmbedBuilder } = require("discord.js")
 const fs = require("fs");
 const { v2, auth } = require("osu-api-extended")
 
