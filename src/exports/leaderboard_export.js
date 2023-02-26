@@ -37,12 +37,6 @@ async function LbSend(beatmapId, scores, pagenum) {
         let map = new Beatmap({ path: `./osuFiles/${beatmapId}.osu` })
         const mapinfo = await v2.beatmap.diff(beatmapId)
 
-        one = 0
-        two = 1
-        three = 2
-        four = 3
-        five = 4
-
         const grades = {
             A: "<:A_:1057763284327080036>",
             B: "<:B_:1057763286097076405>",
@@ -63,7 +57,7 @@ async function LbSend(beatmapId, scores, pagenum) {
             let ModsRaw = score.mods.map(mod => mod.acronym).join('')
             let modsID = mods.id(ModsRaw)
             if (ModsRaw != "") {
-                Mods1 = `+${ModsRaw}`
+                Mods1 = `\`+${ModsRaw}\``
             } else {
                 Mods1 = ""
                 modsID = 0
@@ -111,26 +105,28 @@ async function LbSend(beatmapId, scores, pagenum) {
             const UnixDate = date.getTime() / 1000
 
             const first_row = `**${num + 1}.** ${grade} [**${score.user.username}**](https://osu.ppy.sh/users/${score.user.id}) (${(score.accuracy * 100).toFixed(2)}%) • ${score.total_score.toLocaleString()} **${score.statistics.miss}**<:hit00:1061254490075955231>\n`
-            const second_row = `▹${PP} • [ **${score.max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] \`${Mods1}\` • [${CurAttrs.difficulty.stars.toFixed(2)}★]\n`
+            const second_row = `▹${PP} • [ **${score.max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] ${Mods1} • [${CurAttrs.difficulty.stars.toFixed(2)}★]\n`
             const third_row = `▹Score Set: <t:${UnixDate}:R>`
+
+            console.log(second_row)
 
             return `${first_row}${second_row}${third_row}`
         }
 
         first_score = "**No scores found.**"
-        if (scores.scores[one]) first_score = `${await ScoreGet(scores.scores[one], pagenum)}\n`
+        if (scores.scores[one]) first_score = `${await ScoreGet(scores.scores[one], one)}\n`
 
         second_score = ""
-        if (scores.scores[two]) second_score = `${await ScoreGet(scores.scores[two], pagenum)}\n`
+        if (scores.scores[two]) second_score = `${await ScoreGet(scores.scores[two], two)}\n`
 
         third_score = ""
-        if (scores.scores[three]) third_score = `${await ScoreGet(scores.scores[three], pagenum)}\n`
+        if (scores.scores[three]) third_score = `${await ScoreGet(scores.scores[three], three)}\n`
 
         fourth_score = ""
-        if (scores.scores[four]) fourth_score = `${await ScoreGet(scores.scores[four], pagenum)}\n`
+        if (scores.scores[four]) fourth_score = `${await ScoreGet(scores.scores[four], four)}\n`
 
         fifth_score = ""
-        if (scores.scores[five]) fifth_score = `${await ScoreGet(scores.scores[five], pagenum)}`
+        if (scores.scores[five]) fifth_score = `${await ScoreGet(scores.scores[five], five)}`
 
 
         const embed = new EmbedBuilder()

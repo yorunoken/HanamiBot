@@ -62,22 +62,25 @@ exports.run = async (client, message, args, prefix) => {
   };
 
 
-  let modsArg
+  let modsArg;
+  let SortArg = "";
   let modifiedMods
   if (args.join(" ").includes("+")) {
     const iIndex = args.indexOf("+")
     modsArg = (args[iIndex + 1].slice(1)).toUpperCase().match(/[A-Z]{2}/g)
+    SortArg = `, Sorting by: ${modsArg}`
     if (args[0].startsWith("https://")) {
       modsArg = (args[iIndex + 2].slice(1)).toUpperCase().match(/[A-Z]{2}/g)
     }
     modifiedMods = modsArg.map((mod) => `&mods[]=${mod}`).join("")
   } else {
     modifiedMods = ""
+    SortArg = "";
   }
 
 
   async function SendEmbed(beatmapId, scores, pagenum) {
-    message.channel.send({content: `Turkish LB, Sorting by: \`${modsArg}\``,embeds: [await LbSend(beatmapId, scores, pagenum)]})
+    message.channel.send({content: `Turkish LB${SortArg}`,embeds: [await LbSend(beatmapId, scores, pagenum)]})
   }
 
   async function EmbedFetch(embed) {
