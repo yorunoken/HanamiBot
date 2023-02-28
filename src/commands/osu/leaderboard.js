@@ -87,6 +87,8 @@ exports.run = async (client, message, args, prefix) => {
 	async function EmbedFetch(embed) {
 		try {
 			const embed_author = embed.url
+			if (embed_author.includes("/users/")) throw new Error("Wrong embed")
+			if (embed_author.includes("/u/")) throw new Error("Wrong embed")
 			const beatmapId = embed_author.match(/\d+/)[0]
 			if (!ModeSelected) GameMode = await (await GetMapMode(beatmapId)).GameMode
 			const mapinfo = await (await GetMapMode(beatmapId)).mapinfo
@@ -104,6 +106,8 @@ exports.run = async (client, message, args, prefix) => {
 
 			try {
 				const embed_author = embed.author.url
+				if (embed_author.includes("/users/")) throw new Error("Wrong embed")
+				if (embed_author.includes("/u/")) throw new Error("Wrong embed")
 				const beatmapId = embed_author.match(/\d+/)[0]
 				if (!ModeSelected) GameMode = await (await GetMapMode(beatmapId)).GameMode
 				const mapinfo = await (await GetMapMode(beatmapId)).mapinfo
