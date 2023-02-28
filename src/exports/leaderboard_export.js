@@ -19,7 +19,7 @@ async function LbSend(beatmapId, scores, pagenum, mapinfo) {
 	const four = numbers[3] - 1
 	const five = numbers[4] - 1
 
-	if (scores.length == 0) {
+	if (scores.scores.length == 0) {
 		const embed = new EmbedBuilder()
 			.setColor("Purple")
 			.setTitle(`${mapinfo.beatmapset.artist} - ${mapinfo.beatmapset.title} [${mapinfo.version}]`) // [${starRating.difficulty.starRating.toFixed(2)}★]

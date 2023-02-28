@@ -61,7 +61,7 @@ exports.run = async (client, message, args, prefix) => {
 			.slice(1)
 			.toUpperCase()
 			.match(/[A-Z]{2}/g)
-		SortArg = `, Sorting by: ${modsArg}`
+		SortArg = `, Sorting by mod(s): \`${modsArg}\``
 		if (args[0].startsWith("https://")) {
 			modsArg = args[iIndex + 2]
 				.slice(1)
@@ -81,10 +81,10 @@ exports.run = async (client, message, args, prefix) => {
 		}
 
 		let ModeText
-		if (mapinfo.mode_int == "0") ModeText = ", Standard"
-		if (mapinfo.mode_int == "1") ModeText = ", Taiko"
-		if (mapinfo.mode_int == "2") ModeText = ", Ctb"
-		if (mapinfo.mode_int == "3") ModeText = ", Mania"
+		if (mapinfo.mode_int == "0") ModeText = ", Game mode: `Standard`"
+		if (mapinfo.mode_int == "1") ModeText = ", Game mode: `Taiko`"
+		if (mapinfo.mode_int == "2") ModeText = ", Game mode: `Fruits`"
+		if (mapinfo.mode_int == "3") ModeText = ", Game mode: `Mania`"
 
 		message.channel.send({ content: `Global LB${SortArg}${ModeText}`, embeds: [await LbSend(beatmapId, scores, pagenum, mapinfo)] })
 	}
