@@ -87,9 +87,12 @@ exports.run = async (client, message, args, prefix) => {
 	async function EmbedFetch(embed) {
 		try {
 			const embed_author = embed.url
+			if (embed_author.includes("/users/")) throw new Error("Wrong embed")
+			if (embed_author.includes("/u/")) throw new Error("Wrong embed")
 			const beatmapId = embed_author.match(/\d+/)[0]
 			if (!ModeSelected) GameMode = await (await GetMapMode(beatmapId)).GameMode
 			const mapinfo = await (await GetMapMode(beatmapId)).mapinfo
+			if (mapinfo.id == undefined) throw new Error("Wrong embed")
 
 			const response = await axios.get(`https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${GameMode}&type=country${modifiedMods}`, { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } })
 			const scores = response.data
@@ -103,9 +106,12 @@ exports.run = async (client, message, args, prefix) => {
 
 			try {
 				const embed_author = embed.author.url
+				if (embed_author.includes("/users/")) throw new Error("Wrong embed")
+				if (embed_author.includes("/u/")) throw new Error("Wrong embed")
 				const beatmapId = embed_author.match(/\d+/)[0]
 				if (!ModeSelected) GameMode = await (await GetMapMode(beatmapId)).GameMode
 				const mapinfo = await (await GetMapMode(beatmapId)).mapinfo
+				if (mapinfo.id == undefined) throw new Error("Wrong embed")
 
 				const response = await axios.get(`https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${GameMode}&type=country${modifiedMods}`, { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } })
 				const scores = response.data
@@ -122,6 +128,7 @@ exports.run = async (client, message, args, prefix) => {
 					const beatmapId = match[1]
 					if (!ModeSelected) GameMode = await (await GetMapMode(beatmapId)).GameMode
 					const mapinfo = await (await GetMapMode(beatmapId)).mapinfo
+					if (mapinfo.id == undefined) throw new Error("Wrong embed")
 
 					const response = await axios.get(`https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${GameMode}&type=country${modifiedMods}`, { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } })
 					const scores = response.data
@@ -170,6 +177,7 @@ exports.run = async (client, message, args, prefix) => {
 
 				if (!ModeSelected) GameMode = await (await GetMapMode(beatmapId)).GameMode
 				const mapinfo = await (await GetMapMode(beatmapId)).mapinfo
+				if (mapinfo.id == undefined) throw new Error("Wrong embed")
 
 				//message
 				try {
