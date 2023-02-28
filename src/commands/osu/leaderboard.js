@@ -75,6 +75,11 @@ exports.run = async (client, message, args, prefix) => {
 	}
 
 	async function SendEmbed(beatmapId, scores, pagenum, mapinfo) {
+		if (mapinfo.status != "ranked" && mapinfo.status != "ranked" && mapinfo.status != "qualified") {
+			message.channel.send("It seems like this map doesn't have a leaderboard available... Try again with another map")
+			return
+		}
+
 		let ModeText
 		if (mapinfo.mode_int == "0") ModeText = ", Standard"
 		if (mapinfo.mode_int == "1") ModeText = ", Taiko"
