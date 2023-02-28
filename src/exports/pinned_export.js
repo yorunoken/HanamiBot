@@ -73,20 +73,12 @@ async function GetPinned(value, user, mode, RuleSetId, pageNumber) {
 		const time_set = `<t:${new Date(pin.created_at).getTime() / 1000}:R>`
 
 		let AccValues
-		if (pin.mode_int == "0")
-			AccValues = `{**${pin.statistics.count_300}**/${pin.statistics.count_100}/${pin.statistics.count_50}/${pin.statistics.count_miss}}`
-		if (pin.mode_int == "1")
-			AccValues = `{**${pin.statistics.count_300}**/${pin.statistics.count_100}}/${pin.statistics.count_miss}}`
-		if (pin.mode_int == "2")
-			AccValues = `{**${pin.statistics.count_300}**/${pin.statistics.count_100}/${pin.statistics.count_50}/${pin.statistics.count_miss}}`
-		if (pin.mode_int == "3")
-			AccValues = `{**${pin.statistics.count_geki}/${pin.statistics.count_300}**/${pin.statistics.count_katu}/${pin.statistics.count_100}/${pin.statistics.count_50}/${pin.statistics.count_miss}}`
+		if (pin.mode_int == "0") AccValues = `{**${pin.statistics.count_300}**/${pin.statistics.count_100}/${pin.statistics.count_50}/${pin.statistics.count_miss}}`
+		if (pin.mode_int == "1") AccValues = `{**${pin.statistics.count_300}**/${pin.statistics.count_100}}/${pin.statistics.count_miss}}`
+		if (pin.mode_int == "2") AccValues = `{**${pin.statistics.count_300}**/${pin.statistics.count_100}/${pin.statistics.count_50}/${pin.statistics.count_miss}}`
+		if (pin.mode_int == "3") AccValues = `{**${pin.statistics.count_geki}/${pin.statistics.count_300}**/${pin.statistics.count_katu}/${pin.statistics.count_100}/${pin.statistics.count_50}/${pin.statistics.count_miss}}`
 
-		const first_row = `**${num + 1}. [${pin.beatmapset.title} [${
-			pin.beatmap.version
-		}]](https://osu.ppy.sh/b/${
-			pin.beatmap.id
-		}) +${Mods}** [${Star.difficulty.stars.toFixed(2)}★]\n`
+		const first_row = `**${num + 1}. [${pin.beatmapset.title} [${pin.beatmap.version}]](https://osu.ppy.sh/b/${pin.beatmap.id}) +${Mods}** [${Star.difficulty.stars.toFixed(2)}★]\n`
 		const second_row = `${grade} ${pp} ▹ (${acc}) ▹ [**${pin.max_combo}**/${Star.difficulty.maxCombo}x]\n`
 		const third_row = `${pin.score.toLocaleString()} ▹ ${AccValues} ${time_set}`
 		return `${first_row}${second_row}${third_row}`
@@ -97,11 +89,7 @@ async function GetPinned(value, user, mode, RuleSetId, pageNumber) {
 		const embed = new EmbedBuilder()
 			.setColor("Purple")
 			.setAuthor({
-				name: `${
-					user.username
-				} ${user.statistics.pp.toLocaleString()}pp (#${user.statistics.global_rank.toLocaleString()} ${
-					user.country_code
-				}#${user.statistics.country_rank.toLocaleString()}) `,
+				name: `${user.username} ${user.statistics.pp.toLocaleString()}pp (#${user.statistics.global_rank.toLocaleString()} ${user.country_code}#${user.statistics.country_rank.toLocaleString()}) `,
 				iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
 				url: `https://osu.ppy.sh/users/${user.id}`,
 			})
@@ -131,11 +119,7 @@ async function GetPinned(value, user, mode, RuleSetId, pageNumber) {
 	const embed = new EmbedBuilder()
 		.setColor("Purple")
 		.setAuthor({
-			name: `${
-				user.username
-			} ${user.statistics.pp.toLocaleString()}pp (#${user.statistics.global_rank.toLocaleString()} ${
-				user.country_code
-			}#${user.statistics.country_rank.toLocaleString()}) `,
+			name: `${user.username} ${user.statistics.pp.toLocaleString()}pp (#${user.statistics.global_rank.toLocaleString()} ${user.country_code}#${user.statistics.country_rank.toLocaleString()}) `,
 			iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
 			url: `https://osu.ppy.sh/users/${user.id}`,
 		})
