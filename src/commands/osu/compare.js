@@ -302,6 +302,6 @@ exports.run = async (client, message, args, prefix) => {
 }
 exports.name = "compare"
 exports.aliases = ["compare", "c", "gap"]
-exports.description = ["Displays your best scores of a beatmap.\n\n**Parameters:**\n`username` get the score of a user (must be first parameter)\n`link` get score by beatmap link \n`-i (int)` get a specific score.\n`-p (int)` get a specific page"]
+exports.description = ["Displays your best scores of a beatmap.\n\n**Parameters:**\n`username` get the score of a user (must be first parameter)\n`link` get score by beatmap link \n`-i (number)` get a specific score.\n`-p (number)` get a specific page"]
 exports.usage = [`compare https://osu.ppy.sh/b/1861487 whitecat`]
 exports.category = ["osu"]

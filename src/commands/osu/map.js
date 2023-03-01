@@ -269,6 +269,6 @@ exports.run = async (client, message, args, prefix) => {
 }
 exports.name = "map"
 exports.aliases = ["map", "m"]
-exports.description = ["Displays the stats of a beatmap.\n\n**Parameters:**\n`link` get map by beatmap link\n`BPM=(int)` changes the BPM of the beatmap and gives its info (50-4000) also scales up other values with it\n`AR=(int)` changes the AR of the map\n`OD=(int)` changes the OD of the map\n`CS=(int)` changes the circle size of the map\n`mods=(string)` gets the beatmap info based on the mod combination"]
+exports.description = ["Displays the stats of a beatmap.\n\n**Parameters:**\n`link` get map by beatmap link\n`BPM=(number)` changes the BPM of the beatmap and gives its info (50-4000) also scales up other values with it\n`AR=(number)` changes the AR of the map\n`OD=(number)` changes the OD of the map\n`CS=(number)` changes the circle size of the map\n`mods=(string)` gets the beatmap info based on the mod combination"]
 exports.usage = ["map {link} {args}"]
 exports.category = ["osu"]

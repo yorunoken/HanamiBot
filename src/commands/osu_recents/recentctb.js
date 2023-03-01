@@ -328,6 +328,6 @@ module.exports.run = async (client, message, args, prefix) => {
 }
 exports.name = ["recentctb"]
 exports.aliases = ["recentctb", "rctb", "rsctb", "rc", "rsc"]
-exports.description = ["Displays user's recent osu!ctb play\n\n**Parameters:**\n`username` get the recent play of a user (must be first parameter) \n`-i (int)` get a specific play (1-100)\n`-pass` get the latest passed play (no parameters)\n`mods=(string)` get the latest play by mods"]
+exports.description = ["Displays user's recent osu!ctb play\n\n**Parameters:**\n`username` get the recent play of a user (must be first parameter) \n`-i (number)` get a specific play (1-100)\n`-pass` get the latest passed play (no parameters)\n`mods=(string)` get the latest play by mods"]
 exports.usage = [`rctb -pass -i 3\nrecentctb Rocma -i 5`]
 exports.category = ["osu"]

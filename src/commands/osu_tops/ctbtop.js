@@ -637,6 +637,6 @@ exports.run = async (client, message, args, prefix) => {
 }
 exports.name = ["ctbtop"]
 exports.aliases = ["ctbtop", "ctop"]
-exports.description = ["Displays user's Catch the Beat top plays\n\n**Parameters:**\n`username` get the top plays of a user (must be first parameter) \n`-i (int)` get a specific play (1-100)\n`-p` get a specific page (1-20)"]
+exports.description = ["Displays user's Catch the Beat top plays\n\n**Parameters:**\n`username` get the top plays of a user (must be first parameter) \n`-i (number)` get a specific play (1-100)\n`-p` get a specific page (1-20)"]
 exports.usage = [`ctbtop YesMyDarkness -i 16\nctbtop YesMyDarkness -p 8`]
 exports.category = ["osu"]

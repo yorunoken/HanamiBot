@@ -327,6 +327,6 @@ module.exports.run = async (client, message, args, prefix) => {
 }
 exports.name = ["recenttaiko"]
 exports.aliases = ["recenttaiko", "rt", "rst", "rtaiko"]
-exports.description = ["Displays user's recent osu!taiko play\n\n**Parameters:**\n`username` get the recent play of a user (must be first parameter) \n`-i (int)` get a specific play (1-100)\n`-pass` get the latest passed play (no parameters)\n`mods=(string)` get the latest play by mods"]
+exports.description = ["Displays user's recent osu!taiko play\n\n**Parameters:**\n`username` get the recent play of a user (must be first parameter) \n`-i (number)` get a specific play (1-100)\n`-pass` get the latest passed play (no parameters)\n`mods=(string)` get the latest play by mods"]
 exports.usage = [`rt JustinNF -i 8\nrecenttaiko Peaceful -pass`]
 exports.category = ["osu"]

@@ -143,6 +143,6 @@ exports.run = async (client, message, args, prefix) => {
 }
 exports.name = "mostplayed"
 exports.aliases = ["mostplayed", "mp"]
-exports.description = ["Displays a user's most played beatmaps.**Parameters:**\n`-p {int}` browse through the pages"]
+exports.description = ["Displays a user's most played beatmaps.**Parameters:**\n`-p {number}` browse through the pages"]
 exports.usage = [`mp chocomint`]
 exports.category = ["osu"]
