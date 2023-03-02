@@ -56,34 +56,36 @@ exports.run = async (client, message, args, prefix) => {
 	let SortArg = ""
 	let modifiedMods = ""
 	let ModText = ""
-	if (args.join(" ").includes("+")) {
-		const iIndex = args.indexOf("+")
-		modsArg = args[iIndex + 1]
-			.slice(1)
-			.toUpperCase()
-			.match(/[A-Z]{2}/g)
-		ModText = modsArg.join("").replace(",", "")
-		SortArg = `, Sorting by mod(s): \`${ModText}\``
-		if (args[0].startsWith("https://")) {
-			modsArg = args[iIndex + 2]
+	try {
+		if (args.join(" ").includes("+")) {
+			const iIndex = args.indexOf("+")
+			modsArg = args[iIndex + 1]
 				.slice(1)
 				.toUpperCase()
 				.match(/[A-Z]{2}/g)
+			ModText = modsArg.join("").replace(",", "")
+			SortArg = `, Sorting by mod(s): \`${ModText}\``
+			if (args[0].startsWith("https://")) {
+				modsArg = args[iIndex + 2]
+					.slice(1)
+					.toUpperCase()
+					.match(/[A-Z]{2}/g)
+			}
+			modifiedMods = modsArg.map(mod => `&mods[]=${mod}`).join("")
+		} else if (isNaN(Number(args[0])) && !args[0].startsWith("https")) {
+			console.log("hi")
+			modsArg = args[0].toUpperCase().match(/[A-Z]{2}/g)
+			ModText = modsArg.join("").replace(",", "")
+			SortArg = `, Sorting by mod(s): \`${ModText}\``
+			if (args[0].startsWith("https://")) {
+				modsArg = args[iIndex + 2]
+					.slice(1)
+					.toUpperCase()
+					.match(/[A-Z]{2}/g)
+			}
+			modifiedMods = modsArg.map(mod => `&mods[]=${mod}`).join("")
 		}
-		modifiedMods = modsArg.map(mod => `&mods[]=${mod}`).join("")
-	} else if (isNaN(args[0]) && !args[0].startsWith("https")) {
-		console.log("hi")
-		modsArg = args[0].toUpperCase().match(/[A-Z]{2}/g)
-		ModText = modsArg.join("").replace(",", "")
-		SortArg = `, Sorting by mod(s): \`${ModText}\``
-		if (args[0].startsWith("https://")) {
-			modsArg = args[iIndex + 2]
-				.slice(1)
-				.toUpperCase()
-				.match(/[A-Z]{2}/g)
-		}
-		modifiedMods = modsArg.map(mod => `&mods[]=${mod}`).join("")
-	}
+	} catch (err) {}
 
 	async function SendEmbed(beatmapId, scores, pagenum, mapinfo) {
 		if (mapinfo.status != "ranked" && mapinfo.status != "ranked" && mapinfo.status != "qualified") {
