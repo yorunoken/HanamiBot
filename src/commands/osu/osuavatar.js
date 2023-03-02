@@ -58,7 +58,7 @@ exports.run = async (client, message, args, prefix) => {
 			try {
 				if (user.id == undefined) throw new Error("The user doesn't exist")
 			} catch (err) {
-				message.reply(`**The user, \`${userargs}\`, doesn't exist**`)
+				message.reply(`**The user \`${userargs}\` doesn't exist**`)
 				return
 			}
 
@@ -68,6 +68,7 @@ exports.run = async (client, message, args, prefix) => {
 
 				//if the user is found. display the avatar
 				const embed = new EmbedBuilder()
+					.setColor("Purple")
 					.setAuthor({
 						name: `Profile Avatar of ${user.username}`,
 						iconURL: `https://flagcdn.com/h80/${countrycode}.png`,
