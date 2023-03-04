@@ -18,6 +18,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
 		let mode = "mania"
 		let RuleSetId = 3
+		let mentioneduser = false
 
 		if (message.mentions.users.size > 0) {
 			const mentionedUser = message.mentions.users.first()
@@ -97,6 +98,8 @@ module.exports.run = async (client, message, args, prefix) => {
 			}
 		}
 
+		console.log(userargs)
+
 		//log in
 		await auth.login(process.env.client_id, process.env.client_secret)
 
@@ -117,6 +120,10 @@ module.exports.run = async (client, message, args, prefix) => {
 		}
 
 		const ppraw = Number(args[args.length - 1])
+		if (isNaN(ppraw)) {
+			message.channel.send({ embeds: [new EmbedBuilder().setTitle("Error!").setColor("Purple").setDescription(`**Please provide a value.**`).setFooter({ text: `Are you having issues with the formatting? remember username always comes first!` })] })
+			return
+		}
 
 		let plays = await v2.user.scores.category(user.id, "best", {
 			mode: mode,
@@ -184,7 +191,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
 			const response = await axios.get(`${endpoint}pp.php?k=${apiKey}&m=${RuleSetId}&t=pp&v=${newpp}`)
 			const ReponseData = response.data
-			const TopPlay = scores.filter(x => x > ppraw) + 1
+			const TopPlay = scores.filter(x => x > ppraw).length + 1
 
 			const embed = new EmbedBuilder()
 				.setColor("Purple")

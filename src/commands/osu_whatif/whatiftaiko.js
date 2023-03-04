@@ -18,6 +18,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
 		let mode = "taiko"
 		let RuleSetId = 1
+		let mentioneduser = false
 
 		if (message.mentions.users.size > 0) {
 			const mentionedUser = message.mentions.users.first()
@@ -97,6 +98,8 @@ module.exports.run = async (client, message, args, prefix) => {
 			}
 		}
 
+		console.log(userargs)
+
 		//log in
 		await auth.login(process.env.client_id, process.env.client_secret)
 
@@ -117,6 +120,10 @@ module.exports.run = async (client, message, args, prefix) => {
 		}
 
 		const ppraw = Number(args[args.length - 1])
+		if (isNaN(ppraw)) {
+			message.channel.send({ embeds: [new EmbedBuilder().setTitle("Error!").setColor("Purple").setDescription(`**Please provide a value.**`).setFooter({ text: `Are you having issues with the formatting? remember username always comes first!` })] })
+			return
+		}
 
 		let plays = await v2.user.scores.category(user.id, "best", {
 			mode: mode,
