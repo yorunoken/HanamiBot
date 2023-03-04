@@ -120,6 +120,14 @@ module.exports.run = async (client, message, args, prefix) => {
 		}
 
 		const ppraw = Number(args[args.length - 1])
+		if (ppraw == 0) {
+			message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription("Value cannot be zero.")] })
+			return
+		}
+		if (ppraw < 0) {
+			message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription("Value cannot be less than zero.")] })
+			return
+		}
 		if (isNaN(ppraw)) {
 			message.channel.send({ embeds: [new EmbedBuilder().setTitle("Error!").setColor("Purple").setDescription(`**Please provide a value.**`).setFooter({ text: `Are you having issues with the formatting? remember that the username always comes first!` })] })
 			return

@@ -120,6 +120,14 @@ module.exports.run = async (client, message, args, prefix) => {
 		}
 
 		const ppraw = Number(args[args.length - 1])
+		if (ppraw == 0) {
+			message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription("Value cannot be zero.")] })
+			return
+		}
+		if (ppraw < 0) {
+			message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription("Value cannot be less than zero.")] })
+			return
+		}
 		if (isNaN(ppraw)) {
 			message.channel.send({ embeds: [new EmbedBuilder().setTitle("Error!").setColor("Purple").setDescription(`**Please provide a value.**`).setFooter({ text: `Are you having issues with the formatting? remember that the username always comes first!` })] })
 			return
@@ -202,7 +210,7 @@ module.exports.run = async (client, message, args, prefix) => {
 				})
 				.setTitle(`What if ${user.username} got a ${ppraw.toFixed()}pp score?`)
 				.setThumbnail(user.avatar_url)
-				.setDescription(`A **${ppraw.toFixed(2)}pp** play would be ${user.username}'s **#${TopPlay}** top play. It would increase their total pp to **${newpp.toFixed(2).toLocaleString()}** (+${Math.round(newpp - user.statistics.pp).toLocaleString()}pp) and increase their rank to **#${ReponseData.rank.toLocaleString()}** (+${(user.statistics.global_rank - ReponseData.rank).toLocaleString()}).`)
+				.setDescription(`A **${ppraw.toFixed(2)}pp** play would be ${user.username}'s **#${TopPlay}** top play. It would increase their total pp to **${newpp.toFixed(2).toLocaleString()}** (+${differencerounded.toLocaleString()}pp) and increase their rank to **#${ReponseData.rank.toLocaleString()}** (+${(user.statistics.global_rank - ReponseData.rank).toLocaleString()}).`)
 
 			message.channel.send({ embeds: [embed] })
 		}

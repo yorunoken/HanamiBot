@@ -117,7 +117,15 @@ module.exports.run = async (client, message, args, prefix) => {
 			pp = "0"
 		}
 
-		const ReachRank = args[args.length - 1]
+		const ReachRank = Number(args[args.length - 1])
+		if (ReachRank == 0) {
+			message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription("Value cannot be zero.")] })
+			return
+		}
+		if (ReachRank < 0) {
+			message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription("Value cannot be less than zero.")] })
+			return
+		}
 		if (isNaN(ReachRank)) {
 			message.channel.send({ embeds: [new EmbedBuilder().setTitle("Error!").setColor("Purple").setDescription(`**Please provide a value.**`).setFooter({ text: `Are you having issues with the formatting? remember that the username always comes first!` })] })
 			return

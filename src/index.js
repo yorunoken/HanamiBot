@@ -117,7 +117,7 @@ client.on("messageCreate", message => {
 		if (!command) return
 
 		// check if the user is still in cooldown period
-		const cooldownAmount = (command.cooldown || 5) * 1000
+		const cooldownAmount = (command.cooldown || 2) * 1000
 		if (cooldowns.has(commandName)) {
 			const expirationTime = cooldowns.get(commandName) + cooldownAmount
 			if (Date.now() < expirationTime) {

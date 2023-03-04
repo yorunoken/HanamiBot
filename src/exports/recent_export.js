@@ -189,8 +189,6 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId) {
 		if (score[value].passed == true) {
 			if (scorerank.rank_global != undefined) {
 				sc_rank = ` 🌐 #${scorerank.rank_global}`
-			} else {
-				sc_rank = " "
 			}
 
 			console.log("file: recent_export.js:219 ~ GetRecent ~ rank_global:", scorerank.rank_global)
