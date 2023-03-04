@@ -126,6 +126,10 @@ module.exports.run = async (client, message, args, prefix) => {
 		}
 
 		const ReachRank = args[args.length - 1]
+		if (isNaN(ReachRank)) {
+			message.channel.send("**Please provide a rank.**")
+			return
+		}
 
 		const response = await axios.get(`${endpoint}pp.php?k=${apiKey}&m=${RuleSetId}&t=rank&v=${ReachRank}`)
 		const ReponseData = response.data
