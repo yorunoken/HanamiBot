@@ -27,6 +27,7 @@ module.exports.run = async (client, message, args, prefix) => {
 				if (mentionedUser) {
 					if (message.content.includes(`<@${mentionedUser.id}>`)) {
 						userargs = userData[mentionedUser.id].osuUsername
+						mentioneduser = true
 					} else {
 						userargs = userData[message.author.id].osuUsername
 					}
@@ -67,6 +68,19 @@ module.exports.run = async (client, message, args, prefix) => {
 					userargs = args[0]
 				}
 
+				if (args.includes("-mania")) {
+					mode = "mania"
+					RuleSetId = 3
+				}
+				if (args.includes("-taiko")) {
+					mode = "taiko"
+					RuleSetId = 1
+				}
+				if (args.includes("-ctb")) {
+					mode = "fruits"
+					RuleSetId = 2
+				}
+
 				if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko")) {
 					try {
 						userargs = userData[message.author.id].osuUsername
@@ -77,7 +91,7 @@ module.exports.run = async (client, message, args, prefix) => {
 			}
 		}
 
-		if (userargs.length === 0 || !isNaN(userargs)) {
+		if (userargs.length === 0 || (!isNaN(userargs) && !mentioneduser)) {
 			try {
 				userargs = userData[message.author.id].osuUsername
 			} catch (err) {
