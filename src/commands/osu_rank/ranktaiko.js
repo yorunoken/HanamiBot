@@ -20,6 +20,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
 		let mode = "taiko"
 		let RuleSetId = 1
+		let mentioneduser = false
 
 		if (message.mentions.users.size > 0) {
 			const mentionedUser = message.mentions.users.first()
@@ -127,7 +128,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
 		const ReachRank = args[args.length - 1]
 		if (isNaN(ReachRank)) {
-			message.channel.send("**Please provide a rank.**")
+			message.channel.send({ embeds: [new EmbedBuilder().setTitle("Error!").setColor("Purple").setDescription(`**Please provide a value.**`).setFooter({ text: `Are you having issues with the formatting? remember that the username always comes first!` })] })
 			return
 		}
 

@@ -121,7 +121,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
 		const ppraw = Number(args[args.length - 1])
 		if (isNaN(ppraw)) {
-			message.channel.send({ embeds: [new EmbedBuilder().setTitle("Error!").setColor("Purple").setDescription(`**Please provide a value.**`).setFooter({ text: `Are you having issues with the formatting? remember username always comes first!` })] })
+			message.channel.send({ embeds: [new EmbedBuilder().setTitle("Error!").setColor("Purple").setDescription(`**Please provide a value.**`).setFooter({ text: `Are you having issues with the formatting? remember that the username always comes first!` })] })
 			return
 		}
 
