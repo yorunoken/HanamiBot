@@ -88,7 +88,7 @@ exports.run = async (client, message, args, prefix) => {
 	} catch (err) {}
 
 	async function SendEmbed(beatmapId, scores, pagenum, mapinfo) {
-		if (mapinfo.status != "ranked" && mapinfo.status != "ranked" && mapinfo.status != "qualified") {
+		if (mapinfo.status != "ranked" && mapinfo.status != "qualified" && mapinfo.status != "loved") {
 			message.channel.send("It seems like this map doesn't have a leaderboard available... Try again with another map")
 			return
 		}
