@@ -4,7 +4,7 @@ const { v2, auth, mods, tools } = require("osu-api-extended")
 const { Beatmap, Calculator } = require("rosu-pp")
 const { Downloader, DownloadEntry } = require("osu-downloader")
 
-async function LbSend(beatmapId, scores, pagenum, mapinfo) {
+async function LbSend(beatmapId, scores, pagenum, mapinfo, AuthorsName) {
 	await auth.login(process.env.client_id, process.env.client_secret)
 
 	const start = (pagenum - 1) * 5 + 1
@@ -105,20 +105,26 @@ async function LbSend(beatmapId, scores, pagenum, mapinfo) {
 			const date = new Date(score.ended_at)
 			const UnixDate = date.getTime() / 1000
 
-			const first_row = `**${num + 1}.** ${grade} [**${score.user.username}**](https://osu.ppy.sh/users/${score.user.id}) (${(score.accuracy * 100).toFixed(2)}%) • ${score.total_score.toLocaleString()} **${score.statistics.miss}**<:hit00:1061254490075955231>\n`
-			const second_row = `▹${PP} ${Mods1} • **__[${CurAttrs.difficulty.stars.toFixed(2)}★]__**\n`
-			const third_row = `▹[ **${score.max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] • ${AccValues}\n`
-			const fourth_row = `▹Score Set: <t:${UnixDate}:R>`
+			let first_row = `**${num + 1}.** ${grade} [**${score.user.username}**](https://osu.ppy.sh/users/${score.user.id}) (${(score.accuracy * 100).toFixed(2)}%) • ${score.total_score.toLocaleString()}\n`
+			let second_row = `▹${PP} ${Mods1} • **__[${CurAttrs.difficulty.stars.toFixed(2)}★]__**\n`
+			let third_row = `▹[ **${score.max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] • ${AccValues}\n`
+			let fourth_row = `▹Score Set: <t:${UnixDate}:R>`
+
+			if (YourScore) {
+				first_row = `**${num + 1}.** ${grade} [**${score.user.username}**](https://osu.ppy.sh/users/${score.user.id}) (${(score.accuracy * 100).toFixed(2)}%) ${Mods1} **${score.statistics.miss}**<:hit00:1061254490075955231>\n`
+				second_row = `▹ ${PP} [ **${score.max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] **__[${CurAttrs.difficulty.stars.toFixed(2)}★]__**`
+				third_row = ``
+				fourth_row = ``
+			}
+
 			return `${first_row}${second_row}${third_row}${fourth_row}`
 		}
 
-		first_score = "**No scores found.**"
-		if (scores.scores[one]) first_score = `${await ScoreGet(scores.scores[one], one)}\n`
-		else {
-			console.log(mapinfo)
-			console.log("page", pagenum)
-			console.log("totalPage", pagenum)
+		let YourScore = false
 
+		first_score = "**No scores found.**"
+		if (scores.scores[one]) first_score = `${await ScoreGet(scores.scores[one], one, YourScore)}\n`
+		else {
 			if (pagenum > totalPage || pagenum < 0) {
 				const embed = new EmbedBuilder()
 					.setColor("Red")
@@ -129,22 +135,35 @@ async function LbSend(beatmapId, scores, pagenum, mapinfo) {
 		}
 
 		second_score = ""
-		if (scores.scores[two]) second_score = `${await ScoreGet(scores.scores[two], two)}\n`
+		if (scores.scores[two]) second_score = `${await ScoreGet(scores.scores[two], two, YourScore)}\n`
 
 		third_score = ""
-		if (scores.scores[three]) third_score = `${await ScoreGet(scores.scores[three], three)}\n`
+		if (scores.scores[three]) third_score = `${await ScoreGet(scores.scores[three], three, YourScore)}\n`
 
 		fourth_score = ""
-		if (scores.scores[four]) fourth_score = `${await ScoreGet(scores.scores[four], four)}\n`
+		if (scores.scores[four]) fourth_score = `${await ScoreGet(scores.scores[four], four, YourScore)}\n`
 
 		fifth_score = ""
-		if (scores.scores[five]) fifth_score = `${await ScoreGet(scores.scores[five], five)}`
+		if (scores.scores[five]) fifth_score = `${await ScoreGet(scores.scores[five], five, YourScore)}\n`
+
+		user_score = ""
+		if (AuthorsName) {
+			let index = scores.scores.findIndex(x => x.user.id == AuthorsName)
+			if (index == -1) {
+				index = scores.scores.findIndex(x => x.user.username == AuthorsName)
+			}
+			if (index == -1) {
+			} else {
+				YourScore = true
+				user_score = `\n__**Your score:**__\n${await ScoreGet(scores.scores[index], index, YourScore)}`
+			}
+		}
 
 		const embed = new EmbedBuilder()
 			.setColor("Purple")
 			.setTitle(`${mapinfo.beatmapset.artist} - ${mapinfo.beatmapset.title} [${mapinfo.version}]`) // [${starRating.difficulty.starRating.toFixed(2)}★]
 			.setURL(`https://osu.ppy.sh/b/${mapinfo.id}`)
-			.setDescription(`${first_score}${second_score}${third_score}${fourth_score}${fifth_score}`)
+			.setDescription(`${first_score}${second_score}${third_score}${fourth_score}${fifth_score}${user_score}`)
 			.setImage(`https://assets.ppy.sh/beatmaps/${mapinfo.beatmapset_id}/covers/cover.jpg`)
 			.setFooter({ text: `Page: ${pagenum}/${totalPage}` })
 

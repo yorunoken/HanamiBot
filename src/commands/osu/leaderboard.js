@@ -1,11 +1,23 @@
 // require('fetch')
 const axios = require("axios")
+const fs = require("fs")
 const { v2, auth, mods, tools } = require("osu-api-extended")
 
 // importing GetRecent
 const { LbSend } = require("../../exports/leaderboard_export.js")
 exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()
+
+	let AuthorsName
+	fs.readFile("./user-data.json", async (error, data) => {
+		if (error) return
+		const userData = JSON.parse(data)
+		try {
+			AuthorsName = userData[message.author.id].osuUsername
+		} catch (err) {
+			console.log(err)
+		}
+	})
 
 	await auth.login(process.env.client_id, process.env.client_secret)
 	let EmbedValue = 0
@@ -39,19 +51,6 @@ exports.run = async (client, message, args, prefix) => {
 		ModeSelected = true
 	}
 
-	// determine the page of the lb
-	const start = (pagenum - 1) * 5 + 1
-	const end = pagenum * 5
-	const numbers = []
-	for (let i = start; i <= end; i++) {
-		numbers.push(i)
-	}
-	one = numbers[0] - 1
-	two = numbers[1] - 1
-	three = numbers[2] - 1
-	four = numbers[3] - 1
-	five = numbers[4] - 1
-
 	let modsArg
 	let SortArg = ""
 	let modifiedMods = ""
@@ -75,8 +74,6 @@ exports.run = async (client, message, args, prefix) => {
 		} else if (isNaN(Number(args[0])) && !args[0].startsWith("https")) {
 			console.log("hi")
 			modsArg = args[0].toUpperCase().match(/[A-Z]{2}/g)
-			ModText = modsArg.join("").replace(",", "")
-			SortArg = `, Sorting by mod(s): \`${ModText}\``
 			if (args[0].startsWith("https://")) {
 				modsArg = args[iIndex + 2]
 					.slice(1)
@@ -84,10 +81,15 @@ exports.run = async (client, message, args, prefix) => {
 					.match(/[A-Z]{2}/g)
 			}
 			modifiedMods = modsArg.map(mod => `&mods[]=${mod}`).join("")
+			modsArg.shift()
+			modsArg.shift()
+			console.log(modsArg)
+			ModText = modsArg.join("").replace(",", "")
+			SortArg = `, Sorting by mod(s): \`${ModText}\``
 		}
 	} catch (err) {}
 
-	async function SendEmbed(beatmapId, scores, pagenum, mapinfo) {
+	async function SendEmbed(beatmapId, scores, pagenum, mapinfo, AuthorsName) {
 		if (mapinfo.status != "ranked" && mapinfo.status != "qualified" && mapinfo.status != "loved") {
 			message.channel.send("It seems like this map doesn't have a leaderboard available... Try again with another map")
 			return
@@ -99,7 +101,7 @@ exports.run = async (client, message, args, prefix) => {
 		if (mapinfo.mode_int == "2") ModeText = ", Game mode: `Fruits`"
 		if (mapinfo.mode_int == "3") ModeText = ", Game mode: `Mania`"
 
-		message.channel.send({ content: `Global LB${SortArg}${ModeText}`, embeds: [await LbSend(beatmapId, scores, pagenum, mapinfo)] })
+		message.channel.send({ content: `Global LB${SortArg}${ModeText}`, embeds: [await LbSend(beatmapId, scores, pagenum, mapinfo, AuthorsName)] })
 	}
 
 	async function EmbedFetch(embed) {
@@ -115,7 +117,7 @@ exports.run = async (client, message, args, prefix) => {
 			const response = await axios.get(`https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${GameMode}&type=global${modifiedMods}`, { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } })
 			const scores = response.data
 			//send the embed
-			SendEmbed(beatmapId, scores, pagenum, mapinfo)
+			SendEmbed(beatmapId, scores, pagenum, mapinfo, AuthorsName)
 			GoodToGo = true
 		} catch (err) {
 			console.log(err)
@@ -134,7 +136,7 @@ exports.run = async (client, message, args, prefix) => {
 				const response = await axios.get(`https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${GameMode}&type=global${modifiedMods}`, { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } })
 				const scores = response.data
 				//send the embed
-				SendEmbed(beatmapId, scores, pagenum, mapinfo)
+				SendEmbed(beatmapId, scores, pagenum, mapinfo, AuthorsName)
 				GoodToGo = true
 			} catch (err) {
 				console.log(err)
@@ -152,7 +154,7 @@ exports.run = async (client, message, args, prefix) => {
 					const scores = response.data
 
 					//send the embed
-					SendEmbed(beatmapId, scores, pagenum, mapinfo)
+					SendEmbed(beatmapId, scores, pagenum, mapinfo, AuthorsName)
 					GoodToGo = true
 					return
 				} catch (err) {
@@ -196,13 +198,12 @@ exports.run = async (client, message, args, prefix) => {
 				if (!ModeSelected) GameMode = await (await GetMapMode(beatmapId)).GameMode
 				const mapinfo = await (await GetMapMode(beatmapId)).mapinfo
 				if (mapinfo.id == undefined) throw new Error("Wrong embed")
-
 				//message
 				try {
 					//send the embed
 					const response = await axios.get(`https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${GameMode}&type=global${modifiedMods}`, { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } })
 					const scores = response.data
-					SendEmbed(beatmapId, scores, pagenum, mapinfo)
+					SendEmbed(beatmapId, scores, pagenum, mapinfo, AuthorsName)
 					return
 				} catch (err) {
 					// console.log(err)
