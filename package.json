@@ -19,6 +19,7 @@
     "cheerio": "^1.0.0-rc.12",
     "chess-web-api": "^1.1.2",
     "cjs-to-es6": "^2.0.1",
+    "discord-id": "^1.1.0",
     "discord.js": "^14.3.0",
     "dotenv": "^16.0.2",
     "fetch": "^1.1.0",

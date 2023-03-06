@@ -70,6 +70,12 @@ exports.run = async (client, message, args, prefix) => {
 			//ranked or not
 			let status = DiffValues.status.charAt(0).toUpperCase() + DiffValues.status.slice(1)
 
+			var options = { weekday: "long", year: "numeric", month: "long", day: "numeric" }
+			let Updated_at = `Last updated at ${new Date(DiffValues.last_updated).toLocaleDateString("en-US", options)}`
+			if (DiffValues.status == "ranked") Updated_at = `Ranked at ${new Date(DiffValues.last_updated).toLocaleDateString("en-US", options)}`
+			if (DiffValues.status == "loved") Updated_at = `Loved at ${new Date(DiffValues.last_updated).toLocaleDateString("en-US", options)}`
+			if (DiffValues.status == "qualified") Updated_at = `Qualified at ${new Date(DiffValues.last_updated).toLocaleDateString("en-US", options)}`
+
 			//embed
 			const embed = new EmbedBuilder()
 				.setColor("Purple")
@@ -78,7 +84,7 @@ exports.run = async (client, message, args, prefix) => {
 				.setFields({ name: `${osuEmote} **[${DiffValues.version}]**`, value: `Stars: \`${PP100.difficulty.stars.toFixed(2)}★\` Mods: \`NM\` BPM: \`${mapValues.bpm.toFixed()}\`\nLength: \`${minutes}:${seconds}\` Max Combo: \`${PP100.difficulty.maxCombo.toLocaleString()}x\` Objects: \`${PP100.difficulty.nCircles + PP100.difficulty.nSliders + PP100.difficulty.nSpinners + PP100.difficulty.nFruits}\`\nAR: \`${mapValues.ar.toFixed(1)}\` OD: \`${mapValues.od.toFixed(1)}\` CS: \`${mapValues.cs.toFixed(2)}\` HP: \`${mapValues.hp.toFixed(1)}\`\nLongest Stream: \`${data.longest_stream}\` Stream Density: \`${data.streams_density}\`\nStreams Length: \`${sminutes}:${sseconds}\` Spacing: \`${data.streams_spacing}\`` }, { name: "PP", value: `\`\`\`Acc | PP\n95%:  ${PP95.pp.toFixed(1)}\n97%:  ${PP97.pp.toFixed(1)}\n99%:  ${PP99.pp.toFixed(1)}\n100%: ${PP100.pp.toFixed(1)}\`\`\``, inline: true }, { name: "Links", value: `:notes:[Song Preview](https://b.ppy.sh/preview/${DiffValues.beatmapset_id}.mp3)\n🎬[Map Preview](https://osu.pages.dev/preview#${DiffValues.id})\n🖼️[Full Background](https://assets.ppy.sh/beatmaps/${DiffValues.beatmapset_id}/covers/raw.jpg)\n<:beatconnect:1075915329512931469>[Beatconnect](https://beatconnect.io/b/${DiffValues.beatmapset_id})\n<:kitsu:1075915745973776405>[Kitsu](https://kitsu.moe/d/${DiffValues.beatmapset_id})`, inline: true })
 				.setURL(`https://osu.ppy.sh/b/${DiffValues.id}`)
 				.setImage(`https://assets.ppy.sh/beatmaps/${DiffValues.beatmapset_id}/covers/cover.jpg`)
-				.setFooter({ text: `${status} | ${DiffValues.beatmapset.favourite_count} ♥` })
+				.setFooter({ text: `${status} | ${DiffValues.beatmapset.favourite_count} ♥ | ${Updated_at}` })
 
 			message.channel.send({ content: "Here is a beatmap with provided filters:", embeds: [embed] })
 			return

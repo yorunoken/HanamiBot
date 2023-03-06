@@ -77,7 +77,9 @@ const cooldowns = new Map()
 
 client.on("ready", async () => {
 	console.log(`Logged in as ${client.user.tag}, in ${client.guilds.cache.size} servers!`)
-	console.log(`server list:`)
+
+	const servers = client.guilds.cache.map(x => `${x.name} \\ ${x.ownerId}`)
+	// console.log(`server list:\n${servers.join("\n")}`)
 
 	try {
 		commandCount = parseInt(fs.readFileSync("commandCount.txt"), 10)
