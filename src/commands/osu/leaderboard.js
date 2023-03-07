@@ -227,7 +227,7 @@ exports.run = async (client, message, args, prefix) => {
 		}
 	})
 }
-exports.name = "leadearboard"
+exports.name = "leaderboard"
 exports.aliases = ["lb", "leaderboard"]
 exports.description = ["Displays the Leaderboard of a map.\n\n**Parameters:**\n`link` link a beatmap to get its leaderboard\n`+(mod combination)` get the leaderboard of that mod combination"]
 exports.usage = [`lb +DTNF`]
