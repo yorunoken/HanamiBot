@@ -18,7 +18,7 @@ exports.run = async (client, message, args, prefix) => {
 		let pagenum = 1
 		let ModsString
 
-		let ModeOsu = "osu"
+		let ModeOsu = "taiko"
 
 		let ErrCount = 0
 
@@ -84,13 +84,7 @@ exports.run = async (client, message, args, prefix) => {
 				}
 			} else {
 				try {
-					if (args.includes("-mania")) ModeOsu = "mania"
-
-					if (args.includes("-taiko")) ModeOsu = "taiko"
-
-					if (args.includes("-ctb")) ModeOsu = "ctb"
-
-					if (args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-p")) userargs = userData[message.author.id].osuUsername
+					if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("-p")) userargs = userData[message.author.id].osuUsername
 				} catch (err) {
 					message.reply(`Set your osu! username by using "${prefix}link **your username**"`)
 				}

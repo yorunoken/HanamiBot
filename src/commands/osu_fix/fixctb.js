@@ -18,7 +18,7 @@ exports.run = async (client, message, args, prefix) => {
 		let pagenum = 1
 		let ModsString
 
-		let ModeOsu = "osu"
+		let ModeOsu = "fruits"
 
 		let ErrCount = 0
 
@@ -84,13 +84,7 @@ exports.run = async (client, message, args, prefix) => {
 				}
 			} else {
 				try {
-					if (args.includes("-mania")) ModeOsu = "mania"
-
-					if (args.includes("-taiko")) ModeOsu = "taiko"
-
-					if (args.includes("-ctb")) ModeOsu = "ctb"
-
-					if (args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-p")) userargs = userData[message.author.id].osuUsername
+					if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("-p")) userargs = userData[message.author.id].osuUsername
 				} catch (err) {
 					message.reply(`Set your osu! username by using "${prefix}link **your username**"`)
 				}
@@ -270,8 +264,8 @@ exports.run = async (client, message, args, prefix) => {
 		})
 	})
 }
-exports.name = "fix"
-exports.aliases = ["fix"]
+exports.name = "fixctb"
+exports.aliases = ["fixctb", "fixctb", "fixc"]
 exports.description = ["Displays your play if it was an FC\n\n**Parameters:**\n`username` get the score of a user (must be first parameter)\n`link` get score by beatmap link \n`-i (number)` get a specific score.\n`-p (number)` get a specific page"]
-exports.usage = [`fix Whitecat`]
+exports.usage = [`fixctb Whitecat`]
 exports.category = ["osu"]
