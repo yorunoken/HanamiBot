@@ -9,6 +9,7 @@ exports.run = async (client, message, args, prefix) => {
 
 	let EmbedValue = 0
 	let GoodToGo = false
+	let beatmapId
 
 	await auth.login(process.env.client_id, process.env.client_secret)
 
@@ -166,14 +167,16 @@ exports.run = async (client, message, args, prefix) => {
 	async function EmbedFetch(embed) {
 		try {
 			const embed_author = embed.url
+			if (embed_author.includes("/users/")) throw new Error("Wrong embed")
+			if (embed_author.includes("/u/")) throw new Error("Wrong embed")
 			const beatmapId = embed_author.match(/\d+/)[0]
-			console.log(beatmapId)
 
 			const ranked = await v2.beatmap.diff(beatmapId)
 			if (ranked.id == undefined) throw new Error("No URL")
 			//send the embed
 			await SendEmbed(ranked, beatmapId)
 			GoodToGo = true
+			return
 		} catch (err) {
 			console.log(err)
 
@@ -181,6 +184,8 @@ exports.run = async (client, message, args, prefix) => {
 
 			try {
 				const embed_author = embed.author.url
+				if (embed_author.includes("/users/")) throw new Error("Wrong embed")
+				if (embed_author.includes("/u/")) throw new Error("Wrong embed")
 				const beatmapId = embed_author.match(/\d+/)[0]
 
 				const ranked = await v2.beatmap.diff(beatmapId)
@@ -189,6 +194,7 @@ exports.run = async (client, message, args, prefix) => {
 				//send the embed
 				await SendEmbed(ranked, beatmapId)
 				GoodToGo = true
+				return
 			} catch (err) {
 				console.log(err)
 
@@ -205,8 +211,8 @@ exports.run = async (client, message, args, prefix) => {
 					GoodToGo = true
 					return
 				} catch (err) {
+					console.log(err)
 					EmbedValue++
-					ErrCount++
 				}
 			}
 		}
@@ -215,13 +221,13 @@ exports.run = async (client, message, args, prefix) => {
 	if (message.mentions.users.size > 0 && message.mentions.repliedUser.bot) {
 		message.channel.messages.fetch(message.reference.messageId).then(message => {
 			const embed = message.embeds[0]
-
 			EmbedFetch(embed)
 		})
 		return
 	}
 
 	const channel = client.channels.cache.get(message.channel.id)
+
 	channel.messages.fetch({ limit: 100 }).then(async messages => {
 		//find the latest message with an embed
 		let embedMessages = []
@@ -231,11 +237,6 @@ exports.run = async (client, message, args, prefix) => {
 			}
 		}
 
-		/**
-		 * TODO: Add a function to loop the SendEmbed function if no embeds are found
-		 */
-
-		// let ErrCount = 0
 		try {
 			if (args) {
 				//if args doesn't start with https: try to get the beatmap id by number provided
@@ -247,8 +248,8 @@ exports.run = async (client, message, args, prefix) => {
 					const match = regex.exec(args[0])
 					beatmapId = match[1]
 				}
-
 				const ranked = await v2.beatmap.diff(beatmapId)
+
 				if (ranked.id == undefined) throw new Error("No html")
 
 				//send the embed
