@@ -12,6 +12,7 @@
   "dependencies": {
     "@giphy/js-fetch-api": "^4.7.1",
     "@kionell/osu-pp-calculator": "^3.2.7",
+    "@vitalets/google-translate-api": "^9.1.0",
     "axios": "^1.2.3",
     "bmi-calc": "^2.0.0",
     "chart.js": "^3.9.1",
