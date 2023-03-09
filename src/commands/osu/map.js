@@ -111,6 +111,8 @@ exports.run = async (client, message, args, prefix) => {
 			const PP97 = calc.clockRate(clock_rate).acc(97).performance(map)
 			const PP95 = calc.clockRate(clock_rate).acc(95).performance(map)
 
+			console.log(PP100)
+
 			let AccPP = ""
 			if (argValues["acc"]) {
 				const PPif = calc.acc(Number(argValues["acc"])).performance(map)

@@ -47,7 +47,7 @@ exports.run = async (client, message, args, prefix) => {
 
 		.addFields({ name: "**osu! commands**", value: categories.osu.join(", "), inline: false }, { name: "**general commands**", value: categories.general.join(", "), inline: false }, { name: "**fun commands**", value: categories.fun.join(", "), inline: false }, { name: "**chess commands**", value: categories.chess.join(", "), inline: false }, { name: "**help commands**", value: categories.help.join(", "), inline: false }, { name: "**Developer commands**", value: categories.developer.join(", "), inline: false }, { name: "**Number of servers:**", value: `${client.guilds.cache.size}`, inline: true }, { name: "**Number of commands:**", value: `${categories.osu.length + categories.general.length + categories.fun.length + categories.help.length + categories.chess.length}`, inline: true }, { name: "**Executed commands:**", value: `${commandCount}`, inline: true })
 		.setThumbnail(message.author.displayAvatarURL())
-		.setFooter({ text: `for more information on a command, do: ${prefix}help {commandname}` })
+		.setFooter({ text: `for more information on a command, type: ${prefix}help {commandname}` })
 	message.channel.send({ embeds: [embed] })
 }
 exports.name = "help"

@@ -242,6 +242,6 @@ exports.run = async (client, message, args, prefix) => {
 }
 exports.name = "simulate"
 exports.aliases = ["simulate", "sim", "s"]
-exports.description = ["Simulates a score on a beatmap.\n\n**Parameters:**\n`link` simulate a beatmap using a link\n`n300=value`\n`n100=value`\n`n50=value`\n`miss=value`\n`BPM=value`\n`AR=value`\n`OD=value`\n`CS=value`\n`combo=value`\n`mods=string`"]
+exports.description = ["Simulates a score on a beatmap.\n\n**Parameters:**\n`link` simulate a beatmap typing a link\n`n300=value`\n`n100=value`\n`n50=value`\n`miss=value`\n`BPM=value`\n`AR=value`\n`OD=value`\n`CS=value`\n`combo=value`\n`mods=string`"]
 exports.usage = [`simulate https://osu.ppy.sh/b/552068 n100=34 miss=4 combo=900 mods=hr`]
 exports.category = ["osu"]

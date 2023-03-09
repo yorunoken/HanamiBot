@@ -34,7 +34,7 @@ exports.run = async (client, message, args, prefix, EmbedBuilder) => {
 						Skin = userData[message.author.id].Url_skin
 					} catch (err) {
 						console.error(err)
-						message.reply(`Set your osu! username by using "${prefix}link **your username**"`)
+						message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 						return
 					}
 				} else {
@@ -75,6 +75,6 @@ exports.run = async (client, message, args, prefix, EmbedBuilder) => {
 }
 exports.name = "skin"
 exports.aliases = ["skin"]
-exports.description = ["gets skin of user. can set skin by using `-set` argument."]
+exports.description = ["gets skin of user. can set skin by typing `-set` argument."]
 exports.usage = [`skin -set aristia v10\nskin @nawhbody`]
 exports.category = ["osu"]

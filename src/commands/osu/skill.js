@@ -41,7 +41,7 @@ module.exports.run = async (client, message, args, prefix) => {
 						try {
 							userargs = userData[message.author.id].osuUsername
 						} catch (err) {
-							message.reply(`Set your osu! username by using "${prefix}link **your username**"`)
+							message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 						}
 					}
 				}
@@ -53,7 +53,7 @@ module.exports.run = async (client, message, args, prefix) => {
 					userargs = userData[message.author.id].osuUsername
 				} catch (err) {
 					console.error(err)
-					message.reply(`Set your osu! username by using "${prefix}link **your username**"`)
+					message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 					return
 				}
 			} else {
@@ -70,7 +70,7 @@ module.exports.run = async (client, message, args, prefix) => {
 			try {
 				userargs = userData[message.author.id].osuUsername
 			} catch (err) {
-				message.reply(`Set your osu! username by using "${prefix}link **your username**"`)
+				message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 			}
 		}
 
@@ -153,7 +153,7 @@ module.exports.run = async (client, message, args, prefix) => {
 		})
 
 		message.channel
-			.send({ embeds: [new EmbedBuilder().setColor("Purple").setTitle("Calculating...").setDescription("Please sit still while I'm calculating your plays, this may take a while if it's your first time using this command.")] })
+			.send({ embeds: [new EmbedBuilder().setColor("Purple").setTitle("Calculating...").setDescription("Please sit still while I'm calculating your plays, this may take a while if it's your first time typing this command.")] })
 			.then(async msg => {
 				//formatted values for user
 				try {
