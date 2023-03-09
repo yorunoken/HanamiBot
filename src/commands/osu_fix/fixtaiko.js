@@ -264,8 +264,8 @@ exports.run = async (client, message, args, prefix) => {
 		})
 	})
 }
-exports.name = "fix"
-exports.aliases = ["fix"]
+exports.name = "fixtaiko"
+exports.aliases = ["fixtaiko", "fixt"]
 exports.description = ["Displays your play if it was an FC\n\n**Parameters:**\n`username` get the score of a user (must be first parameter)\n`link` get score by beatmap link \n`-i (number)` get a specific score.\n`-p (number)` get a specific page"]
-exports.usage = [`fix Whitecat`]
+exports.usage = [`fixtaiko Whitecat`]
 exports.category = ["osu"]

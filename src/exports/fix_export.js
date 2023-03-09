@@ -36,8 +36,13 @@ async function FixFunction(mapinfo, beatmapId, user, ModeOsu, ModsString, messag
 		if (ModsString == undefined) {
 			score = scr.scores[0]
 		} else {
-			const FilteredScores = scr.scores.filter(obj => obj.mods.sort().join("").toUpperCase() === ModsString.join("").toUpperCase())
-			score = FilteredScores[0]
+			try {
+				const FilteredScores = scr.scores.filter(obj => obj.mods.sort().join("").toUpperCase() === ModsString.join("").toUpperCase())
+				score = FilteredScores[0]
+			} catch (err) {
+				const FilteredScores = scr.scores.filter(obj => obj.mods.sort().join("").toUpperCase() === ModsString.toUpperCase())
+				score = FilteredScores[0]
+			}
 		}
 
 		try {

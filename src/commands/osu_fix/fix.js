@@ -90,7 +90,7 @@ exports.run = async (client, message, args, prefix) => {
 
 					if (args.includes("-ctb")) ModeOsu = "ctb"
 
-					if (args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-p")) userargs = userData[message.author.id].osuUsername
+					if (args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-p") || args.join(" ").startsWith("+") || args.join(" ").startsWith("mods=")) userargs = userData[message.author.id].osuUsername
 				} catch (err) {
 					message.reply(`Set your osu! username by using "${prefix}link **your username**"`)
 				}
