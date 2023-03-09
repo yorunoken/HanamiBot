@@ -62,7 +62,7 @@ async function LbSend(beatmapId, scores, pagenum, mapinfo, AuthorsName) {
 			const ModsRaw = score.mods.map(mod => mod.acronym).join("")
 			let modsID = mods.id(ModsRaw)
 			if (ModsRaw != "") {
-				Mods1 = `\`+${ModsRaw}\``
+				Mods1 = `\`+${ModsRaw}\` `
 			} else {
 				Mods1 = ""
 				modsID = 0
@@ -105,19 +105,17 @@ async function LbSend(beatmapId, scores, pagenum, mapinfo, AuthorsName) {
 			const date = new Date(score.ended_at)
 			const UnixDate = date.getTime() / 1000
 
-			let first_row = `**${num + 1}.** ${grade} [**${score.user.username}**](https://osu.ppy.sh/users/${score.user.id}) (${(score.accuracy * 100).toFixed(2)}%) • ${score.total_score.toLocaleString()}\n`
-			let second_row = `▹${PP} ${Mods1} • **__[${CurAttrs.difficulty.stars.toFixed(2)}★]__**\n`
-			let third_row = `▹[ **${score.max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] • ${AccValues}\n`
-			let fourth_row = `▹Score Set: <t:${UnixDate}:R>`
+			let first_row = `**${num + 1}.** ${grade} [**${score.user.username}**](https://osu.ppy.sh/users/${score.user.id}) ${Mods1}**__[${CurAttrs.difficulty.stars.toFixed(2)}★]__**\n`
+			let second_row = `▹${PP} ▹ (${(score.accuracy * 100).toFixed(2)}%) • ${score.total_score.toLocaleString()}\n`
+			let third_row = `▹[ **${score.max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] • ${AccValues} <t:${UnixDate}:R>`
 
 			if (YourScore) {
-				first_row = `**${num + 1}.** ${grade} [**${score.user.username}**](https://osu.ppy.sh/users/${score.user.id}) (${(score.accuracy * 100).toFixed(2)}%) ${Mods1} **${score.statistics.miss}**<:hit00:1061254490075955231>\n`
+				first_row = `**${num + 1}.** ${grade} [**${score.user.username}**](https://osu.ppy.sh/users/${score.user.id}) (${(score.accuracy * 100).toFixed(2)}%) ${Mods1} **${score.statistics.miss}**<:hit00:1061254490075955231> <t:${UnixDate}:R>\n`
 				second_row = `▹ ${PP} [ **${score.max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] **__[${CurAttrs.difficulty.stars.toFixed(2)}★]__**`
 				third_row = ``
-				fourth_row = ``
 			}
 
-			return `${first_row}${second_row}${third_row}${fourth_row}`
+			return `${first_row}${second_row}${third_row}`
 		}
 
 		let YourScore = false
