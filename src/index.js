@@ -78,6 +78,11 @@ const cooldowns = new Map()
 client.on("ready", async () => {
 	console.log(`Logged in as ${client.user.tag}, in ${client.guilds.cache.size} servers!`)
 
+	client.user.setPresence({
+		activities: [{ name: `?help`, type: ActivityType.Playing }],
+		status: "online",
+	})
+
 	const servers = client.guilds.cache.map(x => `${x.name} \\ ${x.ownerId}`)
 	// console.log(`server list:\n${servers.join("\n")}`)
 
@@ -120,8 +125,10 @@ client.on("messageCreate", message => {
 
 		// check if the user is still in cooldown period
 		const cooldownAmount = (command.cooldown || 2) * 1000
-		if (cooldowns.has(commandName)) {
-			const expirationTime = cooldowns.get(commandName) + cooldownAmount
+		const userId = message.author.id
+		const key = `${userId}-${commandName}`
+		if (cooldowns.has(key)) {
+			const expirationTime = cooldowns.get(key) + cooldownAmount
 			if (Date.now() < expirationTime) {
 				const timeLeft = (expirationTime - Date.now()) / 1000
 				message.reply(`**You're on cooldown, please wait ${timeLeft.toFixed(1)} more seconds and try again.**`)
@@ -141,8 +148,8 @@ client.on("messageCreate", message => {
 		fs.writeFileSync("commandCount.txt", commandCount.toString())
 
 		// setting the cooldown
-		cooldowns.set(commandName, Date.now())
-		setTimeout(() => cooldowns.delete(commandName), cooldownAmount)
+		cooldowns.set(key, Date.now())
+		setTimeout(() => cooldowns.delete(key), cooldownAmount)
 	}
 })
 
