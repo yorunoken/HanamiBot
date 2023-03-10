@@ -108,7 +108,7 @@ exports.run = async (client, message, args, prefix) => {
 			ModeOsu = "ctb"
 		}
 
-		if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+") || args.join(" ").startsWith("-g") || args.join(" ").startsWith("-am") || args.join(" ").startsWith("-amount") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-reverse")) {
+		if (args.join(" ").startsWith("-r") || args.join(" ").startsWith("-recent") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+") || args.join(" ").startsWith("-g") || args.join(" ").startsWith("-am") || args.join(" ").startsWith("-amount") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-reverse")) {
 			try {
 				userargs = userData[message.author.id].osuUsername
 			} catch (err) {
@@ -170,6 +170,8 @@ exports.run = async (client, message, args, prefix) => {
 
 			return
 		}
+
+		if (args.join(" ").includes("-r") || args.join(" ").includes("-recent")) RB = true
 
 		message.channel.send({ embeds: [await GetUserTop(user, pageNumber, ModeOsu, ModeID, args, argValues["mods"], play_number, RB)] })
 	})
