@@ -153,7 +153,7 @@ module.exports.run = async (client, message, args, prefix) => {
 		})
 
 		message.channel
-			.send({ embeds: [new EmbedBuilder().setColor("Purple").setTitle("Calculating...").setDescription("Please sit still while I'm calculating your plays, this may take a while if it's your first time typing this command.")] })
+			.send({ embeds: [new EmbedBuilder().setColor("Purple").setTitle("Calculating...").setDescription("Please sit still while I'm calculating your plays, this may take a while if it's your first time using this command.")] })
 			.then(async msg => {
 				//formatted values for user
 				try {
