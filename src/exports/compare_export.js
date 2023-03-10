@@ -142,12 +142,17 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString, value, pagenum
 				pps = `**${CurAttrs1.pp.toFixed(2)}**/${maxAttrs1.pp.toFixed(2)}PP ▹ (**${FCAttrs1.pp.toFixed(2)}**PP for **${FcAcc}%**)`
 			}
 
+			if (score.mode_int == "0") AccValues = `{**${score.statistics.count_300}**/${score.statistics.count_100}/${score.statistics.count_50}/${score.statistics.count_miss}}`
+			if (score.mode_int == "1") AccValues = `{**${score.statistics.count_300}**/${score.statistics.count_100}}/${score.statistics.count_miss}}`
+			if (score.mode_int == "2") AccValues = `{**${score.statistics.count_300}**/${score.statistics.count_100}/${score.statistics.count_50}/${score.statistics.count_miss}}`
+			if (score.mode_int == "3") AccValues = `{**${score.statistics.count_geki}**/${score.statistics.count_300}/${score.statistics.count_katu}/${score.statistics.count_100}/${score.statistics.count_50}/${score.statistics.count_miss}}`
+
 			let grade = score.rank
 			grade = grades[grade]
 
 			const row_one = `**${num + 1}.**${grade} \`+${modsone}\` **[${maxAttrs1.difficulty.stars.toFixed(2)}★]** ∙ ${score.score.toLocaleString()} ∙ (${(score.accuracy * 100).toFixed(2)}%)\n`
 			const row_two = `▹${pps}\n`
-			const row_three = `▹[**${score.max_combo}**x/${FCAttrs1.difficulty.maxCombo}x] ∙ {${score.statistics.count_300}/${score.statistics.count_100}/${score.statistics.count_50}/${score.statistics.count_miss}} <t:${time1}:R>`
+			const row_three = `▹[**${score.max_combo}**x/${FCAttrs1.difficulty.maxCombo}x] ∙ ${AccValues} <t:${time1}:R>`
 
 			return `${row_one}${row_two}${row_three}`
 		}

@@ -51,7 +51,7 @@ exports.run = async (client, message, args, prefix) => {
 			userargs = string[1]
 		} else {
 			userargs = args[0]
-		}
+}
 
 		if (message.mentions.users.size > 0) {
 			const mentionedUser = Array.from(message.mentions.users.entries()).pop()[Array.from(message.mentions.users.entries()).pop().length - 1]
