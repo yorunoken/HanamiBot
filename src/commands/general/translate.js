@@ -7,19 +7,27 @@ exports.run = async (client, message, args, prefix) => {
 	let TranslateTo = "en"
 	const Text = args.join(" ")
 
-	const res = await translate(Text, { to: TranslateTo }).catch(err => {
-		message.channel.send(`${err}`)
+	let res
+	try {
+		res = await translate(Text, { to: TranslateTo })
+	} catch (err) {
+	console.log(err)
+		message.channel.send(`There appears to be an error with the api. Please try again.`)
 		return
-	})
+	}
 
-	const embed = new EmbedBuilder()
-		.setTitle(`Translated from ${res.raw.src.toUpperCase()} to ${TranslateTo.toUpperCase()}`)
-		.setColor("Purple")
-		// .setThumbnail(`${message.author.displayAvatarURL()}?size=1024`)
-		.setDescription(`raw:\n> ${Text}\n\ntranslated:\n> ${res.text}`)
-		.setFooter({ text: `Requested by ${message.author.username}` })
+	try {
+		const embed = new EmbedBuilder()
+			.setTitle(`Translated from ${res.raw.src.toUpperCase()} to ${TranslateTo.toUpperCase()}`)
+			.setColor("Purple")
+			// .setThumbnail(`${message.author.displayAvatarURL()}?size=1024`)
+			.setDescription(`raw:\n> ${Text}\n\ntranslated:\n> ${res.text}`)
+			.setFooter({ text: `Requested by ${message.author.username}` })
 
-	message.channel.send({ embeds: [embed] })
+		message.channel.send({ embeds: [embed] })
+	} catch (err) {
+		message.channel.send(`${err}`)
+	}
 }
 exports.name = "translate"
 exports.aliases = ["translate"]
