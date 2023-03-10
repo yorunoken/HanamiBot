@@ -44,13 +44,13 @@ async function GetUserTop100Stats(user, tops, ruleset, mode) {
 
 		let map = new Beatmap({ path: `./osuFiles/${score.beatmap.id}.osu` })
 
-		const pp = new Calculator(scoreParam).n100(score.statistics.count_100).n300(score.statistics.count_300).n50(score.statistics.count_50).nMisses(Number(score.statistics.count_miss)).combo(score.max_combo).nGeki(score.statistics.count_geki).nKatu(score.statistics.count_katu).performance(map)
 		const mapValues = new Calculator(scoreParam).mapAttributes(map)
+		const ppfc = new Calculator(scoreParam).n100(score.statistics.count_100).n300(score.statistics.count_300).n50(score.statistics.count_50).nGeki(score.statistics.count_geki).nKatu(score.statistics.count_katu).performance(map)
 
 		let UsedMods = score.mods.join("")
 		if (UsedMods.length == 0) UsedMods = "NM"
 
-		Attrs.push(pp)
+		Attrs.push(ppfc)
 		MapDifficulty.push(mapValues)
 		PlayedMods.push(UsedMods)
 		RawMappers.push(score.beatmapset.creator)
@@ -60,6 +60,7 @@ async function GetUserTop100Stats(user, tops, ruleset, mode) {
 	const combo = tops.map(x => x.max_combo)
 	const miss = tops.map(x => x.statistics.count_miss)
 	const pps = tops.map(x => x.pp)
+	const ppfc = Attrs.map(x => x.pp)
 	const star = Attrs.map(x => x.difficulty.stars)
 	const bpm = MapDifficulty.map(x => x.bpm)
 	const ar = MapDifficulty.map(x => x.ar)
@@ -118,6 +119,7 @@ async function GetUserTop100Stats(user, tops, ruleset, mode) {
 		{ name: "Accuracy", min: GetMinAvgMax(acc).min, avg: GetMinAvgMax(acc).avg, max: GetMinAvgMax(acc).max },
 		{ name: "Combo", min: GetMinAvgMax(combo).min.toFixed(), avg: GetMinAvgMax(combo).avg.toFixed(), max: GetMinAvgMax(combo).max.toFixed() },
 		{ name: "PP", min: GetMinAvgMax(pps).min, avg: GetMinAvgMax(pps).avg, max: GetMinAvgMax(pps).max },
+		{ name: "PP FC", min: GetMinAvgMax(ppfc).min, avg: GetMinAvgMax(ppfc).avg, max: GetMinAvgMax(ppfc).max },
 		{ name: "Miss", min: GetMinAvgMax(miss).min, avg: GetMinAvgMax(miss).avg, max: GetMinAvgMax(miss).max },
 		{ name: "BPM", min: GetMinAvgMax(bpm).min, avg: GetMinAvgMax(bpm).avg, max: GetMinAvgMax(bpm).max },
 		{ name: "AR", min: GetMinAvgMax(ar).min, avg: GetMinAvgMax(ar).avg, max: GetMinAvgMax(ar).max },
