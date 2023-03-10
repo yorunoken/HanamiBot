@@ -96,23 +96,27 @@ exports.run = async (client, message, args, prefix) => {
 
 			try {
 				ordrclient.on("render_progress", data => {
-					if (data.renderID === replay.renderID) {
-						console.log(data)
-						if (!messageId) {
-							message.channel.send(`${data.progress}`).then(sentMessage => {
-								messageId = sentMessage.id
-							})
-						} else {
-							message.channel.messages.fetch(messageId).then(messageToEdit => {
-								messageToEdit.edit(`${data.progress}`)
-								if (messageToEdit.content == "Finalizing...") {
-									setTimeout(() => {
-										messageToEdit.delete()
-									}, 2000)
-								}
-							})
+					try{
+						if (data.renderID === replay.renderID) {
+							console.log(data)
+							if (!messageId) {
+								message.channel.send(`${data.progress}`).then(sentMessage => {
+									messageId = sentMessage.id
+								})
+							} else {
+								message.channel.messages.fetch(messageId).then(messageToEdit => {
+									messageToEdit.edit(`${data.progress}`)
+									if (messageToEdit.content == "Finalizing...") {
+										setTimeout(() => {
+											messageToEdit.delete()
+										}, 2000)
+									}
+								})
+							}
+							replay_description = data.description
 						}
-						replay_description = data.description
+					}catch(err){
+						message.channel.send("There was an error! Please try again.")
 					}
 				})
 
