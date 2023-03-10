@@ -19,6 +19,7 @@ exports.run = async (client, message, args, prefix) => {
 		let ModeOsu = "osu"
 		let string = args.join(" ").match(/"(.*?)"/)
 		ModeID = 0
+		let RB = false
 
 		if (message.mentions.users.size > 0) {
 			const mentionedUser = message.mentions.users.first()
@@ -170,7 +171,7 @@ exports.run = async (client, message, args, prefix) => {
 			return
 		}
 
-		message.channel.send({ embeds: [await GetUserTop(user, pageNumber, ModeOsu, ModeID, args, argValues["mods"], play_number)] })
+		message.channel.send({ embeds: [await GetUserTop(user, pageNumber, ModeOsu, ModeID, args, argValues["mods"], play_number, RB)] })
 	})
 }
 exports.name = ["osutop"]

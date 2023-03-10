@@ -4,7 +4,7 @@ const { v2, auth, mods, tools } = require("osu-api-extended")
 const { Beatmap, Calculator } = require("rosu-pp")
 const { Downloader, DownloadEntry } = require("osu-downloader")
 
-async function GetUserTop(user, pageNumber, ModeOsu, RulesetId, args, ModsSearch, play_number) {
+async function GetUserTop(user, pageNumber, ModeOsu, RulesetId, args, ModsSearch, play_number, rb) {
 	//determine the page of the osutop
 	const start = (pageNumber - 1) * 5 + 1
 	const end = pageNumber * 5
@@ -25,10 +25,18 @@ async function GetUserTop(user, pageNumber, ModeOsu, RulesetId, args, ModsSearch
 		offset: "0",
 	})
 
-	if (args.includes("-reverse") || args.includes("-rev")) {
-		score.sort((b, a) => new Date(b.pp) - new Date(a.pp))
+	if (rb) {
+		if (args.includes("-reverse") || args.includes("-rev")) {
+			score.sort((b, a) => new Date(b.created_at) - new Date(a.created_at))
+		} else {
+			score.sort((b, a) => new Date(a.created_at) - new Date(b.created_at))
+		}
 	} else {
-		score.sort((b, a) => new Date(a.pp) - new Date(b.pp))
+		if (args.includes("-reverse") || args.includes("-rev")) {
+			score.sort((b, a) => new Date(b.pp) - new Date(a.pp))
+		} else {
+			score.sort((b, a) => new Date(a.pp) - new Date(b.pp))
+		}
 	}
 
 	const scores = [...score]
