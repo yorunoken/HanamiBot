@@ -7,7 +7,7 @@ const endpoint = `https://osudaily.net/api/`
 const apiKey = process.env.osudaily_api
 const fs = require("fs")
 
-async function GetuserNoChoke(user, tops, ruleset, mode, pageNumber) {
+async function GetuserNoChoke(user, tops, ruleset, GameMode, pageNumber) {
 	try {
 		global_rank = user.statistics.global_rank.toLocaleString()
 		country_rank = user.statistics.country_rank.toLocaleString()
@@ -56,15 +56,6 @@ async function GetuserNoChoke(user, tops, ruleset, mode, pageNumber) {
 
 	PPfc.sort((a, b) => b.pp.pp - a.pp.pp)
 
-	/**
-	PP.sort((a, b) => {
-		const aIndex = PPfc.findIndex(item => item.difficulty.stars === a.pp.difficulty.stars)
-		const bIndex = PPfc.findIndex(item => item.difficulty.stars === b.pp.difficulty.stars)
-
-		return PPfc[bIndex].pp - PPfc[aIndex].pp
-	})
-	*/
-
 	const PPFcScores = PPfc.map(x => x.pp)
 	const PPFcMap = PPfc.map(x => x.pp.pp)
 	const PPMap = PP.map(x => x.pp.pp)
@@ -111,10 +102,24 @@ async function GetuserNoChoke(user, tops, ruleset, mode, pageNumber) {
 			katu: score.statistics.count_katu,
 			50: score.statistics.count_50,
 			0: 0,
-			mode: mode,
+			mode: GameMode,
 		})
-		let mods = score.mods.join("")
-		if (!mods.length) mods = `NM`
+		let modsName = score.mods.join("")
+
+		let GradeForFC = tools.rank(
+			{
+				300: Map300CountFc,
+				geki: score.statistics.count_geki,
+				100: score.statistics.count_100,
+				katu: score.statistics.count_katu,
+				50: score.statistics.count_50,
+				0: 0,
+			},
+			modsName,
+			GameMode,
+		)
+
+		if (!modsName.length) modsName = `NM`
 
 		//grades
 		const grades = {
@@ -128,11 +133,14 @@ async function GetuserNoChoke(user, tops, ruleset, mode, pageNumber) {
 			X: "<:X_:1057763294707974215>",
 			XH: "<:XH_:1057763296717045891>",
 		}
-		let grade = score.rank
-		grade = grades[grade]
+		let FcGrade = GradeForFC
+		FcGrade = grades[FcGrade]
 
-		const row1 = `**${oldState + 1} (\`${newState + 1}\`). [${score.beatmapset.title} [${score.beatmap.version}]](https://osu.ppy.sh/b/${score.beatmap.id})** \`+${mods}\` __**[${FCMap.difficulty.stars.toFixed(2)}★]**__\n`
-		const row2 = `${grade} ▸ ${grade} • ${score.pp.toFixed(2)}pp ▸ **${FCMap.pp.toFixed(2)}pp** • (${(score.accuracy * 100).toFixed(2)}% ▸ **${FcAcc.toFixed(2)}%**)\n`
+		let Grade = score.rank
+		Grade = grades[Grade]
+
+		const row1 = `**${oldState + 1} (\`${newState + 1}\`). [${score.beatmapset.title} [${score.beatmap.version}]](https://osu.ppy.sh/b/${score.beatmap.id})** \`+${modsName}\` __**[${FCMap.difficulty.stars.toFixed(2)}★]**__\n`
+		const row2 = `${Grade} ▸ ${FcGrade} • ${score.pp.toFixed(2)}pp ▸ **${FCMap.pp.toFixed(2)}pp** • (${(score.accuracy * 100).toFixed(2)}% ▸ **${FcAcc.toFixed(2)}%**)\n`
 		const row3 = `[ ${score.max_combo}x ▸ **${FCMap.difficulty.maxCombo}x** ] • Removed ${score.statistics.count_miss}<:hit00:1061254490075955231>`
 
 		return `${row1}${row2}${row3}`
@@ -172,7 +180,7 @@ async function GetuserNoChoke(user, tops, ruleset, mode, pageNumber) {
 		.setAuthor({
 			name: `${user.username}: ${TotalPP}pp (#${global_rank} ${user.country.code}#${country_rank})`,
 			iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
-			url: `https://osu.ppy.sh/users/${user.id}/${mode}`,
+			url: `https://osu.ppy.sh/users/${user.id}/${GameMode}`,
 		})
 		.setDescription(`**Total PP: ${user.statistics.pp} ▸ ${NewTotal.toFixed(2)} (+${(NewTotal - user.statistics.pp).toFixed(2)})**\n**Approx. Rank: #${ReponseData.rank.toLocaleString()}**\n\n${thing1}${thing2}${thing3}${thing4}${thing5}`)
 
