@@ -48,6 +48,8 @@ exports.run = async (client, message, args, prefix) => {
 		let user, userstats
 		let firstPage = true
 
+		if (userargs == undefined) userargs = "dslf;gjsdf;g09tagf;sladk"
+
 		if (server == "bancho") {
 			//log into api
 			await auth.login(process.env.client_id, process.env.client_secret)
