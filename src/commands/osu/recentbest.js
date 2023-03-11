@@ -26,9 +26,9 @@ exports.run = async (client, message, args, prefix) => {
 			try {
 				if (mentionedUser) {
 					if (message.content.includes(`<@${mentionedUser.id}>`)) {
-						userargs = userData[mentionedUser.id].osuUsername
+						userargs = userData[mentionedUser.id].BanchoUserId
 					} else {
-						userargs = userData[message.author.id].osuUsername
+						userargs = userData[message.author.id].BanchoUserId
 					}
 				}
 			} catch (err) {
@@ -36,13 +36,13 @@ exports.run = async (client, message, args, prefix) => {
 				if (mentionedUser) {
 					if (message.content.includes(`<@${mentionedUser.id}>`)) {
 						try {
-							userargs = userData[mentionedUser.id].osuUsername
+							userargs = userData[mentionedUser.id].BanchoUserId
 						} catch (err) {
 							message.reply(`No osu! user found for ${mentionedUser.tag}`)
 						}
 					} else {
 						try {
-							userargs = userData[message.author.id].osuUsername
+							userargs = userData[message.author.id].BanchoUserId
 						} catch (err) {
 							message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 						}
@@ -53,7 +53,7 @@ exports.run = async (client, message, args, prefix) => {
 		} else {
 			if (args[0] === undefined) {
 				try {
-					userargs = userData[message.author.id].osuUsername
+					userargs = userData[message.author.id].BanchoUserId
 				} catch (err) {
 					console.error(err)
 					message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
@@ -110,7 +110,7 @@ exports.run = async (client, message, args, prefix) => {
 
 		if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+") || args.join(" ").startsWith("-g") || args.join(" ").startsWith("-am") || args.join(" ").startsWith("-amount") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-reverse")) {
 			try {
-				userargs = userData[message.author.id].osuUsername
+				userargs = userData[message.author.id].BanchoUserId
 			} catch (err) {
 				message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 				return
@@ -124,7 +124,7 @@ exports.run = async (client, message, args, prefix) => {
 		if (args[0] === "-p") {
 			pageNumber = Number(value)
 			try {
-				userargs = userData[message.author.id].osuUsername
+				userargs = userData[message.author.id].BanchoUserId
 			} catch (err) {
 				message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 			}
@@ -145,7 +145,6 @@ exports.run = async (client, message, args, prefix) => {
 			message.reply(`**The user ${userargs} does not exist.**`)
 			return
 		}
-
 
 		message.channel.send({ embeds: [await GetUserTop(user, pageNumber, ModeOsu, ModeID, args, argValues["mods"], play_number, RB)] })
 	})

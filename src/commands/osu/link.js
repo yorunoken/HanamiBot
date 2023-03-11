@@ -22,7 +22,7 @@ exports.run = async (client, message, args, prefix) => {
 		message.reply(`**The user \`${username}\` does not exist in the Bancho database.**`)
 		return
 	}
-	user_id = user.id
+	var user_id = user.id
 
 	// Read the JSON file
 	fs.readFile("./user-data.json", (error, data) => {
@@ -32,7 +32,7 @@ exports.run = async (client, message, args, prefix) => {
 			try {
 				//update the user's osu! username in the JSON file
 				const userData = JSON.parse(data)
-				userData[message.author.id] = { ...userData[message.author.id], osuUsername: user_id }
+				userData[message.author.id] = { ...userData[message.author.id], BanchoUserId: user_id }
 				fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
 					if (error) {
 						console.log(error)

@@ -52,20 +52,20 @@ exports.run = async (client, message, args, prefix) => {
 			const mentionedUser = Array.from(message.mentions.users.entries()).pop()[Array.from(message.mentions.users.entries()).pop().length - 1]
 			try {
 				if (message.content.includes(`<@${mentionedUser.id}>`)) {
-					userargs = userData[mentionedUser.id].osuUsername
+					userargs = userData[mentionedUser.id].BanchoUserId
 				}
 			} catch (err) {
 				console.error(err)
 				if (mentionedUser) {
 					if (message.content.includes(`<@${mentionedUser.id}>`)) {
 						try {
-							userData[mentionedUser.id].osuUsername
+							userData[mentionedUser.id].BanchoUserId
 						} catch (err) {
 							message.reply(`No osu! user found for ${mentionedUser.tag}`)
 						}
 					} else {
 						try {
-							userData[message.author.id].osuUsername
+							userData[message.author.id].BanchoUserId
 						} catch (err) {
 							message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 						}
@@ -76,7 +76,7 @@ exports.run = async (client, message, args, prefix) => {
 		} else {
 			if (args[0] === undefined) {
 				try {
-					userargs = userData[message.author.id].osuUsername
+					userargs = userData[message.author.id].BanchoUserId
 				} catch (err) {
 					console.error(err)
 					message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
@@ -90,7 +90,7 @@ exports.run = async (client, message, args, prefix) => {
 
 					if (args.includes("-ctb")) ModeOsu = "ctb"
 
-					if (args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-p") || args.join(" ").startsWith("+") || args.join(" ").startsWith("mods=")) userargs = userData[message.author.id].osuUsername
+					if (args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-p") || args.join(" ").startsWith("+") || args.join(" ").startsWith("mods=")) userargs = userData[message.author.id].BanchoUserId
 				} catch (err) {
 					message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 				}
@@ -99,7 +99,7 @@ exports.run = async (client, message, args, prefix) => {
 
 		if (userargs?.length === 0 || userargs === undefined) {
 			try {
-				userargs = userData[message.author.id].osuUsername
+				userargs = userData[message.author.id].BanchoUserId
 			} catch (err) {
 				message.reply(`No osu! user found for ${mentionedUser.tag}`)
 			}
@@ -143,7 +143,7 @@ exports.run = async (client, message, args, prefix) => {
 
 				if (userargs.startsWith("https")) {
 					console.log("startswith")
-					userargs = userData[message.author.id].osuUsername
+					userargs = userData[message.author.id].BanchoUserId
 
 					if (args[1]) {
 						userargs = args[1]

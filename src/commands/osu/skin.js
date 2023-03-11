@@ -15,10 +15,10 @@ exports.run = async (client, message, args, prefix, EmbedBuilder) => {
 				try {
 					if (mentionedUser) {
 						if (message.content.includes(`<@${mentionedUser.id}>`)) {
-							userargs = userData[mentionedUser.id].osuUsername
+							userargs = userData[mentionedUser.id].BanchoUserId
 							Skin = userData[mentionedUser.id].Url_skin
 						} else {
-							userargs = userData[message.author.id].osuUsername
+							userargs = userData[message.author.id].BanchoUserId
 							Skin = userData[message.author.id].Url_skin
 						}
 					}
@@ -30,7 +30,7 @@ exports.run = async (client, message, args, prefix, EmbedBuilder) => {
 			} else {
 				if (args[0] === undefined) {
 					try {
-						userargs = userData[message.author.id].osuUsername
+						userargs = userData[message.author.id].BanchoUserId
 						Skin = userData[message.author.id].Url_skin
 					} catch (err) {
 						console.error(err)

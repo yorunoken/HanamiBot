@@ -13,7 +13,7 @@ exports.run = async (client, message, args, prefix) => {
 		if (error) return
 		const userData = JSON.parse(data)
 		try {
-			AuthorsName = userData[message.author.id].osuUsername
+			AuthorsName = userData[message.author.id].BanchoUserId
 		} catch (err) {
 			console.log(err)
 		}

@@ -26,10 +26,10 @@ module.exports.run = async (client, message, args, prefix) => {
 			try {
 				if (mentionedUser) {
 					if (message.content.includes(`<@${mentionedUser.id}>`)) {
-						userargs = userData[mentionedUser.id].osuUsername
+						userargs = userData[mentionedUser.id].BanchoUserId
 						mentioneduser = true
 					} else {
-						userargs = userData[message.author.id].osuUsername
+						userargs = userData[message.author.id].BanchoUserId
 					}
 				}
 			} catch (err) {
@@ -37,13 +37,13 @@ module.exports.run = async (client, message, args, prefix) => {
 				if (mentionedUser) {
 					if (message.content.includes(`<@${mentionedUser.id}>`)) {
 						try {
-							userargs = userData[mentionedUser.id].osuUsername
+							userargs = userData[mentionedUser.id].BanchoUserId
 						} catch (err) {
 							message.reply(`No osu! user found for ${mentionedUser.tag}`)
 						}
 					} else {
 						try {
-							userargs = userData[message.author.id].osuUsername
+							userargs = userData[message.author.id].BanchoUserId
 						} catch (err) {
 							message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 						}
@@ -54,7 +54,7 @@ module.exports.run = async (client, message, args, prefix) => {
 		} else {
 			if (args[0] === undefined) {
 				try {
-					userargs = userData[message.author.id].osuUsername
+					userargs = userData[message.author.id].BanchoUserId
 				} catch (err) {
 					console.error(err)
 					message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
@@ -83,7 +83,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
 				if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko")) {
 					try {
-						userargs = userData[message.author.id].osuUsername
+						userargs = userData[message.author.id].BanchoUserId
 					} catch (err) {
 						message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 					}
@@ -93,7 +93,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
 		if (userargs.length === 0 || (!isNaN(userargs) && !mentioneduser)) {
 			try {
-				userargs = userData[message.author.id].osuUsername
+				userargs = userData[message.author.id].BanchoUserId
 			} catch (err) {
 				message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 			}

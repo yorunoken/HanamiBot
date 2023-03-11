@@ -16,9 +16,9 @@ exports.run = async (client, message, args, prefix) => {
 			const mentionedUser = message.mentions.users.first()
 			try {
 				if (mentionedUser) {
-					userargs = userData[message.author.id].osuUsername
+					userargs = userData[message.author.id].BanchoUserId
 					if (message.content.includes(`<@${mentionedUser.id}>`)) {
-						userargs = userData[mentionedUser.id].osuUsername
+						userargs = userData[mentionedUser.id].BanchoUserId
 					}
 				}
 			} catch (err) {
@@ -26,13 +26,13 @@ exports.run = async (client, message, args, prefix) => {
 				if (mentionedUser) {
 					if (message.content.includes(`<@${mentionedUser.id}>`)) {
 						try {
-							userargs = userData[mentionedUser.id].osuUsername
+							userargs = userData[mentionedUser.id].BanchoUserId
 						} catch (err) {
 							message.reply(`No osu! user found for ${mentionedUser.tag}`)
 						}
 					} else {
 						try {
-							userargs = userData[message.author.id].osuUsername
+							userargs = userData[message.author.id].BanchoUserId
 						} catch (err) {
 							message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 						}
@@ -43,7 +43,7 @@ exports.run = async (client, message, args, prefix) => {
 		} else {
 			if (args[0] === undefined) {
 				try {
-					userargs = userData[message.author.id].osuUsername
+					userargs = userData[message.author.id].BanchoUserId
 				} catch (err) {
 					console.error(err)
 					message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
@@ -71,7 +71,7 @@ exports.run = async (client, message, args, prefix) => {
 
 		if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-osu") || args.join(" ").startsWith("-d") || args.join(" ").startsWith("-details")) {
 			try {
-				userargs = userData[message.author.id].osuUsername
+				userargs = userData[message.author.id].BanchoUserId
 			} catch (err) {
 				message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 			}
