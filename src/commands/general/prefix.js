@@ -30,7 +30,7 @@ exports.run = async (client, message, args, prefix) => {
 				if (err) throw err
 				const prefixes = JSON.parse(data)
 				prefixes[message.guild.id] = newPrefix
-				fs.writeFile("./prefixes.json", JSON.stringify(prefixes), err => {
+				fs.writeFile("./prefixes.json", JSON.stringify(prefixes, null, 2), err => {
 					if (err) throw err
 					message.channel.send(`Prefix updated to **${newPrefix}**`)
 				})

@@ -46,7 +46,7 @@ exports.run = async (client, message, args, prefix, EmbedBuilder) => {
 			if (args.includes("-set")) {
 				SkinUrl = args[1]
 				userData[message.author.id] = { ...userData[message.author.id], Url_skin: SkinUrl }
-				fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+				fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 					if (error) {
 						console.log(error)
 					} else {

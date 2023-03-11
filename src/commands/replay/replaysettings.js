@@ -27,7 +27,7 @@ exports.run = async (client, message, args, prefix) => {
 				return
 			}
 			userData[message.author.id] = { ...userData[message.author.id], bg_dim: `${args[1]}` }
-			fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 				if (error) {
 					console.log(error)
 				} else {
@@ -47,7 +47,7 @@ exports.run = async (client, message, args, prefix) => {
 				return
 			}
 			userData[message.author.id] = { ...userData[message.author.id], music_volume: `${args[1]}` }
-			fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 				if (error) {
 					console.log(error)
 				} else {
@@ -67,7 +67,7 @@ exports.run = async (client, message, args, prefix) => {
 				return
 			}
 			userData[message.author.id] = { ...userData[message.author.id], hitsound_volume: `${args[1]}` }
-			fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 				if (error) {
 					console.log(error)
 				} else {
@@ -88,7 +88,7 @@ exports.run = async (client, message, args, prefix) => {
 				return
 			}
 			userData[message.author.id] = { ...userData[message.author.id], cursor_size: `${args[1]}` }
-			fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 				if (error) {
 					console.log(error)
 				} else {
@@ -101,7 +101,7 @@ exports.run = async (client, message, args, prefix) => {
 		if (args[0] == "-parallax" || args[0] == "parallax") {
 			if (args[1] === "true" || args[1] === "false") {
 				userData[message.author.id] = { ...userData[message.author.id], parallax: `${args[1]}` }
-				fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+				fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 					if (error) {
 						console.log(error)
 					} else {
@@ -117,7 +117,7 @@ exports.run = async (client, message, args, prefix) => {
 		if (args[0] == "-cursor_ripples" || args[0] == "cursor_ripples") {
 			if (args[1] === "true" || args[1] === "false") {
 				userData[message.author.id] = { ...userData[message.author.id], cursor_ripples: `${args[1]}` }
-				fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+				fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 					if (error) {
 						console.log(error)
 					} else {
@@ -133,7 +133,7 @@ exports.run = async (client, message, args, prefix) => {
 		if (args[0] == "-storyboard" || args[0] == "storyboard") {
 			if (args[1] === "true" || args[1] === "false") {
 				userData[message.author.id] = { ...userData[message.author.id], storyboard: `${args[1]}` }
-				fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+				fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 					if (error) {
 						console.log(error)
 					} else {
@@ -149,7 +149,7 @@ exports.run = async (client, message, args, prefix) => {
 		if (args[0] == "-bg_video" || args[0] == "bg_video") {
 			if (args[1] === "true" || args[1] === "false") {
 				userData[message.author.id] = { ...userData[message.author.id], bg_video: `${args[1]}` }
-				fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+				fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 					if (error) {
 						console.log(error)
 					} else {
@@ -165,7 +165,7 @@ exports.run = async (client, message, args, prefix) => {
 		if (args[0] == "-key_overlay" || args[0] == "key_overlay") {
 			if (args[1] === "true" || args[1] === "false") {
 				userData[message.author.id] = { ...userData[message.author.id], key_overlay: `${args[1]}` }
-				fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+				fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 					if (error) {
 						console.log(error)
 					} else {
@@ -181,7 +181,7 @@ exports.run = async (client, message, args, prefix) => {
 		if (args[0] == "-danser_logo" || args[0] == "danser_logo") {
 			if (args[1] === "true" || args[1] === "false") {
 				userData[message.author.id] = { ...userData[message.author.id], danser_logo: `${args[1]}` }
-				fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+				fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 					if (error) {
 						console.log(error)
 					} else {
@@ -197,7 +197,7 @@ exports.run = async (client, message, args, prefix) => {
 		if (args[0] == "-aim_ur" || args[0] == "aim_ur") {
 			if (args[1] === "true" || args[1] === "false") {
 				userData[message.author.id] = { ...userData[message.author.id], aim_ur: `${args[1]}` }
-				fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+				fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 					if (error) {
 						console.log(error)
 					} else {
@@ -213,7 +213,7 @@ exports.run = async (client, message, args, prefix) => {
 		if (args[0] == "-ur" || args[0] == "ur") {
 			if (args[1] === "true" || args[1] === "false") {
 				userData[message.author.id] = { ...userData[message.author.id], ur: `${args[1]}` }
-				fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+				fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 					if (error) {
 						console.log(error)
 					} else {
@@ -229,7 +229,7 @@ exports.run = async (client, message, args, prefix) => {
 		if (args[0] == "-pp_counter" || args[0] == "pp_counter") {
 			if (args[1] === "true" || args[1] === "false") {
 				userData[message.author.id] = { ...userData[message.author.id], pp_counter: `${args[1]}` }
-				fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+				fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 					if (error) {
 						console.log(error)
 					} else {
@@ -245,7 +245,7 @@ exports.run = async (client, message, args, prefix) => {
 		if (args[0] == "-snaking_slider" || args[0] == "snaking_slider") {
 			if (args[1] === "true" || args[1] === "false") {
 				userData[message.author.id] = { ...userData[message.author.id], snaking_slider: `${args[1]}` }
-				fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+				fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 					if (error) {
 						console.log(error)
 					} else {
@@ -261,7 +261,7 @@ exports.run = async (client, message, args, prefix) => {
 		if (args[0] == "-skin_colors" || args[0] == "skin_colors") {
 			if (args[1] === "true" || args[1] === "false") {
 				userData[message.author.id] = { ...userData[message.author.id], skin_colors: `${args[1]}` }
-				fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+				fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 					if (error) {
 						console.log(error)
 					} else {
@@ -277,7 +277,7 @@ exports.run = async (client, message, args, prefix) => {
 		if (args[0] == "-nightcore_hs" || args[0] == "nightcore_hs") {
 			if (args[1] === "true" || args[1] === "false") {
 				userData[message.author.id] = { ...userData[message.author.id], nightcore_hs: `${args[1]}` }
-				fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+				fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 					if (error) {
 						console.log(error)
 					} else {
@@ -293,7 +293,7 @@ exports.run = async (client, message, args, prefix) => {
 		if (args[0] == "-skip_intro" || args[0] == "skip_intro") {
 			if (args[1] === "true" || args[1] === "false") {
 				userData[message.author.id] = { ...userData[message.author.id], skip_intro: `${args[1]}` }
-				fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+				fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 					if (error) {
 						console.log(error)
 					} else {

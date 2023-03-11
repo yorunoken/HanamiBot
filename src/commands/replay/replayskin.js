@@ -41,7 +41,7 @@ exports.run = async (client, message, args, prefix) => {
 			}
 
 			userData[message.author.id] = { ...userData[message.author.id], ID_skin: `${SkinId_ToSet}` }
-			fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
+			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 				if (error) {
 					console.log(error)
 				} else {

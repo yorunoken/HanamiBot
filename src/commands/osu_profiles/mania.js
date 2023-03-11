@@ -1,5 +1,5 @@
 const fs = require("fs")
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js")
+const { EmbedBuilder } = require("discord.js")
 const { v2, auth } = require("osu-api-extended")
 exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()
@@ -59,17 +59,7 @@ exports.run = async (client, message, args, prefix) => {
 			}
 		}
 
-		if (args.includes("-mania")) {
-			mode = "mania"
-		}
-		if (args.includes("-taiko")) {
-			mode = "taiko"
-		}
-		if (args.includes("-ctb")) {
-			mode = "fruits"
-		}
-
-		if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-osu") || args.join(" ").startsWith("-d") || args.join(" ").startsWith("-details")) {
+		if (args.join(" ").startsWith("-d") || args.join(" ").startsWith("-details")) {
 			try {
 				userargs = userData[message.author.id].BanchoUserId
 			} catch (err) {
@@ -77,29 +67,8 @@ exports.run = async (client, message, args, prefix) => {
 			}
 		}
 
-		userData[message.author.id] = {
-			...userData[message.author.id],
-			temp_osu: userargs,
-		}
-		fs.writeFile("./user-data.json", JSON.stringify(userData), error => {
-			if (error) {
-				console.log(error)
-			} else {
-			}
-		})
-
 		//log into api
 		await auth.login(process.env.client_id, process.env.client_secret)
-
-		userargs = userData[message.author.id].temp_osu
-
-		const button = new ActionRowBuilder().addComponents(
-			new ButtonBuilder().setCustomId("less").setLabel("Less details").setStyle(ButtonStyle.Secondary).setDisabled(),
-
-			new ButtonBuilder().setCustomId("more").setLabel("More details").setStyle(ButtonStyle.Primary),
-		)
-
-		const button2 = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("less").setLabel("Less details").setStyle(ButtonStyle.Secondary), new ButtonBuilder().setCustomId("more").setLabel("More details").setStyle(ButtonStyle.Primary).setDisabled())
 
 		async function getUserFirstPage(user) {
 			try {
@@ -308,7 +277,7 @@ exports.run = async (client, message, args, prefix) => {
 
 			const UserData = await getUserSecondPage(user)
 
-			message.channel.send({ embeds: [UserData.data], components: [button2] })
+			message.channel.send({ embeds: [UserData.data] })
 		} else {
 			const user = await v2.user.details(userargs, mode)
 
@@ -321,55 +290,8 @@ exports.run = async (client, message, args, prefix) => {
 
 			const UserData = await getUserFirstPage(user)
 
-			message.channel.send({ embeds: [UserData.data], components: [button] })
+			message.channel.send({ embeds: [UserData.data] })
 		}
-
-		const collector = message.channel.createMessageComponentCollector({
-			time: 1000 * 15,
-		})
-
-		try {
-			collector.on("collect", async i => {
-				try {
-					if (i.user.id != message.author.id) {
-					} else if (i.user.id != message.author.id) {
-					} else if (i.user.id === message.author.id) {
-						userargs = ""
-						userargs = userData[message.author.id].temp_osu
-
-						if (i.customId == "more") {
-							const user = await v2.user.details(userargs, mode)
-
-							try {
-								if (user.id == undefined) throw new Error("The user doesn't exist")
-							} catch (err) {
-								message.reply(`**The user \`${userargs}\` doesn't exist**`)
-								return
-							}
-
-							const userData = await getUserSecondPage(user)
-							await i.update({ embeds: [userData.data], components: [button2] })
-						}
-
-						if (i.customId == "less") {
-							const user = await v2.user.details(userargs, mode)
-
-							try {
-								if (user.id == undefined) throw new Error("The user doesn't exist")
-							} catch (err) {
-								message.reply(`**The user \`${userargs}\` doesn't exist**`)
-								return
-							}
-
-							const userData = await getUserFirstPage(user)
-							await i.update({ embeds: [userData.data], components: [button] })
-						}
-					}
-				} catch (err) {
-					console.log(err)
-				}
-			})
-		} catch (err) {}
 	})
 }
 exports.name = "mania"
