@@ -114,6 +114,6 @@ exports.run = async (client, message, args, prefix) => {
 }
 exports.name = "link"
 exports.aliases = ["link"]
-exports.description = ["Sets a nickname as your default**Parameters:**\n`username` set your username to the argument`\n`default=${server}` set your default server`\n`server=${server}` set the nickname in a server`"]
+exports.description = ["Sets a nickname as your default\n\n**Parameters:**\n`username` set your username to the argument\n`default=${server}` set your default server\n`server=${server}` set the nickname in a server"]
 exports.usage = [`link YoruNoKen`]
 exports.category = ["osu"]
