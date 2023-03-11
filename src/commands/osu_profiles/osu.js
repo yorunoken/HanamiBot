@@ -14,8 +14,8 @@ exports.run = async (client, message, args, prefix) => {
 			return message.reply("An error occurred while reading user data.")
 		}
 		const userData = JSON.parse(data)
-		const mode = "osu"
-		rulesetId = 0
+		let mode = "osu"
+		let rulesetId = 0
 		let server = userData[message.author.id].server
 
 		if (args.includes("-bancho")) server = "bancho"
