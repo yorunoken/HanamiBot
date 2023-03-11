@@ -202,7 +202,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId) {
 			.setColor("Purple")
 			.setAuthor({
 				name: `${user.username} ${user_pp}pp (#${global_rank} ${user.country_code}#${country_rank}) `,
-				iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
+				iconURL: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
 				url: `https://osu.ppy.sh/users/${user.id}`,
 			})
 			.setTitle(title)

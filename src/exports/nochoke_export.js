@@ -179,7 +179,7 @@ async function GetuserNoChoke(user, tops, ruleset, GameMode, pageNumber) {
 		.setColor("Purple")
 		.setAuthor({
 			name: `${user.username}: ${TotalPP}pp (#${global_rank} ${user.country.code}#${country_rank})`,
-			iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
+			iconURL: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
 			url: `https://osu.ppy.sh/users/${user.id}/${GameMode}`,
 		})
 		.setDescription(`**Total PP: ${user.statistics.pp} ▸ ${NewTotal.toFixed(2)} (+${(NewTotal - user.statistics.pp).toFixed(2)})**\n**Approx. Rank: #${ReponseData.rank.toLocaleString()}**\n\n${thing1}${thing2}${thing3}${thing4}${thing5}`)

@@ -216,7 +216,7 @@ async function GetUserTop(user, pageNumber, ModeOsu, RulesetId, args, ModsSearch
 			.setColor("Purple")
 			.setAuthor({
 				name: `${user.username} ${pp}pp (#${global_rank} ${user.country_code}#${country_rank}) `,
-				iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
+				iconURL: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
 				url: `https://osu.ppy.sh/users/${user.id}`,
 			})
 			.setTitle(await (await ScoreGet(score[play_number - 1])).title)
@@ -239,7 +239,7 @@ async function GetUserTop(user, pageNumber, ModeOsu, RulesetId, args, ModsSearch
 			.setColor("Purple")
 			.setAuthor({
 				name: `${user.username}: ${pp}pp (#${global_rank} ${user.country.code}#${country_rank})`,
-				iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
+				iconURL: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
 				url: `https://osu.ppy.sh/users/${user.id}/${ModeOsu}`,
 			})
 			.setThumbnail(user.avatar_url)

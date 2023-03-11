@@ -147,7 +147,7 @@ module.exports.run = async (client, message, args, prefix) => {
 						.setColor("Purple")
 						.setAuthor({
 							name: `${user.username} ${pp}pp (#${global_rank} ${user.country_code}#${country_rank}) `,
-							iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
+							iconURL: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
 							url: `https://osu.ppy.sh/users/${user.id}`,
 						})
 						.setTitle(`What if ${user.username} got a ${ppraw.toFixed(1)}pp score?`)
@@ -205,7 +205,7 @@ module.exports.run = async (client, message, args, prefix) => {
 				.setColor("Purple")
 				.setAuthor({
 					name: `${user.username} ${pp}pp (#${global_rank} ${user.country_code}#${country_rank}) `,
-					iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
+					iconURL: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
 					url: `https://osu.ppy.sh/users/${user.id}`,
 				})
 				.setTitle(`What if ${user.username} got a ${ppraw.toFixed()}pp score?`)

@@ -46,7 +46,7 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString, value, pagenum
 				.setColor("Purple")
 				.setAuthor({
 					name: `${user.username} ${user_pp}pp (#${global_rank} ${user.country_code}#${country_rank}) `,
-					iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
+					iconURL: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
 					url: `https://osu.ppy.sh/users/${user.id}`,
 				})
 				.setTitle(`${mapinfo.beatmapset.artist} - ${mapinfo.beatmapset.title} [${mapinfo.version}] [${maxAttrs.difficulty.stars.toFixed(2)}★]`)
@@ -174,7 +174,7 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString, value, pagenum
 			.setColor("Purple")
 			.setAuthor({
 				name: `${user.username} ${user_pp}pp (#${global_rank} ${user.country_code}#${country_rank}) `,
-				iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
+				iconURL: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
 				url: `https://osu.ppy.sh/users/${user.id}`,
 			})
 			.setTitle(`${mapinfo.beatmapset.artist} - ${mapinfo.beatmapset.title} [${mapinfo.version}]`)

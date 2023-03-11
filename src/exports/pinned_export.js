@@ -90,7 +90,7 @@ async function GetPinned(value, user, mode, RuleSetId, pageNumber) {
 			.setColor("Purple")
 			.setAuthor({
 				name: `${user.username} ${user.statistics.pp.toLocaleString()}pp (#${user.statistics.global_rank.toLocaleString()} ${user.country_code}#${user.statistics.country_rank.toLocaleString()}) `,
-				iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
+				iconURL: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
 				url: `https://osu.ppy.sh/users/${user.id}`,
 			})
 			.setThumbnail(user.avatar_url)
@@ -120,7 +120,7 @@ async function GetPinned(value, user, mode, RuleSetId, pageNumber) {
 		.setColor("Purple")
 		.setAuthor({
 			name: `${user.username} ${user.statistics.pp.toLocaleString()}pp (#${user.statistics.global_rank.toLocaleString()} ${user.country_code}#${user.statistics.country_rank.toLocaleString()}) `,
-			iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
+			iconURL: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
 			url: `https://osu.ppy.sh/users/${user.id}`,
 		})
 		.setThumbnail(user.avatar_url)

@@ -51,7 +51,7 @@ exports.run = async (client, message, args, prefix) => {
 			.setColor("Purple")
 			.setAuthor({
 				name: `${maps.username}, Total Maps: ${maps.graveyard_beatmapset_count + maps.loved_beatmapset_count + maps.pending_beatmapset_count + maps.ranked_beatmapset_count}`,
-				iconURL: `https://osuflags.omkserver.nl/${maps.country_code}-256.png`,
+				iconURL: `https://osu.ppy.sh/images/flags/${maps.country_code}.png`,
 				url: `https://osu.ppy.sh/users/${maps.id}`,
 			})
 			.setDescription(`**Subscribers:** \`${maps.mapping_follower_count.toLocaleString()}\` **Kudosu:** \`${maps.kudosu.total.toLocaleString()}\`\n\n**Map Count**\n**Ranked Count:** \`${maps.ranked_beatmapset_count}\` **Loved Count:** \`${maps.loved_beatmapset_count}\`\n**Pending Count:** \`${maps.pending_beatmapset_count}\` **Graveyard Count:** \`${maps.graveyard_beatmapset_count}\`\n${ranked}${loved}${pending}${graveyard}`)

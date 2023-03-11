@@ -127,7 +127,7 @@ exports.run = async (client, message, args, prefix) => {
 			const embed = new EmbedBuilder()
 				.setAuthor({
 					name: `${user.username}: ${pp}pp (#${global_rank} ${user.country.code}#${country_rank})`,
-					iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
+					iconURL: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
 					url: `https://osu.ppy.sh/users/${user.id}`,
 				})
 				.setDescription(pageBeatmaps.map((beatmap, index) => `#${start + index + 1} ▹ __[${beatmap.count}]__ ▹ [${beatmap.beatmapset.artist} - ${beatmap.beatmapset.title} [${beatmap.beatmap.version}]](https://osu.ppy.sh/b/${beatmap.beatmap_id}) [${beatmap.beatmap.difficulty_rating}★]`).join("\n"))

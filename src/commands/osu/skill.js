@@ -174,7 +174,7 @@ module.exports.run = async (client, message, args, prefix) => {
 					.setColor("Purple")
 					.setAuthor({
 						name: `${user.username} ${user_pp}pp (#${global_rank} ${user.country_code}#${country_rank}) `,
-						iconURL: `https://osuflags.omkserver.nl/${user.country_code}-256.png`,
+						iconURL: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
 						url: `https://osu.ppy.sh/users/${user.id}`,
 					})
 					.setFields({ name: `Average values`, value: `Average stars: \`${starSum.toFixed(2)}★\`\nAverage pp: \`${ppSum.toFixed(2)}\`\nAverage miss: \`${missSum.toFixed(2)}\`` }, { name: `Skills`, value: `Aim skill: \`${values.aim}\`\nAcc skill: \`${values.acc}\`\nSpeed skill:\`${values.speed}\`` })
