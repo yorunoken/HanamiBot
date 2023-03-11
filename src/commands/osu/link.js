@@ -78,7 +78,7 @@ exports.run = async (client, message, args, prefix) => {
 				}
 			})
 		})
-	}
+	} 
 
 	if (server == "gatari") {
 		var url = `https://api.gatari.pw/users/get?u=`
