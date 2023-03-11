@@ -56,6 +56,7 @@ exports.run = async (client, message, args, prefix) => {
 		//log into api
 		await auth.login(process.env.client_id, process.env.client_secret)
 		const user = await v2.user.details(username, "osu")
+		console.log("file: link.js:59 ~ exports.run= ~ user:", user)
 		if (user.id == undefined) {
 			message.reply(`**The user \`${username}\` does not exist in the Bancho database.**`)
 			return
@@ -78,15 +79,14 @@ exports.run = async (client, message, args, prefix) => {
 				}
 			})
 		})
-	} 
+	}
 
 	if (server == "gatari") {
 		var url = `https://api.gatari.pw/users/get?u=`
 
 		const response = await axios.get(`${url}${username}`)
-		const data = response.data
+		const user = response.data.users[0]
 
-		const user = data.users[0]
 		if (user == undefined) {
 			message.reply(`**The user \`${username}\` does not exist in the Gatari database.**`)
 			return
@@ -114,6 +114,6 @@ exports.run = async (client, message, args, prefix) => {
 }
 exports.name = "link"
 exports.aliases = ["link"]
-exports.description = ["Sets a nickname as your default**Parameters:**\n`username` set your username to the argument\n To set your default gamemode, see `setmode`"]
+exports.description = ["Sets a nickname as your default**Parameters:**\n`username` set your username to the argument`\n`default=${server}` set your default server`\n`server=${server}` set the nickname in a server`"]
 exports.usage = [`link YoruNoKen`]
 exports.category = ["osu"]
