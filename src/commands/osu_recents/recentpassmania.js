@@ -16,10 +16,10 @@ module.exports.run = async (client, message, args, prefix) => {
 		let userargs
 		let value = 0
 
-		let mode = "fruits"
+		let mode = "mania"
 
-		let RuleSetId = 2
-		let PassDetermine = 1
+		let RuleSetId = 3
+		let PassDetermine = 0
 
 		if (message.mentions.users.size > 0) {
 			const mentionedUser = message.mentions.users.first()
@@ -72,11 +72,7 @@ module.exports.run = async (client, message, args, prefix) => {
 				} else {
 					value = 0
 				}
-				if (args.includes("-pass") || args.includes("-ps")) {
-					PassDetermine = 0
-				}
-
-				if (args.join(" ").startsWith("-pass") || args.join(" ").startsWith("-ps") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
+				if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
 					try {
 						userargs = userData[message.author.id].osuUsername
 					} catch (err) {
@@ -113,8 +109,8 @@ module.exports.run = async (client, message, args, prefix) => {
 		message.channel.send({ content: Recent.FilterMods, embeds: [Recent.embed.data] })
 	})
 }
-exports.name = ["recentctb"]
-exports.aliases = ["recentctb", "rctb", "rsctb", "rc", "rsc"]
-exports.description = ["Displays user's recent osu!ctb play\n\n**Parameters:**\n`username` get the recent play of a user (must be first parameter) \n`-i (number)` get a specific play (1-100)\n`-pass` get the latest passed play (no parameters)\n`mods=(string)` get the latest play by mods"]
-exports.usage = [`rctb -pass -i 3\nrecentctb Rocma -i 5`]
+exports.name = ["recentpassmania"]
+exports.aliases = ["recentpassmania", "rpm", "rspm", "rpmania"]
+exports.description = ["Displays user's recent passed osu!mania play\n\n**Parameters:**\n`username` get the recent play of a user (must be first parameter) \n`-i (number)` get a specific play (1-100)\n`-pass` get the latest passed play (no parameters)\n`mods=(string)` get the latest play by mods"]
+exports.usage = [`rm dressurf -i 5\nrecentmania jakads -pass -i 3 `]
 exports.category = ["osu"]

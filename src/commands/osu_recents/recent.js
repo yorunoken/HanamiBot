@@ -90,11 +90,11 @@ module.exports.run = async (client, message, args, prefix) => {
 					mode = "fruits"
 					RuleSetId = 2
 				}
-				if (args.includes("-pass")) {
+				if (args.includes("-pass") || args.includes("-ps")) {
 					PassDetermine = 0
 				}
 
-				if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-osu") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-pass") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
+				if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-osu") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-pass") || args.join(" ").startsWith("-ps") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
 					try {
 						userargs = userData[message.author.id].osuUsername
 					} catch (err) {
