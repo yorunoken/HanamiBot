@@ -54,10 +54,10 @@ async function FixFunction(mapinfo, beatmapId, user, ModeOsu, ModsString, messag
 
 		console.log(score)
 
-		if (!fs.existsSync(`./osuFiles/${beatmapId}.osu`)) {
+		if (!fs.existsSync(`./osuBeatmapCache/${beatmapId}.osu`)) {
 			console.log("no file.")
 			const downloader = new Downloader({
-				rootPath: "./osuFiles",
+				rootPath: "./osuBeatmapCache",
 
 				filesPerSecond: 0,
 			})
@@ -65,7 +65,7 @@ async function FixFunction(mapinfo, beatmapId, user, ModeOsu, ModsString, messag
 			downloader.addSingleEntry(beatmapId)
 			await downloader.downloadSingle()
 		}
-		let map = new Beatmap({ path: `./osuFiles/${beatmapId}.osu` })
+		let map = new Beatmap({ path: `./osuBeatmapCache/${beatmapId}.osu` })
 
 		let ModName = score.mods.join("")
 		let modsID

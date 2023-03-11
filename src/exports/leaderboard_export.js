@@ -31,10 +31,10 @@ async function LbSend(beatmapId, scores, pagenum, mapinfo, AuthorsName) {
 	}
 
 	try {
-		if (!fs.existsSync(`./osuFiles/${beatmapId}.osu`)) {
+		if (!fs.existsSync(`./osuBeatmapCache/${beatmapId}.osu`)) {
 			console.log("no file.")
 			const downloader = new Downloader({
-				rootPath: "./osuFiles",
+				rootPath: "./osuBeatmapCache",
 
 				filesPerSecond: 0,
 			})
@@ -42,7 +42,7 @@ async function LbSend(beatmapId, scores, pagenum, mapinfo, AuthorsName) {
 			await downloader.downloadSingle()
 		}
 
-		let map = new Beatmap({ path: `./osuFiles/${beatmapId}.osu` })
+		let map = new Beatmap({ path: `./osuBeatmapCache/${beatmapId}.osu` })
 
 		const grades = {
 			A: "<:A_:1057763284327080036>",

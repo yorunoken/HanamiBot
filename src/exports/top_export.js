@@ -76,10 +76,10 @@ async function GetUserTop(user, pageNumber, ModeOsu, RulesetId, args, ModsSearch
 	async function ScoreGet(score) {
 		const Play_rank = scores.findIndex(play => play.id === score.id) + 1
 
-		if (!fs.existsSync(`./osuFiles/${score.beatmap.id}.osu`)) {
+		if (!fs.existsSync(`./osuBeatmapCache/${score.beatmap.id}.osu`)) {
 			console.log("no file.")
 			const downloader = new Downloader({
-				rootPath: "./osuFiles",
+				rootPath: "./osuBeatmapCache",
 
 				filesPerSecond: 0,
 			})
@@ -107,7 +107,7 @@ async function GetUserTop(user, pageNumber, ModeOsu, RulesetId, args, ModsSearch
 		if (score.mode_int == "2") AccValues = `{**${score.statistics.count_300}**/${score.statistics.count_100}/${score.statistics.count_50}/${score.statistics.count_miss}}`
 		if (score.mode_int == "3") AccValues = `{**${score.statistics.count_geki}**/${score.statistics.count_300}/${score.statistics.count_katu}/${score.statistics.count_100}/${score.statistics.count_50}/${score.statistics.count_miss}}`
 
-		let map = new Beatmap({ path: `./osuFiles/${score.beatmap.id}.osu` })
+		let map = new Beatmap({ path: `./osuBeatmapCache/${score.beatmap.id}.osu` })
 		const calc = new Calculator(scoreParam)
 
 		// ss pp

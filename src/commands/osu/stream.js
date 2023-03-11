@@ -11,10 +11,10 @@ exports.run = async (client, message, args, prefix) => {
 
 	async function MapInfoGet(DiffValues, beatmapId, data) {
 		try {
-			if (!fs.existsSync(`./osuFiles/${beatmapId}.osu`)) {
+			if (!fs.existsSync(`./osuBeatmapCache/${beatmapId}.osu`)) {
 				console.log("no file.")
 				const downloader = new Downloader({
-					rootPath: "./osuFiles",
+					rootPath: "./osuBeatmapCache",
 
 					filesPerSecond: 0,
 				})
@@ -25,7 +25,7 @@ exports.run = async (client, message, args, prefix) => {
 
 			const RuleSetId = DiffValues.mode_int
 			let mapParam = {
-				path: `./osuFiles/${beatmapId}.osu`,
+				path: `./osuBeatmapCache/${beatmapId}.osu`,
 				ar: DiffValues.ar,
 				cs: DiffValues.cs,
 				hp: DiffValues.drain,

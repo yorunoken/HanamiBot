@@ -133,10 +133,10 @@ module.exports.run = async (client, message, args, prefix) => {
 					FilterMods = `**Filtering mod(s): ${score[value].mods.join("").toUpperCase()}**`
 				}
 
-				if (!fs.existsSync(`./osuFiles/${score[value].beatmap.id}.osu`)) {
+				if (!fs.existsSync(`./osuBeatmapCache/${score[value].beatmap.id}.osu`)) {
 					console.log("no file.")
 					const downloader = new Downloader({
-						rootPath: "./osuFiles",
+						rootPath: "./osuBeatmapCache",
 
 						filesPerSecond: 0,
 					})
@@ -158,7 +158,7 @@ module.exports.run = async (client, message, args, prefix) => {
 					mods: modsID,
 				}
 
-				let map = new Beatmap({ path: `./osuFiles/${score[value].beatmap.id}.osu` })
+				let map = new Beatmap({ path: `./osuBeatmapCache/${score[value].beatmap.id}.osu` })
 				let calc = new Calculator(scoreParam)
 
 				const mapValues = calc.mapAttributes(map)

@@ -35,10 +35,10 @@ exports.run = async (client, message, args, prefix) => {
 
 	async function SendEmbed(DiffValues, beatmapId) {
 		try {
-			if (!fs.existsSync(`./osuFiles/${beatmapId}.osu`)) {
+			if (!fs.existsSync(`./osuBeatmapCache/${beatmapId}.osu`)) {
 				console.log("no file.")
 				const downloader = new Downloader({
-					rootPath: "./osuFiles",
+					rootPath: "./osuBeatmapCache",
 
 					filesPerSecond: 0,
 				})
@@ -89,7 +89,7 @@ exports.run = async (client, message, args, prefix) => {
 
 			const RuleSetId = DiffValues.mode_int
 			let mapParam = {
-				path: `./osuFiles/${beatmapId}.osu`,
+				path: `./osuBeatmapCache/${beatmapId}.osu`,
 				ar: Number(argValues["ar"]),
 				cs: Number(argValues["cs"]),
 				hp: Number(argValues["hp"]),

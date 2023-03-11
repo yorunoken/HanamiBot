@@ -39,10 +39,10 @@ if (!fs.existsSync("beatmapsongs")) {
 	fs.mkdirSync("beatmapsongs")
 } else console.log("beatmapsongs ✔")
 
-if (!fs.existsSync("osuFiles")) {
-	console.log("osuFiles folder not found, creating folder..")
-	fs.mkdirSync("osuFiles")
-} else console.log("osuFiles ✔")
+if (!fs.existsSync("osuBeatmapCache")) {
+	console.log("osuBeatmapCache folder not found, creating folder..")
+	fs.mkdirSync("osuBeatmapCache")
+} else console.log("osuBeatmapCache ✔")
 
 // command handler
 client.commands = new Map()

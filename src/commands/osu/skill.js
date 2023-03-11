@@ -98,10 +98,10 @@ module.exports.run = async (client, message, args, prefix) => {
 			for (let i = 0; i < scores.length; i++) {
 				const score = scores[i]
 
-				if (!fs.existsSync(`./osuFiles/${score.beatmap.id}.osu`)) {
+				if (!fs.existsSync(`./osuBeatmapCache/${score.beatmap.id}.osu`)) {
 					console.log(`no file, ${i}`)
 					const downloader = new Downloader({
-						rootPath: "./osuFiles",
+						rootPath: "./osuBeatmapCache",
 
 						filesPerSecond: 0,
 					})
@@ -117,7 +117,7 @@ module.exports.run = async (client, message, args, prefix) => {
 					mods: modsID,
 				}
 
-				let map = new Beatmap({ path: `./osuFiles/${score.beatmap.id}.osu` })
+				let map = new Beatmap({ path: `./osuBeatmapCache/${score.beatmap.id}.osu` })
 
 				const pp = new Calculator(scoreParam).n100(score.statistics.count_100).n300(score.statistics.count_300).n50(score.statistics.count_50).nMisses(Number(score.statistics.count_miss)).combo(score.max_combo).nGeki(score.statistics.count_geki).nKatu(score.statistics.count_katu).performance(map)
 

@@ -38,10 +38,10 @@ async function GetPinned(value, user, mode, RuleSetId, pageNumber) {
 	})
 
 	async function Pinget(pin, num) {
-		if (!fs.existsSync(`./osuFiles/${pin.beatmap.id}.osu`)) {
+		if (!fs.existsSync(`./osuBeatmapCache/${pin.beatmap.id}.osu`)) {
 			console.log("no file.")
 			const downloader = new Downloader({
-				rootPath: "./osuFiles",
+				rootPath: "./osuBeatmapCache",
 
 				filesPerSecond: 0,
 			})
@@ -62,7 +62,7 @@ async function GetPinned(value, user, mode, RuleSetId, pageNumber) {
 			mods: modsID,
 		}
 
-		let map = new Beatmap({ path: `./osuFiles/${pin.beatmap.id}.osu` })
+		let map = new Beatmap({ path: `./osuBeatmapCache/${pin.beatmap.id}.osu` })
 		let calc = new Calculator(scoreParam)
 
 		const Star = calc.performance(map)

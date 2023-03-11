@@ -59,10 +59,10 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString, value, pagenum
 			message.channel.send({ embeds: [embed] })
 		}
 
-		if (!fs.existsSync(`./osuFiles/${beatmapId}.osu`)) {
+		if (!fs.existsSync(`./osuBeatmapCache/${beatmapId}.osu`)) {
 			console.log("no file.")
 			const downloader = new Downloader({
-				rootPath: "./osuFiles",
+				rootPath: "./osuBeatmapCache",
 
 				filesPerSecond: 0,
 			})
@@ -70,7 +70,7 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString, value, pagenum
 			downloader.addSingleEntry(beatmapId)
 			await downloader.downloadSingle()
 		}
-		let map = new Beatmap({ path: `./osuFiles/${beatmapId}.osu` })
+		let map = new Beatmap({ path: `./osuBeatmapCache/${beatmapId}.osu` })
 		let objects1 = mapinfo.count_circles + mapinfo.count_sliders + mapinfo.count_spinners
 
 		const grades = {

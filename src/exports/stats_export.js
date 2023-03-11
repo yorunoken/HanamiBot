@@ -23,10 +23,10 @@ async function GetUserTop100Stats(user, tops, ruleset, mode) {
 	for (let i = 0; i < tops.length; i++) {
 		const score = tops[i]
 
-		if (!fs.existsSync(`./osuFiles/${score.beatmap.id}.osu`)) {
+		if (!fs.existsSync(`./osuBeatmapCache/${score.beatmap.id}.osu`)) {
 			console.log(`no file, ${i}`)
 			const downloader = new Downloader({
-				rootPath: "./osuFiles",
+				rootPath: "./osuBeatmapCache",
 
 				filesPerSecond: 0,
 			})
@@ -42,7 +42,7 @@ async function GetUserTop100Stats(user, tops, ruleset, mode) {
 			mods: modsID,
 		}
 
-		let map = new Beatmap({ path: `./osuFiles/${score.beatmap.id}.osu` })
+		let map = new Beatmap({ path: `./osuBeatmapCache/${score.beatmap.id}.osu` })
 
 		const mapValues = new Calculator(scoreParam).mapAttributes(map)
 		const ppfc = new Calculator(scoreParam).n100(score.statistics.count_100).n300(score.statistics.count_300).n50(score.statistics.count_50).nGeki(score.statistics.count_geki).nKatu(score.statistics.count_katu).performance(map)

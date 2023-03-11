@@ -24,10 +24,10 @@ async function GetuserNoChoke(user, tops, ruleset, GameMode, pageNumber) {
 	for (let i = 0; i < tops.length; i++) {
 		const score = tops[i]
 
-		if (!fs.existsSync(`./osuFiles/${score.beatmap.id}.osu`)) {
+		if (!fs.existsSync(`./osuBeatmapCache/${score.beatmap.id}.osu`)) {
 			console.log(`no file, ${i}`)
 			const downloader = new Downloader({
-				rootPath: "./osuFiles",
+				rootPath: "./osuBeatmapCache",
 
 				filesPerSecond: 0,
 			})
@@ -43,7 +43,7 @@ async function GetuserNoChoke(user, tops, ruleset, GameMode, pageNumber) {
 			mods: modsID,
 		}
 
-		let map = new Beatmap({ path: `./osuFiles/${score.beatmap.id}.osu` })
+		let map = new Beatmap({ path: `./osuBeatmapCache/${score.beatmap.id}.osu` })
 
 		const pp = new Calculator(scoreParam).n100(score.statistics.count_100).n300(score.statistics.count_300).n50(score.statistics.count_50).nMisses(score.statistics.count_miss).combo(score.max_combo).nGeki(score.statistics.count_geki).nKatu(score.statistics.count_katu).nMisses(score.statistics.count_miss).performance(map)
 		const ppfc = new Calculator(scoreParam).n100(score.statistics.count_100).n300(score.statistics.count_300).n50(score.statistics.count_50).nMisses(0).nGeki(score.statistics.count_geki).nKatu(score.statistics.count_katu).performance(map)
