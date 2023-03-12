@@ -306,7 +306,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		.setFields({ name: `**Beatmap info:**`, value: `BPM: \`${mapValues.bpm.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${mapValues.ar.toFixed(1).toString().replace(/\.0+$/, "")}\` OD: \`${mapValues.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\`` })
 		.setImage(`https://assets.ppy.sh/beatmaps/${MapsetId}/covers/cover.jpg`)
 		.setThumbnail(avatarUrl)
-		.setFooter({ text: `${MapStatus} map by ${creatorName}`, iconURL: `https://a.ppy.sh/${creatorUserId}?1668890819.jpeg` })
+		.setFooter({ text: `${MapStatus} map by ${creatorName} | on osu!${server}`, iconURL: `https://a.ppy.sh/${creatorUserId}?1668890819.jpeg` })
 
 	return { embed, FilterMods }
 }
