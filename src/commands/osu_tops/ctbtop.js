@@ -1,9 +1,11 @@
-const { EmbedBuilder } = require("discord.js")
 const fs = require("fs")
-const { v2, auth, tools, mods } = require("osu-api-extended")
+const { EmbedBuilder } = require("discord.js")
+const { v2, auth } = require("osu-api-extended")
+const axios = require("axios")
 
 // importing top
 const { GetUserTop } = require("../../exports/top_export.js")
+const { FindUserargs } = require("../../exports/finduserargs_export.js")
 
 exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()
@@ -14,105 +16,11 @@ exports.run = async (client, message, args, prefix) => {
 			return
 		}
 		const userData = JSON.parse(data)
-		value = 1
-		play_number = undefined
+		let PageNumber = 1
+		let play_number = undefined
 		let ModeOsu = "fruits"
-		let string = args.join(" ").match(/"(.*?)"/)
-		ModeID = 2
-
-		if (message.mentions.users.size > 0) {
-			const mentionedUser = message.mentions.users.first()
-			try {
-				if (mentionedUser) {
-					if (message.content.includes(`<@${mentionedUser.id}>`)) {
-						userargs = userData[mentionedUser.id].BanchoUserId
-					} else {
-						userargs = userData[message.author.id].BanchoUserId
-					}
-				}
-			} catch (err) {
-				console.error(err)
-				if (mentionedUser) {
-					if (message.content.includes(`<@${mentionedUser.id}>`)) {
-						try {
-							userargs = userData[mentionedUser.id].BanchoUserId
-						} catch (err) {
-							message.reply(`No osu! user found for ${mentionedUser.tag}`)
-						}
-					} else {
-						try {
-							userargs = userData[message.author.id].BanchoUserId
-						} catch (err) {
-							message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
-						}
-					}
-				}
-				return
-			}
-		} else {
-			if (args[0] === undefined) {
-				try {
-					userargs = userData[message.author.id].BanchoUserId
-				} catch (err) {
-					console.error(err)
-					message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
-					return
-				}
-			} else {
-				if (args.includes("-i")) {
-					singleArgument = args.slice(0, args.indexOf("-i")).join(" ")
-					const iIndex = args.indexOf("-i")
-					play_number = args[iIndex + 1]
-					userargs = singleArgument
-				} else if (args.includes("-p")) {
-					singleArgument = args.slice(0, args.indexOf("-p")).join(" ")
-					const iIndex = args.indexOf("-p")
-					value = args[iIndex + 1]
-					userargs = singleArgument
-				} else {
-					singleArgument = args.join(" ")
-					value = 1
-					userargs = singleArgument
-				}
-
-				if (value > 20) {
-					message.reply(`**Value must not be greater than 20**`)
-					return
-				}
-				if (play_number > 100) {
-					message.reply(`**Value must not be greater than 100**`)
-					return
-				}
-
-				if (string) {
-					userargs = string[1]
-				} else {
-					userargs = args[0]
-				}
-			}
-		}
-
-		if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+") || args.join(" ").startsWith("-g") || args.join(" ").startsWith("-am") || args.join(" ").startsWith("-amount") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-reverse")) {
-			try {
-				userargs = userData[message.author.id].BanchoUserId
-			} catch (err) {
-				message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
-				return
-			}
-		}
-
-		let pageNumber = Number(value)
-		if (args === undefined) {
-			pageNumber = Number("1")
-		}
-		if (args[0] === "-p") {
-			pageNumber = Number(value)
-			try {
-				userargs = userData[message.author.id].BanchoUserId
-			} catch (err) {
-				message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
-			}
-		}
+		let RulesetId = 2
+		let RB = false
 
 		let argValues = {}
 		for (const arg of args) {
@@ -120,17 +28,72 @@ exports.run = async (client, message, args, prefix) => {
 			argValues[key] = value
 		}
 
-		//log into api
-		await auth.login(process.env.client_id, process.env.client_secret)
+		let server = "bancho"
+		try {
+			server = userData[message.author.id].server
+		} catch (err) {}
 
-		const user = await v2.user.details(userargs, ModeOsu)
+		if (args.includes("-bancho")) server = "bancho"
+		if (args.includes("-gatari")) server = "gatari"
 
-		if (user.id == undefined) {
-			message.reply(`**The user ${userargs} does not exist.**`)
+		var userargs = await FindUserargs(message, args, server, prefix)
+
+		if (args.includes("-i")) {
+			const iIndex = args.indexOf("-i")
+			play_number = args[iIndex + 1]
+		} else if (args.includes("-p")) {
+			PageNumber = args[args.indexOf("-p") + 1]
+		} else {
+			PageNumber = 1
+		}
+
+		if (PageNumber > 20) {
+			message.reply(`**Value must not be greater than 20**`)
+			return
+		}
+		if (play_number > 100) {
+			message.reply(`**Value must not be greater than 100**`)
 			return
 		}
 
-		if (args.join(" ").includes("-am") || args.join(" ").includes("-g")) {
+		if (args.join(" ").startsWith("-r") || args.join(" ").startsWith("-recent") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+") || args.join(" ").startsWith("-g") || args.join(" ").startsWith("-am") || args.join(" ").startsWith("-amount") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-reverse")) {
+			try {
+				if (server == "bancho") userargs = userData[message.author.id].BanchoUserId
+				if (server == "gatari") userargs = userData[message.author.id].GatariUserId
+			} catch (err) {
+				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Set your osu! username by typing "${prefix}link **your username**"`)] })
+			}
+		}
+
+		let user
+		let userstats
+		if (server == "bancho") {
+			//log in
+			await auth.login(process.env.client_id, process.env.client_secret)
+			user = await v2.user.details(userargs, ModeOsu)
+			if (user.id === undefined) {
+				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in Bancho database**`)] })
+				return
+			}
+		}
+
+		if (server == "gatari") {
+			var Userurl = `https://api.gatari.pw/users/get?u=`
+			var UserStatsurl = `https://api.gatari.pw/user/stats?u=`
+
+			const userResponse = await axios.get(`${Userurl}${userargs}`)
+			const userStatsResponse = await axios.get(`${UserStatsurl}${userargs}&${RulesetId}`)
+
+			user = userResponse.data.users[0]
+			userstats = userStatsResponse.data.stats
+
+			if (user == undefined) {
+				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in Gatari database**`)] })
+				return
+			}
+		}
+
+		if (args.includes("-am") || args.includes("-g")) {
 			if (args.join(" ").includes("-am")) query = "-am"
 			if (args.join(" ").includes("-amount")) query = "-amount"
 			if (args.join(" ").includes("-g")) query = "-g"
@@ -138,24 +101,38 @@ exports.run = async (client, message, args, prefix) => {
 			const iIndex = args.indexOf(query)
 			const GIndex = Number(args[iIndex + 1])
 
-			//score set
-			const score = await v2.user.scores.category(user.id, "best", {
-				include_fails: "0",
-				mode: ModeOsu,
-				limit: "100",
-				offset: "0",
-			})
+			let score
+
+			if (server == "gatari") {
+				var url = `https://api.gatari.pw/user/scores/best`
+				const response = await axios.get(`${url}?id=${user.id}&l=100&p=1&mode=${RuleSetId}&mods=${modSort}`)
+				score = response.data.scores
+			}
+			if (server == "bancho") {
+				//score set
+				score = await v2.user.scores.category(user.id, "best", {
+					include_fails: "0",
+					mode: ModeOsu,
+					limit: "100",
+					offset: "0",
+				})
+			}
 
 			const Number_bigger = score.filter(x => x.pp > GIndex)
 
-			const embed = new EmbedBuilder().setColor("Purple").setDescription(`${user.username} has **\`${Number_bigger.length}\`** plays worth more than ${GIndex.toFixed(1)}PP`)
+			const embed = new EmbedBuilder()
+				.setColor("Purple")
+				.setDescription(`${user.username} has **\`${Number_bigger.length}\`** plays worth more than ${GIndex.toFixed(1)}PP`)
+				.setFooter({ text: `osu!${server}` })
 
 			message.channel.send({ embeds: [embed] })
 
 			return
 		}
 
-		message.channel.send({ embeds: [await GetUserTop(user, pageNumber, ModeOsu, ModeID, args, argValues["mods"], play_number)] })
+		if (args.includes("-r") || args.includes("-recent")) RB = true
+
+		message.channel.send({ embeds: [await GetUserTop(user, userstats, PageNumber, ModeOsu, RulesetId, args, argValues["mods"], play_number, RB, server)] })
 	})
 }
 exports.name = ["ctbtop"]
