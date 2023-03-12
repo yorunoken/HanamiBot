@@ -52,7 +52,7 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 		let a = userstats.a_count.toLocaleString()
 
 		//join date
-		const dateString = user.registered_on
+		const dateString = user.registered_on * 1000
 		const date = new Date(dateString)
 		//current time
 		const currenttime = new Date()
