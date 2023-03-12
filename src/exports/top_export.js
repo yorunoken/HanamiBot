@@ -4,7 +4,7 @@ const { v2, auth, mods, tools } = require("osu-api-extended")
 const { Beatmap, Calculator } = require("rosu-pp")
 const { Downloader, DownloadEntry } = require("osu-downloader")
 
-async function GetUserTop(user, pageNumber, ModeOsu, RulesetId, args, ModsSearch, play_number, rb) {
+async function GetUserTop(user, userstats, pageNumber, ModeOsu, RulesetId, args, ModsSearch, play_number, rb, server) {
 	//determine the page of the osutop
 	const start = (pageNumber - 1) * 5 + 1
 	const end = pageNumber * 5
@@ -46,7 +46,12 @@ async function GetUserTop(user, pageNumber, ModeOsu, RulesetId, args, ModsSearch
 		sortmod = 1
 		filteredscore = score.filter(x => x.mods.join("").split("").sort().join("").toLowerCase() == ModsSearch.split("").sort().join("").toLowerCase())
 		score = filteredscore
-		FilterMods = `**Filtering mod(s): ${score[value].mods.join("").toUpperCase()}**`
+		try {
+			FilterMods = `**Filtering mod(s): ${score[value].mods.join("").toUpperCase()}**`
+		} catch (err) {
+			const embed = new EmbedBuilder().setColor("Purple").setDescription("Please provide a valid mod combination.")
+			return embed
+		}
 	}
 
 	//formatted values for user

@@ -105,7 +105,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
 		let user = await v2.user.details(userargs, mode)
 		if (user.id === undefined) {
-			message.channel.send(`**The player, \`${userargs}\` does not exist**`)
+			message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist**`)] })
 			return
 		}
 

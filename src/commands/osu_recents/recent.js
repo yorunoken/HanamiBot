@@ -5,6 +5,7 @@ const axios = require("axios")
 // importing GetRecent
 const { GetRecent } = require("../../exports/recent_export")
 const { FindUserargs } = require("../../exports/finduserargs_export.js")
+const { EmbedBuilder } = require("discord.js")
 
 module.exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()
@@ -54,7 +55,7 @@ module.exports.run = async (client, message, args, prefix) => {
 				if (server == "bancho") userargs = userData[message.author.id].BanchoUserId
 				if (server == "gatari") userargs = userData[message.author.id].GatariUserId
 			} catch (err) {
-				message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
+				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Set your osu! username by typing "${prefix}link **your username**"`)] })
 			}
 		}
 
@@ -66,7 +67,7 @@ module.exports.run = async (client, message, args, prefix) => {
 			await auth.login(process.env.client_id, process.env.client_secret)
 			user = await v2.user.details(userargs, mode)
 			if (user.id === undefined) {
-				message.channel.send(`**The player, \`${userargs}\` does not exist**`)
+				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist**`)] })
 				return
 			}
 		}

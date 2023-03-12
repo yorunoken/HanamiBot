@@ -30,7 +30,7 @@ async function FindUserargs(message, args, server, prefix) {
 							if (server == "bancho") userargs = userData[mentionedUser.id].BanchoUserId
 							if (server == "gatari") userargs = userData[mentionedUser.id].GatariUserId
 						} catch (err) {
-							message.reply(`No osu! user found for ${mentionedUser.tag}`)
+							message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No osu! user found for ${mentionedUser.tag}`)] })
 						}
 					} else {
 						let string = args.join(" ").match(/"(.*?)"/)
@@ -46,7 +46,7 @@ async function FindUserargs(message, args, server, prefix) {
 							if (server == "gatari") userargs = userData[message.author.id].GatariUserId
 						} catch (err) {
 							console.error(err)
-							message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
+							message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Set your osu! username by typing "${prefix}link **your username**"`)] })
 							return
 						}
 					}
@@ -59,7 +59,7 @@ async function FindUserargs(message, args, server, prefix) {
 						if (server == "gatari") userargs = userData[message.author.id].GatariUserId
 					} catch (err) {
 						console.error(err)
-						message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
+						message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Set your osu! username by typing "${prefix}link **your username**"`)] })
 						return
 					}
 				} else {

@@ -51,7 +51,12 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		if (argValues["mods"] != undefined) {
 			filteredscore = score.filter(x => mods.name(x.mods).toLowerCase() == argValues["mods"].split("").sort().join("").toLowerCase())
 			score = filteredscore
-			FilterMods = `**Filtering mod(s): ${mods.name(score[value].mods).toUpperCase()}**`
+			try {
+				FilterMods = `**Filtering mod(s): ${mods.name(score[value].mods).toUpperCase()}**`
+			} catch (err) {
+				const embed = new EmbedBuilder().setColor("Purple").setDescription("Please provide a valid mod combination.")
+				return embed
+			}
 		}
 
 		valuegeki = score[value].count_gekis
@@ -119,7 +124,12 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		if (argValues["mods"] != undefined) {
 			filteredscore = score.filter(x => x.mods.join("").split("").sort().join("").toLowerCase() == argValues["mods"].split("").sort().join("").toLowerCase())
 			score = filteredscore
-			FilterMods = `**Filtering mod(s): ${score[value].mods.join("").toUpperCase()}**`
+			try {
+				FilterMods = `**Filtering mod(s): ${score[value].mods.join("").toUpperCase()}**`
+			} catch (err) {
+				const embed = new EmbedBuilder().setColor("Purple").setDescription("Please provide a valid mod combination.")
+				return embed
+			}
 		}
 
 		valuegeki = score[value].statistics.count_geki
