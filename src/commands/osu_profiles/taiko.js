@@ -14,7 +14,7 @@ exports.run = async (client, message, args, prefix) => {
 			return message.reply("An error occurred while reading user data.")
 		}
 		const userData = JSON.parse(data)
-		let mode = "fruits"
+		let mode = "taiko"
 		let rulesetId = 1
 		let server = "taiko"
 		try {
