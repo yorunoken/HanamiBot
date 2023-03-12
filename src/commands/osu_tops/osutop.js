@@ -1,4 +1,5 @@
 const fs = require("fs")
+const { EmbedBuilder } = require("discord.js")
 const { v2, auth } = require("osu-api-extended")
 const axios = require("axios")
 
@@ -20,6 +21,12 @@ exports.run = async (client, message, args, prefix) => {
 		let ModeOsu = "osu"
 		let RulesetId = 0
 		let RB = false
+
+		let argValues = {}
+		for (const arg of args) {
+			const [key, value] = arg.split("=")
+			argValues[key] = value
+		}
 
 		let server = "bancho"
 		try {
@@ -66,17 +73,11 @@ exports.run = async (client, message, args, prefix) => {
 
 		if (args.join(" ").startsWith("-r") || args.join(" ").startsWith("-recent") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+") || args.join(" ").startsWith("-g") || args.join(" ").startsWith("-am") || args.join(" ").startsWith("-amount") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-reverse")) {
 			try {
-				userargs = userData[message.author.id].BanchoUserId
+				if (server == "bancho") userargs = userData[message.author.id].BanchoUserId
+				if (server == "gatari") userargs = userData[message.author.id].GatariUserId
 			} catch (err) {
-				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Set your osu! username by typing "${prefix}link **your username**`)] })
-				return
+				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Set your osu! username by typing "${prefix}link **your username**"`)] })
 			}
-		}
-
-		let argValues = {}
-		for (const arg of args) {
-			const [key, value] = arg.split("=")
-			argValues[key] = value
 		}
 
 		let user
@@ -84,10 +85,9 @@ exports.run = async (client, message, args, prefix) => {
 		if (server == "bancho") {
 			//log in
 			await auth.login(process.env.client_id, process.env.client_secret)
-			user = await v2.user.details(userargs, mode)
+			user = await v2.user.details(userargs, ModeOsu)
 			if (user.id === undefined) {
 				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in Bancho database**`)] })
-				message.channel.send(``)
 				return
 			}
 		}
@@ -97,7 +97,7 @@ exports.run = async (client, message, args, prefix) => {
 			var UserStatsurl = `https://api.gatari.pw/user/stats?u=`
 
 			const userResponse = await axios.get(`${Userurl}${userargs}`)
-			const userStatsResponse = await axios.get(`${UserStatsurl}${userargs}&${RuleSetId}`)
+			const userStatsResponse = await axios.get(`${UserStatsurl}${userargs}&${RulesetId}`)
 
 			user = userResponse.data.users[0]
 			userstats = userStatsResponse.data.stats
@@ -108,7 +108,7 @@ exports.run = async (client, message, args, prefix) => {
 			}
 		}
 
-		if (args.join(" ").includes("-am") || args.join(" ").includes("-g")) {
+		if (args.includes("-am") || args.includes("-g")) {
 			if (args.join(" ").includes("-am")) query = "-am"
 			if (args.join(" ").includes("-amount")) query = "-amount"
 			if (args.join(" ").includes("-g")) query = "-g"
@@ -116,24 +116,36 @@ exports.run = async (client, message, args, prefix) => {
 			const iIndex = args.indexOf(query)
 			const GIndex = Number(args[iIndex + 1])
 
-			//score set
-			const score = await v2.user.scores.category(user.id, "best", {
-				include_fails: "0",
-				mode: ModeOsu,
-				limit: "100",
-				offset: "0",
-			})
+			let score
+
+			if (server == "gatari") {
+				var url = `https://api.gatari.pw/user/scores/best`
+				const response = await axios.get(`${url}?id=${user.id}&l=100&p=1&mode=${RuleSetId}&mods=${modSort}`)
+				score = response.data.scores
+			}
+			if (server == "bancho") {
+				//score set
+				score = await v2.user.scores.category(user.id, "best", {
+					include_fails: "0",
+					mode: ModeOsu,
+					limit: "100",
+					offset: "0",
+				})
+			}
 
 			const Number_bigger = score.filter(x => x.pp > GIndex)
 
-			const embed = new EmbedBuilder().setColor("Purple").setDescription(`${user.username} has **\`${Number_bigger.length}\`** plays worth more than ${GIndex.toFixed(1)}PP`)
+			const embed = new EmbedBuilder()
+				.setColor("Purple")
+				.setDescription(`${user.username} has **\`${Number_bigger.length}\`** plays worth more than ${GIndex.toFixed(1)}PP`)
+				.setFooter({ text: `osu!${server}` })
 
 			message.channel.send({ embeds: [embed] })
 
 			return
 		}
 
-		if (args.join(" ").includes("-r") || args.join(" ").includes("-recent")) RB = true
+		if (args.includes("-r") || args.includes("-recent")) RB = true
 
 		message.channel.send({ embeds: [await GetUserTop(user, userstats, PageNumber, ModeOsu, RulesetId, args, argValues["mods"], play_number, RB, server)] })
 	})
