@@ -17,18 +17,21 @@ exports.run = async (client, message, args, prefix) => {
 		let mode = "fruits"
 		let rulesetId = 2
 		let server = "bancho"
+		try {
+			server = userData[message.author.id].server
+		} catch (err) {}
 
 		if (args.includes("-bancho")) server = "bancho"
 		if (args.includes("-gatari")) server = "gatari"
 
 		var userargs = await FindUserargs(message, args, server, prefix)
-
-		if (args.join(" ").startsWith("-bancho") || args.join(" ").startsWith("-gatari") || args.join(" ").startsWith("-d") || args.join(" ").startsWith("-details")) {
+		if (args[0] == "-bancho" || args[0] == "-gatari" || args.join(" ").startsWith("-d") || args.join(" ").startsWith("-details")) {
 			try {
 				if (server == "bancho") userargs = userData[message.author.id].BanchoUserId
 				if (server == "gatari") userargs = userData[message.author.id].GatariUserId
 			} catch (err) {
 				message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
+				return
 			}
 		}
 
@@ -64,7 +67,7 @@ exports.run = async (client, message, args, prefix) => {
 
 		if (args.join(" ").includes("-d") || args.join(" ").includes("-details")) firstPage = false
 
-		message.channel.send({ embeds: [await GetUserPage(firstPage, user, userstats, mode, rulesetId)] })
+		message.channel.send({ embeds: [await GetUserPage(firstPage, user, userstats, mode, rulesetId, server)] })
 	})
 }
 exports.name = "ctb"

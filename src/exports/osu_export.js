@@ -1,7 +1,7 @@
 const { v2, auth } = require("osu-api-extended")
 const { EmbedBuilder } = require("discord.js")
 
-async function GetUserPage(firstPage, user, userstats, mode, RuleSetId) {
+async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) {
 	//grades
 	const grades = {
 		A: "<:A_:1057763284327080036>",
@@ -11,7 +11,7 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId) {
 		XH: "<:XH_:1057763296717045891>",
 	}
 
-	if (userstats.length != 0) {
+	if (server == "gatari") {
 		try {
 			global_rank = userstats.rank.toLocaleString()
 			country_rank = userstats.country_rank.toLocaleString()
