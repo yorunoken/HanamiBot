@@ -1,108 +1,81 @@
 const fs = require("fs")
 const { v2, auth } = require("osu-api-extended")
+const axios = require("axios")
 
 // importing GetRecent
 const { GetRecent } = require("../../exports/recent_export")
+const { FindUserargs } = require("../../exports/finduserargs_export.js")
 
 module.exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()
-
 	fs.readFile("./user-data.json", async (error, data) => {
 		if (error) {
 			console.log(error)
 			return
 		}
 		const userData = JSON.parse(data)
-		let userargs
 		let value = 0
-
 		let mode = "taiko"
-
 		let RuleSetId = 1
 		let PassDetermine = 1
+		let server = "bancho"
+		try {
+			server = userData[message.author.id].server
+		} catch (err) {}
 
-		if (message.mentions.users.size > 0) {
-			const mentionedUser = message.mentions.users.first()
-			try {
-				if (mentionedUser) {
-					if (message.content.includes(`<@${mentionedUser.id}>`)) {
-						userargs = userData[mentionedUser.id].BanchoUserId
-					} else {
-						userargs = userData[message.author.id].BanchoUserId
-					}
-				}
-			} catch (err) {
-				console.error(err)
-				if (mentionedUser) {
-					if (message.content.includes(`<@${mentionedUser.id}>`)) {
-						try {
-							userargs = userData[mentionedUser.id].BanchoUserId
-						} catch (err) {
-							message.reply(`No osu! user found for ${mentionedUser.tag}`)
-						}
-					} else {
-						try {
-							userargs = userData[message.author.id].BanchoUserId
-						} catch (err) {
-							message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
-						}
-					}
-				}
-				return
-			}
-		} else {
-			if (args[0] === undefined) {
-				try {
-					userargs = userData[message.author.id].BanchoUserId
-				} catch (err) {
-					console.error(err)
-					message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
-					return
-				}
-			} else {
-				let string = args.join(" ").match(/"(.*?)"/)
-				if (string) {
-					userargs = string[1]
-				} else {
-					userargs = args[0]
-				}
-				if (args.includes("-i")) {
-					const iIndex = args.indexOf("-i")
-					value = args[iIndex + 1] - 1
-				} else {
-					value = 0
-				}
-				if (args.includes("-pass") || args.includes("-ps")) {
-					PassDetermine = 0
-				}
+		if (args.includes("-bancho")) server = "bancho"
+		if (args.includes("-gatari")) server = "gatari"
 
-				if (args.join(" ").startsWith("-pass") || args.join(" ").startsWith("-ps") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
-					try {
-						userargs = userData[message.author.id].BanchoUserId
-					} catch (err) {
-						message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
-					}
-				}
-			}
+		if (args.includes("-i")) {
+			const iIndex = args.indexOf("-i")
+			value = args[iIndex + 1] - 1
 		}
 
-		if (userargs.length === 0) {
+		if (args.includes("-pass") || args.includes("-ps")) {
+			PassDetermine = 0
+		}
+
+		var userargs = await FindUserargs(message, args, server, prefix)
+
+		if (args.join(" ").startsWith("-gatari") || args.join(" ").startsWith("-bancho") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-pass") || args.join(" ").startsWith("-ps") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
 			try {
-				userargs = userData[message.author.id].BanchoUserId
+				if (server == "bancho") userargs = userData[message.author.id].BanchoUserId
+				if (server == "gatari") userargs = userData[message.author.id].GatariUserId
 			} catch (err) {
 				message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 			}
 		}
 
-		//log in
-		await auth.login(process.env.client_id, process.env.client_secret)
-		const user = await v2.user.details(userargs, mode)
-		if (user.id === undefined) {
-			message.channel.send(`**The player, \`${userargs}\` does not exist**`)
-			return
+		let user
+		let userstats
+
+		if (server == "bancho") {
+			//log in
+			await auth.login(process.env.client_id, process.env.client_secret)
+			user = await v2.user.details(userargs, mode)
+			if (user.id === undefined) {
+				message.channel.send(`**The player, \`${userargs}\` does not exist**`)
+				return
+			}
 		}
 
-		const Recent = await GetRecent(value, user, mode, PassDetermine, args, RuleSetId)
+		if (server == "gatari") {
+			var Userurl = `https://api.gatari.pw/users/get?u=`
+			var UserStatsurl = `https://api.gatari.pw/user/stats?u=`
+
+			const userResponse = await axios.get(`${Userurl}${userargs}`)
+			const userStatsResponse = await axios.get(`${UserStatsurl}${userargs}&${RuleSetId}`)
+
+			user = userResponse.data.users[0]
+			userstats = userStatsResponse.data.stats
+
+			if (user == undefined) {
+				message.channel.send(`**User doesn't exist in gatari database**`)
+				return
+			}
+		}
+
+		const Recent = await GetRecent(value, user, mode, PassDetermine, args, RuleSetId, userstats, server)
 		try {
 			console.log(Recent.FilterMods)
 		} catch (err) {

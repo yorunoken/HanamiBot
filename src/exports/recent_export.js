@@ -3,99 +3,132 @@ const fs = require("fs")
 const { v2, auth, tools, mods } = require("osu-api-extended")
 const { Beatmap, Calculator } = require("rosu-pp")
 const { Downloader, DownloadEntry } = require("osu-downloader")
+const axios = require("axios")
 
-async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId) {
-	try {
-		//score set
-		let score = await v2.user.scores.category(user.id, "recent", {
+async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, userstats, server) {
+	await auth.login(process.env.client_id, process.env.client_secret)
+
+	let argValues = {}
+	for (const arg of args) {
+		const [key, value] = arg.split("=")
+		argValues[key] = value
+	}
+
+	if (args.join(" ").includes("+")) {
+		const iIndex = args.indexOf("+")
+		modsArg = args[iIndex + 1]
+			.slice(1)
+			.toUpperCase()
+			.match(/[A-Z]{2}/g)
+		argValues["mods"] = modsArg.join("")
+	}
+
+	let FilterMods = ""
+	let ScoreGlobalRank = ""
+	let replayLink = ""
+	let score, filteredscore, ModsName, mapId, retryMap, global_rank, country_rank, user_pp, acc, objects, TimeCreated, grade, title, hitLength, totalLength, CountryCode, profileUrl, MapsetId, avatarUrl, creatorName, creatorUserId
+	let valuegeki,
+		value300,
+		valuekatu,
+		value100,
+		value50,
+		valuemiss,
+		valuecombo = 0
+
+	if (server == "gatari") {
+		var url = `https://api.gatari.pw/user/scores/recent`
+		const response = await axios.get(`${url}?id=${user.id}&l=100&p=1&mode=${RuleSetId}&f=${PassDetermine}`)
+
+		score = response.data.scores
+		if (score.code == 200) {
+			let embed = new EmbedBuilder().setColor("Purple").setDescription(`No recent Gatari plays found for **${user.username}**`)
+			return { embed, FilterMods }
+		}
+
+		mapId = score[value].beatmap.beatmap_id
+		ModsName = mods.name(score[value].mods).toUpperCase()
+
+		if (argValues["mods"] != undefined) {
+			filteredscore = score.filter(x => mods.name(x.mods).toLowerCase() == argValues["mods"].split("").sort().join("").toLowerCase())
+			score = filteredscore
+			FilterMods = `**Filtering mod(s): ${mods.name(score[value].mods).toUpperCase()}**`
+		}
+
+		valuegeki = score[value].count_gekis
+		value300 = score[value].count_300
+		valuekatu = score[value].count_katu
+		value100 = score[value].count_100
+		value50 = score[value].count_50
+		valuemiss = score[value].count_miss
+		valuecombo = score[value].max_combo
+
+		retryMap = score.map(x => x.beatmap.beatmap_id)
+		retryMap.splice(0, value)
+
+		//formatted values for user
+		try {
+			global_rank = userstats.rank.toLocaleString()
+			country_rank = userstats.country_rank.toLocaleString()
+		} catch (err) {
+			global_rank = 0
+			country_rank = 0
+		}
+		user_pp = userstats.pp.toLocaleString()
+		CountryCode = user.country
+		profileUrl = `https://osu.gatari.pw/u/${user.id}?m=${RuleSetId}`
+		avatarUrl = `https://a.gatari.pw/${user.id}`
+		MapsetId = score[value].beatmap.beatmapset_id
+
+		acc = `**(${Number(score[value].accuracy).toFixed(2)}%)**`
+
+		var BeatmapGatari = await v2.beatmap.diff(mapId)
+		objects = BeatmapGatari.count_circles + BeatmapGatari.count_sliders + BeatmapGatari.count_spinners
+
+		TimeCreated = new Date(score[value].time).getTime()
+		grade = score[value].ranking
+		title = `${BeatmapGatari.beatmapset.artist} - ${BeatmapGatari.beatmapset.title} [${BeatmapGatari.version}]`
+
+		hitLength = BeatmapGatari.hit_length
+		totalLength = BeatmapGatari.total_length
+
+		if (score[value].beatmap.ranked == 0) MapStatus = `Unranked`
+		if (score[value].beatmap.ranked == 2) MapStatus = `Ranked`
+		if (score[value].beatmap.ranked == 3) MapStatus = `Approved`
+		if (score[value].beatmap.ranked == 4) MapStatus = `Qualified`
+		if (score[value].beatmap.ranked == 5) MapStatus = `Loved`
+
+		creatorUserId = BeatmapGatari.beatmapset.user_id
+		creatorName = BeatmapGatari.beatmapset.creator
+	}
+	if (server == "bancho") {
+		score = await v2.user.scores.category(user.id, "recent", {
 			include_fails: PassDetermine,
 			mode: mode,
 			limit: "100",
 			offset: "0",
 		})
 
-		let argValues = {}
-		for (const arg of args) {
-			const [key, value] = arg.split("=")
-			argValues[key] = value
+		try {
+			mapId = score[value].beatmap.id
+		} catch (err) {
+			let embed = new EmbedBuilder().setColor("Purple").setDescription(`No recent Bancho plays found for **${user.username}**`)
+			return { embed, FilterMods }
 		}
-
-		if (args.join(" ").includes("+")) {
-			const iIndex = args.indexOf("+")
-			modsArg = args[iIndex + 1]
-				.slice(1)
-				.toUpperCase()
-				.match(/[A-Z]{2}/g)
-			argValues["mods"] = modsArg.join("")
-		}
-
-		let filteredscore
-		let FilterMods = ""
-		let sortmod = 0
+		ModsName = score[value].mods.join("").toUpperCase()
 
 		if (argValues["mods"] != undefined) {
-			sortmod = 1
 			filteredscore = score.filter(x => x.mods.join("").split("").sort().join("").toLowerCase() == argValues["mods"].split("").sort().join("").toLowerCase())
 			score = filteredscore
 			FilterMods = `**Filtering mod(s): ${score[value].mods.join("").toUpperCase()}**`
 		}
 
-		if (!fs.existsSync(`./osuBeatmapCache/${score[value].beatmap.id}.osu`)) {
-			console.log("no file.")
-			const downloader = new Downloader({
-				rootPath: "./osuBeatmapCache",
-
-				filesPerSecond: 0,
-			})
-
-			downloader.addSingleEntry(score[value].beatmap.id)
-			await downloader.downloadSingle()
-		}
-
-		let modsone = `**+${score[value].mods.join("")}**`
-		let modsID = mods.id(score[value].mods.join(""))
-
-		if (!score[value].mods.join("").length) {
-			modsone = ""
-			modsID = 0
-		}
-
-		let scoreParam = {
-			mode: RuleSetId,
-			mods: modsID,
-		}
-
-		let map = new Beatmap({ path: `./osuBeatmapCache/${score[value].beatmap.id}.osu` })
-		let calc = new Calculator(scoreParam)
-
-		const mapValues = calc.mapAttributes(map)
-
-		// ss pp
-		let maxAttrs = calc.performance(map)
-
-		//normal pp
-		let CurAttrs = calc.n100(score[value].statistics.count_100).n300(score[value].statistics.count_300).n50(score[value].statistics.count_50).nMisses(Number(score[value].statistics.count_miss)).combo(score[value].max_combo).nGeki(score[value].statistics.count_geki).nKatu(score[value].statistics.count_katu).performance(map)
-
-		//fc pp
-		let FCAttrs = calc.n100(score[value].statistics.count_100).n300(score[value].statistics.count_300).n50(score[value].statistics.count_50).nMisses(0).combo(maxAttrs.difficulty.maxCombo).nGeki(score[value].statistics.count_geki).nKatu(score[value].statistics.count_katu).performance(map)
-
-		// retry counter
-		const retryMap = score.map(x => x.beatmap.id)
-		retryMap.splice(0, value)
-
-		const mapId = score[value].beatmap.id
-
-		function getRetryCount(retryMap, mapId) {
-			let retryCounter = 0
-			for (let i = 0; i < retryMap.length; i++) {
-				if (retryMap[i] === mapId) {
-					retryCounter++
-				}
-			}
-			return retryCounter
-		}
-
-		const retryCounter = getRetryCount(retryMap, mapId)
+		valuegeki = score[value].statistics.count_geki
+		value300 = score[value].statistics.count_300
+		valuekatu = score[value].statistics.count_katu
+		value100 = score[value].statistics.count_100
+		value50 = score[value].statistics.count_50
+		valuemiss = score[value].statistics.count_miss
+		valuecombo = score[value].max_combo
 
 		//formatted values for user
 		try {
@@ -105,118 +138,177 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId) {
 			global_rank = 0
 			country_rank = 0
 		}
-		let user_pp = user.statistics.pp.toLocaleString()
+		user_pp = user.statistics.pp.toLocaleString()
+		CountryCode = user.country_code
+		profileUrl = `https://osu.ppy.sh/users/${user.id}/${mode}`
+		avatarUrl = user.avatar_url
+		MapsetId = score[value].beatmapset.id
 
-		if (score[value].mode_int == "0") AccValues = `{**${score[value].statistics.count_300}**/${score[value].statistics.count_100}/${score[value].statistics.count_50}/${score[value].statistics.count_miss}}`
-		if (score[value].mode_int == "1") AccValues = `{**${score[value].statistics.count_300}**/${score[value].statistics.count_100}}/${score[value].statistics.count_miss}}`
-		if (score[value].mode_int == "2") AccValues = `{**${score[value].statistics.count_300}**/${score[value].statistics.count_100}/${score[value].statistics.count_50}/${score[value].statistics.count_miss}}`
-		if (score[value].mode_int == "3") AccValues = `{**${score[value].statistics.count_geki}/${score[value].statistics.count_300}**/${score[value].statistics.count_katu}/${score[value].statistics.count_100}/${score[value].statistics.count_50}/${score[value].statistics.count_miss}}`
+		acc = `**(${Number(score[value].accuracy * 100).toFixed(2)}%)**`
+		objects = score[value].beatmap.count_circles + score[value].beatmap.count_sliders + score[value].beatmap.count_spinners
 
-		//formatted values for score
-		let map_score = score[value].score.toLocaleString()
-		let acc = `**(${Number(score[value].accuracy * 100).toFixed(2)}%)**`
-		let beatmap_id = Number(score[value].beatmap.id)
+		TimeCreated = new Date(score[value].created_at).getTime() / 1000
+		grade = score[value].rank
+		title = `${score[value].beatmapset.artist} - ${score[value].beatmapset.title} [${score[value].beatmap.version}]`
 
-		//calculating pass percentage
-		let objects = score[value].beatmap.count_circles + score[value].beatmap.count_sliders + score[value].beatmap.count_spinners
-		let objectshit = score[value].statistics.count_300 + score[value].statistics.count_100 + score[value].statistics.count_50 + score[value].statistics.count_miss
+		// retry counter
+		retryMap = score.map(x => x.beatmap.id)
+		retryMap.splice(0, value)
 
-		let fraction = objectshit / objects
-		let percentage_raw = Number((fraction * 100).toFixed(2))
-		let percentagenum = percentage_raw.toFixed(1)
-		let percentage = `**(${percentagenum}%)** `
-		if (percentagenum == "100.0" || score[value].passed == true) {
-			percentage = " "
-		}
+		hitLength = score[value].beatmap.hit_length
+		totalLength = score[value].beatmap.total_length
 
-		//score set at
-		time1 = new Date(score[value].created_at).getTime() / 1000
-
-		//grades
-		const grades = {
-			A: "<:A_:1057763284327080036>",
-			B: "<:B_:1057763286097076405>",
-			C: "<:C_:1057763287565086790>",
-			D: "<:D_:1057763289121173554>",
-			F: "<:F_:1057763290484318360>",
-			S: "<:S_:1057763291998474283>",
-			SH: "<:SH_:1057763293491642568>",
-			X: "<:X_:1057763294707974215>",
-			XH: "<:XH_:1057763296717045891>",
-		}
-		let grade = score[value].rank
-		grade = grades[grade]
-
-		//set title
-		let title = `${score[value].beatmapset.artist} - ${score[value].beatmapset.title} [${score[value].beatmap.version}] `
-
-		pps = `**${CurAttrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}PP`
-		if (CurAttrs.effectiveMissCount > 0) {
-			Map300CountFc = objects - score[value].statistics.count_100 - score[value].statistics.count_50
-
-			const FcAcc = tools.accuracy({
-				300: Map300CountFc,
-				geki: score[value].statistics.count_geki,
-				100: score[value].statistics.count_100,
-				katu: score[value].statistics.count_katu,
-				50: score[value].statistics.count_50,
-				0: 0,
-				mode: mode,
-			})
-
-			pps = `**${CurAttrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}PP ▹ (**${FCAttrs.pp.toFixed(2)}**PP for **${FcAcc}%**)`
-		}
-
-		let Hit = score[value].beatmap.hit_length
-		let Total = score[value].beatmap.total_length
-
-		if (score[value].mods.join(" ").toLowerCase().includes("dt")) {
-			Hit = (score[value].beatmap.hit_length / 1.5).toFixed()
-			Total = (score[value].beatmap.total_length / 1.5).toFixed()
-		}
-
-		//length
-
-		let minutesHit = Math.floor(Hit / 60).toFixed()
-		let secondsHit = (Hit % 60).toString().padStart(2, "0")
-		let minutesTotal = Math.floor(Total / 60).toFixed()
-		let secondsTotal = (Total % 60).toString().padStart(2, "0")
-
-		let scorerank = await v2.scores.details(score[value].best_id, "osu")
-
-		let sc_rank = ""
-		let replayLink = ""
 		if (score[value].passed == true) {
+			let scorerank = await v2.scores.details(score[value].best_id, mode)
+
 			if (scorerank.rank_global != undefined) {
-				sc_rank = ` 🌐 #${scorerank.rank_global}`
+				ScoreGlobalRank = ` 🌐 #${scorerank.rank_global}`
 			}
 
-			console.log("file: recent_export.js:219 ~ GetRecent ~ rank_global:", scorerank.rank_global)
 			if (scorerank.rank_global < 1000) {
 				replayLink = ` • [Replay](https://osu.ppy.sh/scores/osu/${scorerank.id}/download)`
 			}
 		}
-		let status = score[value].beatmapset.status.charAt(0).toUpperCase() + score[value].beatmapset.status.slice(1)
-		//score embed
-		const embed = new EmbedBuilder()
-			.setColor("Purple")
-			.setAuthor({
-				name: `${user.username} ${user_pp}pp (#${global_rank} ${user.country_code}#${country_rank}) `,
-				iconURL: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
-				url: `https://osu.ppy.sh/users/${user.id}`,
-			})
-			.setTitle(title)
-			.setURL(`https://osu.ppy.sh/b/${beatmap_id}`)
-			.setDescription(`${grade} ${percentage}${modsone} • **__[${maxAttrs.difficulty.stars.toFixed(2)}★]__** ${sc_rank}\n▹${pps} \n▹${map_score} • ${acc}\n▹[ **${score[value].max_combo}**x/${maxAttrs.difficulty.maxCombo}x ] • ${AccValues} ${replayLink}\n▹Score Set <t:${time1}:R> • **Try #${retryCounter}**`)
-			.setFields({ name: `**Beatmap info:**`, value: `BPM: \`${mapValues.bpm.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${mapValues.ar.toFixed(1).toString().replace(/\.0+$/, "")}\` OD: \`${mapValues.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\`` })
-			.setImage(`https://assets.ppy.sh/beatmaps/${score[value].beatmapset.id}/covers/cover.jpg`)
-			.setThumbnail(user.avatar_url)
-			.setFooter({ text: `${status} map by ${score[value].beatmapset.creator}`, iconURL: `https://a.ppy.sh/${score[value].beatmapset.user_id}?1668890819.jpeg` })
 
-		return { embed, FilterMods }
-	} catch (err) {
-		console.log(err)
+		MapStatus = score[value].beatmapset.status.charAt(0).toUpperCase() + score[value].beatmapset.status.slice(1)
+		creatorUserId = score[value].beatmapset.user_id
+		creatorName = score[value].beatmapset.creator
 	}
+
+	if (!fs.existsSync(`./osuBeatmapCache/${mapId}.osu`)) {
+		console.log("no file.")
+		const downloader = new Downloader({
+			rootPath: "./osuBeatmapCache",
+
+			filesPerSecond: 0,
+		})
+
+		downloader.addSingleEntry(mapId)
+		await downloader.downloadSingle()
+	}
+
+	let ModDisplay = `**+${ModsName}**`
+	let modsID = mods.id(ModsName)
+
+	if (!ModsName.length) {
+		ModDisplay = ""
+		modsID = 0
+	}
+
+	let scoreParam = {
+		mode: RuleSetId,
+		mods: modsID,
+	}
+
+	let map = new Beatmap({ path: `./osuBeatmapCache/${mapId}.osu` })
+	let calc = new Calculator(scoreParam)
+
+	const mapValues = calc.mapAttributes(map)
+
+	// ss pp
+	let maxAttrs = calc.performance(map)
+
+	//normal pp
+	let CurAttrs = calc.n300(value300).n100(value100).n50(value50).nMisses(valuemiss).combo(valuecombo).nGeki(valuegeki).nKatu(valuekatu).performance(map)
+
+	//fc pp
+	let FCAttrs = calc.n300(value300).n100(value100).n50(value50).nMisses(0).combo(maxAttrs.difficulty.maxCombo).nGeki(valuegeki).nKatu(valuekatu).performance(map)
+
+	function getRetryCount(retryMap, mapId) {
+		let retryCounter = 0
+		for (let i = 0; i < retryMap.length; i++) {
+			if (retryMap[i] === mapId) {
+				retryCounter++
+			}
+		}
+		return retryCounter
+	}
+
+	const retryCounter = getRetryCount(retryMap, mapId)
+
+	if (RuleSetId == "0") AccValues = `{**${value300}**/${value100}/${value50}/${valuemiss}}`
+	if (RuleSetId == "1") AccValues = `{**${value300}**/${value100}/${valuemiss}}`
+	if (RuleSetId == "2") AccValues = `{**${value300}**/${value100}/${value50}/${valuemiss}}`
+	if (RuleSetId == "3") AccValues = `{**${valuegeki}/${value300}**/${valuekatu}/${value100}/${value50}/${valuemiss}}`
+
+	//formatted values for score
+	let map_score = score[value].score.toLocaleString()
+
+	let objectshit = value300 + value100 + value50 + valuemiss
+
+	let fraction = objectshit / objects
+	let percentage_raw = Number((fraction * 100).toFixed(2))
+	let percentagenum = percentage_raw.toFixed(1)
+	let percentage = `**(${percentagenum}%)** `
+	if (percentagenum == "100.0" || score[value].passed == true) {
+		percentage = " "
+	}
+
+	//grades
+	const grades = {
+		A: "<:A_:1057763284327080036>",
+		B: "<:B_:1057763286097076405>",
+		C: "<:C_:1057763287565086790>",
+		D: "<:D_:1057763289121173554>",
+		F: "<:F_:1057763290484318360>",
+		S: "<:S_:1057763291998474283>",
+		SH: "<:SH_:1057763293491642568>",
+		X: "<:X_:1057763294707974215>",
+		XH: "<:XH_:1057763296717045891>",
+	}
+	grade = grades[grade]
+
+	pps = `**${CurAttrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}PP`
+	if (CurAttrs.effectiveMissCount > 0) {
+		Map300CountFc = objects - value100 - value50
+
+		const FcAcc = tools.accuracy({
+			300: Map300CountFc,
+			geki: valuegeki,
+			100: value100,
+			katu: valuekatu,
+			50: value50,
+			0: 0,
+			mode: mode,
+		})
+
+		pps = `**${CurAttrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}PP ▹ (**${FCAttrs.pp.toFixed(2)}**PP for **${FcAcc}%**)`
+	}
+
+	let Hit, Total
+
+	if (ModsName.toLowerCase().includes("dt")) {
+		Hit = (hitLength / 1.5).toFixed()
+		Total = (totalLength / 1.5).toFixed()
+	} else {
+		Hit = hitLength
+		Total = totalLength
+	}
+
+	//length
+
+	let minutesHit = Math.floor(Hit / 60).toFixed()
+	let secondsHit = (Hit % 60).toString().padStart(2, "0")
+	let minutesTotal = Math.floor(Total / 60).toFixed()
+	let secondsTotal = (Total % 60).toString().padStart(2, "0")
+
+	//score embed
+	const embed = new EmbedBuilder()
+		.setColor("Purple")
+		.setAuthor({
+			name: `${user.username} ${user_pp}pp (#${global_rank} ${CountryCode}#${country_rank}) `,
+			iconURL: `https://osu.ppy.sh/images/flags/${CountryCode}.png`,
+			url: profileUrl,
+		})
+		.setTitle(title)
+		.setURL(`https://osu.ppy.sh/b/${mapId}`)
+		.setDescription(`${grade} ${percentage}${ModDisplay} • **__[${maxAttrs.difficulty.stars.toFixed(2)}★]__** ${ScoreGlobalRank}\n▹${pps} \n▹${map_score} • ${acc}\n▹[ **${score[value].max_combo}**x/${maxAttrs.difficulty.maxCombo}x ] • ${AccValues} ${replayLink}\n▹Score Set <t:${TimeCreated}:R> • **Try #${retryCounter}**`)
+		.setFields({ name: `**Beatmap info:**`, value: `BPM: \`${mapValues.bpm.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${mapValues.ar.toFixed(1).toString().replace(/\.0+$/, "")}\` OD: \`${mapValues.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\`` })
+		.setImage(`https://assets.ppy.sh/beatmaps/${MapsetId}/covers/cover.jpg`)
+		.setThumbnail(avatarUrl)
+		.setFooter({ text: `${MapStatus} map by ${creatorName}`, iconURL: `https://a.ppy.sh/${creatorUserId}?1668890819.jpeg` })
+
+	return { embed, FilterMods }
 }
 
 module.exports = { GetRecent }
