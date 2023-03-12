@@ -40,7 +40,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		const response = await axios.get(`${url}?id=${user.id}&l=100&p=1&mode=${RuleSetId}&f=${PassDetermine}`)
 
 		score = response.data.scores
-		if (score.code == 200) {
+		if (score == null) {
 			let embed = new EmbedBuilder().setColor("Purple").setDescription(`No recent Gatari plays found for **${user.username}**`)
 			return { embed, FilterMods }
 		}
