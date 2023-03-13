@@ -8,6 +8,8 @@ const axios = require("axios")
 async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, userstats, server) {
 	await auth.login(process.env.client_id, process.env.client_secret)
 
+	let top1k = false
+	let score_id
 	let argValues = {}
 	for (const arg of args) {
 		const [key, value] = arg.split("=")
@@ -170,13 +172,16 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 
 		if (score[value].passed == true) {
 			let scorerank = await v2.scores.details(score[value].best_id, mode)
+			if (scorerank.created_at == score[value].created_at) {
+				if (scorerank.rank_global != undefined) {
+					ScoreGlobalRank = ` 🌐 #${scorerank.rank_global}`
+				}
 
-			if (scorerank.rank_global != undefined) {
-				ScoreGlobalRank = ` 🌐 #${scorerank.rank_global}`
-			}
-
-			if (scorerank.rank_global < 1000) {
-				replayLink = ` • [Replay](https://osu.ppy.sh/scores/osu/${scorerank.id}/download)`
+				if (scorerank.rank_global < 1000) {
+					top1k = true
+					score_id = scorerank.best_id
+					replayLink = ` • [Replay](https://osu.ppy.sh/scores/osu/${scorerank.id}/download)`
+				}
 			}
 		}
 
@@ -184,6 +189,22 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		creatorUserId = score[value].beatmapset.user_id
 		creatorName = score[value].beatmapset.creator
 	}
+
+	fs.readFile("./user-recent.json", (error, data) => {
+		if (error) {
+			console.log(error)
+			return
+		}
+		//update the user's osu! username in the JSON file
+		const userData = JSON.parse(data)
+		userData[user.id] = { ...userData[user.id], Score: score }
+		fs.writeFile("./user-recent.json", JSON.stringify(userData, null, 2), error => {
+			if (error) {
+				console.log(error)
+				return
+			}
+		})
+	})
 
 	if (!fs.existsSync(`./osuBeatmapCache/${mapId}.osu`)) {
 		console.log("no file.")
@@ -316,9 +337,10 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		.setFields({ name: `**Beatmap info:**`, value: `BPM: \`${mapValues.bpm.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${mapValues.ar.toFixed(1).toString().replace(/\.0+$/, "")}\` OD: \`${mapValues.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\`` })
 		.setImage(`https://assets.ppy.sh/beatmaps/${MapsetId}/covers/cover.jpg`)
 		.setThumbnail(avatarUrl)
-		.setFooter({ text: `${MapStatus} map by ${creatorName} | on osu!${server}`, iconURL: `https://a.ppy.sh/${creatorUserId}?1668890819.jpeg` })
+		.setFooter({ text: `${MapStatus} map by ${creatorName} | osu!${server}`, iconURL: `https://a.ppy.sh/${creatorUserId}?1668890819.jpeg` })
 
-	return { embed, FilterMods }
+	console.log(`${top1k} ${score_id}`)
+	return { embed, FilterMods, top1k, score_id }
 }
 
 module.exports = { GetRecent }

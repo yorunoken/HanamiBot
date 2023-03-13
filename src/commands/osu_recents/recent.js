@@ -1,11 +1,12 @@
 const fs = require("fs")
 const { v2, auth } = require("osu-api-extended")
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js")
 const axios = require("axios")
 
 // importing GetRecent
 const { GetRecent } = require("../../exports/recent_export")
 const { FindUserargs } = require("../../exports/finduserargs_export.js")
-const { EmbedBuilder } = require("discord.js")
+const { GetReplay } = require("../../exports/replay_export.js")
 
 module.exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()
@@ -96,6 +97,28 @@ module.exports.run = async (client, message, args, prefix) => {
 			return
 		}
 
+		let row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("render").setDisabled().setStyle(ButtonStyle.Primary).setLabel("Render"))
+		if (Recent.top1k) {
+			row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("render").setStyle(ButtonStyle.Primary).setLabel("Render"))
+			console.log("uuu?")
+			message.channel.send({ content: Recent.FilterMods, embeds: [Recent.embed.data], components: [row] })
+
+			const filter = m => m.user.id === message.author.id
+			const collector = message.channel.createMessageComponentCollector({ filter: filter, max: 1, time: 5000 })
+
+			collector.on("collect", async collected => {
+				let collectedm = collected.message
+				let user = collected.user
+				let score_id = Recent.score_id
+
+				collected.update({ content: Recent.FilterMods, embeds: [Recent.embed.data], components: [new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("render").setDisabled().setStyle(ButtonStyle.Primary).setLabel("Render"))] })
+				GetReplay(message, collectedm, user, score_id, mode)
+				return
+			})
+
+			collector.on("end", async m => {})
+			return
+		}
 		message.channel.send({ content: Recent.FilterMods, embeds: [Recent.embed.data] })
 	})
 }

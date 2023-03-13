@@ -6,8 +6,11 @@ commands/embed.js
 beatmapsongs/
 extracted/
 mes/
+replayFile/
 user-data.json
 prefixes.json
 commandCount.txt
 asd.js
 test.js
+user-recent.json
+user-replay.json
