@@ -180,7 +180,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 				if (scorerank.rank_global < 1000) {
 					top1k = true
 					score_id = scorerank.best_id
-					replayLink = ` • [Replay](https://osu.ppy.sh/scores/osu/${scorerank.id}/download)`
+					replayLink = ` • [Replay](https://osu.ppy.sh/scores/${mode}/${scorerank.id}/download)`
 				}
 			}
 		}

@@ -117,6 +117,7 @@ exports.run = async (client, message, args, prefix) => {
 						}
 					}catch(err){
 						message.channel.send("There was an error! Please try again.")
+						return
 					}
 				})
 

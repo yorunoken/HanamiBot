@@ -117,6 +117,7 @@ async function GetReplay(message, collected, user, score_id, mode) {
 						}
 					} catch (err) {
 						message.channel.send("There was an error! Please try again.")
+						return
 					}
 				})
 
