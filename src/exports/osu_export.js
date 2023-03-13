@@ -84,7 +84,7 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 			.setDescription(`**Accuracy:** \`${acc}%\` •  **Level:** \`${UserLevel}.${lvlprogress}\`\n**Playcount:** \`${playcount}\` (\`${playhours.toFixed()} hrs\`)\n**Followers:** \`${followers}\` • **Max Combo:** \`${profile_maxcombo}\`\n**Ranks:** ${grades.XH}\`${ssh}\`${grades.X}\`${ss}\`${grades.SH}\`${sh}\`${grades.S}\`${s}\`${grades.A}\`${a}\``)
 			.setImage(user.cover_url)
 			.setFooter({
-				text: `Joined osu! ${formattedDate} (${user_joined_ago} years ago) | on osu!${server}`,
+				text: `Joined osu! ${formattedDate} (${user_joined_ago} years ago) | osu!${server}`,
 			})
 		return embed
 	}
@@ -158,7 +158,7 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 			.setDescription(`**Accuracy:** \`${acc}%\` •  **Level:** \`${user.statistics.level.current}.${lvlprogress}\`\n${time}**Playcount:** \`${playcount}\` (\`${playhours.toFixed()} hrs\`)\n**Followers:** \`${followers}\` • **Max Combo:** \`${profile_maxcombo}\`\n**Ranks:** ${grades.XH}\`${ssh}\`${grades.X}\`${ss}\`${grades.SH}\`${sh}\`${grades.S}\`${s}\`${grades.A}\`${a}\``)
 			.setImage(user.cover_url)
 			.setFooter({
-				text: `Joined osu! ${formattedDate} (${user_joined_ago} years ago) | on osu!${server}`,
+				text: `Joined osu! ${formattedDate} (${user_joined_ago} years ago) | osu!${server}`,
 			})
 		return embed
 	} else {
@@ -269,7 +269,7 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 			.setDescription(`**Hits per play:** \`${hpp_count}\` • **Medals:** \`${medal_count}/289\` (\`${medal_percentage}%\`)\n**Replays watched:** \`${replays_watched}\` • **#1 Scores:** \`${number_1s}\`\n**Recommended difficulty:** \`${recc_stars}★\`\n**Total score:** \`${totalScore}\`\n**Ranked Score:** \`${rankedScore}\`\n**Plays with:** \`${playstyles}\`\n**Posts:** \`${posts}\` • **Comments:** \`${comments}\``)
 			.setImage(user.cover_url)
 			.setFooter({
-				text: `Joined osu! ${formattedDate} (${user_joined_ago} years ago) | on osu!${server}`,
+				text: `Joined osu! ${formattedDate} (${user_joined_ago} years ago) | osu!${server}`,
 			})
 
 		return embed
