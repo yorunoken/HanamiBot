@@ -2,6 +2,7 @@ const fs = require("fs")
 const { EmbedBuilder } = require("discord.js")
 const { Client } = require("ordr.js")
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js")
+const Table = require("easy-table")
 exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()
 
@@ -16,9 +17,13 @@ exports.run = async (client, message, args, prefix) => {
 
 	const getSkinsFull = async () => {
 		const data = await ordrclient.skins({ pageSize: 460, page: 1 })
+		const realdata = data.skins
+		realdata.sort((a, b) => b.id - a.id)
+		console.log(realdata)
 		const Ids_skin = data.skins.map(x => x.id)
 		return { Ids_skin, data }
 	}
+
 	if (args.join(" ").includes("-set")) {
 		fs.readFile("./user-data.json", async (error, data) => {
 			if (error) {
@@ -105,14 +110,21 @@ exports.run = async (client, message, args, prefix) => {
 		return
 	}
 
-	const SkinName = skinvalues.presentationNames
-	const SkinID = skinvalues.SkinID
+	const SkinData = skinvalues.data.skins
+
+	const t = new Table()
+	SkinData.forEach(function (skin) {
+		t.cell("ID", skin.id)
+		t.cell("Name", skin.presentationName)
+		t.newRow()
+	})
+
 	const pageValue = "23"
 
 	const embed = new EmbedBuilder()
 		.setColor("Purple")
 		.setTitle("Available skins:")
-		.setFields({ name: "ID", value: `${SkinID.join("\n")}`, inline: true }, { name: "Name", value: `${SkinName.join("\n")}`, inline: true })
+		.setDescription(`\`\`\`${t.toString()}\`\`\``)
 		.setFooter({ text: `Page: ${page}/${pageValue}` })
 
 	await message.channel.send({ embeds: [embed], components: [buttons] })
