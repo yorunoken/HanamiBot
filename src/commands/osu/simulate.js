@@ -78,21 +78,50 @@ exports.run = async (client, message, args, prefix) => {
 				bpm = Number(argValues["bpm"])
 			}
 
+			if (args.join(" ").includes("-a")) {
+				const iIndex = args.indexOf("-a")
+				modsArg = args[iIndex + 1]
+				argValues["acc"] = modsArg
+			}
+
+			if (args.join(" ").includes("-acc")) {
+				const iIndex = args.indexOf("-acc")
+				modsArg = args[iIndex + 1]
+				argValues["acc"] = modsArg
+			}
+
 			//pp Calculator
 			const scoreCalculator = new ScoreCalculator()
-			const pp = await scoreCalculator.calculate({
-				beatmapId: map.beatmapInfo.id,
-				mods: argValues["mods"],
-				count50: Number(argValues["n50"]),
-				count100: Number(argValues["n100"]),
-				countMiss: Number(argValues["miss"]),
-				maxCombo: Number(argValues["combo"]),
-				circleSize: cs,
-				approachRate: ar,
-				overallDifficulty: od,
-				bpm: bpm,
-				fix: false,
-			})
+
+			let pp
+			if (argValues["acc"]) {
+				pp = await scoreCalculator.calculate({
+					beatmapId: map.beatmapInfo.id,
+					mods: argValues["mods"],
+					accuracy: Number(argValues["acc"]),
+					countMiss: Number(argValues["miss"]),
+					maxCombo: Number(argValues["combo"]),
+					circleSize: cs,
+					approachRate: ar,
+					overallDifficulty: od,
+					bpm: bpm,
+					fix: false,
+				})
+			} else {
+				pp = await scoreCalculator.calculate({
+					beatmapId: map.beatmapInfo.id,
+					mods: argValues["mods"],
+					count50: Number(argValues["n50"]),
+					count100: Number(argValues["n100"]),
+					countMiss: Number(argValues["miss"]),
+					maxCombo: Number(argValues["combo"]),
+					circleSize: cs,
+					approachRate: ar,
+					overallDifficulty: od,
+					bpm: bpm,
+					fix: false,
+				})
+			}
 
 			//grades
 			const grades = {
