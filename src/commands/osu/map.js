@@ -7,6 +7,13 @@ const { Downloader, DownloadEntry } = require("osu-downloader")
 exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()
 
+	let PageArg = args.join(" ")
+	if (!PageArg.includes("-p") && !PageArg.includes("-i") && !PageArg.includes("-page") && !PageArg.includes("-set")) PageArg = undefined
+	else PageArg = args[1]
+
+	if (!PageArg) PageArg = undefined
+	if (PageArg <= 0) PageArg = undefined
+
 	let EmbedValue = 0
 	let GoodToGo = false
 	let beatmapId
@@ -33,7 +40,7 @@ exports.run = async (client, message, args, prefix) => {
 		argValues["mods"] = modsArg.join("")
 	}
 
-	async function SendEmbed(DiffValues, beatmapId) {
+	async function SendEmbed(DiffValues, beatmapId, set, PageArg) {
 		try {
 			if (!fs.existsSync(`./osuBeatmapCache/${beatmapId}.osu`)) {
 				console.log("no file.")
@@ -138,24 +145,25 @@ exports.run = async (client, message, args, prefix) => {
 			let minutes = Math.floor(length / 60)
 			let seconds = (length % 60).toString().padStart(2, "0")
 
-			//ranked or not
-			let status = DiffValues.status.charAt(0).toUpperCase() + DiffValues.status.slice(1)
-
 			var options = { weekday: "long", year: "numeric", month: "long", day: "numeric" }
 			let Updated_at = `Last updated at ${new Date(DiffValues.last_updated).toLocaleDateString("en-US", options)}`
 			if (DiffValues.status == "ranked") Updated_at = `Ranked at ${new Date(DiffValues.last_updated).toLocaleDateString("en-US", options)}`
 			if (DiffValues.status == "loved") Updated_at = `Loved at ${new Date(DiffValues.last_updated).toLocaleDateString("en-US", options)}`
 			if (DiffValues.status == "qualified") Updated_at = `Qualified at ${new Date(DiffValues.last_updated).toLocaleDateString("en-US", options)}`
 
+			const field1 = { name: `${osuEmote} **[${DiffValues.version}]**`, value: `Stars: \`${PP100.difficulty.stars.toFixed(2)}★\` Mods: \`${argValues["mods"].toUpperCase()}\` BPM: \`${mapValues.bpm.toFixed()}\`\nLength: \`${minutes}:${seconds}\` Max Combo: \`${PP100.difficulty.maxCombo.toLocaleString()}x\` Objects: \`${PP100.difficulty.nCircles + PP100.difficulty.nSliders + PP100.difficulty.nSpinners + PP100.difficulty.nFruits}\`\nAR: \`${mapValues.ar.toFixed(1)}\` OD: \`${mapValues.od.toFixed(1)}\` CS: \`${mapValues.cs.toFixed(2)}\` HP: \`${mapValues.hp.toFixed(1)}\`\n\n:heart:**${DiffValues.beatmapset.favourite_count.toLocaleString()}** :play_pause:**${DiffValues.beatmapset.play_count.toLocaleString()}**` }
+			const field2 = { name: "PP", value: `\`\`\`Acc | PP\n95%:  ${PP95.pp.toFixed(1)}\n97%:  ${PP97.pp.toFixed(1)}\n99%:  ${PP99.pp.toFixed(1)}\n100%: ${PP100.pp.toFixed(1)}${AccPP}\`\`\``, inline: true }
+			const field3 = { name: "Links", value: `:notes:[Song Preview](https://b.ppy.sh/preview/${DiffValues.beatmapset_id}.mp3)\n🎬[Map Preview](https://osu.pages.dev/preview#${DiffValues.id})\n🖼️[Full Background](https://assets.ppy.sh/beatmaps/${DiffValues.beatmapset_id}/covers/raw.jpg)\n<:beatconnect:1075915329512931469>[Beatconnect](https://beatconnect.io/b/${DiffValues.beatmapset_id})\n<:kitsu:1075915745973776405>[Kitsu](https://kitsu.moe/d/${DiffValues.beatmapset_id})`, inline: true }
+
 			//embed
 			const embed = new EmbedBuilder()
 				.setColor("Purple")
 				.setAuthor({ name: `Beatmap by ${DiffValues.beatmapset.creator}`, url: `https://osu.ppy.sh/users/${DiffValues.user_id}`, iconURL: `https://a.ppy.sh/${DiffValues.user_id}?1668890819.jpeg` })
 				.setTitle(`${DiffValues.beatmapset.artist} - ${DiffValues.beatmapset.title}`)
-				.setFields({ name: `${osuEmote} **[${DiffValues.version}]**`, value: `Stars: \`${PP100.difficulty.stars.toFixed(2)}★\` Mods: \`${argValues["mods"].toUpperCase()}\` BPM: \`${mapValues.bpm.toFixed()}\`\nLength: \`${minutes}:${seconds}\` Max Combo: \`${PP100.difficulty.maxCombo.toLocaleString()}x\` Objects: \`${PP100.difficulty.nCircles + PP100.difficulty.nSliders + PP100.difficulty.nSpinners + PP100.difficulty.nFruits}\`\nAR: \`${mapValues.ar.toFixed(1)}\` OD: \`${mapValues.od.toFixed(1)}\` CS: \`${mapValues.cs.toFixed(2)}\` HP: \`${mapValues.hp.toFixed(1)}\`` }, { name: "PP", value: `\`\`\`Acc | PP\n95%:  ${PP95.pp.toFixed(1)}\n97%:  ${PP97.pp.toFixed(1)}\n99%:  ${PP99.pp.toFixed(1)}\n100%: ${PP100.pp.toFixed(1)}${AccPP}\`\`\``, inline: true }, { name: "Links", value: `:notes:[Song Preview](https://b.ppy.sh/preview/${DiffValues.beatmapset_id}.mp3)\n🎬[Map Preview](https://osu.pages.dev/preview#${DiffValues.id})\n🖼️[Full Background](https://assets.ppy.sh/beatmaps/${DiffValues.beatmapset_id}/covers/raw.jpg)\n<:beatconnect:1075915329512931469>[Beatconnect](https://beatconnect.io/b/${DiffValues.beatmapset_id})\n<:kitsu:1075915745973776405>[Kitsu](https://kitsu.moe/d/${DiffValues.beatmapset_id})`, inline: true })
+				.setFields(field1, field2, field3)
 				.setURL(`https://osu.ppy.sh/b/${DiffValues.id}`)
 				.setImage(`https://assets.ppy.sh/beatmaps/${DiffValues.beatmapset_id}/covers/cover.jpg`)
-				.setFooter({ text: `${status} | ${DiffValues.beatmapset.favourite_count} ♥ | ${Updated_at}` })
+				.setFooter({ text: `Map ${PageArg} of ${set.length} | ${Updated_at}` })
 
 			message.channel.send({ embeds: [embed] })
 			return
@@ -165,6 +173,8 @@ exports.run = async (client, message, args, prefix) => {
 		}
 	}
 
+	page = PageArg - 1
+
 	async function EmbedFetch(embed) {
 		try {
 			const embed_author = embed.url
@@ -172,10 +182,23 @@ exports.run = async (client, message, args, prefix) => {
 			if (embed_author.includes("/u/")) throw new Error("Wrong embed")
 			const beatmapId = embed_author.match(/\d+/)[0]
 
-			const ranked = await v2.beatmap.diff(beatmapId)
+			let ranked = await v2.beatmap.diff(beatmapId)
 			if (ranked.id == undefined) throw new Error("No URL")
+
+			let set = await v2.beatmap.set(ranked.beatmapset_id)
+			const sortedset = set.beatmaps.sort((a, b) => a.difficulty_rating - b.difficulty_rating)
+
+			if (PageArg > sortedset.length) {
+				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Please input a value not grater than ${sortedset.length}`)] })
+				GoodToGo = true
+				return
+			}
+
+			if (!isNaN(page)) ranked = await v2.beatmap.diff(sortedset[page].id)
+			else PageArg = sortedset.findIndex(x => x.difficulty_rating == ranked.difficulty_rating) + 1
+
 			//send the embed
-			await SendEmbed(ranked, beatmapId)
+			await SendEmbed(ranked, beatmapId, sortedset, PageArg)
 			GoodToGo = true
 			return
 		} catch (err) {
@@ -189,11 +212,22 @@ exports.run = async (client, message, args, prefix) => {
 				if (embed_author.includes("/u/")) throw new Error("Wrong embed")
 				const beatmapId = embed_author.match(/\d+/)[0]
 
-				const ranked = await v2.beatmap.diff(beatmapId)
-				if (ranked.id == undefined) throw new Error("No Author")
+				let ranked = await v2.beatmap.diff(beatmapId)
+				if (ranked.id == undefined) throw new Error("No URL")
+
+				// set.beatmaps.sort((a, b) => b.difficulty_rating - a.difficulty_rating)
+				let set = await v2.beatmap.set(ranked.beatmapset_id)
+				if (PageArg > sortedset.length) {
+					message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Please input a value not grater than ${sortedset.length}`)] })
+					GoodToGo = true
+					return
+				}
+
+				if (!isNaN(page)) ranked = await v2.beatmap.diff(sortedset[page].id)
+				else PageArg = sortedset.findIndex(x => x.difficulty_rating == ranked.difficulty_rating) + 1
 
 				//send the embed
-				await SendEmbed(ranked, beatmapId)
+				await SendEmbed(ranked, beatmapId, set, PageArg)
 				GoodToGo = true
 				return
 			} catch (err) {
@@ -205,10 +239,22 @@ exports.run = async (client, message, args, prefix) => {
 					const match = regex.exec(embed.description)
 					const beatmapId = match[1]
 
-					const ranked = await v2.beatmap.diff(beatmapId)
-					if (ranked.id == undefined) throw new Error("No Desc")
+					let ranked = await v2.beatmap.diff(beatmapId)
+					if (ranked.id == undefined) throw new Error("No URL")
+
+					// set.beatmaps.sort((a, b) => b.difficulty_rating - a.difficulty_rating)
+					let set = await v2.beatmap.set(ranked.beatmapset_id)
+					if (PageArg > sortedset.length) {
+						message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Please input a value not grater than ${sortedset.length}`)] })
+						GoodToGo = true
+						return
+					}
+
+					if (!isNaN(page)) ranked = await v2.beatmap.diff(sortedset[page].id)
+					else PageArg = sortedset.findIndex(x => x.difficulty_rating == ranked.difficulty_rating) + 1
+
 					//send the embed
-					await SendEmbed(ranked, beatmapId)
+					await SendEmbed(ranked, beatmapId, set, PageArg)
 					GoodToGo = true
 					return
 				} catch (err) {
@@ -239,7 +285,7 @@ exports.run = async (client, message, args, prefix) => {
 		}
 
 		try {
-			if (args) {
+			if (args || !args.join(" ").includes("-p") || !args.join(" ").includes("-i") || !args.join(" ").includes("-page") || !args.join(" ").includes("-set")) {
 				//if args doesn't start with https: try to get the beatmap id by number provided
 				if (!args[0].startsWith("https:")) {
 					beatmapId = args[0]
@@ -249,14 +295,25 @@ exports.run = async (client, message, args, prefix) => {
 					const match = regex.exec(args[0])
 					beatmapId = match[1]
 				}
-				const ranked = await v2.beatmap.diff(beatmapId)
 
-				if (ranked.id == undefined) throw new Error("No html")
+				let ranked = await v2.beatmap.diff(beatmapId)
+				if (ranked.id == undefined) throw new Error("No URL")
+
+				// set.beatmaps.sort((a, b) => b.difficulty_rating - a.difficulty_rating)
+				let set = await v2.beatmap.set(ranked.beatmapset_id)
+				if (PageArg > sortedset.length) {
+					message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Please input a value not grater than ${sortedset.length}`)] })
+					GoodToGo = true
+					return
+				}
+
+				if (!isNaN(page)) ranked = await v2.beatmap.diff(sortedset[page].id)
+				else PageArg = sortedset.findIndex(x => x.difficulty_rating == ranked.difficulty_rating) + 1
 
 				//send the embed
-				await SendEmbed(ranked, beatmapId)
+				await SendEmbed(ranked, beatmapId, set, PageArg)
 				return
-			}
+			} else throw new Error("no")
 		} catch (err) {
 			try {
 				if (embedMessages) {
