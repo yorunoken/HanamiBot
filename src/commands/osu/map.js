@@ -77,7 +77,6 @@ exports.run = async (client, message, args, prefix) => {
 
 			if (argValues["mods"].toUpperCase().includes("DT") || argValues["mods"].toUpperCase().includes("NC")) clock_rate = 1.5
 			if (argValues["mods"].toUpperCase().includes("HT")) clock_rate = 0.75
-			console.log("file: map.js:77 ~ SendEmbed ~ clock_rate:", clock_rate)
 
 			if (!argValues["mods"]) argValues["mods"] = "NM"
 			const modsID = mods.id(argValues["mods"])

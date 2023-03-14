@@ -96,7 +96,7 @@ exports.run = async (client, message, args, prefix) => {
 
 			try {
 				ordrclient.on("render_progress", data => {
-					try{
+					try {
 						if (data.renderID === replay.renderID) {
 							console.log(data)
 							if (!messageId) {
@@ -115,7 +115,7 @@ exports.run = async (client, message, args, prefix) => {
 							}
 							replay_description = data.description
 						}
-					}catch(err){
+					} catch (err) {
 						message.channel.send("There was an error! Please try again.")
 						return
 					}

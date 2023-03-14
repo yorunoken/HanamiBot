@@ -16,14 +16,27 @@ exports.run = async (client, message, args, prefix) => {
 		let userargs
 		let value = undefined
 		let pagenum = 1
-
-		let ModeOsu
+		let RuleSetId
+		let server = "bancho"
 		try {
-			ModeOsu = userData[message.author.id].osumode
-			if (ModeOsu == undefined) ModeOsu = "osu"
+			server = userData[message.author.id].server
+		} catch (err) {}
+
+		if (args.includes("-bancho")) server = "bancho"
+		if (args.includes("-gatari")) server = "gatari"
+
+		let mode
+		try {
+			mode = userData[message.author.id].osumode
+			if (mode == undefined) mode = "osu"
 		} catch (err) {
-			ModeOsu = "osu"
+			mode = "osu"
 		}
+
+		if (mode == "osu") RuleSetId = 0
+		if (mode == "taiko") RuleSetId = 1
+		if (mode == "fruits") RuleSetId = 2
+		if (mode == "mania") RuleSetId = 3
 
 		let ErrCount = 0
 
@@ -52,7 +65,6 @@ exports.run = async (client, message, args, prefix) => {
 		} else {
 			userargs = args[0]
 		}
-
 		if (message.mentions.users.size > 0) {
 			const mentionedUser = Array.from(message.mentions.users.entries()).pop()[Array.from(message.mentions.users.entries()).pop().length - 1]
 			try {
@@ -91,38 +103,33 @@ exports.run = async (client, message, args, prefix) => {
 				try {
 					if (args.includes("-osu")) {
 						RuleSetId = 0
-						ModeOsu = "osu"
+						mode = "osu"
 					}
-					if (args.join(" ").startsWith("-osu")) userargs = userData[message.author.id].BanchoUserId
 
 					if (args.includes("-mania")) {
 						RuleSetId = 3
-						ModeOsu = "mania"
+						mode = "mania"
 					}
-					if (args.join(" ").startsWith("-mania")) userargs = userData[message.author.id].BanchoUserId
 
 					if (args.includes("-taiko")) {
 						RuleSetId = 1
-						ModeOsu = "taiko"
+						mode = "taiko"
 					}
-					if (args.join(" ").startsWith("-taiko")) userargs = userData[message.author.id].BanchoUserId
 
 					if (args.includes("-ctb")) {
 						RuleSetId = 2
-						ModeOsu = "ctb"
+						mode = "ctb"
 					}
-					if (args.join(" ").startsWith("-ctb")) userargs = userData[message.author.id].BanchoUserId
 
-					if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("-p")) {
-						userargs = userData[message.author.id].BanchoUserId
+					if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("-p") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-osu")) {
+						if (server == "bancho") userargs = userData[message.author.id].BanchoUserId
+						if (server == "gatari") userargs = userData[message.author.id].GatariUserId
 					}
 				} catch (err) {
 					message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 				}
 			}
 		}
-
-		console.log(userargs)
 
 		if (userargs?.length === 0 || userargs === undefined) {
 			try {
@@ -132,15 +139,33 @@ exports.run = async (client, message, args, prefix) => {
 			}
 		}
 
-		console.log(value, pagenum, userargs)
+		let user
+		let userstats
 
-		//log into api
-		await auth.login(process.env.client_id, process.env.client_secret)
-		let user = await v2.user.details(userargs, ModeOsu)
+		if (server == "bancho") {
+			//log in
+			await auth.login(process.env.client_id, process.env.client_secret)
+			user = await v2.user.details(userargs, mode)
+			if (user.id === undefined) {
+				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] })
+				return
+			}
+		}
 
-		if (user.id == undefined) {
-			message.reply(`**The user ${userargs} doesn't exist.**`)
-			return
+		if (server == "gatari") {
+			var Userurl = `https://api.gatari.pw/users/get?u=`
+			var UserStatsurl = `https://api.gatari.pw/user/stats?u=`
+
+			const userResponse = await axios.get(`${Userurl}${userargs}`)
+			const userStatsResponse = await axios.get(`${UserStatsurl}${userargs}&${RuleSetId}`)
+
+			user = userResponse.data.users[0]
+			userstats = userStatsResponse.data.stats
+
+			if (user == undefined) {
+				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] })
+				return
+			}
 		}
 
 		async function EmbedFetch(embed) {
@@ -167,12 +192,12 @@ exports.run = async (client, message, args, prefix) => {
 				}
 
 				try {
-					user = await v2.user.details(userargs, ModeOsu)
+					user = await v2.user.details(userargs, mode)
 					const mapinfo = await v2.beatmap.diff(beatmapId)
-					ModeOsu = mapinfo.mode
+					mode = mapinfo.mode
 
 					// send the embed
-					await EmbedFunc(mapinfo, beatmapId, user, ModeOsu, value, pagenum)
+					await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum)
 
 					if (ErrCount >= 1) {
 						// message.reply(`**No Scores Found For \`${user.username}\`.**`)
@@ -193,10 +218,10 @@ exports.run = async (client, message, args, prefix) => {
 					const mapinfo = await v2.beatmap.diff(beatmapId)
 
 					if (mapinfo.id == undefined) throw new Error("No Author")
-					ModeOsu = mapinfo.mode
+					mode = mapinfo.mode
 
 					//send the embed
-					await EmbedFunc(mapinfo, beatmapId, user, ModeOsu, value, pagenum)
+					await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum)
 					GoodToGo = true
 				} catch (err) {
 					console.log(err)
@@ -212,10 +237,10 @@ exports.run = async (client, message, args, prefix) => {
 						const mapinfo = await v2.beatmap.diff(beatmapId)
 
 						if (mapinfo.id == undefined) throw new Error("No Author")
-						ModeOsu = mapinfo.mode
+						mode = mapinfo.mode
 
 						//send the embed
-						await EmbedFunc(mapinfo, beatmapId, user, ModeOsu, value, pagenum)
+						await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum)
 						GoodToGo = true
 					} catch (err) {
 						console.log(err)
@@ -227,11 +252,11 @@ exports.run = async (client, message, args, prefix) => {
 							const beatmapId = match[1]
 
 							const mapinfo = await v2.beatmap.diff(beatmapId)
-							ModeOsu = mapinfo.mode
+							mode = mapinfo.mode
 
 							if (mapinfo.id == undefined) throw new Error("No Author")
 							//send the embed
-							await EmbedFunc(mapinfo, beatmapId, user, ModeOsu, value, pagenum)
+							await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum)
 							GoodToGo = true
 							return
 						} catch (err) {
@@ -244,13 +269,7 @@ exports.run = async (client, message, args, prefix) => {
 		}
 
 		async function EmbedFunc(mapinfo, beatmapId, user, ModeOsu, value, pagenum) {
-			if (value >= 0) {
-				console.log("value")
-				message.channel.send({ embeds: [await CompareEmbed(mapinfo, beatmapId, user, ModeOsu, value, pagenum)] })
-			} else {
-				console.log("not defined")
-				message.channel.send({ embeds: [await CompareEmbed(mapinfo, beatmapId, user, ModeOsu, value, pagenum)] })
-			}
+			message.channel.send({ embeds: [await CompareEmbed(mapinfo, beatmapId, user, ModeOsu, value, pagenum)] })
 		}
 
 		const channel = client.channels.cache.get(message.channel.id)

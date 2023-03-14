@@ -68,7 +68,7 @@ module.exports.run = async (client, message, args, prefix) => {
 			userstats = userStatsResponse.data.stats
 
 			if (user == undefined) {
-				message.channel.send(`**User doesn't exist in gatari database**`)
+				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] })
 				return
 			}
 		}
