@@ -171,15 +171,14 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		totalLength = score[value].beatmap.total_length
 
 		if (score[value].passed == true) {
-			let scorerank = await v2.scores.details(score[value].id, mode)
-			if (scorerank) {
+			let scorerank = await v2.scores.details(score[value].best_id, mode)
+			if (scorerank.created_at == score[value].created_at) {
 				if (scorerank.rank_global != undefined) {
 					ScoreGlobalRank = ` 🌐 #${scorerank.rank_global}`
 				}
-
 				if (scorerank.rank_global < 1000) {
 					top1k = true
-					score_id = scorerank.id
+					score_id = scorerank.best_id
 					replayLink = ` • [Replay](https://osu.ppy.sh/scores/${mode}/${scorerank.id}/download)`
 				}
 			}
