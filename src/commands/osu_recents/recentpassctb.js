@@ -88,7 +88,7 @@ module.exports.run = async (client, message, args, prefix) => {
 			message.channel.send({ content: Recent.FilterMods, embeds: [Recent.embed.data], components: [row] })
 
 			const filter = m => m.user.id === message.author.id
-			const collector = message.channel.createMessageComponentCollector({ filter: filter, max: 1, time: 5000 })
+			const collector = message.channel.createMessageComponentCollector({ filter: filter, max: 1, time: 50000 })
 
 			collector.on("collect", async collected => {
 				let collectedm = collected.message
