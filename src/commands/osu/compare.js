@@ -1,11 +1,13 @@
 const fs = require("fs")
 const { v2, auth, tools, mods } = require("osu-api-extended")
+const axios = require("axios")
 
 // importing CompareEmbed
 const { CompareEmbed } = require("../../exports/compare_export.js")
 
 exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()
+	await auth.login(process.env.client_id, process.env.client_secret)
 
 	fs.readFile("./user-data.json", async (error, data) => {
 		if (error) {
@@ -100,33 +102,33 @@ exports.run = async (client, message, args, prefix) => {
 					return
 				}
 			} else {
-				try {
-					if (args.includes("-osu")) {
-						RuleSetId = 0
-						mode = "osu"
-					}
+				if (args.includes("-osu")) {
+					RuleSetId = 0
+					mode = "osu"
+				}
 
-					if (args.includes("-mania")) {
-						RuleSetId = 3
-						mode = "mania"
-					}
+				if (args.includes("-mania")) {
+					RuleSetId = 3
+					mode = "mania"
+				}
 
-					if (args.includes("-taiko")) {
-						RuleSetId = 1
-						mode = "taiko"
-					}
+				if (args.includes("-taiko")) {
+					RuleSetId = 1
+					mode = "taiko"
+				}
 
-					if (args.includes("-ctb")) {
-						RuleSetId = 2
-						mode = "ctb"
-					}
+				if (args.includes("-ctb")) {
+					RuleSetId = 2
+					mode = "ctb"
+				}
 
-					if (args.join(" ").startsWith("-i") || args.join(" ").startsWith("-p") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-osu")) {
+				if (args.join(" ").startsWith("-gatari") || args.join(" ").startsWith("-bancho") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-p") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-osu")) {
+					try {
 						if (server == "bancho") userargs = userData[message.author.id].BanchoUserId
 						if (server == "gatari") userargs = userData[message.author.id].GatariUserId
+					} catch (err) {
+						message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Set your osu! username by typing "${prefix}link **your username**"`)] })
 					}
-				} catch (err) {
-					message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 				}
 			}
 		}
@@ -170,8 +172,6 @@ exports.run = async (client, message, args, prefix) => {
 
 		async function EmbedFetch(embed) {
 			try {
-				console.log("lksdfg dsf;lgfsdkl; gsfdkl;")
-
 				const beatmapId = args[0].match(/\d+/)[0]
 				console.log("file: compare.js:151 ~ EmbedFetch ~ beatmapId:", beatmapId)
 				// if args doesn't start with https: try to get the beatmap id by number provided
@@ -192,12 +192,11 @@ exports.run = async (client, message, args, prefix) => {
 				}
 
 				try {
-					user = await v2.user.details(userargs, mode)
 					const mapinfo = await v2.beatmap.diff(beatmapId)
 					mode = mapinfo.mode
 
 					// send the embed
-					await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum)
+					await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum, server, userstats)
 
 					if (ErrCount >= 1) {
 						// message.reply(`**No Scores Found For \`${user.username}\`.**`)
@@ -213,7 +212,7 @@ exports.run = async (client, message, args, prefix) => {
 					if (embed_author.includes("/users/")) throw new Error("Wrong embed")
 					if (embed_author.includes("/u/")) throw new Error("Wrong embed")
 					const beatmapId = embed_author.match(/\d+/)[0]
-					console.log(beatmapId)
+					console.log(`embed url beatmap id ${beatmapId}`)
 
 					const mapinfo = await v2.beatmap.diff(beatmapId)
 
@@ -221,7 +220,7 @@ exports.run = async (client, message, args, prefix) => {
 					mode = mapinfo.mode
 
 					//send the embed
-					await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum)
+					await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum, server, userstats)
 					GoodToGo = true
 				} catch (err) {
 					console.log(err)
@@ -240,7 +239,7 @@ exports.run = async (client, message, args, prefix) => {
 						mode = mapinfo.mode
 
 						//send the embed
-						await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum)
+						await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum, server, userstats)
 						GoodToGo = true
 					} catch (err) {
 						console.log(err)
@@ -256,7 +255,7 @@ exports.run = async (client, message, args, prefix) => {
 
 							if (mapinfo.id == undefined) throw new Error("No Author")
 							//send the embed
-							await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum)
+							await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum, server, userstats)
 							GoodToGo = true
 							return
 						} catch (err) {
@@ -268,8 +267,8 @@ exports.run = async (client, message, args, prefix) => {
 			}
 		}
 
-		async function EmbedFunc(mapinfo, beatmapId, user, ModeOsu, value, pagenum) {
-			message.channel.send({ embeds: [await CompareEmbed(mapinfo, beatmapId, user, ModeOsu, value, pagenum)] })
+		async function EmbedFunc(mapinfo, beatmapId, user, ModeOsu, value, pagenum, server, userstats) {
+			message.channel.send({ embeds: [await CompareEmbed(mapinfo, beatmapId, user, ModeOsu, value, pagenum, server, userstats)] })
 		}
 
 		const channel = client.channels.cache.get(message.channel.id)
