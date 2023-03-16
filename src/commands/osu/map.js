@@ -285,9 +285,10 @@ exports.run = async (client, message, args, prefix) => {
 		}
 
 		try {
-			if (args || !args.join(" ").includes("-p") || !args.join(" ").includes("-i") || !args.join(" ").includes("-page") || !args.join(" ").includes("-set")) {
-				//if args doesn't start with https: try to get the beatmap id by number provided
+			if (args) {
+				if (args.join(" ").startsWith("-p") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-page") || args.join(" ").startsWith("-set")) throw new Error("no page.")
 				if (!args[0].startsWith("https:")) {
+					//if args doesn't start with https: try to get the beatmap id by number provided
 					beatmapId = args[0]
 				} else {
 					//try to get beatmapId by link
@@ -299,8 +300,9 @@ exports.run = async (client, message, args, prefix) => {
 				let ranked = await v2.beatmap.diff(beatmapId)
 				if (ranked.id == undefined) throw new Error("No URL")
 
-				// set.beatmaps.sort((a, b) => b.difficulty_rating - a.difficulty_rating)
 				let set = await v2.beatmap.set(ranked.beatmapset_id)
+				const sortedset = set.beatmaps.sort((a, b) => a.difficulty_rating - b.difficulty_rating)
+
 				if (PageArg > sortedset.length) {
 					message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Please input a value not grater than ${sortedset.length}`)] })
 					GoodToGo = true
@@ -311,10 +313,11 @@ exports.run = async (client, message, args, prefix) => {
 				else PageArg = sortedset.findIndex(x => x.difficulty_rating == ranked.difficulty_rating) + 1
 
 				//send the embed
-				await SendEmbed(ranked, beatmapId, set, PageArg)
+				await SendEmbed(ranked, beatmapId, sortedset, PageArg)
 				return
 			} else throw new Error("no")
 		} catch (err) {
+			console.log(err)
 			try {
 				if (embedMessages) {
 					do {
