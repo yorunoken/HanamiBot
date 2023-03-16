@@ -56,6 +56,8 @@ async function GetUserTop(user, userstats, pageNumber, ModeOsu, RuleSetId, args,
 		user_pp = user.statistics.pp.toLocaleString()
 		country = user.country_code
 		useravatar = user.avatar_url
+
+		userUrl = `https://osu.ppy.sh/users/${user.id}/osu`
 	}
 
 	if (server == "gatari") {
@@ -87,6 +89,8 @@ async function GetUserTop(user, userstats, pageNumber, ModeOsu, RuleSetId, args,
 		user_pp = userstats.pp
 		country = user.country
 		useravatar = `https://a.gatari.pw/${user.id}`
+
+		userUrl = `https://osu.gatari.pw/u/${user.id}?m=0`
 	}
 
 	if (rb) {
@@ -405,7 +409,7 @@ async function GetUserTop(user, userstats, pageNumber, ModeOsu, RuleSetId, args,
 		.setAuthor({
 			name: `${user.username}: ${user_pp}pp (#${global_rank} ${country}#${country_rank})`,
 			iconURL: `https://osu.ppy.sh/images/flags/${country}.png`,
-			url: `https://osu.ppy.sh/users/${user.id}/${ModeOsu}`,
+			url: `${userUrl}`,
 		})
 		.setThumbnail(useravatar)
 		.setDescription(`${thing1}${thing2}${thing3}${thing4}${thing5}`)
