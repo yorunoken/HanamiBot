@@ -136,6 +136,7 @@ client.on("messageCreate", message => {
 			}
 		}
 
+		console.log(message.content)
 		// execute the command
 		command.run(client, message, args, prefix, EmbedBuilder)
 
