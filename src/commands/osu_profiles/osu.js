@@ -1,6 +1,7 @@
 const fs = require("fs")
 const { v2, auth } = require("osu-api-extended")
 const axios = require("axios")
+const { EmbedBuilder } = require("discord.js")
 
 // imports
 const { GetUserPage } = require("../../exports/osu_export.js")
@@ -23,6 +24,7 @@ exports.run = async (client, message, args, prefix) => {
 
 		if (args.includes("-bancho")) server = "bancho"
 		if (args.includes("-gatari")) server = "gatari"
+		if (args.includes("-akatsuki")) server = "akatsuki"
 
 		if (args.includes("-mania")) {
 			mode = "mania"
@@ -37,11 +39,14 @@ exports.run = async (client, message, args, prefix) => {
 			rulesetId = 2
 		}
 
+		console.log(server)
+
 		var userargs = await FindUserargs(message, args, server, prefix)
-		if (args[0] == "-bancho" || args[0] == "-gatari" || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-osu") || args.join(" ").startsWith("-d") || args.join(" ").startsWith("-details")) {
+		if (args[0] == "-akatsuki" || args[0] == "-bancho" || args[0] == "-gatari" || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-osu") || args.join(" ").startsWith("-d") || args.join(" ").startsWith("-details")) {
 			try {
 				if (server == "bancho") userargs = userData[message.author.id].BanchoUserId
 				if (server == "gatari") userargs = userData[message.author.id].GatariUserId
+				if (server == "akatsuki") userargs = userData[message.author.id].AkatsukiUserId
 			} catch (err) {
 				message.reply(`Set your osu! username by typing "${prefix}link **your username**"`)
 				return
@@ -57,7 +62,7 @@ exports.run = async (client, message, args, prefix) => {
 			user = await v2.user.details(userargs, mode)
 			userstats = ""
 			if (user.id == undefined) {
-				message.channel.send(`**User doesn't exist in bancho database**`)
+				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] })
 				return
 			}
 		}
@@ -73,6 +78,21 @@ exports.run = async (client, message, args, prefix) => {
 			userstats = userStatsResponse.data.stats
 
 			if (user == undefined) {
+				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] })
+				return
+			}
+		}
+
+		if (server == "akatsuki") {
+			var BaseUrl = `https://akatsuki.pw/api/v1`
+
+			var response = await axios.get(`${BaseUrl}/users/whatid?name=${userargs}`)
+			var userId = response.data.id
+
+			var response = await axios.get(`${BaseUrl}/users/full?id=${userId}`)
+			user = response.data
+
+			if (user.code != 200) {
 				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] })
 				return
 			}

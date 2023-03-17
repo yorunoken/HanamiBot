@@ -11,6 +11,15 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 		XH: "<:XH_:1057763296717045891>",
 	}
 
+	const options = {
+		hour: "2-digit",
+		minute: "2-digit",
+		year: "numeric",
+		month: "numeric",
+		day: "numeric",
+		timeZone: "UTC",
+	}
+
 	if (server == "gatari") {
 		try {
 			global_rank = userstats.rank.toLocaleString()
@@ -20,15 +29,6 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 			global_rank = "0"
 			country_rank = "0"
 			pp = "0"
-		}
-
-		//grades
-		const grades = {
-			A: "<:A_:1057763284327080036>",
-			S: "<:S_:1057763291998474283>",
-			SH: "<:SH_:1057763293491642568>",
-			X: "<:X_:1057763294707974215>",
-			XH: "<:XH_:1057763296717045891>",
 		}
 
 		try {
@@ -61,22 +61,14 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 		const months = Math.floor(timedifference / (1000 * 60 * 60 * 24 * 30))
 		const user_joined = months / 12
 		const user_joined_ago = user_joined.toFixed(1)
-		//joindate
-		const options = {
-			hour: "2-digit",
-			minute: "2-digit",
-			year: "numeric",
-			month: "long",
-			day: "numeric",
-			timeZone: "UTC",
-		}
+
 		const formattedDate = date.toLocaleDateString("en-US", options)
 
 		//embed
 		const embed = new EmbedBuilder()
 			.setColor("Purple")
 			.setAuthor({
-				name: `${user.username}: ${pp}pp (#${global_rank} ${user.country}#${country_rank})`,
+				name: `${user.username}[${user.abbr}]: ${pp}pp (#${global_rank} ${user.country}#${country_rank})`,
 				iconURL: `https://osu.ppy.sh/images/flags/${user.country}.png`,
 				url: `https://osu.gatari.pw/u/${user.id}?m=${RuleSetId}`,
 			})
@@ -84,7 +76,58 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 			.setDescription(`**Accuracy:** \`${acc}%\` •  **Level:** \`${UserLevel}.${lvlprogress}\`\n**Playcount:** \`${playcount}\` (\`${playhours.toFixed()} hrs\`)\n**Followers:** \`${followers}\` • **Max Combo:** \`${profile_maxcombo}\`\n**Ranks:** ${grades.XH}\`${ssh}\`${grades.X}\`${ss}\`${grades.SH}\`${sh}\`${grades.S}\`${s}\`${grades.A}\`${a}\``)
 			.setImage(user.cover_url)
 			.setFooter({
-				text: `Joined osu! ${formattedDate} (${user_joined_ago} years ago) | osu!${server}`,
+				text: `Joined osu!${server} ${formattedDate} (${user_joined_ago} years ago)`,
+			})
+		return embed
+	}
+
+	if (server == "akatsuki") {
+		let uStats = user.stats[0].std
+		if (mode == "taiko") uStats = user.stats[0].taiko
+		if (mode == "fruits") uStats = user.stats[0].ctb
+		if (mode == "mania") uStats = user.stats[0].mania
+
+		global_rank = uStats.global_leaderboard_rank?.toLocaleString() || "-"
+		country_rank = uStats.country_leaderboard_rank?.toLocaleString() || "-"
+		pp = uStats.pp.toLocaleString() || "0"
+		acc = uStats.accuracy.toFixed(2) || "0"
+
+		UserLevel = uStats.level.toFixed(2)
+		playcount = uStats.playcount.toLocaleString()
+		playhours = uStats.playtime.toFixed(4) / 3600
+		followers = user.followers.toLocaleString()
+		profile_maxcombo = uStats.max_combo.toLocaleString()
+
+		const date = new Date(user.registered_on)
+		const currenttime = new Date()
+		const timedifference = currenttime - date
+		const months = Math.floor(timedifference / (1000 * 60 * 60 * 24 * 30))
+		const user_joined = months / 12
+		const user_joined_ago = user_joined.toFixed(1)
+
+		const formattedDate = date.toLocaleDateString("en-US", options)
+
+		var clan = user.clan
+		let clanTag = `[${clan.tag}]`
+		let clanName = clan.name
+		if (clan.id == 0) {
+			clanTag = ""
+			clanName = "None"
+		}
+
+		//embed
+		const embed = new EmbedBuilder()
+			.setColor("Purple")
+			.setAuthor({
+				name: `${user.username}${clanTag}: ${pp}pp (#${global_rank} ${user.country}#${country_rank})`,
+				iconURL: `https://osu.ppy.sh/images/flags/${user.country}.png`,
+				url: `https://osu.akatsuki.pw/u/${user.id}?mode=${RuleSetId}&rx=0`,
+			})
+			.setThumbnail(`https://a.akatsuki.pw/${user.id}`)
+			.setDescription(`**Clan:** \`${clanName}\`\n**Accuracy:** \`${acc}%\` •  **Level:** \`${UserLevel}\`\n**Playcount:** \`${playcount}\` (\`${playhours.toFixed()} hrs\`)\n**Followers:** \`${followers}\` • **Max Combo:** \`${profile_maxcombo}\``)
+			.setImage(user.cover_url)
+			.setFooter({
+				text: `Joined osu!${server} ${formattedDate} (${user_joined_ago} years ago)`,
 			})
 		return embed
 	}
@@ -127,15 +170,7 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 		const months = Math.floor(timedifference / (1000 * 60 * 60 * 24 * 30))
 		const user_joined = months / 12
 		const user_joined_ago = user_joined.toFixed(1)
-		//joindate
-		const options = {
-			hour: "2-digit",
-			minute: "2-digit",
-			year: "numeric",
-			month: "long",
-			day: "numeric",
-			timeZone: "UTC",
-		}
+
 		const formattedDate = date.toLocaleDateString("en-US", options)
 
 		//time get
@@ -158,7 +193,7 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 			.setDescription(`**Accuracy:** \`${acc}%\` •  **Level:** \`${user.statistics.level.current}.${lvlprogress}\`\n${time}**Playcount:** \`${playcount}\` (\`${playhours.toFixed()} hrs\`)\n**Followers:** \`${followers}\` • **Max Combo:** \`${profile_maxcombo}\`\n**Ranks:** ${grades.XH}\`${ssh}\`${grades.X}\`${ss}\`${grades.SH}\`${sh}\`${grades.S}\`${s}\`${grades.A}\`${a}\``)
 			.setImage(user.cover_url)
 			.setFooter({
-				text: `Joined osu! ${formattedDate} (${user_joined_ago} years ago) | osu!${server}`,
+				text: `Joined osu!${server} ${formattedDate} (${user_joined_ago} years ago)`,
 			})
 		return embed
 	} else {
@@ -203,15 +238,7 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 		const months = Math.floor(timedifference / (1000 * 60 * 60 * 24 * 30))
 		const user_joined = months / 12
 		const user_joined_ago = user_joined.toFixed(1)
-		//joindate
-		const options = {
-			hour: "2-digit",
-			minute: "2-digit",
-			year: "numeric",
-			month: "long",
-			day: "numeric",
-			timeZone: "UTC",
-		}
+
 		const formattedDate = date.toLocaleDateString("en-US", options)
 
 		let playstyles = ""
@@ -269,7 +296,7 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 			.setDescription(`**Hits per play:** \`${hpp_count}\` • **Medals:** \`${medal_count}/289\` (\`${medal_percentage}%\`)\n**Replays watched:** \`${replays_watched}\` • **#1 Scores:** \`${number_1s}\`\n**Recommended difficulty:** \`${recc_stars}★\`\n**Total score:** \`${totalScore}\`\n**Ranked Score:** \`${rankedScore}\`\n**Plays with:** \`${playstyles}\`\n**Posts:** \`${posts}\` • **Comments:** \`${comments}\``)
 			.setImage(user.cover_url)
 			.setFooter({
-				text: `Joined osu! ${formattedDate} (${user_joined_ago} years ago) | osu!${server}`,
+				text: `Joined osu!${server} ${formattedDate} (${user_joined_ago} years ago)`,
 			})
 
 		return embed

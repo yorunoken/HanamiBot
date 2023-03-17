@@ -23,9 +23,11 @@ exports.run = async (client, message, args, prefix) => {
 
 	if (argValues["server"] == "bancho") server = "bancho"
 	if (argValues["server"] == "gatari") server = "gatari"
+	if (argValues["server"] == "akatsuki") server = "akatsuki"
 
 	if (argValues["default"] == "bancho") defaultServer = "bancho"
 	if (argValues["default"] == "gatari") defaultServer = "gatari"
+	if (argValues["default"] == "akatsuki") defaultServer = "akatsuki"
 
 	if (username == undefined) {
 		message.reply("**Please provide a username.**")
@@ -58,7 +60,7 @@ exports.run = async (client, message, args, prefix) => {
 		const user = await v2.user.details(username, "osu")
 		console.log("file: link.js:59 ~ exports.run= ~ user:", user)
 		if (user.id == undefined) {
-			message.reply(`**The user \`${username}\` does not exist in the Bancho database.**`)
+			message.reply(`**The user \`${username}\` does not exist in the ${server} database.**`)
 			return
 		}
 		var user_id = user.id
@@ -75,7 +77,7 @@ exports.run = async (client, message, args, prefix) => {
 				if (error) {
 					console.log(error)
 				} else {
-					message.reply(`Set osu! bancho username to **${user.username}**`)
+					message.reply(`Set osu!${server} username to **${user.username}**`)
 				}
 			})
 		})
@@ -88,7 +90,7 @@ exports.run = async (client, message, args, prefix) => {
 		const user = response.data.users[0]
 
 		if (user == undefined) {
-			message.reply(`**The user \`${username}\` does not exist in the Gatari database.**`)
+			message.reply(`**The user \`${username}\` does not exist in the ${server} database.**`)
 			return
 		}
 		var user_id = user.id
@@ -106,7 +108,42 @@ exports.run = async (client, message, args, prefix) => {
 				if (error) {
 					console.log(error)
 				} else {
-					message.reply(`Set osu! gatari username to **${user.username}**`)
+					message.reply(`Set osu!${server} username to **${user.username}**`)
+				}
+			})
+		})
+	}
+
+	if (server == "akatsuki") {
+		var BaseUrl = `https://akatsuki.pw/api/v1`
+
+		var response = await axios.get(`${BaseUrl}/users/whatid?name=${username}`)
+		const userId = response.data.id
+
+		var response = await axios.get(`${BaseUrl}/users?id=${userId}`)
+		const user = response.data
+
+		if (user.code != 200) {
+			message.reply(`**The user \`${username}\` does not exist in the ${server} database.**`)
+			return
+		}
+
+		var user_id = user.id
+		// Read the JSON file
+		fs.readFile("./user-data.json", (error, data) => {
+			if (error) {
+				console.log(error)
+				return
+			}
+
+			//update the user's osu! username in the JSON file
+			const userData = JSON.parse(data)
+			userData[message.author.id] = { ...userData[message.author.id], AkatsukiUserId: user_id }
+			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
+				if (error) {
+					console.log(error)
+				} else {
+					message.reply(`Set osu!${server} username to **${user.username}**`)
 				}
 			})
 		})
