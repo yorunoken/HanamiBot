@@ -27,6 +27,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
 		if (args.includes("-bancho")) server = "bancho"
 		if (args.includes("-gatari")) server = "gatari"
+		if (args.includes("-akatsuki")) server = "akatsuki"
 
 		if (args.includes("-i")) {
 			const iIndex = args.indexOf("-i")
@@ -51,10 +52,11 @@ module.exports.run = async (client, message, args, prefix) => {
 
 		var userargs = await FindUserargs(message, args, server, prefix)
 
-		if (args.join(" ").startsWith("-gatari") || args.join(" ").startsWith("-bancho") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-osu") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-pass") || args.join(" ").startsWith("-ps") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
+		if (args.join(" ").startsWith("-gatari") || args.join(" ").startsWith("-akatsuki") || args.join(" ").startsWith("-bancho") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-osu") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-pass") || args.join(" ").startsWith("-ps") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
 			try {
 				if (server == "bancho") userargs = userData[message.author.id].BanchoUserId
 				if (server == "gatari") userargs = userData[message.author.id].GatariUserId
+				if (server == "akatsuki") userargs = userData[message.author.id].AkatsukiUserId
 			} catch (err) {
 				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Set your osu! username by typing "${prefix}link **your username**"`)] })
 			}
@@ -89,6 +91,28 @@ module.exports.run = async (client, message, args, prefix) => {
 			}
 		}
 
+		if (server == "akatsuki") {
+			var BaseUrl = `https://akatsuki.pw/api/v1`
+
+			if (isNaN(userargs)) {
+				try {
+					var response = await axios.get(`${BaseUrl}/users/whatid?name=${userargs}`)
+					userargs = response.data.id
+				} catch (err) {
+					message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] })
+					return
+				}
+			}
+
+			var response = await axios.get(`${BaseUrl}/users/full?id=${userargs}`)
+			user = response.data
+
+			if (user.code != 200) {
+				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] })
+				return
+			}
+		}
+
 		const Recent = await GetRecent(value, user, mode, PassDetermine, args, RuleSetId, userstats, server)
 		try {
 			console.log(Recent.FilterMods)
@@ -100,7 +124,6 @@ module.exports.run = async (client, message, args, prefix) => {
 		let row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("render").setDisabled().setStyle(ButtonStyle.Primary).setLabel("Render"))
 		if (Recent.top1k) {
 			row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("render").setStyle(ButtonStyle.Primary).setLabel("Render"))
-			console.log("uuu?")
 			message.channel.send({ content: Recent.FilterMods, embeds: [Recent.embed.data], components: [row] })
 
 			const filter = m => m.user.id === message.author.id

@@ -88,15 +88,15 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 
 		acc = `**(${Number(score[value].accuracy).toFixed(2)}%)**`
 
-		var BeatmapGatari = await v2.beatmap.diff(mapId)
-		objects = BeatmapGatari.count_circles + BeatmapGatari.count_sliders + BeatmapGatari.count_spinners
+		var MapAkatsuki = await v2.beatmap.diff(mapId)
+		objects = MapAkatsuki.count_circles + MapAkatsuki.count_sliders + MapAkatsuki.count_spinners
 
 		TimeCreated = new Date(score[value].time).getTime()
 		grade = score[value].ranking
-		title = `${BeatmapGatari.beatmapset.artist} - ${BeatmapGatari.beatmapset.title} [${BeatmapGatari.version}]`
+		title = `${MapAkatsuki.beatmapset.artist} - ${MapAkatsuki.beatmapset.title} [${MapAkatsuki.version}]`
 
-		hitLength = BeatmapGatari.hit_length
-		totalLength = BeatmapGatari.total_length
+		hitLength = MapAkatsuki.hit_length
+		totalLength = MapAkatsuki.total_length
 
 		if (score[value].beatmap.ranked == 0) MapStatus = `Unranked`
 		if (score[value].beatmap.ranked == 2) MapStatus = `Ranked`
@@ -104,9 +104,85 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		if (score[value].beatmap.ranked == 4) MapStatus = `Qualified`
 		if (score[value].beatmap.ranked == 5) MapStatus = `Loved`
 
-		creatorUserId = BeatmapGatari.beatmapset.user_id
-		creatorName = BeatmapGatari.beatmapset.creator
+		creatorUserId = MapAkatsuki.beatmapset.user_id
+		creatorName = MapAkatsuki.beatmapset.creator
 	}
+
+	if (server == "akatsuki") {
+		var BaseUrl = `https://akatsuki.pw/api/v1`
+		var response = await axios.get(`${BaseUrl}/users/scores/recent?id=${user.id}&mode=${RuleSetId}`)
+
+		score = response.data.scores
+		if (response.data.code != 200 || score == null) {
+			let embed = new EmbedBuilder().setColor("Purple").setDescription(`No recent Gatari plays found for **${user.username}**`)
+			return { embed, FilterMods }
+		}
+
+		mapId = score[value].beatmap.beatmap_id
+		ModsName = mods.name(score[value].mods).toUpperCase()
+
+		if (argValues["mods"] != undefined) {
+			filteredscore = score.filter(x => mods.name(x.mods).toLowerCase() == argValues["mods"].split("").sort().join("").toLowerCase())
+			score = filteredscore
+			try {
+				FilterMods = `**Filtering mod(s): ${mods.name(score[value].mods).toUpperCase()}**`
+			} catch (err) {
+				const embed = new EmbedBuilder().setColor("Purple").setDescription("Please provide a valid mod combination.")
+				return embed
+			}
+		}
+
+		valuegeki = score[value].count_geki
+		value300 = score[value].count_300
+		valuekatu = score[value].count_katu
+		value100 = score[value].count_100
+		value50 = score[value].count_50
+		valuemiss = score[value].count_miss
+		valuecombo = score[value].max_combo
+
+		retryMap = score.map(x => x.beatmap.beatmap_id)
+		retryMap.splice(0, value)
+
+		let uStats = user.stats[0].std
+		if (mode == "taiko") uStats = user.stats[0].taiko
+		if (mode == "fruits") uStats = user.stats[0].ctb
+		if (mode == "mania") uStats = user.stats[0].mania
+
+		global_rank = uStats.global_leaderboard_rank?.toLocaleString() || "-"
+		country_rank = uStats.country_leaderboard_rank?.toLocaleString() || "-"
+		user_pp = uStats.pp.toLocaleString()
+
+		CountryCode = user.country
+		profileUrl = `https://osu.akatsuki.pw/u/${user.id}?m=${RuleSetId}`
+		avatarUrl = `https://a.akatsuki.pw/${user.id}`
+		MapsetId = score[value].beatmap.beatmapset_id
+
+		acc = `**(${Number(score[value].accuracy).toFixed(2)}%)**`
+
+		var MapAkatsuki = await v2.beatmap.diff(mapId)
+		objects = MapAkatsuki.count_circles + MapAkatsuki.count_sliders + MapAkatsuki.count_spinners
+
+		TimeCreated = new Date(score[value].time).getTime() / 1000
+		grade = score[value].rank
+
+		if (score[value].completed == 0) {
+			grade = "F"
+		}
+		title = `${MapAkatsuki.beatmapset.artist} - ${MapAkatsuki.beatmapset.title} [${MapAkatsuki.version}]`
+
+		hitLength = MapAkatsuki.hit_length
+		totalLength = MapAkatsuki.total_length
+
+		if (score[value].beatmap.ranked == 0) MapStatus = `Unranked`
+		if (score[value].beatmap.ranked == 2) MapStatus = `Ranked`
+		if (score[value].beatmap.ranked == 3) MapStatus = `Approved`
+		if (score[value].beatmap.ranked == 4) MapStatus = `Qualified`
+		if (score[value].beatmap.ranked == 5) MapStatus = `Loved`
+
+		creatorUserId = MapAkatsuki.beatmapset.user_id
+		creatorName = MapAkatsuki.beatmapset.creator
+	}
+
 	if (server == "bancho") {
 		score = await v2.user.scores.category(user.id, "recent", {
 			include_fails: PassDetermine,
