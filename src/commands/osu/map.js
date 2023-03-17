@@ -215,8 +215,9 @@ exports.run = async (client, message, args, prefix) => {
 				let ranked = await v2.beatmap.diff(beatmapId)
 				if (ranked.id == undefined) throw new Error("No URL")
 
-				// set.beatmaps.sort((a, b) => b.difficulty_rating - a.difficulty_rating)
 				let set = await v2.beatmap.set(ranked.beatmapset_id)
+				const sortedset = set.beatmaps.sort((a, b) => a.difficulty_rating - b.difficulty_rating)
+
 				if (PageArg > sortedset.length) {
 					message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Please input a value not grater than ${sortedset.length}`)] })
 					GoodToGo = true
@@ -227,7 +228,7 @@ exports.run = async (client, message, args, prefix) => {
 				else PageArg = sortedset.findIndex(x => x.difficulty_rating == ranked.difficulty_rating) + 1
 
 				//send the embed
-				await SendEmbed(ranked, beatmapId, set, PageArg)
+				await SendEmbed(ranked, beatmapId, sortedset, PageArg)
 				GoodToGo = true
 				return
 			} catch (err) {
@@ -242,8 +243,9 @@ exports.run = async (client, message, args, prefix) => {
 					let ranked = await v2.beatmap.diff(beatmapId)
 					if (ranked.id == undefined) throw new Error("No URL")
 
-					// set.beatmaps.sort((a, b) => b.difficulty_rating - a.difficulty_rating)
 					let set = await v2.beatmap.set(ranked.beatmapset_id)
+					const sortedset = set.beatmaps.sort((a, b) => a.difficulty_rating - b.difficulty_rating)
+
 					if (PageArg > sortedset.length) {
 						message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Please input a value not grater than ${sortedset.length}`)] })
 						GoodToGo = true
@@ -254,7 +256,7 @@ exports.run = async (client, message, args, prefix) => {
 					else PageArg = sortedset.findIndex(x => x.difficulty_rating == ranked.difficulty_rating) + 1
 
 					//send the embed
-					await SendEmbed(ranked, beatmapId, set, PageArg)
+					await SendEmbed(ranked, beatmapId, sortedset, PageArg)
 					GoodToGo = true
 					return
 				} catch (err) {
