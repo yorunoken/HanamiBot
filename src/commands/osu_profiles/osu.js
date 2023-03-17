@@ -86,10 +86,17 @@ exports.run = async (client, message, args, prefix) => {
 		if (server == "akatsuki") {
 			var BaseUrl = `https://akatsuki.pw/api/v1`
 
-			var response = await axios.get(`${BaseUrl}/users/whatid?name=${userargs}`)
-			var userId = response.data.id
+			if (isNaN(userargs)) {
+				try {
+					var response = await axios.get(`${BaseUrl}/users/whatid?name=${userargs}`)
+					userargs = response.data.id
+				} catch (err) {
+					message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] })
+					return
+				}
+			}
 
-			var response = await axios.get(`${BaseUrl}/users/full?id=${userId}`)
+			var response = await axios.get(`${BaseUrl}/users/full?id=${userargs}`)
 			user = response.data
 
 			if (user.code != 200) {
