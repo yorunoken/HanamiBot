@@ -139,9 +139,11 @@ async function GetuserNoChoke(user, tops, ruleset, GameMode, pageNumber) {
 		let Grade = score.rank
 		Grade = grades[Grade]
 
+		let TimeSet = new Date(score.created_at).getTime() / 1000
+
 		const row1 = `**${oldState + 1} (\`${newState + 1}\`). [${score.beatmapset.title} [${score.beatmap.version}]](https://osu.ppy.sh/b/${score.beatmap.id})** \`+${modsName}\` __**[${FCMap.difficulty.stars.toFixed(2)}★]**__\n`
 		const row2 = `${Grade} ▸ ${FcGrade} • ${score.pp.toFixed(2)}pp ▸ **${FCMap.pp.toFixed(2)}pp** • (${(score.accuracy * 100).toFixed(2)}% ▸ **${FcAcc.toFixed(2)}%**)\n`
-		const row3 = `[ ${score.max_combo}x ▸ **${FCMap.difficulty.maxCombo}x** ] • Removed ${score.statistics.count_miss}<:hit00:1061254490075955231>`
+		const row3 = `[ ${score.max_combo}x ▸ **${FCMap.difficulty.maxCombo}x** ] • Removed ${score.statistics.count_miss}<:hit00:1061254490075955231> <t:${TimeSet}:R>`
 
 		return `${row1}${row2}${row3}`
 	}

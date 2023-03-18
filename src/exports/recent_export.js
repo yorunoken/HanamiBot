@@ -265,22 +265,6 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		creatorName = score[value].beatmapset.creator
 	}
 
-	fs.readFile("./user-recent.json", (error, data) => {
-		if (error) {
-			console.log(error)
-			return
-		}
-		//update the user's osu! username in the JSON file
-		const userData = JSON.parse(data)
-		userData[user.id] = { ...userData[user.id], Score: score }
-		fs.writeFile("./user-recent.json", JSON.stringify(userData, null, 2), error => {
-			if (error) {
-				console.log(error)
-				return
-			}
-		})
-	})
-
 	if (!fs.existsSync(`./osuBeatmapCache/${mapId}.osu`)) {
 		console.log("no file.")
 		const downloader = new Downloader({
@@ -392,7 +376,6 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 	}
 
 	//length
-
 	let minutesHit = Math.floor(Hit / 60).toFixed()
 	let secondsHit = (Hit % 60).toString().padStart(2, "0")
 	let minutesTotal = Math.floor(Total / 60).toFixed()
@@ -414,7 +397,52 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		.setThumbnail(avatarUrl)
 		.setFooter({ text: `${MapStatus} map by ${creatorName} | osu!${server}`, iconURL: `https://a.ppy.sh/${creatorUserId}?1668890819.jpeg` })
 
-	console.log(`${top1k} ${score_id}`)
+	fs.readFile("./user-recent.json", (error, data) => {
+		if (error) {
+			console.log(error)
+			return
+		}
+
+		//update the user's osu! recent in the JSON file
+		const userData = JSON.parse(data)
+
+		score[value] = { ...score[value], StarRating: maxAttrs.difficulty.stars, CurPP: CurAttrs.pp, FixPP: FCAttrs.pp, SSPP: maxAttrs.pp, bpm: mapValues.bpm, mode: mode }
+
+		if (userData[user.id]) {
+			if (userData[user.id].scores.findIndex(ScoreArr => ScoreArr.score.id == score[value].id) != -1) {
+			} else
+				userData[user.id].scores.push({
+					score: score[value],
+					StarRating: maxAttrs.difficulty.stars,
+					CurPP: CurAttrs.pp,
+					FixPP: FCAttrs.pp,
+					SSPP: maxAttrs.pp,
+					bpm: mapValues.bpm,
+					mode: mode,
+				})
+		} else {
+			userData[user.id] = {
+				scores: [
+					{
+						score: score[value],
+						StarRating: maxAttrs.difficulty.stars,
+						CurPP: CurAttrs.pp,
+						FixPP: FCAttrs.pp,
+						SSPP: maxAttrs.pp,
+						bpm: mapValues.bpm,
+						mode: mode,
+					},
+				],
+				server: server,
+			}
+		}
+		fs.writeFile("./user-recent.json", JSON.stringify(userData, null, 2), error => {
+			if (error) {
+				console.log(error)
+				return
+			}
+		})
+	})
 	return { embed, FilterMods, top1k, score_id }
 }
 
