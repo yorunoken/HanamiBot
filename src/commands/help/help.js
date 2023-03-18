@@ -20,12 +20,13 @@ exports.run = async (client, message, args, prefix) => {
 
 	if (args[0]) {
 		const commandName = args[0]
-		if (commands[commandName]) {
+		const command = commands[commandName] || Object.values(commands).find(cmd => cmd.aliases && cmd.aliases.includes(commandName))
+		if (command) {
 			const embed = new EmbedBuilder()
 				.setColor("Purple")
-				.setTitle(`${prefix}${commandName}`)
-				.setDescription(`${commands[commandName].description}`)
-				.setFields({ name: `Usage`, value: `\`${commands[commandName].usage}\``, inline: true }, { name: `Aliases`, value: `\`${commands[commandName].aliases}\``, inline: true })
+				.setTitle(`${prefix}${command.name}`)
+				.setDescription(`${command.description}`)
+				.setFields({ name: `Usage`, value: `\`${command.usage}\``, inline: true }, { name: `Aliases`, value: `\`${command.aliases}\``, inline: true })
 			message.channel.send({ embeds: [embed] })
 		} else {
 			message.channel.send(`**Such a command doesn't exist! see a list of all the commands using \`${prefix}help\`**`)
