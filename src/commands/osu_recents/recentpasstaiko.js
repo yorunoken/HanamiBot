@@ -81,28 +81,6 @@ module.exports.run = async (client, message, args, prefix) => {
 			return
 		}
 
-		let row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("render").setDisabled().setStyle(ButtonStyle.Primary).setLabel("Render"))
-		if (Recent.top1k) {
-			row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("render").setStyle(ButtonStyle.Primary).setLabel("Render"))
-			console.log("uuu?")
-			message.channel.send({ content: Recent.FilterMods, embeds: [Recent.embed.data], components: [row] })
-
-			const filter = m => m.user.id === message.author.id
-			const collector = message.channel.createMessageComponentCollector({ filter: filter, max: 1, time: 50000 })
-
-			collector.on("collect", async collected => {
-				let collectedm = collected.message
-				let user = collected.user
-				let score_id = Recent.score_id
-
-				collected.update({ content: Recent.FilterMods, embeds: [Recent.embed.data], components: [new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("render").setDisabled().setStyle(ButtonStyle.Primary).setLabel("Render"))] })
-				GetReplay(message, collectedm, user, score_id, mode)
-				return
-			})
-
-			collector.on("end", async m => {})
-			return
-		}
 		message.channel.send({ content: Recent.FilterMods, embeds: [Recent.embed.data] })
 	})
 }
