@@ -43,6 +43,6 @@ module.exports.run = async (client, message, args, prefix) => {
 }
 exports.name = ["playstats"]
 exports.aliases = ["playstats", "playstats", "ps", "pstat"]
-exports.description = ["Displays user's osu!standard stats based on recent plays\n\n**Parameters:**\n`username`"]
+exports.description = ["Displays user's osu!standard stats based on a collection of recent plays. The user can type `?recent` to add to the collection of plays.\n\n**Parameters:**\n`username`"]
 exports.usage = [`ps YoruNoKen`]
 exports.category = ["osu"]
