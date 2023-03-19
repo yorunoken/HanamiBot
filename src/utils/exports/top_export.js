@@ -1,11 +1,12 @@
 const { EmbedBuilder } = require("discord.js");
 const fs = require("fs");
-const { v2, auth, mods } = require("osu-api-extended");
+const { v2, auth } = require("osu-api-extended");
 const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
 const axios = require("axios");
 
 const { tools } = require("../../utils/calculators/tools.js");
+const { mods } = require("../../utils/calculators/mods.js");
 
 async function GetUserTop(user, userstats, pageNumber, ModeOsu, RuleSetId, args, ModsSearch, play_number, rb, server) {
 	console.log("file: top_export.js:8 ~ GetUserTop ~ RuleSetId:", RuleSetId);
@@ -214,7 +215,9 @@ async function GetUserTop(user, userstats, pageNumber, ModeOsu, RuleSetId, args,
 			await downloader.downloadSingle();
 		}
 
-		if (!ModsName.length) {
+		console.log(modsID);
+
+		if (ModsName.length == 0) {
 			ModsName = "NM";
 			modsID = 0;
 		}

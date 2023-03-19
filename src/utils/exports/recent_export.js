@@ -1,11 +1,12 @@
 const { EmbedBuilder } = require("discord.js");
 const fs = require("fs");
-const { v2, auth, mods } = require("osu-api-extended");
+const { v2, auth } = require("osu-api-extended");
 const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
 const axios = require("axios");
 
 const { tools } = require("../../utils/calculators/tools.js");
+const { mods } = require("../../utils/calculators/mods.js");
 
 async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, userstats, server) {
 	await auth.login(process.env.client_id, process.env.client_secret);
@@ -282,7 +283,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 	let ModDisplay = `**+${ModsName}**`;
 	let modsID = mods.id(ModsName);
 
-	if (!ModsName.length) {
+	if (ModsName.length == 0) {
 		ModDisplay = "";
 		modsID = 0;
 	}

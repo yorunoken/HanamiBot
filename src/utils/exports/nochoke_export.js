@@ -1,6 +1,5 @@
 const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
-const { mods } = require("osu-api-extended");
 const { EmbedBuilder } = require("discord.js");
 const axios = require("axios");
 const endpoint = `https://osudaily.net/api/`;
@@ -8,6 +7,7 @@ const apiKey = process.env.osudaily_api;
 const fs = require("fs");
 
 const { tools } = require("../../utils/calculators/tools.js");
+const { mods } = require("../../utils/calculators/mods.js");
 
 async function GetuserNoChoke(user, tops, ruleset, GameMode, pageNumber) {
 	try {
@@ -109,21 +109,20 @@ async function GetuserNoChoke(user, tops, ruleset, GameMode, pageNumber) {
 			GameMode,
 		);
 		let modsName = score.mods.join("");
+		if (modsName.length == 0) modsName = `NM`;
 
 		let GradeForFC = tools.grade(
 			{
 				n300: Map300CountFc,
-				ngeki: score.statistics.count_geki,
 				n100: score.statistics.count_100,
-				nkatu: score.statistics.count_katu,
 				n50: score.statistics.count_50,
 				nmiss: 0,
+				nkatu: score.statistics.count_katu,
+				ngeki: score.statistics.count_geki,
 			},
 			GameMode,
 			modsName,
 		);
-
-		if (!modsName.length) modsName = `NM`;
 
 		//grades
 		const grades = {
