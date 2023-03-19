@@ -3,7 +3,7 @@ const { v2, auth, tools, mods } = require("osu-api-extended")
 const { EmbedBuilder } = require("discord.js")
 
 const { CardImage, CalculateSkill } = require("../../utils/card/cardCalculator.js")
-const { FindUserargs } = require("../../utils/finduserargs_export.js")
+const { FindUserargs } = require("../../utils/exports/finduserargs_export.js")
 
 module.exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()

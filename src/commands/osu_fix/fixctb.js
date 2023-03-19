@@ -2,7 +2,7 @@ const fs = require("fs")
 const { v2, auth, tools, mods } = require("osu-api-extended")
 
 // importing FixFunction
-const { FixFunction } = require("../../utils/fix_export.js")
+const { FixFunction } = require("../../utils/exports/fix_export.js")
 
 exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()

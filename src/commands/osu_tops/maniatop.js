@@ -4,8 +4,8 @@ const { v2, auth } = require("osu-api-extended")
 const axios = require("axios")
 
 // importing top
-const { GetUserTop } = require("../../utils/top_export.js")
-const { FindUserargs } = require("../../utils/finduserargs_export.js")
+const { GetUserTop } = require("../../utils/exports/top_export.js")
+const { FindUserargs } = require("../../utils/exports/finduserargs_export.js")
 
 exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()

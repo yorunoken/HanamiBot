@@ -3,7 +3,7 @@ const { v2, auth } = require("osu-api-extended")
 const { EmbedBuilder } = require("discord.js")
 
 // importing GetRecent
-const { GetuserNoChoke } = require("../../utils/nochoke_export.js")
+const { GetuserNoChoke } = require("../../utils/exports/nochoke_export.js")
 
 module.exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()

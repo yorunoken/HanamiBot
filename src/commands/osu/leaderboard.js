@@ -4,7 +4,7 @@ const fs = require("fs")
 const { v2, auth, mods, tools } = require("osu-api-extended")
 
 // importing GetRecent
-const { LbSend } = require("../../utils/leaderboard_export.js")
+const { LbSend } = require("../../utils/exports/leaderboard_export.js")
 exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()
 

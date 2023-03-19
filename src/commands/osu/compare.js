@@ -3,7 +3,7 @@ const { v2, auth, tools, mods } = require("osu-api-extended")
 const axios = require("axios")
 
 // importing CompareEmbed
-const { CompareEmbed } = require("../../utils/compare_export.js")
+const { CompareEmbed } = require("../../utils/exports/compare_export.js")
 
 exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()

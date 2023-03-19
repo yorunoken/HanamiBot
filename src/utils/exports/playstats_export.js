@@ -13,7 +13,6 @@ async function PlayStats(user, RuleSetId, mode) {
 
 			var userId = user.id
 			var scores = Recents[userId]
-			scores = scores.scores.filter(x => x.mode == mode)
 
 			global_rank = user.statistics.global_rank.toLocaleString() || "-"
 			country_rank = user.statistics.country_rank.toLocaleString() || "-"
@@ -32,6 +31,8 @@ async function PlayStats(user, RuleSetId, mode) {
 				resolve(embed)
 				return
 			}
+
+			scores = scores.scores.filter(x => x.mode == mode)
 
 			function FindPattern(Array, Acc) {
 				let avg = (Array.reduce((a, b) => a + b) / Array.length).toFixed(2)

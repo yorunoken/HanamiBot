@@ -3,7 +3,7 @@ const { v2, auth } = require("osu-api-extended")
 const { EmbedBuilder } = require("discord.js")
 
 // importing GetRecent
-const { GetUserTop100Stats } = require("../../utils/stats_export.js")
+const { GetUserTop100Stats } = require("../../utils/exports/stats_export.js")
 
 module.exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()
