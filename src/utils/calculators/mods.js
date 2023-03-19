@@ -51,6 +51,7 @@ function id(combination) {
 
 function name(id) {
 	if (isNaN(id)) return undefined;
+	if (id == 0) return "NM";
 	const modCodes = Object.values(num_codes);
 	const modId = modCodes.filter((_, i) => (id >> i) & 1).join("");
 	if (!modId) return undefined;
