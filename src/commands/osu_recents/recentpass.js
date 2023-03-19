@@ -20,10 +20,7 @@ module.exports.run = async (client, message, args, prefix) => {
 		let mode = "osu"
 		let RuleSetId = 0
 		let PassDetermine = 0
-		let server = "bancho"
-		try {
-			server = userData[message.author.id].server
-		} catch (err) {}
+		server = userData[message.author.id].server || "bancho"
 
 		if (args.includes("-bancho")) server = "bancho"
 		if (args.includes("-gatari")) server = "gatari"

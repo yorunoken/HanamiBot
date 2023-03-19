@@ -86,7 +86,9 @@ exports.run = async (client, message, args, prefix) => {
 			if (argValues["mods"].toUpperCase().includes("HT")) clock_rate = 0.75
 
 			if (!argValues["mods"]) argValues["mods"] = "NM"
+			console.log(argValues["mods"])
 			const modsID = mods.id(argValues["mods"])
+			console.log(modsID)
 
 			if (isNaN(Number(argValues["ar"]))) argValues["ar"] = DiffValues.ar
 			if (isNaN(Number(argValues["cs"]))) argValues["cs"] = DiffValues.cs
@@ -198,7 +200,7 @@ exports.run = async (client, message, args, prefix) => {
 			else PageArg = sortedset.findIndex(x => x.difficulty_rating == ranked.difficulty_rating) + 1
 
 			//send the embed
-			await SendEmbed(ranked, beatmapId, sortedset, PageArg)
+			await SendEmbed(ranked, ranked.id, sortedset, PageArg)
 			GoodToGo = true
 			return
 		} catch (err) {
@@ -228,7 +230,7 @@ exports.run = async (client, message, args, prefix) => {
 				else PageArg = sortedset.findIndex(x => x.difficulty_rating == ranked.difficulty_rating) + 1
 
 				//send the embed
-				await SendEmbed(ranked, beatmapId, sortedset, PageArg)
+				await SendEmbed(ranked, ranked.id, sortedset, PageArg)
 				GoodToGo = true
 				return
 			} catch (err) {
@@ -256,7 +258,7 @@ exports.run = async (client, message, args, prefix) => {
 					else PageArg = sortedset.findIndex(x => x.difficulty_rating == ranked.difficulty_rating) + 1
 
 					//send the embed
-					await SendEmbed(ranked, beatmapId, sortedset, PageArg)
+					await SendEmbed(ranked, ranked.id, sortedset, PageArg)
 					GoodToGo = true
 					return
 				} catch (err) {
@@ -315,7 +317,7 @@ exports.run = async (client, message, args, prefix) => {
 				else PageArg = sortedset.findIndex(x => x.difficulty_rating == ranked.difficulty_rating) + 1
 
 				//send the embed
-				await SendEmbed(ranked, beatmapId, sortedset, PageArg)
+				await SendEmbed(ranked, ranked.id, sortedset, PageArg)
 				return
 			} else throw new Error("no")
 		} catch (err) {

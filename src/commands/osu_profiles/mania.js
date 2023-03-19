@@ -16,10 +16,7 @@ exports.run = async (client, message, args, prefix) => {
 		const userData = JSON.parse(data)
 		let mode = "mania"
 		let rulesetId = 3
-		let server = "bancho"
-		try {
-			server = userData[message.author.id].server
-		} catch (err) {}
+		server = userData[message.author.id].server || "bancho"
 
 		if (args.includes("-bancho")) server = "bancho"
 		if (args.includes("-gatari")) server = "gatari"

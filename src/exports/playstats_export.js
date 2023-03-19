@@ -116,7 +116,7 @@ async function PlayStats(user, RuleSetId, mode) {
 					url: `https://osu.ppy.sh/users/${user.id}/${mode}`,
 				})
 				.setThumbnail(user.avatar_url)
-				.setFields({ name: `Statistics:`, value: `\`\`\`${t.toString()}\`\`\``, inline: false })
+				.setFields({ name: `Statistics:`, value: `\`\`\`${t.toString()}\`\`\`\n**Calculated scores:** \`${scores.scores.length}\``, inline: false })
 			resolve(embed)
 		})
 	})

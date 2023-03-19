@@ -19,10 +19,7 @@ exports.run = async (client, message, args, prefix) => {
 		let value = undefined
 		let pagenum = 1
 		let RuleSetId
-		let server = "bancho"
-		try {
-			server = userData[message.author.id].server
-		} catch (err) {}
+		server = userData[message.author.id].server || "bancho"
 
 		if (args.includes("-bancho")) server = "bancho"
 		if (args.includes("-gatari")) server = "gatari"

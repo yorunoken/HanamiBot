@@ -28,16 +28,12 @@ exports.run = async (client, message, args, prefix) => {
 			argValues[key] = value
 		}
 
-		let server = "bancho"
-		try {
-			server = userData[message.author.id].server
-		} catch (err) {}
+		server = userData[message.author.id].server || "bancho"
 
 		if (args.includes("-bancho")) server = "bancho"
 		if (args.includes("-gatari")) server = "gatari"
 
 		var userargs = await FindUserargs(message, args, server, prefix)
-
 		if (args.includes("-mania")) {
 			RulesetId = 3
 			ModeOsu = "mania"

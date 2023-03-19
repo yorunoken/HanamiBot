@@ -24,7 +24,7 @@ exports.run = async (client, message, args, prefix) => {
 		if (command) {
 			const embed = new EmbedBuilder()
 				.setColor("Purple")
-				.setTitle(`${prefix}${command.name}`)
+				.setTitle(`${prefix}${commandName}`)
 				.setDescription(`${command.description}`)
 				.setFields({ name: `Usage`, value: `\`${command.usage}\``, inline: true }, { name: `Aliases`, value: `\`${command.aliases}\``, inline: true })
 			message.channel.send({ embeds: [embed] })

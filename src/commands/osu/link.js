@@ -34,7 +34,7 @@ exports.run = async (client, message, args, prefix) => {
 		return
 	}
 
-	if (defaultServer) {
+	if (args[0].startsWith("server=")) {
 		fs.readFile("./user-data.json", (error, data) => {
 			if (error) {
 				console.log(error)
@@ -42,12 +42,12 @@ exports.run = async (client, message, args, prefix) => {
 			}
 
 			const userData = JSON.parse(data)
-			userData[message.author.id] = { ...userData[message.author.id], server: defaultServer }
+			userData[message.author.id] = { ...userData[message.author.id], server: server }
 			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
 				if (error) {
 					console.log(error)
 				} else {
-					message.reply(`Set default server to **${defaultServer}**`)
+					message.reply(`Set default server to **${server}**`)
 				}
 			})
 		})
