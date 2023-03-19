@@ -283,7 +283,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 	let ModDisplay = `**+${ModsName}**`;
 	let modsID = mods.id(ModsName);
 
-	if (ModsName.length == 0) {
+	if (!ModsName.length) {
 		ModDisplay = "";
 		modsID = 0;
 	}
