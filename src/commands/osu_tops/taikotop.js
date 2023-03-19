@@ -28,7 +28,11 @@ exports.run = async (client, message, args, prefix) => {
 			argValues[key] = value
 		}
 
-		server = userData[message.author.id].server || "bancho"
+		try {
+			server = userData[message.author.id].server || "bancho"
+		} catch (err) {
+			server = "bancho"
+		}
 
 		if (args.includes("-bancho")) server = "bancho"
 		if (args.includes("-gatari")) server = "gatari"

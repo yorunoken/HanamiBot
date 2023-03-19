@@ -170,6 +170,14 @@ module.exports.run = async (client, message, args, prefix) => {
 				const ppSum = avgpp.reduce((pp, num) => pp + parseFloat(num), 0) / avgpp.length
 				const missSum = miss.reduce((miss, num) => miss + parseFloat(num), 0) / miss.length
 
+				let aimSkill = values.aim
+				let accSkill = values.acc
+				let speedSkill = values.speed
+
+				if (aimSkill > 200) aimSkill = 200
+				if (accSkill > 200) accSkill = 200
+				if (speedSkill > 200) speedSkill = 200
+
 				const embed = new EmbedBuilder()
 					.setColor("Purple")
 					.setAuthor({
@@ -177,7 +185,7 @@ module.exports.run = async (client, message, args, prefix) => {
 						iconURL: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
 						url: `https://osu.ppy.sh/users/${user.id}`,
 					})
-					.setFields({ name: `Average values`, value: `Average stars: \`${starSum.toFixed(2)}★\`\nAverage pp: \`${ppSum.toFixed(2)}\`\nAverage miss: \`${missSum.toFixed(2)}\`` }, { name: `Skills`, value: `Aim skill: \`${values.aim}\`\nAcc skill: \`${values.acc}\`\nSpeed skill:\`${values.speed}\`` })
+					.setFields({ name: `Average values`, value: `Average stars: \`${starSum.toFixed(2)}★\`\nAverage pp: \`${ppSum.toFixed(2)}\`\nAverage miss: \`${missSum.toFixed(2)}\`` }, { name: `Skills`, value: `Aim skill: \`${aimSkill}\`\nAcc skill: \`${accSkill}\`\nSpeed skill:\`${speedSkill}\`` })
 
 				msg.edit({ embeds: [embed] })
 			})
