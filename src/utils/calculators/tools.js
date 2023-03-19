@@ -28,12 +28,13 @@ function grade({ n300, n100, n50, nmiss, nkatu, ngeki }, mode, mods) {
 	ngeki = Number(ngeki) || 0;
 	nkatu = Number(nkatu) || 0;
 
-	const TotalHit = n300 + n100 + n50 + nmiss + ngeki + nkatu;
-	function calculatePercentage(num, total) {
-		return (num / total) * 100;
+	function calculatePercentage(num, TotalAmount) {
+		return (num / TotalAmount) * 100;
 	}
 
 	if (mode.toLowerCase() == "osu") {
+		const TotalHit = n300 + n100 + n50 + nmiss;
+
 		const percent = calculatePercentage(n300, TotalHit);
 		const percent50 = calculatePercentage(n50, TotalHit);
 
@@ -45,19 +46,20 @@ function grade({ n300, n100, n50, nmiss, nkatu, ngeki }, mode, mods) {
 			case percent === 100 && mods.toUpperCase().includes("HD") && mods.toUpperCase().includes("FL"):
 				return "XH";
 			case percent > 90 && mods.toUpperCase().includes("HD") && mods.toUpperCase().includes("FL"):
-				return nmiss >= 1 || percent50 > 1 ? "A" : "SH";
+				return nmiss > 0 || percent50 > 1 ? "A" : "SH";
 			case percent > 80:
-				return nmiss >= 1 ? "B" : "A";
+				return nmiss > 0 ? "B" : "A";
 			case percent > 70:
-				return nmiss >= 1 ? "C" : "B";
+				return nmiss > 0 ? "C" : "B";
 			case percent > 60:
-				return nmiss >= 1 ? "D" : "C";
+				return nmiss > 0 ? "D" : "C";
 			default:
 				return "D";
 		}
 	}
 
 	if (mode.toLowerCase() == "taiko") {
+		const TotalHit = n300 + n100 + nmiss;
 		const percent = calculatePercentage(n300, TotalHit);
 
 		switch (true) {
