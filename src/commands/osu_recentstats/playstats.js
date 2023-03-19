@@ -20,6 +20,23 @@ module.exports.run = async (client, message, args, prefix) => {
 		let mode = "osu"
 		let RuleSetId = 0
 
+		if (args.includes("-mania")) {
+			mode = "mania"
+			RuleSetId = 3
+		}
+		if (args.includes("-taiko")) {
+			mode = "taiko"
+			RuleSetId = 1
+		}
+		if (args.includes("-ctb")) {
+			mode = "fruits"
+			RuleSetId = 2
+		}
+
+		if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko")) {
+			userargs = userData[message.author.id].BanchoUserId
+		}
+
 		var userargs = await FindUserargs(message, args, server, prefix)
 
 		if (userargs.length === 0) {

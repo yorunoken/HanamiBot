@@ -13,6 +13,7 @@ async function PlayStats(user, RuleSetId, mode) {
 
 			var userId = user.id
 			var scores = Recents[userId]
+			scores = scores.scores.filter(x => x.mode == mode)
 
 			global_rank = user.statistics.global_rank.toLocaleString() || "-"
 			country_rank = user.statistics.country_rank.toLocaleString() || "-"
@@ -46,46 +47,46 @@ async function PlayStats(user, RuleSetId, mode) {
 			}
 
 			const Stars = FindPattern(
-				scores.scores.map(score => score.score.StarRating),
+				scores.map(score => score.score.StarRating),
 				false,
 			)
 			const Miss = FindPattern(
-				scores.scores.map(score => score.score.statistics.count_miss),
+				scores.map(score => score.score.statistics.count_miss),
 				false,
 			)
 			const Count300 = FindPattern(
-				scores.scores.map(score => score.score.statistics.count_300),
+				scores.map(score => score.score.statistics.count_300),
 				false,
 			)
 			const Count100 = FindPattern(
-				scores.scores.map(score => score.score.statistics.count_100),
+				scores.map(score => score.score.statistics.count_100),
 				false,
 			)
 			const Count50 = FindPattern(
-				scores.scores.map(score => score.score.statistics.count_50),
+				scores.map(score => score.score.statistics.count_50),
 				false,
 			)
 			const bpm = FindPattern(
-				scores.scores.map(score => score.score.bpm),
+				scores.map(score => score.score.bpm),
 				false,
 			)
 			const Acc = FindPattern(
-				scores.scores.map(score => score.score.accuracy),
+				scores.map(score => score.score.accuracy),
 				true,
 			)
 			const Combo = FindPattern(
-				scores.scores.map(score => score.score.max_combo),
+				scores.map(score => score.score.max_combo),
 				false,
 			)
 			const PPCur = FindPattern(
-				scores.scores.map(score => score.score.CurPP),
+				scores.map(score => score.score.CurPP),
 				false,
 			)
 			const PPFix = FindPattern(
-				scores.scores.map(score => score.score.FixPP),
+				scores.map(score => score.score.FixPP),
 				false,
 			)
-			// const PPSS = FindPattern(scores.scores.map(score => score.score.SSPP))
+			// const PPSS = FindPattern(scores.map(score => score.score.SSPP))
 
 			const DataForTable = [
 				{ name: "Stars", min: Stars.min, avg: Stars.avg, max: Stars.max },
@@ -116,7 +117,7 @@ async function PlayStats(user, RuleSetId, mode) {
 					url: `https://osu.ppy.sh/users/${user.id}/${mode}`,
 				})
 				.setThumbnail(user.avatar_url)
-				.setFields({ name: `Statistics:`, value: `\`\`\`${t.toString()}\`\`\`\n**Calculated scores:** \`${scores.scores.length}\``, inline: false })
+				.setFields({ name: `Statistics:`, value: `\`\`\`${t.toString()}\`\`\`\n**Calculated scores:** \`${scores.length}\``, inline: false })
 			resolve(embed)
 		})
 	})
