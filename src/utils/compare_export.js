@@ -199,7 +199,7 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString, value, pagenum
 		}
 
 		if (modeint == "0") AccValues = `{**${count_300}**/${count_100}/${count_50}/${count_miss}}`
-		if (modeint == "1") AccValues = `{**${count_300}**/${count_100}}/${count_miss}}`
+		if (modeint == "1") AccValues = `{**${count_300}**/${count_100}/${count_miss}}`
 		if (modeint == "2") AccValues = `{**${count_300}**/${count_100}/${count_50}/${count_miss}}`
 		if (modeint == "3") AccValues = `{**${count_geki}**/${count_300}/${count_katu}/${count_100}/${count_50}/${count_miss}}`
 
