@@ -2,7 +2,7 @@ const fs = require("fs")
 const { v2, auth } = require("osu-api-extended")
 
 // importing GetPinned
-const { GetPinned } = require("../../exports/pinned_export")
+const { GetPinned } = require("../../utils/pinned_export")
 
 exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()

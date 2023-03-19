@@ -4,9 +4,9 @@ const axios = require("axios")
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js")
 
 // importing GetRecent
-const { GetRecent } = require("../../exports/recent_export")
-const { FindUserargs } = require("../../exports/finduserargs_export.js")
-const { GetReplay } = require("../../exports/replay_export.js")
+const { GetRecent } = require("../../utils/recent_export")
+const { FindUserargs } = require("../../utils/finduserargs_export.js")
+const { GetReplay } = require("../../utils/replay_export.js")
 
 module.exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()

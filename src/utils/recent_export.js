@@ -285,6 +285,8 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		modsID = 0
 	}
 
+	console.log(modsID)
+
 	let scoreParam = {
 		mode: RuleSetId,
 		mods: modsID,

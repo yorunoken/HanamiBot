@@ -4,8 +4,8 @@ const axios = require("axios")
 const { EmbedBuilder } = require("discord.js")
 
 // imports
-const { GetUserPage } = require("../../exports/osu_export.js")
-const { FindUserargs } = require("../../exports/finduserargs_export.js")
+const { GetUserPage } = require("../../utils/osu_export.js")
+const { FindUserargs } = require("../../utils/finduserargs_export.js")
 
 exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping()

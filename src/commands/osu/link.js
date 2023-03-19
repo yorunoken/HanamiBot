@@ -25,10 +25,6 @@ exports.run = async (client, message, args, prefix) => {
 	if (argValues["server"] == "gatari") server = "gatari"
 	if (argValues["server"] == "akatsuki") server = "akatsuki"
 
-	if (argValues["default"] == "bancho") defaultServer = "bancho"
-	if (argValues["default"] == "gatari") defaultServer = "gatari"
-	if (argValues["default"] == "akatsuki") defaultServer = "akatsuki"
-
 	if (username == undefined) {
 		message.reply("**Please provide a username.**")
 		return
@@ -151,6 +147,6 @@ exports.run = async (client, message, args, prefix) => {
 }
 exports.name = "link"
 exports.aliases = ["link"]
-exports.description = ["Sets a nickname as your default\n\n**Parameters:**\n`username` set your username to the argument\n`default=${server}` set your default server\n`server=${server}` set the nickname in a server"]
+exports.description = ["Sets a nickname as your default\n\n**Parameters:**\n`username` set your username to the argument\n`server=${server}` set your default server (only works if you don't provide a username)\n`server={server}` set the nickname in a server (only works if you provide a username)"]
 exports.usage = [`link YoruNoKen`]
 exports.category = ["osu"]
