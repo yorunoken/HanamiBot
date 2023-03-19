@@ -57,7 +57,7 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString, value, pagenum
 				.setThumbnail(user.avatar_url)
 				.setFooter({ text: `${status} map by ${mapinfo.beatmapset.creator}`, iconURL: `https://a.ppy.sh/${mapinfo.beatmapset.user_id}?1668890819.jpeg` });
 
-			message.channel.send({ embeds: [embed] });
+			return embed;
 		}
 
 		CountryCode = user.country_code;
@@ -73,7 +73,7 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString, value, pagenum
 		score = response.data.score;
 		if (score == null) {
 			let embed = new EmbedBuilder().setColor("Purple").setDescription(`No recent Gatari plays found for **${user.username}**`);
-			return { embed, FilterMods };
+			return { embed };
 		}
 
 		try {
