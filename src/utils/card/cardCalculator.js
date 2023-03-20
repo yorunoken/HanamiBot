@@ -1,6 +1,6 @@
 const { createCanvas, loadImage } = require("canvas");
 const { formatTitle } = require("./format-text");
-const bgPath = `./src/utils/card/bgs/`;
+const Path = `./src/utils/card/`;
 
 const fs = require("fs");
 const { Beatmap, Calculator } = require("rosu-pp");
@@ -54,9 +54,28 @@ async function CardImage(user, aimProg, speedProg, accProg) {
 	const canvas = createCanvas(width, height);
 	const ctx = canvas.getContext("2d");
 
-	const Background = await loadImage(`${bgPath}bg2.jpg`);
+	const pp = user.statistics.pp / 1000;
+
+	let BgNumber;
+	if (pp > 2.5) BgNumber = 1;
+	if (pp > 5) BgNumber = 2;
+	if (pp > 7.5) BgNumber = 3;
+	if (pp > 10) BgNumber = 4;
+	if (pp > 12.5) BgNumber = 5;
+	if (pp > 15) BgNumber = 6;
+
+	ctx.rotate(0);
+	const Background = await loadImage(`${Path}bgs/star${BgNumber}.jpg`);
 	var { w, h, x, y } = BackgroundPosition;
 	ctx.drawImage(Background, x, y, w, h);
+
+	const Star = await loadImage(`${Path}star.png`);
+	if (BgNumber > 0) ctx.drawImage(Star, 15, 55, 48, 49);
+	if (BgNumber > 1) ctx.drawImage(Star, 70, 45, 54, 55);
+	if (BgNumber > 2) ctx.drawImage(Star, 125, 30, 62, 64);
+	if (BgNumber > 3) ctx.drawImage(Star, width - 181, 30, 62, 64);
+	if (BgNumber > 4) ctx.drawImage(Star, width - 117, 45, 54, 55);
+	if (BgNumber > 5) ctx.drawImage(Star, width - 54, 55, 48, 49);
 
 	const UserAvatar = await loadImage(user.avatar_url);
 	var { w, h, x, y } = AvatarPosition;
