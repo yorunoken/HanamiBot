@@ -36,9 +36,9 @@ const num_codes = {
 	1073741824: "MR",
 };
 
-function id(combination) {
-	if (combination.length == 0 || combination.toLowerCase() == "nm") return 0;
-	const segmentedMods = combination.match(/.{1,2}/g);
+function id(name) {
+	if (name.length == 0 || name.toLowerCase() == "nm") return 0;
+	const segmentedMods = name.match(/.{1,2}/g);
 
 	let BitArray = [];
 	for (let i = 0; segmentedMods.length > i; i++) {
