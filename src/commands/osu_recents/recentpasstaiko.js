@@ -89,7 +89,8 @@ module.exports.run = async (client, message, args, prefix) => {
 			if (isNaN(userargs)) {
 				try {
 					var response = await fetch(`${BaseUrl}/users/whatid?name=${userargs}`, { method: "GET" });
-					userargs = response.data.id;
+					var args_data = await response.json();
+					userargs = args_data.id;
 				} catch (err) {
 					message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] });
 					return;
@@ -97,7 +98,7 @@ module.exports.run = async (client, message, args, prefix) => {
 			}
 
 			var response = await fetch(`${BaseUrl}/users/full?id=${userargs}`, { method: "GET" });
-			user = response.data;
+			user = await response.json();
 
 			if (user.code != 200) {
 				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] });

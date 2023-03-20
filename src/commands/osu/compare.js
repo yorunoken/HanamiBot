@@ -1,6 +1,6 @@
 const fs = require("fs");
 const { v2, auth, tools, mods } = require("osu-api-extended");
-const axios = require("axios");
+const { EmbedBuilder } = require("discord.js");
 
 // importing CompareEmbed
 const { CompareEmbed } = require("../../utils/exports/compare_export.js");
@@ -72,20 +72,26 @@ exports.run = async (client, message, args, prefix) => {
 			const mentionedUser = Array.from(message.mentions.users.entries()).pop()[Array.from(message.mentions.users.entries()).pop().length - 1];
 			try {
 				if (message.content.includes(`<@${mentionedUser.id}>`)) {
-					userargs = userData[mentionedUser.id].BanchoUserId;
+					if (server == "bancho") userargs = userData[mentionedUser.id].BanchoUserId;
+					if (server == "gatari") userargs = userData[mentionedUser.id].GatariUserId;
+					if (server == "akatsuki") userargs = userData[mentionedUser.id].AkatsukiUserId;
 				}
 			} catch (err) {
 				console.error(err);
 				if (mentionedUser) {
 					if (message.content.includes(`<@${mentionedUser.id}>`)) {
 						try {
-							userData[mentionedUser.id].BanchoUserId;
+							if (server == "bancho") userargs = userData[message.author.id].BanchoUserId;
+							if (server == "gatari") userargs = userData[message.author.id].GatariUserId;
+							if (server == "akatsuki") userargs = userData[message.author.id].AkatsukiUserId;
 						} catch (err) {
 							message.reply(`No osu! user found for ${mentionedUser.tag}`);
 						}
 					} else {
 						try {
-							userData[message.author.id].BanchoUserId;
+							if (server == "bancho") userargs = userData[message.author.id].BanchoUserId;
+							if (server == "gatari") userargs = userData[message.author.id].GatariUserId;
+							if (server == "akatsuki") userargs = userData[message.author.id].AkatsukiUserId;
 						} catch (err) {
 							message.reply(`Set your osu! username by typing "${prefix}link **your username**"`);
 						}
@@ -96,7 +102,9 @@ exports.run = async (client, message, args, prefix) => {
 		} else {
 			if (args[0] === undefined) {
 				try {
-					userargs = userData[message.author.id].BanchoUserId;
+					if (server == "bancho") userargs = userData[message.author.id].BanchoUserId;
+					if (server == "gatari") userargs = userData[message.author.id].GatariUserId;
+					if (server == "akatsuki") userargs = userData[message.author.id].AkatsukiUserId;
 				} catch (err) {
 					console.error(err);
 					message.reply(`Set your osu! username by typing "${prefix}link **your username**"`);
@@ -127,6 +135,7 @@ exports.run = async (client, message, args, prefix) => {
 					try {
 						if (server == "bancho") userargs = userData[message.author.id].BanchoUserId;
 						if (server == "gatari") userargs = userData[message.author.id].GatariUserId;
+						if (server == "akatsuki") userargs = userData[message.author.id].AkatsukiUserId;
 					} catch (err) {
 						message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Set your osu! username by typing "${prefix}link **your username**"`)] });
 					}
@@ -161,11 +170,15 @@ exports.run = async (client, message, args, prefix) => {
 
 			var response = await fetch(`${Userurl}${userargs}`, { method: "GET" });
 			var userResponse = await response.json();
+
 			var response = await fetch(`${UserStatsurl}${userargs}&${RuleSetId}`, { method: "GET" });
 			var userStatsResponse = await response.json();
 
 			user = userResponse.users[0];
 			userstats = userStatsResponse.stats;
+
+			console.log(userResponse);
+			console.log(user);
 
 			if (user == undefined) {
 				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] });
@@ -176,7 +189,6 @@ exports.run = async (client, message, args, prefix) => {
 		async function EmbedFetch(embed) {
 			try {
 				const beatmapId = args[0].match(/\d+/)[0];
-				console.log("file: compare.js:151 ~ EmbedFetch ~ beatmapId:", beatmapId);
 				// if args doesn't start with https: try to get the beatmap id by number provided
 				if (!args[0].startsWith("https:")) {
 					beatmapId = args[0];
