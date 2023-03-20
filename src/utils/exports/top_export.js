@@ -9,8 +9,6 @@ const { tools } = require("../../utils/calculators/tools.js");
 const { mods } = require("../../utils/calculators/mods.js");
 
 async function GetUserTop(user, userstats, pageNumber, ModeOsu, RuleSetId, args, ModsSearch, play_number, rb, server) {
-	console.log("file: top_export.js:8 ~ GetUserTop ~ RuleSetId:", RuleSetId);
-
 	//determine the page of the osutop
 	const start = (pageNumber - 1) * 5 + 1;
 	const end = pageNumber * 5;
@@ -28,12 +26,21 @@ async function GetUserTop(user, userstats, pageNumber, ModeOsu, RuleSetId, args,
 	let score, FilterMods, global_rank, country_rank, user_pp, country, useravatar;
 
 	if (server == "bancho") {
-		//score set
-		score = await v2.user.scores.category(user.id, "best", {
+		const url = new URL(`https://osu.ppy.sh/api/v2/users/${user.id}/scores/best`);
+		const params = {
 			mode: ModeOsu,
 			limit: "100",
 			offset: "0",
+		};
+		Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+		const headers = {
+			Authorization: `Bearer ${process.env.osu_bearer_key}`,
+		};
+		const response = await fetch(url, {
+			method: "GET",
+			headers,
 		});
+		score = await response.json();
 
 		/**
 		if (ModsSearch != undefined) {
