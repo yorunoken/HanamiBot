@@ -8,6 +8,7 @@ exports.run = async (client, message, args, prefix) => {
 	const categories = {
 		help: [],
 		osu: [],
+		saber: [],
 		general: [],
 		chess: [],
 		fun: [],
