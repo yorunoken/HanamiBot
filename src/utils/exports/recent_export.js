@@ -50,7 +50,6 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 			return { embed, FilterMods };
 		}
 
-		mapId = score[value].beatmap.beatmap_id;
 		ModsName = mods.name(score[value].mods).toUpperCase();
 
 		if (argValues["mods"] != undefined) {
@@ -64,6 +63,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 			}
 		}
 
+		mapId = score[value].beatmap.beatmap_id;
 		valuegeki = score[value].count_gekis;
 		value300 = score[value].count_300;
 		valuekatu = score[value].count_katu;
@@ -121,7 +121,6 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 			return { embed, FilterMods };
 		}
 
-		mapId = score[value].beatmap.beatmap_id;
 		ModsName = mods.name(score[value].mods).toUpperCase();
 
 		if (argValues["mods"] != undefined) {
@@ -135,6 +134,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 			}
 		}
 
+		mapId = score[value].beatmap.beatmap_id;
 		valuegeki = score[value].count_geki;
 		value300 = score[value].count_300;
 		valuekatu = score[value].count_katu;
@@ -204,13 +204,11 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		});
 
 		score = await response.json();
-
-		try {
-			mapId = score[value].beatmap.id;
-		} catch (err) {
+		if (score.length == 0) {
 			let embed = new EmbedBuilder().setColor("Purple").setDescription(`No recent Bancho plays found for **${user.username}**`);
 			return { embed, FilterMods };
 		}
+
 		ModsName = score[value].mods.join("").toUpperCase();
 
 		if (argValues["mods"] != undefined) {
@@ -224,6 +222,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 			}
 		}
 
+		mapId = score[value].beatmap.id;
 		valuegeki = score[value].statistics.count_geki;
 		value300 = score[value].statistics.count_300;
 		valuekatu = score[value].statistics.count_katu;

@@ -54,7 +54,6 @@ exports.run = async (client, message, args, prefix) => {
 		//log into api
 		await auth.login(process.env.client_id, process.env.client_secret)
 		const user = await v2.user.details(username, "osu")
-		console.log("file: link.js:59 ~ exports.run= ~ user:", user)
 		if (user.id == undefined) {
 			message.reply(`**The user \`${username}\` does not exist in the ${server} database.**`)
 			return

@@ -121,6 +121,11 @@ module.exports.run = async (client, message, args, prefix) => {
 
 		const Recent = await GetRecent(value, user, mode, PassDetermine, args, RuleSetId, userstats, server);
 
+		if (Recent.embed == undefined) {
+			message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setTitle("Huh...").setDescription("Something went wrong. Please check if you have any spelling errors!")] });
+			return;
+		}
+
 		let row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("render").setDisabled().setStyle(ButtonStyle.Primary).setLabel("Render"));
 		if (Recent.top1k) {
 			row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("render").setStyle(ButtonStyle.Primary).setLabel("Render"));
