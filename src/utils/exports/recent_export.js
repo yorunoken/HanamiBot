@@ -187,12 +187,23 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 	}
 
 	if (server == "bancho") {
-		score = await v2.user.scores.category(user.id, "recent", {
+		const url = new URL(`https://osu.ppy.sh/api/v2/users/${user.id}/scores/recent`);
+		const params = {
 			include_fails: PassDetermine,
 			mode: mode,
 			limit: "100",
 			offset: "0",
+		};
+		Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+		const headers = {
+			Authorization: `Bearer ${process.env.osu_bearer_key}`,
+		};
+		const response = await fetch(url, {
+			method: "GET",
+			headers,
 		});
+
+		score = await response.json();
 
 		try {
 			mapId = score[value].beatmap.id;
@@ -287,8 +298,6 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		ModDisplay = "";
 		modsID = 0;
 	}
-
-	console.log(modsID);
 
 	let scoreParam = {
 		mode: RuleSetId,
