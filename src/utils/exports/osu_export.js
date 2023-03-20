@@ -132,6 +132,35 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 		return embed;
 	}
 
+	if (server == "saber") {
+		global_rank = user.rank?.toLocaleString() || "-";
+		country_rank = user.countryRank?.toLocaleString() || "-";
+		pp = user.pp.toLocaleString() || "0";
+		acc = user.scoreStats.averageRankedAccuracy.toFixed(2) || "0";
+
+		playcount = user.scoreStats.totalPlayCount.toLocaleString();
+		playcountranked = user.scoreStats.rankedPlayCount.toLocaleString();
+		replayswatched = user.scoreStats.replaysWatched;
+		totalscore = user.scoreStats.totalScore.toLocaleString();
+		rankedscore = user.scoreStats.totalRankedScore.toLocaleString();
+
+		//embed
+		const embed = new EmbedBuilder()
+			.setColor("Purple")
+			.setAuthor({
+				name: `${user.name}: ${pp}pp (#${global_rank} ${user.country}#${country_rank})`,
+				iconURL: `https://osu.ppy.sh/images/flags/${user.country}.png`,
+				url: `https://scoresaber.com/u/${user.id}`,
+			})
+			.setThumbnail(user.profilePicture)
+			.setDescription(`**Accuracy:** \`${acc}%\` • **Playcount:** \`${playcount}\`\n**Total Score:** \`${totalscore}\`\n**Ranked Score:** \`${rankedscore}\`\n**Replays Watched:** \`${replayswatched}\``)
+			.setFooter({
+				text: `Beat Saber`,
+				iconURL: `https://upload.wikimedia.org/wikipedia/commons/9/91/Beat_Saber_Logo.png`,
+			});
+		return embed;
+	}
+
 	await auth.login(process.env.client_id, process.env.client_secret);
 	if (firstPage) {
 		try {
