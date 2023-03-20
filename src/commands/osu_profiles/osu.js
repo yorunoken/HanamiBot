@@ -14,7 +14,7 @@ exports.run = async (client, message, args, prefix) => {
 		}
 		const userData = JSON.parse(data);
 		let mode = "osu";
-		let rulesetId = 0;
+		let RuleSetId = 0;
 		try {
 			server = userData[message.author.id].server || "bancho";
 		} catch (err) {
@@ -27,15 +27,15 @@ exports.run = async (client, message, args, prefix) => {
 
 		if (args.includes("-mania")) {
 			mode = "mania";
-			rulesetId = 3;
+			RuleSetId = 3;
 		}
 		if (args.includes("-taiko")) {
 			mode = "taiko";
-			rulesetId = 1;
+			RuleSetId = 1;
 		}
 		if (args.includes("-ctb")) {
 			mode = "fruits";
-			rulesetId = 2;
+			RuleSetId = 2;
 		}
 
 		var userargs = await FindUserargs(message, args, server, prefix);
@@ -80,7 +80,7 @@ exports.run = async (client, message, args, prefix) => {
 			});
 			var user_data = await response.json();
 
-			var response = await fetch(`${UserStatsurl}${userargs}&${rulesetId}`, {
+			var response = await fetch(`${UserStatsurl}${userargs}&${RuleSetId}`, {
 				method: "GET",
 			});
 			var user_stats_data = await response.json();
@@ -119,7 +119,7 @@ exports.run = async (client, message, args, prefix) => {
 
 		if (args.join(" ").includes("-d") || args.join(" ").includes("-details")) firstPage = false;
 
-		message.channel.send({ embeds: [await GetUserPage(firstPage, user, userstats, mode, rulesetId, server)] });
+		message.channel.send({ embeds: [await GetUserPage(firstPage, user, userstats, mode, RuleSetId, server)] });
 	});
 };
 exports.name = "osu";

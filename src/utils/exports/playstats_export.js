@@ -1,22 +1,22 @@
-const fs = require("fs")
-const { EmbedBuilder } = require("discord.js")
-const Table = require("easy-table")
+const fs = require("fs");
+const { EmbedBuilder } = require("discord.js");
+const Table = require("easy-table");
 
 async function PlayStats(user, RuleSetId, mode) {
 	return new Promise((resolve, reject) => {
 		fs.readFile("./user-recent.json", async (error, data) => {
 			if (error) {
-				console.log(error)
-				return
+				console.log(error);
+				return;
 			}
-			var Recents = JSON.parse(data)
+			var Recents = JSON.parse(data);
 
-			var userId = user.id
-			var scores = Recents[userId]
+			var userId = user.id;
+			var scores = Recents[userId];
 
-			global_rank = user.statistics.global_rank.toLocaleString() || "-"
-			country_rank = user.statistics.country_rank.toLocaleString() || "-"
-			pp = user.statistics.pp.toLocaleString()
+			global_rank = user.statistics.global_rank.toLocaleString() || "-";
+			country_rank = user.statistics.country_rank.toLocaleString() || "-";
+			pp = user.statistics.pp.toLocaleString();
 
 			if (scores == undefined) {
 				const embed = new EmbedBuilder()
@@ -27,66 +27,66 @@ async function PlayStats(user, RuleSetId, mode) {
 						url: `https://osu.ppy.sh/users/${user.id}/${mode}`,
 					})
 					.setThumbnail(user.avatar_url)
-					.setFields({ name: `Statistics:`, value: `\`\`\`${user.username} was not rs'd any scores using this bot.\`\`\``, inline: false })
-				resolve(embed)
-				return
+					.setFields({ name: `Statistics:`, value: `\`\`\`${user.username} was not rs'd any scores using this bot.\`\`\``, inline: false });
+				resolve(embed);
+				return;
 			}
 
-			scores = scores.scores.filter(x => x.mode == mode)
+			scores = scores.scores.filter(x => x.mode == mode);
 
 			function FindPattern(Array, Acc) {
-				let avg = (Array.reduce((a, b) => a + b) / Array.length).toFixed(2)
-				let min = Number(Math.min.apply(null, Array).toFixed(2))
-				let max = Number(Math.max.apply(null, Array).toFixed(2))
+				let avg = (Array.reduce((a, b) => a + b) / Array.length).toFixed(2);
+				let min = Number(Math.min.apply(null, Array).toFixed(2));
+				let max = Number(Math.max.apply(null, Array).toFixed(2));
 				if (Acc) {
-					avg = ((Array.reduce((a, b) => a + b) / Array.length) * 100).toFixed(2)
-					min = (Number(Math.min.apply(null, Array)) * 100).toFixed(2)
-					max = (Number(Math.max.apply(null, Array)) * 100).toFixed(2)
+					avg = ((Array.reduce((a, b) => a + b) / Array.length) * 100).toFixed(2);
+					min = (Number(Math.min.apply(null, Array)) * 100).toFixed(2);
+					max = (Number(Math.max.apply(null, Array)) * 100).toFixed(2);
 				}
 
-				return { avg, min, max }
+				return { avg, min, max };
 			}
 
 			const Stars = FindPattern(
 				scores.map(score => score.score.StarRating),
 				false,
-			)
+			);
 			const Miss = FindPattern(
 				scores.map(score => score.score.statistics.count_miss),
 				false,
-			)
+			);
 			const Count300 = FindPattern(
 				scores.map(score => score.score.statistics.count_300),
 				false,
-			)
+			);
 			const Count100 = FindPattern(
 				scores.map(score => score.score.statistics.count_100),
 				false,
-			)
+			);
 			const Count50 = FindPattern(
 				scores.map(score => score.score.statistics.count_50),
 				false,
-			)
+			);
 			const bpm = FindPattern(
 				scores.map(score => score.score.bpm),
 				false,
-			)
+			);
 			const Acc = FindPattern(
 				scores.map(score => score.score.accuracy),
 				true,
-			)
+			);
 			const Combo = FindPattern(
 				scores.map(score => score.score.max_combo),
 				false,
-			)
+			);
 			const PPCur = FindPattern(
 				scores.map(score => score.score.CurPP),
 				false,
-			)
+			);
 			const PPFix = FindPattern(
 				scores.map(score => score.score.FixPP),
 				false,
-			)
+			);
 			// const PPSS = FindPattern(scores.map(score => score.score.SSPP))
 
 			const DataForTable = [
@@ -100,16 +100,16 @@ async function PlayStats(user, RuleSetId, mode) {
 				{ name: "n100", min: Count100.min, avg: Count100.avg, max: Count100.max },
 				{ name: "n50", min: Count50.min, avg: Count50.avg, max: Count50.max },
 				{ name: "Miss", min: Miss.min, avg: Miss.avg, max: Miss.max },
-			]
+			];
 
-			t = new Table()
+			t = new Table();
 			DataForTable.forEach(function (Skills) {
-				t.cell("", Skills.name)
-				t.cell("Minimum", Skills.min)
-				t.cell("Average", Skills.avg)
-				t.cell("Maximum", Skills.max)
-				t.newRow()
-			})
+				t.cell("", Skills.name);
+				t.cell("Minimum", Skills.min);
+				t.cell("Average", Skills.avg);
+				t.cell("Maximum", Skills.max);
+				t.newRow();
+			});
 			const embed = new EmbedBuilder()
 				.setColor("Purple")
 				.setAuthor({
@@ -118,10 +118,10 @@ async function PlayStats(user, RuleSetId, mode) {
 					url: `https://osu.ppy.sh/users/${user.id}/${mode}`,
 				})
 				.setThumbnail(user.avatar_url)
-				.setFields({ name: `Statistics:`, value: `\`\`\`${t.toString()}\`\`\`\n**Calculated scores:** \`${scores.length}\``, inline: false })
-			resolve(embed)
-		})
-	})
+				.setFields({ name: `Statistics:`, value: `\`\`\`${t.toString()}\`\`\`\n**Calculated scores:** \`${scores.length}\``, inline: false });
+			resolve(embed);
+		});
+	});
 }
 
-module.exports = { PlayStats }
+module.exports = { PlayStats };

@@ -17,7 +17,7 @@ exports.run = async (client, message, args, prefix) => {
 		let PageNumber = 1;
 		let play_number = undefined;
 		let ModeOsu = "osu";
-		let RulesetId = 0;
+		let RuleSetId = 0;
 		let RB = false;
 
 		let argValues = {};
@@ -38,17 +38,17 @@ exports.run = async (client, message, args, prefix) => {
 		var userargs = await FindUserargs(message, args, server, prefix);
 
 		if (args.includes("-mania")) {
-			RulesetId = 3;
+			RuleSetId = 3;
 			ModeOsu = "mania";
 		}
 
 		if (args.includes("-taiko")) {
-			RulesetId = 1;
+			RuleSetId = 1;
 			ModeOsu = "taiko";
 		}
 
 		if (args.includes("-ctb")) {
-			RulesetId = 2;
+			RuleSetId = 2;
 			ModeOsu = "ctb";
 		}
 
@@ -102,11 +102,13 @@ exports.run = async (client, message, args, prefix) => {
 			var Userurl = `https://api.gatari.pw/users/get?u=`;
 			var UserStatsurl = `https://api.gatari.pw/user/stats?u=`;
 
-			const userResponse = await fetch(`${Userurl}${userargs}`, { method: "GET" });
-			const userStatsResponse = await fetch(`${UserStatsurl}${userargs}&${RulesetId}`, { method: "GET" });
+			var response = await fetch(`${Userurl}${userargs}`, { method: "GET" });
+			var userResponse = await response.json();
+			var response = await fetch(`${UserStatsurl}${userargs}&${RuleSetId}`, { method: "GET" });
+			var userStatsResponse = await response.json();
 
-			user = userResponse.data.users[0];
-			userstats = userStatsResponse.data.stats;
+			user = userResponse.users[0];
+			userstats = userStatsResponse.stats;
 
 			if (user == undefined) {
 				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in Gatari database**`)] });
@@ -162,7 +164,7 @@ exports.run = async (client, message, args, prefix) => {
 
 		if (args.includes("-r") || args.includes("-recent")) RB = true;
 
-		message.channel.send({ embeds: [await GetUserTop(user, userstats, PageNumber, ModeOsu, RulesetId, args, argValues["mods"], play_number, RB, server)] });
+		message.channel.send({ embeds: [await GetUserTop(user, userstats, PageNumber, ModeOsu, RuleSetId, args, argValues["mods"], play_number, RB, server)] });
 	});
 };
 exports.name = ["osutop"];

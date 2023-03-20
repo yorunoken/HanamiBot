@@ -82,11 +82,13 @@ module.exports.run = async (client, message, args, prefix) => {
 			var Userurl = `https://api.gatari.pw/users/get?u=`;
 			var UserStatsurl = `https://api.gatari.pw/user/stats?u=`;
 
-			const userResponse = await fetch(`${Userurl}${userargs}`, { method: "GET" });
-			const userStatsResponse = await fetch(`${UserStatsurl}${userargs}&${RuleSetId}`, { method: "GET" });
+			var response = await fetch(`${Userurl}${userargs}`, { method: "GET" });
+			var userResponse = await response.json();
+			var response = await fetch(`${UserStatsurl}${userargs}&${RuleSetId}`, { method: "GET" });
+			var userStatsResponse = await response.json();
 
-			user = userResponse.data.users[0];
-			userstats = userStatsResponse.data.stats;
+			user = userResponse.users[0];
+			userstats = userStatsResponse.stats;
 
 			if (user == undefined) {
 				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] });

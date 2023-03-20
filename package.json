@@ -58,6 +58,8 @@
     "root-finding": "^1.0.1",
     "rosu-pp": "^0.9.4",
     "rust": "^0.1.6",
+    "steamid-resolver": "^1.2.2",
+    "steamidconvert": "^0.2.4",
     "strftime": "^0.10.1",
     "tenorjs": "^1.0.10",
     "tesseract.js": "^4.0.2",
