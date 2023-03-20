@@ -57,6 +57,7 @@ async function FindUserargs(message, args, server, prefix) {
 					try {
 						if (server == "bancho") userargs = userData[message.author.id].BanchoUserId;
 						if (server == "gatari") userargs = userData[message.author.id].GatariUserId;
+						if (server == "akatsuki") userargs = userData[message.author.id].AkatsukiUserId;
 					} catch (err) {
 						console.error(err);
 						message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Set your osu! username by typing "${prefix}link **your username**"`)] });
