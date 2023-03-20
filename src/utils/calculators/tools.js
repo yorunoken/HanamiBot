@@ -1,3 +1,4 @@
+const { isArray } = require("mathjs");
 function accuracy({ n300, n100, n50, nmiss, ngeki, nkatu }, mode) {
 	n300 = Number(n300) || 0;
 	n100 = Number(n100) || 0;
@@ -18,8 +19,12 @@ function accuracy({ n300, n100, n50, nmiss, ngeki, nkatu }, mode) {
 	}
 }
 
-function grade({ n300, n100, n50, nmiss, nkatu, ngeki }, mode, mods) {
+function grade({ n300, n100, n50, nmiss, nkatu, ngeki, mode, mods }) {
 	if (!mode) return undefined;
+	if (isArray(mods)) mods = mods.join("");
+
+	const isHD = mods.toUpperCase().includes("HD");
+	const isFL = mods.toUpperCase().includes("FL");
 
 	n300 = Number(n300) || 0;
 	n100 = Number(n100) || 0;
@@ -39,13 +44,13 @@ function grade({ n300, n100, n50, nmiss, nkatu, ngeki }, mode, mods) {
 		const percent50 = calculatePercentage(n50, total_hit);
 
 		switch (true) {
-			case percent === 100 && !mods.toUpperCase().includes("HD") && !mods.toUpperCase().includes("FL"):
+			case percent === 100 && !isHD && !isFL:
 				return "X";
-			case percent > 90 && !mods.toUpperCase().includes("HD") && !mods.toUpperCase().includes("FL"):
+			case percent > 90 && !isHD && !isFL:
 				return nmiss >= 1 || percent50 > 1 ? "A" : "S";
-			case percent === 100 && mods.toUpperCase().includes("HD") && mods.toUpperCase().includes("FL"):
+			case percent === 100 && (isHD || isFL):
 				return "XH";
-			case percent > 90 && mods.toUpperCase().includes("HD") && mods.toUpperCase().includes("FL"):
+			case percent > 90 && (isHD || isFL):
 				return nmiss > 0 || percent50 > 1 ? "A" : "SH";
 			case percent > 80:
 				return nmiss > 0 ? "B" : "A";

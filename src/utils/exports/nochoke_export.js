@@ -111,18 +111,16 @@ async function GetuserNoChoke(user, tops, ruleset, GameMode, pageNumber) {
 		let modsName = score.mods.join("");
 		if (modsName.length == 0) modsName = `NM`;
 
-		let GradeForFC = tools.grade(
-			{
-				n300: Map300CountFc,
-				n100: score.statistics.count_100,
-				n50: score.statistics.count_50,
-				nmiss: 0,
-				nkatu: score.statistics.count_katu,
-				ngeki: score.statistics.count_geki,
-			},
-			GameMode,
-			modsName,
-		);
+		let GradeForFC = tools.grade({
+			n300: Map300CountFc,
+			n100: score.statistics.count_100,
+			n50: score.statistics.count_50,
+			nmiss: 0,
+			nkatu: score.statistics.count_katu,
+			ngeki: score.statistics.count_geki,
+			mode: GameMode,
+			mods: modsName,
+		});
 
 		//grades
 		const grades = {
