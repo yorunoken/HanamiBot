@@ -40,6 +40,29 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		valuemiss,
 		valuecombo = 0;
 
+	function getRetryCount(retryMap, mapId) {
+		let retryCounter = 0;
+		for (let i = 0; i < retryMap.length; i++) {
+			if (retryMap[i] === mapId) {
+				retryCounter++;
+			}
+		}
+		return retryCounter;
+	}
+
+	//grades
+	const grades = {
+		A: "<:A_:1057763284327080036>",
+		B: "<:B_:1057763286097076405>",
+		C: "<:C_:1057763287565086790>",
+		D: "<:D_:1057763289121173554>",
+		F: "<:F_:1057763290484318360>",
+		S: "<:S_:1057763291998474283>",
+		SH: "<:SH_:1057763293491642568>",
+		X: "<:X_:1057763294707974215>",
+		XH: "<:XH_:1057763296717045891>",
+	};
+
 	if (server == "gatari") {
 		var url = `https://api.gatari.pw/user/scores/recent`;
 		const response = await axios.get(`${url}?id=${user.id}&l=100&p=1&mode=${RuleSetId}&f=${PassDetermine}`);
@@ -186,6 +209,122 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		creatorName = MapAkatsuki.beatmapset.creator;
 	}
 
+	if (server == "saber") {
+		var BaseUrl = `https://scoresaber.com/api`;
+		var response = await fetch(`${BaseUrl}/player/${user.id}/scores?limit=100&sort=recent&page=1&withMetadata=true`, { method: "GET" });
+		var data = await response.json();
+
+		score = data.playerScores;
+		if (score.length == 0) {
+			let embed = new EmbedBuilder().setColor("Purple").setDescription(`No Beat Saber plays found for **${user.name}**`);
+			return { embed, FilterMods };
+		}
+
+		function getAccuracy(score) {
+			let scoreCalc = score.score.baseScore;
+			let maxScore = score.leaderboard.maxScore;
+			return ((scoreCalc / maxScore) * 100) / score.score.multiplier;
+		}
+
+		function getGrade(accuracy) {
+			switch (true) {
+				case accuracy >= 90:
+					return "X";
+				case accuracy >= 80:
+					return "S";
+				case accuracy >= 65:
+					return "A";
+				case accuracy >= 50:
+					return "B";
+				case accuracy >= 35:
+					return "C";
+				case accuracy >= 20:
+					return "D";
+				default:
+					return "F";
+			}
+		}
+
+		function getDifficultyLabel(input) {
+			switch (input) {
+				case 1:
+					return "Easy";
+				case 3:
+					return "Normal";
+				case 5:
+					return "Hard";
+				case 7:
+					return "Expert";
+				case 9:
+					return "Expert+";
+			}
+		}
+
+		const accuracy = `**(${Number(getAccuracy(score[value])).toFixed(2)}%)**`;
+		// ModsName = mods.name(score[value].mods).toUpperCase();
+
+		const mapId = score[value].leaderboard.difficulty.leaderboardId;
+		const badCut = score[value].score.badCuts;
+		const missedNote = score[value].score.missedNotes;
+		const valuecombo = score[value].score.maxCombo;
+		const map_score = score[value].score.modifiedScore.toLocaleString();
+
+		const AccValues = `{ **Bad:**${badCut}/**Miss:**${missedNote} }`;
+
+		retryMap = score.map(x => x.leaderboard.difficulty.leaderboardId);
+		retryMap.splice(0, value);
+		const retryCounter = getRetryCount(retryMap, mapId);
+
+		const global_rank = user.rank?.toLocaleString() || "-";
+		const country_rank = user.countryRank?.toLocaleString() || "-";
+		const user_pp = user.pp.toLocaleString();
+		const CountryCode = user.country;
+
+		const profileUrl = `https://scoresaber.com/u/${user.id}`;
+		// const avatarUrl = user.profilePicture;
+
+		const TimeCreated = new Date(score[value].score.timeSet).getTime() / 1000;
+		let grade = getGrade(accuracy);
+		grade = grades[grade];
+
+		const difficulty = getDifficultyLabel(score[value].leaderboard.difficulty.difficulty);
+		const title = `${score[value].leaderboard.songAuthorName} - ${score[value].leaderboard.songName} [${difficulty}]`;
+		if (score[value].leaderboard.ranked) MapStatus = `Ranked`;
+		else if (score[value].leaderboard.qualified) MapStatus = `Qualified`;
+		else if (score[value].leaderboard.loved) MapStatus = `Loved`;
+		else MapStatus = `Unknown`;
+
+		const HMDs = {
+			0: "Unknown",
+			1: "Oculus Rift CV1",
+			2: "Vive",
+			4: "Vive Pro",
+			8: "Windows Mixed Reality",
+			16: "Rift S",
+			32: "Oculus Quest",
+			64: "Valve Index",
+			128: "Vive Cosmos",
+		};
+
+		const creatorName = score[value].leaderboard.levelAuthorName;
+
+		//score embed
+		const embed = new EmbedBuilder()
+			.setColor("Purple")
+			.setAuthor({
+				name: `${user.name} ${user_pp}pp (#${global_rank} ${CountryCode}#${country_rank}) `,
+				iconURL: `https://osu.ppy.sh/images/flags/${CountryCode}.png`,
+				url: profileUrl,
+			})
+			.setTitle(title)
+			.setURL(`https://scoresaber.com/leaderboard/${mapId}`)
+			.setDescription(`${grade} • **__[${score[value].leaderboard.stars}★]__**\n▹**${score[value].score.pp.toFixed(2)}pp** • ${map_score} ${accuracy}\n▹[ **${valuecombo}**x ] • ${AccValues}\n▹Score Set <t:${TimeCreated}:R> • **Try #${retryCounter}**\nHeadset used: **${HMDs[score[value].score.hmd]}**`)
+			// .setFields({ name: `**Beatmap info:**`, value: `BPM: \`${mapValues.bpm.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${mapValues.ar.toFixed(1).toString().replace(/\.0+$/, "")}\` OD: \`${mapValues.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\`` })
+			.setThumbnail(score[value].leaderboard.coverImage)
+			.setFooter({ text: `${MapStatus} map by ${creatorName} | Beat Saber`, iconURL: `https://upload.wikimedia.org/wikipedia/commons/9/91/Beat_Saber_Logo.png` });
+		return { embed, FilterMods, top1k, score_id };
+	}
+
 	if (server == "bancho") {
 		const url = new URL(`https://osu.ppy.sh/api/v2/users/${user.id}/scores/recent`);
 		const params = {
@@ -317,16 +456,6 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 	//fc pp
 	let FCAttrs = calc.n300(value300).n100(value100).n50(value50).nMisses(0).combo(maxAttrs.difficulty.maxCombo).nGeki(valuegeki).nKatu(valuekatu).performance(map);
 
-	function getRetryCount(retryMap, mapId) {
-		let retryCounter = 0;
-		for (let i = 0; i < retryMap.length; i++) {
-			if (retryMap[i] === mapId) {
-				retryCounter++;
-			}
-		}
-		return retryCounter;
-	}
-
 	const retryCounter = getRetryCount(retryMap, mapId);
 
 	if (RuleSetId == "0") AccValues = `{**${value300}**/${value100}/${value50}/${valuemiss}}`;
@@ -347,18 +476,6 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		percentage = " ";
 	}
 
-	//grades
-	const grades = {
-		A: "<:A_:1057763284327080036>",
-		B: "<:B_:1057763286097076405>",
-		C: "<:C_:1057763287565086790>",
-		D: "<:D_:1057763289121173554>",
-		F: "<:F_:1057763290484318360>",
-		S: "<:S_:1057763291998474283>",
-		SH: "<:SH_:1057763293491642568>",
-		X: "<:X_:1057763294707974215>",
-		XH: "<:XH_:1057763296717045891>",
-	};
 	grade = grades[grade];
 
 	pps = `**${CurAttrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}PP`;
