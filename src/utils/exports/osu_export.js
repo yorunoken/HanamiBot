@@ -1,5 +1,5 @@
-const { v2, auth } = require("osu-api-extended")
-const { EmbedBuilder } = require("discord.js")
+const { v2, auth } = require("osu-api-extended");
+const { EmbedBuilder } = require("discord.js");
 
 async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) {
 	//grades
@@ -9,7 +9,7 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 		SH: "<:SH_:1057763293491642568>",
 		X: "<:X_:1057763294707974215>",
 		XH: "<:XH_:1057763296717045891>",
-	}
+	};
 
 	const options = {
 		hour: "2-digit",
@@ -18,51 +18,51 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 		month: "numeric",
 		day: "numeric",
 		timeZone: "UTC",
-	}
+	};
 
 	if (server == "gatari") {
 		try {
-			global_rank = userstats.rank.toLocaleString()
-			country_rank = userstats.country_rank.toLocaleString()
-			pp = userstats.pp.toLocaleString()
+			global_rank = userstats.rank.toLocaleString();
+			country_rank = userstats.country_rank.toLocaleString();
+			pp = userstats.pp.toLocaleString();
 		} catch (err) {
-			global_rank = "0"
-			country_rank = "0"
-			pp = "0"
+			global_rank = "0";
+			country_rank = "0";
+			pp = "0";
 		}
 
 		try {
-			acc = userstats.avg_accuracy.toFixed(2)
+			acc = userstats.avg_accuracy.toFixed(2);
 		} catch (err) {
-			acc = 0
+			acc = 0;
 		}
-		UserLevel = userstats.level
-		lvl = userstats.level_progress
-		lvlprogress = lvl.toString(10).padStart(2, "0")
-		playcount = userstats.playcount.toLocaleString()
-		playhours = userstats.playtime.toFixed(4) / 3600
-		followers = user.followers_count.toLocaleString()
-		profile_maxcombo = userstats.max_combo.toLocaleString()
+		UserLevel = userstats.level;
+		lvl = userstats.level_progress;
+		lvlprogress = lvl.toString(10).padStart(2, "0");
+		playcount = userstats.playcount.toLocaleString();
+		playhours = userstats.playtime.toFixed(4) / 3600;
+		followers = user.followers_count.toLocaleString();
+		profile_maxcombo = userstats.max_combo.toLocaleString();
 
 		//ranks
-		let ssh = userstats.xh_count.toLocaleString()
-		let ss = userstats.x_count.toLocaleString()
-		let sh = userstats.s_count.toLocaleString()
-		let s = userstats.s_count.toLocaleString()
-		let a = userstats.a_count.toLocaleString()
+		let ssh = userstats.xh_count.toLocaleString();
+		let ss = userstats.x_count.toLocaleString();
+		let sh = userstats.s_count.toLocaleString();
+		let s = userstats.s_count.toLocaleString();
+		let a = userstats.a_count.toLocaleString();
 
 		//join date
-		const dateString = user.registered_on * 1000
-		const date = new Date(dateString)
+		const dateString = user.registered_on * 1000;
+		const date = new Date(dateString);
 		//current time
-		const currenttime = new Date()
-		const timedifference = currenttime - date
+		const currenttime = new Date();
+		const timedifference = currenttime - date;
 		//convert the time difference to months
-		const months = Math.floor(timedifference / (1000 * 60 * 60 * 24 * 30))
-		const user_joined = months / 12
-		const user_joined_ago = user_joined.toFixed(1)
+		const months = Math.floor(timedifference / (1000 * 60 * 60 * 24 * 30));
+		const user_joined = months / 12;
+		const user_joined_ago = user_joined.toFixed(1);
 
-		const formattedDate = date.toLocaleDateString("en-US", options)
+		const formattedDate = date.toLocaleDateString("en-US", options);
 
 		//embed
 		const embed = new EmbedBuilder()
@@ -77,42 +77,42 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 			.setImage(user.cover_url)
 			.setFooter({
 				text: `Joined osu!${server} ${formattedDate} (${user_joined_ago} years ago)`,
-			})
-		return embed
+			});
+		return embed;
 	}
 
 	if (server == "akatsuki") {
-		let uStats = user.stats[0].std
-		if (mode == "taiko") uStats = user.stats[0].taiko
-		if (mode == "fruits") uStats = user.stats[0].ctb
-		if (mode == "mania") uStats = user.stats[0].mania
+		let uStats = user.stats[0].std;
+		if (mode == "taiko") uStats = user.stats[0].taiko;
+		if (mode == "fruits") uStats = user.stats[0].ctb;
+		if (mode == "mania") uStats = user.stats[0].mania;
 
-		global_rank = uStats.global_leaderboard_rank?.toLocaleString() || "-"
-		country_rank = uStats.country_leaderboard_rank?.toLocaleString() || "-"
-		pp = uStats.pp.toLocaleString() || "0"
-		acc = uStats.accuracy.toFixed(2) || "0"
+		global_rank = uStats.global_leaderboard_rank?.toLocaleString() || "-";
+		country_rank = uStats.country_leaderboard_rank?.toLocaleString() || "-";
+		pp = uStats.pp.toLocaleString() || "0";
+		acc = uStats.accuracy.toFixed(2) || "0";
 
-		UserLevel = uStats.level.toFixed(2)
-		playcount = uStats.playcount.toLocaleString()
-		playhours = uStats.playtime.toFixed(4) / 3600
-		followers = user.followers.toLocaleString()
-		profile_maxcombo = uStats.max_combo.toLocaleString()
+		UserLevel = uStats.level.toFixed(2);
+		playcount = uStats.playcount.toLocaleString();
+		playhours = uStats.playtime.toFixed(4) / 3600;
+		followers = user.followers.toLocaleString();
+		profile_maxcombo = uStats.max_combo.toLocaleString();
 
-		const date = new Date(user.registered_on)
-		const currenttime = new Date()
-		const timedifference = currenttime - date
-		const months = Math.floor(timedifference / (1000 * 60 * 60 * 24 * 30))
-		const user_joined = months / 12
-		const user_joined_ago = user_joined.toFixed(1)
+		const date = new Date(user.registered_on);
+		const currenttime = new Date();
+		const timedifference = currenttime - date;
+		const months = Math.floor(timedifference / (1000 * 60 * 60 * 24 * 30));
+		const user_joined = months / 12;
+		const user_joined_ago = user_joined.toFixed(1);
 
-		const formattedDate = date.toLocaleDateString("en-US", options)
+		const formattedDate = date.toLocaleDateString("en-US", options);
 
-		var clan = user.clan
-		let clanTag = `[${clan.tag}]`
-		let clanName = clan.name
+		var clan = user.clan;
+		let clanTag = `[${clan.tag}]`;
+		let clanName = clan.name;
 		if (clan.id == 0) {
-			clanTag = ""
-			clanName = "None"
+			clanTag = "";
+			clanName = "None";
 		}
 
 		//embed
@@ -128,57 +128,56 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 			.setImage(user.cover_url)
 			.setFooter({
 				text: `Joined osu!${server} ${formattedDate} (${user_joined_ago} years ago)`,
-			})
-		return embed
+			});
+		return embed;
 	}
 
-	await auth.login(process.env.client_id, process.env.client_secret)
+	await auth.login(process.env.client_id, process.env.client_secret);
 	if (firstPage) {
-		console.log("first page")
 		try {
-			global_rank = user.statistics.global_rank.toLocaleString()
-			country_rank = user.statistics.country_rank.toLocaleString()
-			pp = user.statistics.pp.toLocaleString()
+			global_rank = user.statistics.global_rank.toLocaleString();
+			country_rank = user.statistics.country_rank.toLocaleString();
+			pp = user.statistics.pp.toLocaleString();
 		} catch (err) {
-			global_rank = "0"
-			country_rank = "0"
-			pp = "0"
+			global_rank = "0";
+			country_rank = "0";
+			pp = "0";
 		}
 
-		acc = user.statistics.hit_accuracy.toFixed(2)
-		lvl = user.statistics.level.progress
-		lvlprogress = lvl.toString(10).padStart(2, "0")
-		playcount = user.statistics.play_count.toLocaleString()
-		playhours = user.statistics.play_time.toFixed(4) / 3600
-		followers = user.follower_count.toLocaleString()
-		profile_maxcombo = user.statistics.maximum_combo.toLocaleString()
+		acc = user.statistics.hit_accuracy.toFixed(2);
+		lvl = user.statistics.level.progress;
+		lvlprogress = lvl.toString(10).padStart(2, "0");
+		playcount = user.statistics.play_count.toLocaleString();
+		playhours = user.statistics.play_time.toFixed(4) / 3600;
+		followers = user.follower_count.toLocaleString();
+		profile_maxcombo = user.statistics.maximum_combo.toLocaleString();
 
 		//ranks
-		let ssh = user.statistics.grade_counts.ssh.toLocaleString()
-		let ss = user.statistics.grade_counts.ss.toLocaleString()
-		let sh = user.statistics.grade_counts.sh.toLocaleString()
-		let s = user.statistics.grade_counts.s.toLocaleString()
-		let a = user.statistics.grade_counts.a.toLocaleString()
+		let ssh = user.statistics.grade_counts.ssh.toLocaleString();
+		let ss = user.statistics.grade_counts.ss.toLocaleString();
+		let sh = user.statistics.grade_counts.sh.toLocaleString();
+		let s = user.statistics.grade_counts.s.toLocaleString();
+		let a = user.statistics.grade_counts.a.toLocaleString();
 
 		//join date
-		const dateString = user.join_date
-		const date = new Date(dateString)
+		const dateString = user.join_date;
+		const date = new Date(dateString);
 		//current time
-		const currenttime = new Date()
-		const timedifference = currenttime - date
+		const currenttime = new Date();
+		const timedifference = currenttime - date;
 		//convert the time difference to months
-		const months = Math.floor(timedifference / (1000 * 60 * 60 * 24 * 30))
-		const user_joined = months / 12
-		const user_joined_ago = user_joined.toFixed(1)
+		const months = Math.floor(timedifference / (1000 * 60 * 60 * 24 * 30));
+		const user_joined = months / 12;
+		const user_joined_ago = user_joined.toFixed(1);
 
-		const formattedDate = date.toLocaleDateString("en-US", options)
+		const formattedDate = date.toLocaleDateString("en-US", options);
 
 		//time get
-		let time
+		let time;
 		try {
-			time = `**Peak Rank:** \`#${user.rank_highest.rank.toLocaleString()}\` • **Achieved:** <t:${new Date(user.rank_highest.updated_at).getTime() / 1000}:R>\n`
+			time = `**Peak Rank:** \`#${user.rank_highest.rank.toLocaleString()}\` **Achieved:** <t:${new Date(user.rank_highest.updated_at).getTime() / 1000}:R>\n`;
 		} catch (err) {
-			time = ""
+			time = "";
 		}
 
 		//embed
@@ -194,95 +193,95 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 			.setImage(user.cover_url)
 			.setFooter({
 				text: `Joined osu!${server} ${formattedDate} (${user_joined_ago} years ago)`,
-			})
-		return embed
+			});
+		return embed;
 	} else {
 		const tops = await v2.user.scores.category(user.id, "best", {
 			mode: mode,
 			limit: "100",
 			offset: "0",
-		})
+		});
 
 		try {
-			global_rank = user.statistics.global_rank.toLocaleString()
-			country_rank = user.statistics.country_rank.toLocaleString()
-			pp = user.statistics.pp.toLocaleString()
-			pp_spread_raw = tops[0].pp - tops[tops.length - 1].pp
-			pp_spread_num = pp_spread_raw.toFixed(2)
+			global_rank = user.statistics.global_rank.toLocaleString();
+			country_rank = user.statistics.country_rank.toLocaleString();
+			pp = user.statistics.pp.toLocaleString();
+			pp_spread_raw = tops[0].pp - tops[tops.length - 1].pp;
+			pp_spread_num = pp_spread_raw.toFixed(2);
 		} catch (err) {
-			global_rank = "0"
-			country_rank = "0"
-			pp = "0"
-			pp_spread_raw = "0"
-			pp_spread_num = "0"
+			global_rank = "0";
+			country_rank = "0";
+			pp = "0";
+			pp_spread_raw = "0";
+			pp_spread_num = "0";
 		}
 
-		const user_pp_statr = Math.pow(user.statistics.pp, 0.4)
-		let recc_stars = (user_pp_statr * 0.195).toFixed(2)
-		if (recc_stars == 0) recc_stars = 1
+		const user_pp_statr = Math.pow(user.statistics.pp, 0.4);
+		let recc_stars = (user_pp_statr * 0.195).toFixed(2);
+		if (recc_stars == 0) recc_stars = 1;
 
-		replays_watched = user.statistics.replays_watched_by_others.toLocaleString()
-		medal_count = user.user_achievements.length
-		medal_percentage_number = (medal_count / 289) * 100
-		medal_percentage = medal_percentage_number.toFixed(2)
-		hpp = user.statistics.total_hits / user.statistics.play_count
-		hpp_count = hpp.toFixed(1)
+		replays_watched = user.statistics.replays_watched_by_others.toLocaleString();
+		medal_count = user.user_achievements.length;
+		medal_percentage_number = (medal_count / 289) * 100;
+		medal_percentage = medal_percentage_number.toFixed(2);
+		hpp = user.statistics.total_hits / user.statistics.play_count;
+		hpp_count = hpp.toFixed(1);
 
 		//join date
-		const dateString = user.join_date
-		const date = new Date(dateString)
+		const dateString = user.join_date;
+		const date = new Date(dateString);
 		//current time
-		const currenttime = new Date()
-		const timedifference = currenttime - date
+		const currenttime = new Date();
+		const timedifference = currenttime - date;
 		//convert the time difference to months
-		const months = Math.floor(timedifference / (1000 * 60 * 60 * 24 * 30))
-		const user_joined = months / 12
-		const user_joined_ago = user_joined.toFixed(1)
+		const months = Math.floor(timedifference / (1000 * 60 * 60 * 24 * 30));
+		const user_joined = months / 12;
+		const user_joined_ago = user_joined.toFixed(1);
 
-		const formattedDate = date.toLocaleDateString("en-US", options)
+		const formattedDate = date.toLocaleDateString("en-US", options);
 
-		let playstyles = ""
+		let playstyles = "";
 
 		try {
-			const first = user.playstyle[0]
-			const playstyle1 = first.charAt(0).toUpperCase() + first.slice(1).toLowerCase()
-			playstyles += `${playstyle1} `
+			const first = user.playstyle[0];
+			const playstyle1 = first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
+			playstyles += `${playstyle1} `;
 		} catch (err) {}
 
 		try {
-			const second = user.playstyle[1]
-			const playstyle2 = second.charAt(0).toUpperCase() + second.slice(1).toLowerCase()
-			playstyles += `${playstyle2} `
+			const second = user.playstyle[1];
+			const playstyle2 = second.charAt(0).toUpperCase() + second.slice(1).toLowerCase();
+			playstyles += `${playstyle2} `;
 		} catch (err) {}
 
 		try {
-			const third = user.playstyle[2]
-			const playstyle3 = third.charAt(0).toUpperCase() + third.slice(1).toLowerCase()
-			playstyles += `${playstyle3} `
+			const third = user.playstyle[2];
+			const playstyle3 = third.charAt(0).toUpperCase() + third.slice(1).toLowerCase();
+			playstyles += `${playstyle3} `;
 		} catch (err) {}
 
 		try {
-			const fourth = user.playstyle[3]
-			const playstyle4 = fourth.charAt(0).toUpperCase() + fourth.slice(1).toLowerCase()
-			playstyles += `${playstyle4} `
+			const fourth = user.playstyle[3];
+			const playstyle4 = fourth.charAt(0).toUpperCase() + fourth.slice(1).toLowerCase();
+			playstyles += `${playstyle4} `;
 		} catch (err) {}
 
 		if (playstyles.length === 0) {
-			playstyles = "NaN"
+			playstyles = "NaN";
 		}
 
-		playstyles = playstyles.trim()
+		playstyles = playstyles.trim();
 
-		let posts = user.post_count
-		if (posts == undefined) posts = "0"
+		let posts = user.post_count;
+		if (posts == undefined) posts = "0";
 
-		let comments = user.comments_count
-		if (comments == undefined) comments = "0"
+		let comments = user.comments_count;
+		if (comments == undefined) comments = "0";
 
-		const number_1s = user.scores_first_count
+		const number_1s = user.scores_first_count;
 
-		const totalScore = user.statistics.total_score.toLocaleString()
-		const rankedScore = user.statistics.ranked_score.toLocaleString()
+		const totalScore = user.statistics.total_score.toLocaleString();
+		const rankedScore = user.statistics.ranked_score.toLocaleString();
 
 		//embed
 		const embed = new EmbedBuilder()
@@ -297,10 +296,10 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 			.setImage(user.cover_url)
 			.setFooter({
 				text: `Joined osu!${server} ${formattedDate} (${user_joined_ago} years ago)`,
-			})
+			});
 
-		return embed
+		return embed;
 	}
 }
 
-module.exports = { GetUserPage }
+module.exports = { GetUserPage };
