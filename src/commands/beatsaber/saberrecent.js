@@ -33,7 +33,7 @@ exports.run = async (client, message, args, prefix) => {
 			const responseAnswer = await repsonse.json();
 			const data = responseAnswer.response;
 			if (data.success != 1) {
-				message.reply(`**The user \`${username}\` does not exist in the Steam database.**`);
+				message.reply(`**The user \`${userargs}\` does not exist in the Beat Saber database.**`);
 				return;
 			}
 			userargs = data.steamid;
@@ -44,7 +44,7 @@ exports.run = async (client, message, args, prefix) => {
 		var response = await fetch(`${BaseUrl}/player/${userargs}/full`, { method: "GET" });
 		user = await response.json();
 		if (user.errorMessage == "Player not found") {
-			message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player with the id \`${userargs}\` does not exist in Steam database**`)] });
+			message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player with the id \`${userargs}\` does not exist in Beat Saber database**`)] });
 			return;
 		}
 
