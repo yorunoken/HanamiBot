@@ -5,8 +5,8 @@ const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
 const axios = require("axios");
 
-const { tools } = require("../../utils/calculators/tools.js");
-const { mods } = require("../../utils/calculators/mods.js");
+const { tools } = require("../../utils/tools.js");
+const { mods } = require("../../utils/mods.js");
 
 async function GetUserTop(user, userstats, pageNumber, ModeOsu, RuleSetId, args, ModsSearch, play_number, rb, server) {
 	//determine the page of the osutop

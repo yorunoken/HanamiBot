@@ -1,19 +1,19 @@
-const { translate } = require("@vitalets/google-translate-api")
-const { EmbedBuilder } = require("discord.js")
+const { translate } = require("@vitalets/google-translate-api");
+const { EmbedBuilder } = require("discord.js");
 
 exports.run = async (client, message, args, prefix) => {
-	await message.channel.sendTyping()
+	await message.channel.sendTyping();
 
-	let TranslateTo = "en"
-	const Text = args.join(" ")
+	let TranslateTo = "en";
+	const Text = args.join(" ");
 
-	let res
+	let res;
 	try {
-		res = await translate(Text, { to: TranslateTo })
+		res = await translate(Text, { to: TranslateTo });
 	} catch (err) {
-	console.log(err)
-		message.channel.send(`There appears to be an error with the api. Please try again.`)
-		return
+		console.log(err);
+		message.channel.send(`There appears to be an error with the api. Please try again.`);
+		return;
 	}
 
 	try {
@@ -22,15 +22,15 @@ exports.run = async (client, message, args, prefix) => {
 			.setColor("Purple")
 			// .setThumbnail(`${message.author.displayAvatarURL()}?size=1024`)
 			.setDescription(`raw:\n> ${Text}\n\ntranslated:\n> ${res.text}`)
-			.setFooter({ text: `Requested by ${message.author.username}` })
+			.setFooter({ text: `Requested by ${message.author.username}` });
 
-		message.channel.send({ embeds: [embed] })
+		message.channel.send({ embeds: [embed] });
 	} catch (err) {
-		message.channel.send(`${err}`)
+		message.channel.send(`${err}`);
 	}
-}
-exports.name = "translate"
-exports.aliases = ["translate"]
-exports.description = ["Translates your text to English!"]
-exports.usage = [`translate naber dostum ne yapıyorsun`]
-exports.category = ["general"]
+};
+exports.name = "translate";
+exports.aliases = ["translate", "tr"];
+exports.description = ["Translates your text to English!"];
+exports.usage = [`translate naber dostum ne yapıyorsun`];
+exports.category = ["general"];

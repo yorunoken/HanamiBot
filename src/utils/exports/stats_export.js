@@ -4,7 +4,7 @@ const { EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 const Table = require("easy-table");
 
-const { mods } = require("../../utils/calculators/mods.js");
+const { mods } = require("../../utils/mods.js");
 
 async function GetUserTop100Stats(user, tops, ruleset, mode) {
 	try {

@@ -4,7 +4,7 @@ const { v2, auth } = require("osu-api-extended");
 const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
 
-const { mods } = require("../../utils/calculators/mods.js");
+const { mods } = require("../../utils/mods.js");
 
 exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping();

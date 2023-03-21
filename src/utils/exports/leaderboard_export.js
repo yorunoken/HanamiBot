@@ -3,7 +3,7 @@ const fs = require("fs");
 const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
 
-const { mods } = require("../../utils/calculators/mods.js");
+const { mods } = require("../../utils/mods.js");
 
 async function LbSend(beatmapId, scores, pagenum, mapinfo, AuthorsName) {
 	const start = (pagenum - 1) * 5 + 1;

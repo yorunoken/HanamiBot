@@ -6,7 +6,7 @@ const fs = require("fs");
 const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
 
-const { mods } = require("../../utils/calculators/mods.js");
+const { mods } = require("../../utils/mods.js");
 
 async function CardImage(user, aimProg, speedProg, accProg) {
 	const width = 658;

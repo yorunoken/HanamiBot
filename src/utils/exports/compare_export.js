@@ -5,8 +5,8 @@ const { v2, auth } = require("osu-api-extended");
 const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
 
-const { tools } = require("../../utils/calculators/tools.js");
-const { mods } = require("../../utils/calculators/mods.js");
+const { tools } = require("../../utils/tools.js");
+const { mods } = require("../../utils/mods.js");
 
 async function CompareEmbed(mapinfo, beatmapId, user, ModeString, value, pagenum, server, userstats) {
 	try {

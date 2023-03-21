@@ -7,7 +7,7 @@
 
 //requirements
 const { Client, GatewayIntentBits, ActivityType, EmbedBuilder } = require("discord.js");
-const { auth } = require("./utils/calculators/auth.js");
+const { auth } = require("./utils/auth.js");
 const fs = require("fs");
 require("dotenv/config");
 

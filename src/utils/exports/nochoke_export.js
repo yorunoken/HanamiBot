@@ -6,8 +6,8 @@ const endpoint = `https://osudaily.net/api/`;
 const apiKey = process.env.osudaily_api;
 const fs = require("fs");
 
-const { tools } = require("../../utils/calculators/tools.js");
-const { mods } = require("../../utils/calculators/mods.js");
+const { tools } = require("../../utils/tools.js");
+const { mods } = require("../../utils/mods.js");
 
 async function GetuserNoChoke(user, tops, ruleset, GameMode, pageNumber) {
 	try {
