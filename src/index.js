@@ -19,21 +19,11 @@ const client = new Client({
 
 // check if nessecary folders exist
 
-console.log("checking for folders..");
+console.log("checking for files..");
 if (!fs.existsSync("mes")) {
 	console.log("mes folder not found, creating folder..");
 	fs.mkdirSync("mes");
 } else console.log("mes ✔");
-
-if (!fs.existsSync("cache")) {
-	console.log("cache folder not found, creating folder..");
-	fs.mkdirSync("cache");
-} else console.log("cache ✔");
-
-if (!fs.existsSync("bin")) {
-	console.log("bin folder not found, creating folder..");
-	fs.mkdirSync("bin");
-} else console.log("bin ✔");
 
 if (!fs.existsSync("beatmapsongs")) {
 	console.log("beatmapsongs folder not found, creating folder..");
@@ -44,6 +34,27 @@ if (!fs.existsSync("osuBeatmapCache")) {
 	console.log("osuBeatmapCache folder not found, creating folder..");
 	fs.mkdirSync("osuBeatmapCache");
 } else console.log("osuBeatmapCache ✔");
+
+if (!fs.existsSync("user-data.json")) {
+	console.log("user-data.json not found, creating file..");
+	fs.writeFile("user-data.json", "{}", err => {
+		console.log("user-data.json has been created!");
+	});
+} else console.log("user-data.json ✔");
+
+if (!fs.existsSync("user-recent.json")) {
+	console.log("user-recent.json not found, creating file..");
+	fs.writeFile("user-recent.json", "{}", err => {
+		console.log("user-recent.json has been created!");
+	});
+} else console.log("user-recent.json ✔");
+
+if (!fs.existsSync("user-replay.json")) {
+	console.log("user-replay.json not found, creating file..");
+	fs.writeFile("user-replay.json", "{}", err => {
+		console.log("user-replay.json has been created!");
+	});
+} else console.log("user-replay.json ✔");
 
 // command handler
 client.commands = new Map();
