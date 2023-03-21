@@ -27,19 +27,8 @@ exports.run = async (client, message, args, prefix) => {
 
 		if (args.includes("-bancho")) server = "bancho";
 		if (args.includes("-gatari")) server = "gatari";
+		if (args.includes("-akatsuki")) server = "akatsuki";
 
-		let mode;
-		try {
-			mode = userData[message.author.id].osumode;
-			if (mode == undefined) mode = "osu";
-		} catch (err) {
-			mode = "osu";
-		}
-
-		if (mode == "osu") RuleSetId = 0;
-		if (mode == "taiko") RuleSetId = 1;
-		if (mode == "fruits") RuleSetId = 2;
-		if (mode == "mania") RuleSetId = 3;
 
 		let ErrCount = 0;
 
@@ -111,26 +100,6 @@ exports.run = async (client, message, args, prefix) => {
 					return;
 				}
 			} else {
-				if (args.includes("-osu")) {
-					RuleSetId = 0;
-					mode = "osu";
-				}
-
-				if (args.includes("-mania")) {
-					RuleSetId = 3;
-					mode = "mania";
-				}
-
-				if (args.includes("-taiko")) {
-					RuleSetId = 1;
-					mode = "taiko";
-				}
-
-				if (args.includes("-ctb")) {
-					RuleSetId = 2;
-					mode = "ctb";
-				}
-
 				if (args.join(" ").startsWith("-gatari") || args.join(" ").startsWith("-bancho") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-p") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-osu")) {
 					try {
 						if (server == "bancho") userargs = userData[message.author.id].BanchoUserId;
@@ -153,38 +122,6 @@ exports.run = async (client, message, args, prefix) => {
 
 		let user;
 		let userstats;
-
-		if (server == "bancho") {
-			//log in
-			await auth.login(process.env.client_id, process.env.client_secret);
-			user = await v2.user.details(userargs, mode);
-			if (user.id === undefined) {
-				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] });
-				return;
-			}
-		}
-
-		if (server == "gatari") {
-			var Userurl = `https://api.gatari.pw/users/get?u=`;
-			var UserStatsurl = `https://api.gatari.pw/user/stats?u=`;
-
-			var response = await fetch(`${Userurl}${userargs}`, { method: "GET" });
-			var userResponse = await response.json();
-
-			var response = await fetch(`${UserStatsurl}${userargs}&${RuleSetId}`, { method: "GET" });
-			var userStatsResponse = await response.json();
-
-			user = userResponse.users[0];
-			userstats = userStatsResponse.stats;
-
-			console.log(userResponse);
-			console.log(user);
-
-			if (user == undefined) {
-				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] });
-				return;
-			}
-		}
 
 		async function EmbedFetch(embed) {
 			try {
@@ -283,6 +220,58 @@ exports.run = async (client, message, args, prefix) => {
 		}
 
 		async function EmbedFunc(mapinfo, beatmapId, user, ModeOsu, value, pagenum, server, userstats) {
+			if (args.includes("-osu")) {
+				RuleSetId = 0;
+				mode = "osu";
+			}
+
+			if (args.includes("-mania")) {
+				RuleSetId = 3;
+				mode = "mania";
+			}
+
+			if (args.includes("-taiko")) {
+				RuleSetId = 1;
+				mode = "taiko";
+			}
+
+			if (args.includes("-ctb")) {
+				RuleSetId = 2;
+				mode = "ctb";
+			}
+
+			if (server == "bancho") {
+				//log in
+				await auth.login(process.env.client_id, process.env.client_secret);
+				user = await v2.user.details(userargs, mode);
+				if (user.id === undefined) {
+					message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] });
+					return;
+				}
+			}
+
+			if (server == "gatari") {
+				var Userurl = `https://api.gatari.pw/users/get?u=`;
+				var UserStatsurl = `https://api.gatari.pw/user/stats?u=`;
+
+				var response = await fetch(`${Userurl}${userargs}`, { method: "GET" });
+				var userResponse = await response.json();
+
+				var response = await fetch(`${UserStatsurl}${userargs}&${RuleSetId}`, { method: "GET" });
+				var userStatsResponse = await response.json();
+
+				user = userResponse.users[0];
+				userstats = userStatsResponse.stats;
+
+				console.log(userResponse);
+				console.log(user);
+
+				if (user == undefined) {
+					message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] });
+					return;
+				}
+			}
+
 			message.channel.send({ embeds: [await CompareEmbed(mapinfo, beatmapId, user, ModeOsu, value, pagenum, server, userstats)] });
 		}
 
