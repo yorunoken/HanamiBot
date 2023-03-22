@@ -133,7 +133,7 @@ module.exports.run = async (client, message, args, prefix) => {
 	});
 };
 exports.name = ["recentpassctb"];
-exports.aliases = ["recentpassctb", "rpctb", "rspctb", "rpc", "rspc"];
+exports.aliases = ["recentpassctb", "rpctb", "rpc", ];
 exports.description = ["Displays user's recent passed osu!ctb play\n\n**Parameters:**\n`username` get the recent play of a user (must be first parameter) \n`-i (number)` get a specific play (1-100)\n`-pass` get the latest passed play (no parameters)\n`mods=(string)` get the latest play by mods"];
 exports.usage = [`rctb -pass -i 3\nrecentctb Rocma -i 5`];
 exports.category = ["osu"];

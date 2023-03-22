@@ -67,11 +67,12 @@ exports.run = async (client, message, args, prefix) => {
 		let user;
 		let userstats;
 		if (server == "bancho") {
-			const url = new URL(`https://osu.ppy.sh/api/v2/users/${userargs}/${ModeOsu}`);
-			const headers = {
+			headers = {
 				Authorization: `Bearer ${process.env.osu_bearer_key}`,
 			};
-			const response = await fetch(url, {
+
+			url = new URL(`https://osu.ppy.sh/api/v2/users/${userargs}/${ModeOsu}`);
+			response = await fetch(url, {
 				method: "GET",
 				headers,
 			});
@@ -81,19 +82,46 @@ exports.run = async (client, message, args, prefix) => {
 				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in Bancho database**`)] });
 				return;
 			}
+
+			url = new URL(`https://osu.ppy.sh/api/v2/users/${user.id}/scores/best`);
+			params = {
+				mode: ModeOsu,
+				limit: "100",
+				offset: "0",
+			};
+			Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+			response = await fetch(url, {
+				method: "GET",
+				headers,
+			});
+			score = await response.json();
+
+			if (score.length == 0) {
+				message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No Bancho plays found for **${user.username}**`)] });
+				return;
+			}
 		}
 
 		if (server == "gatari") {
-			var Userurl = `https://api.gatari.pw/users/get?u=`;
-			var UserStatsurl = `https://api.gatari.pw/user/stats?u=`;
+			Userurl = `https://api.gatari.pw/users/get?u=`;
+			UserStatsurl = `https://api.gatari.pw/user/stats?u=`;
 
-			var response = await fetch(`${Userurl}${userargs}`, { method: "GET" });
-			var userResponse = await response.json();
-			var response = await fetch(`${UserStatsurl}${userargs}&${RuleSetId}`, { method: "GET" });
-			var userStatsResponse = await response.json();
+			response = await fetch(`${Userurl}${userargs}`, { method: "GET" });
+			userResponse = await response.json();
+
+			response = await fetch(`${UserStatsurl}${userargs}&${RuleSetId}`, { method: "GET" });
+			userStatsResponse = await response.json();
 
 			user = userResponse.users[0];
 			userstats = userStatsResponse.stats;
+
+			url = `https://api.gatari.pw/user/scores/best`;
+			const response = await fetch(`${url}?id=${user.id}&l=100&p=1&mode=${RuleSetId}&mods=${modSort}`, { method: "GET" }).then(response => response.json());
+			score = response.scores;
+			if (score == null) {
+				message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No Gatari plays found for **${user.username}**`)] });
+				return;
+			}
 
 			if (user == undefined) {
 				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in Gatari database**`)] });
@@ -149,7 +177,7 @@ exports.run = async (client, message, args, prefix) => {
 
 		if (args.includes("-r") || args.includes("-recent")) RB = true;
 
-		message.channel.send({ embeds: [await GetUserTop(user, userstats, PageNumber, ModeOsu, RuleSetId, args, argValues["mods"], play_number, RB, server)] });
+		message.channel.send({ embeds: [await GetUserTop(score, user, userstats, PageNumber, ModeOsu, RuleSetId, args, argValues["mods"], play_number, RB, server)] });
 	});
 };
 exports.name = ["ctbtop"];

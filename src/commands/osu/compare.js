@@ -29,7 +29,6 @@ exports.run = async (client, message, args, prefix) => {
 		if (args.includes("-gatari")) server = "gatari";
 		if (args.includes("-akatsuki")) server = "akatsuki";
 
-
 		let ErrCount = 0;
 
 		let EmbedValue = 0;
@@ -147,8 +146,16 @@ exports.run = async (client, message, args, prefix) => {
 					const mapinfo = await v2.beatmap.diff(beatmapId);
 					mode = mapinfo.mode;
 
-					// send the embed
-					await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum, server, userstats);
+					switch (mapinfo.status) {
+						case "graveyard":
+							message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription("Couldn't retrive scores because the map does not have a leaderboard.")] });
+							break;
+						case "pending":
+							message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription("Couldn't retrive scores because the map does not have a leaderboard.")] });
+							break;
+						default:
+							await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum, server, userstats);
+					}
 
 					if (ErrCount >= 1) {
 						// message.reply(`**No Scores Found For \`${user.username}\`.**`)
@@ -171,8 +178,16 @@ exports.run = async (client, message, args, prefix) => {
 					if (mapinfo.id == undefined) throw new Error("No Author");
 					mode = mapinfo.mode;
 
-					//send the embed
-					await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum, server, userstats);
+					switch (mapinfo.status) {
+						case "graveyard":
+							message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription("Couldn't retrive scores because the map does not have a leaderboard.")] });
+							break;
+						case "pending":
+							message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription("Couldn't retrive scores because the map does not have a leaderboard.")] });
+							break;
+						default:
+							await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum, server, userstats);
+					}
 					GoodToGo = true;
 				} catch (err) {
 					console.log(err);
@@ -190,8 +205,16 @@ exports.run = async (client, message, args, prefix) => {
 						if (mapinfo.id == undefined) throw new Error("No Author");
 						mode = mapinfo.mode;
 
-						//send the embed
-						await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum, server, userstats);
+						switch (mapinfo.status) {
+							case "graveyard":
+								message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription("Couldn't retrive scores because the map does not have a leaderboard.")] });
+								break;
+							case "pending":
+								message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription("Couldn't retrive scores because the map does not have a leaderboard.")] });
+								break;
+							default:
+								await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum, server, userstats);
+						}
 						GoodToGo = true;
 					} catch (err) {
 						console.log(err);
@@ -206,8 +229,18 @@ exports.run = async (client, message, args, prefix) => {
 							mode = mapinfo.mode;
 
 							if (mapinfo.id == undefined) throw new Error("No Author");
-							//send the embed
-							await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum, server, userstats);
+
+							switch (mapinfo.status) {
+								case "graveyard":
+									message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription("Couldn't retrive scores because the map does not have a leaderboard.")] });
+									break;
+								case "pending":
+									message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription("Couldn't retrive scores because the map does not have a leaderboard.")] });
+									break;
+								default:
+									await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum, server, userstats);
+							}
+							
 							GoodToGo = true;
 							return;
 						} catch (err) {
@@ -254,11 +287,9 @@ exports.run = async (client, message, args, prefix) => {
 				var Userurl = `https://api.gatari.pw/users/get?u=`;
 				var UserStatsurl = `https://api.gatari.pw/user/stats?u=`;
 
-				var response = await fetch(`${Userurl}${userargs}`, { method: "GET" });
-				var userResponse = await response.json();
+				userResponse = await fetch(`${Userurl}${userargs}`, { method: "GET" }).then(response => response.json());
 
-				var response = await fetch(`${UserStatsurl}${userargs}&${RuleSetId}`, { method: "GET" });
-				var userStatsResponse = await response.json();
+				userStatsResponse = await fetch(`${UserStatsurl}${userargs}&${RuleSetId}`, { method: "GET" }).then(response => response.json());
 
 				user = userResponse.users[0];
 				userstats = userStatsResponse.stats;

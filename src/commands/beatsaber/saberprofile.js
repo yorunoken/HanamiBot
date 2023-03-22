@@ -17,9 +17,8 @@ exports.run = async (client, message, args, prefix) => {
 
 		var userargs = await FindUserargs(message, args, server, prefix);
 		if (isNaN(userargs)) {
-			var repsonse = await fetch(`http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${process.env.STEAM_API_KEY}&vanityurl=${userargs}`, { method: "GET" });
-			const responseAnswer = await repsonse.json();
-			const data = responseAnswer.response;
+			var repsonse = await fetch(`http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${process.env.STEAM_API_KEY}&vanityurl=${userargs}`, { method: "GET" }).then(response => response.json());
+			const data = repsonse.response;
 			if (data.success != 1) {
 				message.reply(`**The user \`${userargs}\` does not exist in the Beat Saber database.**`);
 				return;
@@ -29,8 +28,7 @@ exports.run = async (client, message, args, prefix) => {
 
 		let user, userstats;
 		var BaseUrl = `https://scoresaber.com/api`;
-		var response = await fetch(`${BaseUrl}/player/${userargs}/full`, { method: "GET" });
-		user = await response.json();
+		user = await fetch(`${BaseUrl}/player/${userargs}/full`, { method: "GET" }).then(response => response.json())
 		if (user.errorMessage == "Player not found") {
 			message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player with the id \`${userargs}\` does not exist in Beat Saber database**`)] });
 			return;

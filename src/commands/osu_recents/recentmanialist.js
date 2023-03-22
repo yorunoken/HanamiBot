@@ -1,7 +1,6 @@
 const fs = require("fs");
 const { EmbedBuilder } = require("discord.js");
 
-// importing top
 const { GetUserTop } = require("../../utils/exports/top_export.js");
 const { FindUserargs } = require("../../utils/exports/finduserargs_export.js");
 
@@ -16,9 +15,10 @@ exports.run = async (client, message, args, prefix) => {
 		const userData = JSON.parse(data);
 		let PageNumber = 1;
 		let play_number = undefined;
-		let ModeOsu = "taiko";
-		let RuleSetId = 1;
+		let ModeOsu = "mania";
+		let RuleSetId = 3;
 		let RB = false;
+		let FailPlay = 1;
 
 		let argValues = {};
 		for (const arg of args) {
@@ -46,6 +46,9 @@ exports.run = async (client, message, args, prefix) => {
 			PageNumber = 1;
 		}
 
+		if (args.includes("-pass")) FailPlay = 0;
+		if (args.includes("-ps")) FailPlay = 0;
+
 		if (PageNumber > 20) {
 			message.reply(`**Value must not be greater than 20**`);
 			return;
@@ -55,7 +58,7 @@ exports.run = async (client, message, args, prefix) => {
 			return;
 		}
 
-		if (args.join(" ").startsWith("-r") || args.join(" ").startsWith("-recent") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+") || args.join(" ").startsWith("-g") || args.join(" ").startsWith("-am") || args.join(" ").startsWith("-amount") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-reverse")) {
+		if (args.join(" ").startsWith("-pass") || args.join(" ").startsWith("-ps") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-reverse")) {
 			try {
 				if (server == "bancho") userargs = userData[message.author.id].BanchoUserId;
 				if (server == "gatari") userargs = userData[message.author.id].GatariUserId;
@@ -83,8 +86,9 @@ exports.run = async (client, message, args, prefix) => {
 				return;
 			}
 
-			url = new URL(`https://osu.ppy.sh/api/v2/users/${user.id}/scores/best`);
+			url = new URL(`https://osu.ppy.sh/api/v2/users/${user.id}/scores/recent`);
 			params = {
+				include_fails: FailPlay,
 				mode: ModeOsu,
 				limit: "100",
 				offset: "0",
@@ -95,6 +99,8 @@ exports.run = async (client, message, args, prefix) => {
 				headers,
 			});
 			score = await response.json();
+
+			console.log(score);
 
 			if (score.length == 0) {
 				message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No Bancho plays found for **${user.username}**`)] });
@@ -115,7 +121,7 @@ exports.run = async (client, message, args, prefix) => {
 			user = userResponse.users[0];
 			userstats = userStatsResponse.stats;
 
-			url = `https://api.gatari.pw/user/scores/best`;
+			url = `https://api.gatari.pw/user/scores/recent`;
 			const response = await fetch(`${url}?id=${user.id}&l=100&p=1&mode=${RuleSetId}&mods=${modSort}`, { method: "GET" }).then(response => response.json());
 			score = response.scores;
 			if (score == null) {
@@ -129,59 +135,11 @@ exports.run = async (client, message, args, prefix) => {
 			}
 		}
 
-		if (args.includes("-am") || args.includes("-g")) {
-			if (args.join(" ").includes("-am")) query = "-am";
-			if (args.join(" ").includes("-amount")) query = "-amount";
-			if (args.join(" ").includes("-g")) query = "-g";
-
-			const iIndex = args.indexOf(query);
-			const GIndex = Number(args[iIndex + 1]);
-
-			let score;
-
-			if (server == "gatari") {
-				var url = `https://api.gatari.pw/user/scores/best`;
-				const response = await fetch(`${url}?id=${user.id}&l=100&p=1&mode=${RuleSetId}&mods=${modSort}`, { method: "GET" });
-				score = response.data.scores;
-			}
-
-			if (server == "bancho") {
-				const url = new URL(`https://osu.ppy.sh/api/v2/users/${user.id}/scores/best`);
-				const params = {
-					mode: ModeOsu,
-					limit: "100",
-					offset: "0",
-				};
-				Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-				const headers = {
-					Authorization: `Bearer ${process.env.osu_bearer_key}`,
-				};
-				const response = await fetch(url, {
-					method: "GET",
-					headers,
-				});
-
-				score = await response.json();
-			}
-
-			const Number_bigger = score.filter(x => x.pp > GIndex);
-
-			const embed = new EmbedBuilder()
-				.setColor("Purple")
-				.setDescription(`${user.username} has **\`${Number_bigger.length}\`** plays worth more than ${GIndex.toFixed(1)}PP`)
-				.setFooter({ text: `osu!${server}` });
-
-			message.channel.send({ embeds: [embed] });
-			return;
-		}
-
-		if (args.includes("-r") || args.includes("-recent")) RB = true;
-
 		message.channel.send({ embeds: [await GetUserTop(score, user, userstats, PageNumber, ModeOsu, RuleSetId, args, argValues["mods"], play_number, RB, server)] });
 	});
 };
-exports.name = ["taikotop"];
-exports.aliases = ["taikotop", "ttop", "topt", "toptaiko"];
-exports.description = ["Displays user's Taiko top plays\n\n**Parameters:**\n`username` get the top plays of a user (must be first parameter) \n`-i (number)` get a specific play (1-100)\n`-p (number)` get a specific page (1-20)\n`-g (number)` find out how much of a pp play you have in your top plays"];
-exports.usage = [`taikotop JustinNF -i 45\nttop NeuralG -p 14`];
+exports.name = ["recentmanialist"];
+exports.aliases = ["recentmanialist", "rml"];
+exports.description = ["Displays user's list of recent osu!mania plays\n\n**Parameters:**\n`username` get the recent play of a user (must be first parameter) \n`-i (number)` get a specific play (1-100)\n`-pass` get the latest passed play (no parameters)\n`mods=(string)` get the latest play by mods"];
+exports.usage = [`rml YoruNoKen\nrls Whitecat -i 4\nrml -pass -i 3`];
 exports.category = ["osu"];

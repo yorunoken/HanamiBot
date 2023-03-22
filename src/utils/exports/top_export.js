@@ -8,7 +8,7 @@ const axios = require("axios");
 const { tools } = require("../../utils/tools.js");
 const { mods } = require("../../utils/mods.js");
 
-async function GetUserTop(user, userstats, pageNumber, ModeOsu, RuleSetId, args, ModsSearch, play_number, rb, server) {
+async function GetUserTop(score, user, userstats, pageNumber, ModeOsu, RuleSetId, args, ModsSearch, play_number, rb, server) {
 	//determine the page of the osutop
 	const start = (pageNumber - 1) * 5 + 1;
 	const end = pageNumber * 5;
@@ -23,38 +23,9 @@ async function GetUserTop(user, userstats, pageNumber, ModeOsu, RuleSetId, args,
 	five = numbers[4] - 1;
 
 	let Play_rank = "";
-	let score, FilterMods, global_rank, country_rank, user_pp, country, useravatar;
+	let global_rank, country_rank, user_pp, country, useravatar;
 
 	if (server == "bancho") {
-		const url = new URL(`https://osu.ppy.sh/api/v2/users/${user.id}/scores/best`);
-		const params = {
-			mode: ModeOsu,
-			limit: "100",
-			offset: "0",
-		};
-		Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-		const headers = {
-			Authorization: `Bearer ${process.env.osu_bearer_key}`,
-		};
-		const response = await fetch(url, {
-			method: "GET",
-			headers,
-		});
-		score = await response.json();
-
-		/**
-		if (ModsSearch != undefined) {
-			filteredscore = score.filter(x => x.mods.join("").split("").sort().join("").toLowerCase() == ModsSearch.split("").sort().join("").toLowerCase())
-			score = filteredscore
-			try {
-				FilterMods = `**Filtering mod(s): ${score[value].mods.join("").toUpperCase()}**`
-			} catch (err) {
-				const embed = new EmbedBuilder().setColor("Purple").setDescription("Please provide a valid mod combination.")
-				return embed
-			}
-		}
-		 */
-
 		//formatted values for user
 		try {
 			global_rank = user.statistics.global_rank.toLocaleString();
@@ -77,15 +48,6 @@ async function GetUserTop(user, userstats, pageNumber, ModeOsu, RuleSetId, args,
 			if (modSort == undefined) modSort = "";
 		} catch (err) {
 			modSort = "";
-		}
-
-		var url = `https://api.gatari.pw/user/scores/best`;
-		const response = await axios.get(`${url}?id=${user.id}&l=100&p=1&mode=${RuleSetId}&mods=${modSort}`);
-
-		score = response.data.scores;
-		if (score == null) {
-			let embed = new EmbedBuilder().setColor("Purple").setDescription(`No Gatari plays found for **${user.username}**`);
-			return { embed, FilterMods };
 		}
 
 		//formatted values for user
@@ -151,7 +113,6 @@ async function GetUserTop(user, userstats, pageNumber, ModeOsu, RuleSetId, args,
 	async function ScoreGet(score) {
 		scores.sort((a, b) => b.pp - a.pp);
 		Play_rank = scores.findIndex(play => play.id === score.id) + 1;
-		console.log("hi", Play_rank);
 
 		let mapId, ModsName, modsID, grade, ScoreSetTime, MapTitle, acc, MapArtist;
 		let valuegeki,
@@ -258,7 +219,7 @@ async function GetUserTop(user, userstats, pageNumber, ModeOsu, RuleSetId, args,
 		let maxComboMap = maxAttrs.difficulty.maxCombo;
 
 		let first_row = `**${Play_rank}.** [**${MapTitle} [${score.beatmap.version}]**](https://osu.ppy.sh/b/${mapId}) **+${ModsName}** [${Stars}★]\n`;
-		let second_row = `${grade} ▹ **${score.pp.toFixed(2)}PP** ▹ ${acc} ▹ [**${Number(score.max_combo)}x**/${maxComboMap}x]\n`;
+		let second_row = `${grade} ▹ **${CurAttrs.pp.toFixed(2)}PP** ▹ ${acc} ▹ [**${Number(score.max_combo)}x**/${maxComboMap}x]\n`;
 		let third_row = `${score.score.toLocaleString()} ▹ ${AccValues} <t:${ScoreSetTime}:R>`;
 		let fourth_row = ``;
 		let fifth_row = ``;

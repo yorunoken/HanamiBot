@@ -163,15 +163,10 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 
 	await auth.login(process.env.client_id, process.env.client_secret);
 	if (firstPage) {
-		try {
-			global_rank = user.statistics.global_rank.toLocaleString();
-			country_rank = user.statistics.country_rank.toLocaleString();
-			pp = user.statistics.pp.toLocaleString();
-		} catch (err) {
-			global_rank = "0";
-			country_rank = "0";
-			pp = "0";
-		}
+		global_rank = user.statistics.global_rank?.toLocaleString() || "-";
+		country_rank = user.statistics.country_rank?.toLocaleString() || "-";
+
+		pp = user.statistics.pp.toLocaleString();
 
 		acc = user.statistics.hit_accuracy.toFixed(2);
 		lvl = user.statistics.level.progress;
@@ -231,15 +226,13 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 			offset: "0",
 		});
 
+		global_rank = user.statistics.global_rank?.toLocaleString() || "-";
+		country_rank = user.statistics.country_rank?.toLocaleString() || "-";
 		try {
-			global_rank = user.statistics.global_rank.toLocaleString();
-			country_rank = user.statistics.country_rank.toLocaleString();
 			pp = user.statistics.pp.toLocaleString();
 			pp_spread_raw = tops[0].pp - tops[tops.length - 1].pp;
 			pp_spread_num = pp_spread_raw.toFixed(2);
 		} catch (err) {
-			global_rank = "0";
-			country_rank = "0";
 			pp = "0";
 			pp_spread_raw = "0";
 			pp_spread_num = "0";
@@ -296,7 +289,7 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 		} catch (err) {}
 
 		if (playstyles.length === 0) {
-			playstyles = "NaN";
+			playstyles = "Unknown";
 		}
 
 		playstyles = playstyles.trim();

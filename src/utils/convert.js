@@ -8,15 +8,17 @@ function georgian(sentence) {
 		let convertedSentence = "";
 		for (let i = 0; i < sentence.length; i++) {
 			let letter = sentence[i];
-			if (letter + sentence[i + 1] + sentence[i + 2] in GeorgianLetters) {
-				convertedSentence += GeorgianLetters[letter + sentence[i + 1] + sentence[i + 2]];
-			} else if (letter + sentence[i + 1] in GeorgianLetters) {
-				convertedSentence += GeorgianLetters[letter + sentence[i + 1]];
-				i++;
-			} else if (letter in GeorgianLetters) {
-				convertedSentence += GeorgianLetters[letter];
+
+			switch (true) {
+				case letter + sentence[i + 1] + sentence[i + 2] in GeorgianLetters:
+					convertedSentence += GeorgianLetters[letter + sentence[i + 1] + sentence[i + 2]];
+					break;
+				case letter + sentence[i + 1] in GeorgianLetters:
+					convertedSentence += GeorgianLetters[letter + sentence[i + 1]];
+					break;
+				case letter in GeorgianLetters:
+					convertedSentence += GeorgianLetters[letter];
 			}
-			convertedSentence += " ";
 		}
 		return convertedSentence;
 	}
@@ -32,6 +34,7 @@ function georgian(sentence) {
 			const newWord = word.split(" ").join("");
 			NewConverted.push(newWord);
 		});
+		
 		return NewConverted.join(" ");
 	}
 	return SeperateStrings(sentence);
@@ -45,15 +48,16 @@ function japanese(sentence) {
 	for (let i = 0; i < sentence.length; i++) {
 		let letter = sentence[i];
 
-		if (letter + sentence[i + 1] + sentence[i + 2] in JapaneseLetters) {
-			convertedSentence += JapaneseLetters[letter + sentence[i + 1] + sentence[i + 2]];
-		} else if (letter + sentence[i + 1] in JapaneseLetters) {
-			convertedSentence += JapaneseLetters[letter + sentence[i + 1]];
-			i++;
-		} else if (letter in JapaneseLetters) {
-			convertedSentence += JapaneseLetters[letter];
+		switch (true) {
+			case letter + sentence[i + 1] + sentence[i + 2] in JapaneseLetters:
+				convertedSentence += JapaneseLetters[letter + sentence[i + 1] + sentence[i + 2]];
+				break;
+			case letter + sentence[i + 1] in JapaneseLetters:
+				convertedSentence += JapaneseLetters[letter + sentence[i + 1]];
+				break;
+			case letter in JapaneseLetters:
+				convertedSentence += JapaneseLetters[letter];
 		}
-		convertedSentence += "";
 	}
 	return convertedSentence;
 }
