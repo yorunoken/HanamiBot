@@ -2,7 +2,7 @@ const fs = require("fs");
 const { EmbedBuilder } = require("discord.js");
 const Table = require("easy-table");
 
-async function PlayStats(user, RuleSetId, mode) {
+async function PlayStats(user, RuleSetId, mode, prefix) {
 	return new Promise((resolve, reject) => {
 		fs.readFile("./user-recent.json", async (error, data) => {
 			if (error) {
@@ -27,7 +27,7 @@ async function PlayStats(user, RuleSetId, mode) {
 						url: `https://osu.ppy.sh/users/${user.id}/${mode}`,
 					})
 					.setThumbnail(user.avatar_url)
-					.setFields({ name: `Statistics:`, value: `\`\`\`${user.username} was not rs'd any scores using this bot.\`\`\``, inline: false });
+					.setFields({ name: `Statistics:`, value: `\`\`\`${user.username} does not have any scores collected. type "${prefix}recent ${user.username}" to add to the collection.\`\`\``, inline: false });
 				resolve(embed);
 				return;
 			}
@@ -87,6 +87,11 @@ async function PlayStats(user, RuleSetId, mode) {
 				scores.map(score => score.score.FixPP),
 				false,
 			);
+
+			let Passes = [];
+			for (let i = 0; i < scores.length; i++) {
+				if (scores[i].score.passed) Passes.push(i);
+			}
 			// const PPSS = FindPattern(scores.map(score => score.score.SSPP))
 
 			const DataForTable = [
@@ -118,7 +123,7 @@ async function PlayStats(user, RuleSetId, mode) {
 					url: `https://osu.ppy.sh/users/${user.id}/${mode}`,
 				})
 				.setThumbnail(user.avatar_url)
-				.setFields({ name: `Statistics:`, value: `\`\`\`${t.toString()}\`\`\`\n**Calculated scores:** \`${scores.length}\``, inline: false });
+				.setFields({ name: `Statistics:`, value: `\`\`\`${t.toString()}Passed    ${Passes.length}/${scores.length}\`\`\`\n**Calculated scores:** \`${scores.length}\``, inline: false });
 			resolve(embed);
 		});
 	});

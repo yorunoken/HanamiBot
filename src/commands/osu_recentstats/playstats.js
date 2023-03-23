@@ -55,7 +55,7 @@ module.exports.run = async (client, message, args, prefix) => {
 			return;
 		}
 
-		message.channel.send({ embeds: [await PlayStats(user, RuleSetId, mode)] });
+		message.channel.send({ embeds: [await PlayStats(user, RuleSetId, mode, prefix)] });
 	});
 };
 exports.name = ["playstats"];
