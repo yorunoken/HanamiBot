@@ -176,11 +176,15 @@ async function GetUserTop(score, user, userstats, pageNumber, ModeOsu, RuleSetId
 			const downloader = new Downloader({
 				rootPath: "./osuBeatmapCache",
 
-				filesPerSecond: 0,
+				filesPerSecond: 5,
+				synchronous: true,
 			});
 
 			downloader.addSingleEntry(mapId);
-			await downloader.downloadSingle();
+			const DownloaderResponse = await downloader.downloadSingle();
+			if (DownloaderResponse.status == -3) {
+				throw new Error("ERROR CODE 409, ABORTING TASK");
+			}
 		}
 
 		console.log(modsID);

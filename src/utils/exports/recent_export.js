@@ -39,6 +39,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		value50,
 		valuemiss,
 		valuecombo = 0;
+	let redownload = false;
 
 	function getRetryCount(retryMap, mapId) {
 		let retryCounter = 0;
@@ -114,15 +115,17 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 
 		acc = `**(${Number(score[value].accuracy).toFixed(2)}%)**`;
 
-		var MapAkatsuki = await v2.beatmap.diff(mapId);
-		objects = MapAkatsuki.count_circles + MapAkatsuki.count_sliders + MapAkatsuki.count_spinners;
+		var MapGatari = await v2.beatmap.diff(mapId);
+		objects = MapGatari.count_circles + MapGatari.count_sliders + MapGatari.count_spinners;
+
+		if (MapGatari.status != "loved" && MapGatari.status != "ranked") redownload = true;
 
 		TimeCreated = new Date(score[value].time).getTime();
 		grade = score[value].ranking;
-		title = `${MapAkatsuki.beatmapset.artist} - ${MapAkatsuki.beatmapset.title} [${MapAkatsuki.version}]`;
+		title = `${MapGatari.beatmapset.artist} - ${MapGatari.beatmapset.title} [${MapGatari.version}]`;
 
-		hitLength = MapAkatsuki.hit_length;
-		totalLength = MapAkatsuki.total_length;
+		hitLength = MapGatari.hit_length;
+		totalLength = MapGatari.total_length;
 
 		if (score[value].beatmap.ranked == 0) MapStatus = `Unranked`;
 		if (score[value].beatmap.ranked == 2) MapStatus = `Ranked`;
@@ -130,8 +133,8 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		if (score[value].beatmap.ranked == 4) MapStatus = `Qualified`;
 		if (score[value].beatmap.ranked == 5) MapStatus = `Loved`;
 
-		creatorUserId = MapAkatsuki.beatmapset.user_id;
-		creatorName = MapAkatsuki.beatmapset.creator;
+		creatorUserId = MapGatari.beatmapset.user_id;
+		creatorName = MapGatari.beatmapset.creator;
 	}
 
 	if (server == "akatsuki") {
@@ -187,6 +190,8 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 
 		var MapAkatsuki = await v2.beatmap.diff(mapId);
 		objects = MapAkatsuki.count_circles + MapAkatsuki.count_sliders + MapAkatsuki.count_spinners;
+
+		if (MapAkatsuki.status != "loved" && MapAkatsuki.status != "ranked") redownload = true;
 
 		TimeCreated = new Date(score[value].time).getTime() / 1000;
 		grade = score[value].rank;
@@ -369,6 +374,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		value50 = score[value].statistics.count_50;
 		valuemiss = score[value].statistics.count_miss;
 		valuecombo = score[value].max_combo;
+		if (score[value].beatmap.status != "loved" && score[value].beatmap.status != "ranked") redownload = true;
 
 		//formatted values for user
 		try {
@@ -417,16 +423,19 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		creatorName = score[value].beatmapset.creator;
 	}
 
-	if (!fs.existsSync(`./osuBeatmapCache/${mapId}.osu`)) {
-		console.log("no file.");
-		const downloader = new Downloader({
-			rootPath: "./osuBeatmapCache",
+	console.log(redownload);
+	const downloader = new Downloader({
+		rootPath: "./osuBeatmapCache",
 
-			filesPerSecond: 0,
-		});
+		filesPerSecond: 5,
+		synchronous: true,
+		redownload: redownload,
+	});
 
-		downloader.addSingleEntry(mapId);
-		await downloader.downloadSingle();
+	downloader.addSingleEntry(mapId);
+	const DownloaderResponse = await downloader.downloadSingle();
+	if (DownloaderResponse.status == -3) {
+		throw new Error("ERROR CODE 409, ABORTING TASK");
 	}
 
 	let ModDisplay = `**+${ModsName}**`;

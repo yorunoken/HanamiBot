@@ -31,11 +31,15 @@ async function GetuserNoChoke(user, tops, ruleset, GameMode, pageNumber) {
 			const downloader = new Downloader({
 				rootPath: "./osuBeatmapCache",
 
-				filesPerSecond: 0,
+				filesPerSecond: 5,
+				synchronous: true,
 			});
 
 			downloader.addSingleEntry(score.beatmap.id);
-			await downloader.downloadSingle();
+			const DownloaderResponse = await downloader.downloadSingle();
+			if (DownloaderResponse.status == -3) {
+				throw new Error("ERROR CODE 409, ABORTING TASK");
+			}
 		}
 		let modsID = mods.id(score.mods.join(""));
 		if (!score.mods.join("").length) modsID = 0;

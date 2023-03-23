@@ -55,19 +55,23 @@ async function FixFunction(mapinfo, beatmapId, user, ModeOsu, ModsString, messag
 			return embed;
 		}
 
-		console.log(score);
+		let redownload = false;
+		if (mapinfo.status != "loved" && mapinfo.status != "ranked") redownload = true;
+		console.log("no file.");
+		const downloader = new Downloader({
+			rootPath: "./osuBeatmapCache",
 
-		if (!fs.existsSync(`./osuBeatmapCache/${beatmapId}.osu`)) {
-			console.log("no file.");
-			const downloader = new Downloader({
-				rootPath: "./osuBeatmapCache",
+			filesPerSecond: 5,
+			synchronous: true,
+			redownload: redownload,
+		});
 
-				filesPerSecond: 0,
-			});
-
-			downloader.addSingleEntry(beatmapId);
-			await downloader.downloadSingle();
+		downloader.addSingleEntry(beatmapId);
+		const DownloaderResponse = await downloader.downloadSingle();
+		if (DownloaderResponse.status == -3) {
+			throw new Error("ERROR CODE 409, ABORTING TASK");
 		}
+
 		let map = new Beatmap({ path: `./osuBeatmapCache/${beatmapId}.osu` });
 
 		let ModName = score.mods.join("");

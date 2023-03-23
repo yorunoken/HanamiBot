@@ -188,17 +188,23 @@ async function CalculateSkill(scores, ruleset) {
 	for (let i = 0; i < scores.length; i++) {
 		const score = scores[i];
 
-		if (!fs.existsSync(`./osuBeatmapCache/${score.beatmap.id}.osu`)) {
-			console.log(`no file, ${i}`);
-			const downloader = new Downloader({
-				rootPath: "./osuBeatmapCache",
+		let redownload = false;
+		if (score.beatmap.status != "loved" && score.beatmap.status != "ranked") redownload = true;
+		console.log(`no file, ${i}`);
+		const downloader = new Downloader({
+			rootPath: "./osuBeatmapCache",
 
-				filesPerSecond: 0,
-			});
+			filesPerSecond: 5,
+			synchronous: true,
+			redownload: redownload,
+		});
 
-			downloader.addSingleEntry(score.beatmap.id);
-			await downloader.downloadSingle();
+		downloader.addSingleEntry(score.beatmap.id);
+		const DownloaderResponse = await downloader.downloadSingle();
+		if (DownloaderResponse.status == -3) {
+			throw new Error("ERROR CODE 409, ABORTING TASK");
 		}
+
 		let modsID = mods.id(score.mods.join(""));
 		if (!score.mods.join("").length) modsID = 0;
 

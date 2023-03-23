@@ -40,16 +40,21 @@ async function GetPinned(value, user, mode, RuleSetId, pageNumber) {
 	});
 
 	async function Pinget(pin, num) {
-		if (!fs.existsSync(`./osuBeatmapCache/${pin.beatmap.id}.osu`)) {
-			console.log("no file.");
-			const downloader = new Downloader({
-				rootPath: "./osuBeatmapCache",
+		let redownload = false;
+		if (mapinfo.status != "loved" || mapinfo.status != "ranked") redownload = true;
+		console.log("no file.");
+		const downloader = new Downloader({
+			rootPath: "./osuBeatmapCache",
 
-				filesPerSecond: 0,
-			});
+			filesPerSecond: 5,
+			synchronous: true,
+			redownload: redownload,
+		});
 
-			downloader.addSingleEntry(pin.beatmap.id);
-			await downloader.downloadSingle();
+		downloader.addSingleEntry(pin.beatmap.id);
+		const DownloaderResponse = await downloader.downloadSingle();
+		if (DownloaderResponse.status == -3) {
+			throw new Error("ERROR CODE 409, ABORTING TASK");
 		}
 
 		let grade = pin.rank;

@@ -92,17 +92,23 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString, value, pagenum
 
 		let status = mapinfo.status.charAt(0).toUpperCase() + mapinfo.status.slice(1);
 
-		if (!fs.existsSync(`./osuBeatmapCache/${beatmapId}.osu`)) {
-			console.log("no file.");
-			const downloader = new Downloader({
-				rootPath: "./osuBeatmapCache",
+		let redownload = false;
+		if (mapinfo.status != "loved" && mapinfo.status != "ranked") redownload = true;
+		console.log("no file.");
+		const downloader = new Downloader({
+			rootPath: "./osuBeatmapCache",
 
-				filesPerSecond: 0,
-			});
+			filesPerSecond: 5,
+			synchronous: true,
+			redownload: redownload,
+		});
 
-			downloader.addSingleEntry(beatmapId);
-			await downloader.downloadSingle();
+		downloader.addSingleEntry(beatmapId);
+		const DownloaderResponse = await downloader.downloadSingle();
+		if (DownloaderResponse.status == -3) {
+			throw new Error("ERROR CODE 409, ABORTING TASK");
 		}
+
 		let map = new Beatmap({ path: `./osuBeatmapCache/${beatmapId}.osu` });
 		let objects = mapinfo.count_circles + mapinfo.count_sliders + mapinfo.count_spinners;
 

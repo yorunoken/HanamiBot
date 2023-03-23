@@ -58,7 +58,7 @@ exports.run = async (client, message, args, prefix) => {
 			return;
 		}
 
-		if (args.join(" ").startsWith("-pass") || args.join(" ").startsWith("-ps") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-reverse")) {
+		if (args.join(" ").startsWith("-page") || args.join(" ").startsWith("-p") ||args.join(" ").startsWith("-pass") || args.join(" ").startsWith("-ps") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-reverse")) {
 			try {
 				if (server == "bancho") userargs = userData[message.author.id].BanchoUserId;
 				if (server == "gatari") userargs = userData[message.author.id].GatariUserId;

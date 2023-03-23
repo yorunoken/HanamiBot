@@ -23,17 +23,23 @@ async function GetUserTop100Stats(user, tops, ruleset, mode) {
 	let RawMappers = [];
 	for (let i = 0; i < tops.length; i++) {
 		const score = tops[i];
+		let redownload = false;
+		if (score.beatmap.status != "loved" && score.beatmap.status != "ranked") redownload = true;
 
-		if (!fs.existsSync(`./osuBeatmapCache/${score.beatmap.id}.osu`)) {
-			console.log(`no file, ${i}`);
+		if (!fs.existsSync(`./osuBeatmapCache/${score.beatmap.id}.osu`) || redownload) {
 			const downloader = new Downloader({
 				rootPath: "./osuBeatmapCache",
 
-				filesPerSecond: 0,
+				filesPerSecond: 5,
+				synchronous: true,
+				redownload: redownload,
 			});
 
 			downloader.addSingleEntry(score.beatmap.id);
-			await downloader.downloadSingle();
+			const DownloaderResponse = await downloader.downloadSingle();
+			if (DownloaderResponse.status == -3) {
+				throw new Error("ERROR CODE 409, ABORTING TASK");
+			}
 		}
 		let modsID = mods.id(score.mods.join(""));
 		if (!score.mods.join("").length) modsID = 0;
