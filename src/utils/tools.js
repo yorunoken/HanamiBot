@@ -1,4 +1,3 @@
-const { isArray } = require("mathjs");
 function accuracy({ n300, n100, n50, nmiss, ngeki, nkatu }, mode) {
 	if (n300 < 0) throw new Error("Invalid 300 count");
 	if (n100 < 0) throw new Error("Invalid 100 count");
@@ -34,7 +33,7 @@ function grade({ n300, n100, n50, nmiss, nkatu, ngeki, mode, mods }) {
 	if (nmiss < 0) throw new Error("Invalid miss count");
 	if (nkatu < 0) throw new Error("Invalid katu count");
 	if (ngeki < 0) throw new Error("Invalid geki count");
-	if (isArray(mods)) mods = mods.join("");
+	if (Array.isArray(mods)) mods = mods.join("");
 
 	const is_HD = mods.toUpperCase().includes("HD");
 	const is_FL = mods.toUpperCase().includes("FL");
