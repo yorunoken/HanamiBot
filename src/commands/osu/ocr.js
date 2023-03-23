@@ -14,7 +14,7 @@ exports.run = async (client, message, args, prefix) => {
 			const downloader = new Downloader({
 				rootPath: "./osuBeatmapCache",
 
-				filesPerSecond: 2,
+				filesPerSecond: 0,
 				synchronous: true,
 			});
 

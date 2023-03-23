@@ -30,7 +30,7 @@ async function GetUserTop100Stats(user, tops, ruleset, mode) {
 			const downloader = new Downloader({
 				rootPath: "./osuBeatmapCache",
 
-				filesPerSecond: 2,
+				filesPerSecond: 0,
 				synchronous: true,
 				redownload: redownload,
 			});

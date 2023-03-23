@@ -194,7 +194,7 @@ async function CalculateSkill(scores, ruleset) {
 		const downloader = new Downloader({
 			rootPath: "./osuBeatmapCache",
 
-			filesPerSecond: 2,
+			filesPerSecond: 0,
 			synchronous: true,
 			redownload: redownload,
 		});

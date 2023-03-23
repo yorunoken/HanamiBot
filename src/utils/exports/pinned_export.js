@@ -46,7 +46,7 @@ async function GetPinned(value, user, mode, RuleSetId, pageNumber) {
 		const downloader = new Downloader({
 			rootPath: "./osuBeatmapCache",
 
-			filesPerSecond: 2,
+			filesPerSecond: 0,
 			synchronous: true,
 			redownload: redownload,
 		});
