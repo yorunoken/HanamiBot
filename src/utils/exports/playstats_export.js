@@ -11,8 +11,8 @@ async function PlayStats(user, RuleSetId, mode) {
 			}
 			var Recents = JSON.parse(data);
 
-			var userId = user.id;
-			var scores = Recents[userId];
+			var userID = user.id;
+			var scores = Recents[userID];
 
 			global_rank = user.statistics.global_rank.toLocaleString() || "-";
 			country_rank = user.statistics.country_rank.toLocaleString() || "-";

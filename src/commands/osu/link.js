@@ -116,9 +116,9 @@ exports.run = async (client, message, args, prefix) => {
 		var BaseUrl = `https://akatsuki.pw/api/v1`;
 
 		var response = await axios.get(`${BaseUrl}/users/whatid?name=${username}`);
-		const userId = response.data.id;
+		const userID = response.data.id;
 
-		var response = await axios.get(`${BaseUrl}/users?id=${userId}`);
+		var response = await axios.get(`${BaseUrl}/users?id=${userID}`);
 		const user = response.data;
 
 		if (user.code != 200) {

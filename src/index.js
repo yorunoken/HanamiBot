@@ -90,8 +90,8 @@ const cooldowns = new Map();
 client.on("ready", async () => {
 	console.log(`Logged in as ${client.user.tag}, in ${client.guilds.cache.size} servers!`);
 	console.log("Updating osu! bearer key..");
-	auth.login(process.env.clien_id, process.env.client_secret);
-	console.log("osu! bearer key updated.");
+
+	console.log(await auth.login(process.env.client_id, process.env.client_secret));
 
 	client.user.setPresence({
 		activities: [{ name: `?help`, type: ActivityType.Playing }],
@@ -113,20 +113,10 @@ client.on("guildCreate", guild => {
 client.on("messageCreate", message => {
 	//load the prefixes for each guild
 	let prefixes = JSON.parse(fs.readFileSync("./prefixes.json", "utf8"));
-	let prefix;
-	//check if the guild has a prefix stored in the prefixes.json file
-	if (!prefixes[message.guild.id]) {
-		//if not, set the prefix to the default prefix
-		prefix = "?";
-	} else {
-		//if the guild has a prefix stored, use that prefix
-		prefix = prefixes[message.guild.id];
-	}
+	const prefix = prefixes[message.guild.id] ?? "?";
 
 	//respond with bot's prefix if bot is tagged
-	if (message.content === `<@${client.user.id}>`) {
-		message.reply(`my prefix is **${prefix}**`);
-	}
+	if (message.content === `<@${client.user.id}>`) return message.reply(`my prefix is **${prefix}**`);
 
 	//detect whether or not a command was executed
 	if (message.content.toLowerCase().startsWith(prefix)) {
@@ -137,8 +127,8 @@ client.on("messageCreate", message => {
 
 		// check if the user is still in cooldown period
 		const cooldownAmount = (command.cooldown || 2) * 1000;
-		const userId = message.author.id;
-		const key = `${userId}-${commandName}`;
+		const userID = message.author.id;
+		const key = `${userID}-${commandName}`;
 		if (cooldowns.has(key)) {
 			const expirationTime = cooldowns.get(key) + cooldownAmount;
 			if (Date.now() < expirationTime) {

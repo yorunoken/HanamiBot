@@ -1,4 +1,3 @@
-require("dotenv/config");
 const fs = require("fs");
 
 async function login(client_id, client_secret) {
@@ -9,7 +8,7 @@ async function login(client_id, client_secret) {
 		"Content-Type": "application/x-www-form-urlencoded",
 	};
 
-	let body = `client_id=${process.env.client_id}&client_secret=${process.env.client_secret}&grant_type=client_credentials&scope=public`;
+	let body = `client_id=${client_id}&client_secret=${client_secret}&grant_type=client_credentials&scope=public`;
 	const Token = await fetch(url, {
 		method: "POST",
 		headers,
