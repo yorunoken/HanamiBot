@@ -70,7 +70,7 @@ exports.run = async (client, message, args, prefix) => {
 			return;
 		}
 
-		if (args.join(" ").startsWith("-r") || args.join(" ").startsWith("-recent") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+") || args.join(" ").startsWith("-g") || args.join(" ").startsWith("-am") || args.join(" ").startsWith("-amount") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-reverse")) {
+		if (args.join(" ").startsWith("-page") || args.join(" ").startsWith("-p") || args.join(" ").startsWith("-r") || args.join(" ").startsWith("-recent") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+") || args.join(" ").startsWith("-g") || args.join(" ").startsWith("-am") || args.join(" ").startsWith("-amount") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-rev") || args.join(" ").startsWith("-reverse")) {
 			try {
 				if (server == "bancho") userargs = userData[message.author.id].BanchoUserId;
 				if (server == "gatari") userargs = userData[message.author.id].GatariUserId;
@@ -81,6 +81,7 @@ exports.run = async (client, message, args, prefix) => {
 
 		let user;
 		let userstats;
+		let response;
 		if (server == "bancho") {
 			headers = {
 				Authorization: `Bearer ${process.env.osu_bearer_key}`,
@@ -118,20 +119,20 @@ exports.run = async (client, message, args, prefix) => {
 		}
 
 		if (server == "gatari") {
-			Userurl = `https://api.gatari.pw/users/get?u=`;
-			UserStatsurl = `https://api.gatari.pw/user/stats?u=`;
+			const Userurl = `https://api.gatari.pw/users/get?u=`;
+			const UserStatsurl = `https://api.gatari.pw/user/stats?u=`;
 
-			response = await fetch(`${Userurl}${userargs}`, { method: "GET" });
-			userResponse = await response.json();
+			let response = await fetch(`${Userurl}${userargs}`, { method: "GET" });
+			const userResponse = await response.json();
 
 			response = await fetch(`${UserStatsurl}${userargs}&${RuleSetId}`, { method: "GET" });
-			userStatsResponse = await response.json();
+			const userStatsResponse = await response.json();
 
 			user = userResponse.users[0];
 			userstats = userStatsResponse.stats;
 
 			url = `https://api.gatari.pw/user/scores/best`;
-			const response = await fetch(`${url}?id=${user.id}&l=100&p=1&mode=${RuleSetId}&mods=${modSort}`, { method: "GET" }).then(response => response.json());
+			response = await fetch(`${url}?id=${user.id}&l=100&p=1&mode=${RuleSetId}`, { method: "GET" }).then(response => response.json());
 			score = response.scores;
 			if (score == null) {
 				message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No Gatari plays found for **${user.username}**`)] });
