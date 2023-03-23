@@ -1,5 +1,12 @@
 const { isArray } = require("mathjs");
 function accuracy({ n300, n100, n50, nmiss, ngeki, nkatu }, mode) {
+	if (n300 < 0) throw new Error("Invalid 300 count");
+	if (n100 < 0) throw new Error("Invalid 100 count");
+	if (n50 < 0) throw new Error("Invalid 500 count");
+	if (nmiss < 0) throw new Error("Invalid miss count");
+	if (nkatu < 0) throw new Error("Invalid katu count");
+	if (ngeki < 0) throw new Error("Invalid geki count");
+
 	n300 = Number(n300) || 0;
 	n100 = Number(n100) || 0;
 	n50 = Number(n50) || 0;
@@ -21,10 +28,16 @@ function accuracy({ n300, n100, n50, nmiss, ngeki, nkatu }, mode) {
 
 function grade({ n300, n100, n50, nmiss, nkatu, ngeki, mode, mods }) {
 	if (!mode) return undefined;
+	if (n300 < 0) throw new Error("Invalid 300 count");
+	if (n100 < 0) throw new Error("Invalid 100 count");
+	if (n50 < 0) throw new Error("Invalid 500 count");
+	if (nmiss < 0) throw new Error("Invalid miss count");
+	if (nkatu < 0) throw new Error("Invalid katu count");
+	if (ngeki < 0) throw new Error("Invalid geki count");
 	if (isArray(mods)) mods = mods.join("");
 
-	const isHD = mods.toUpperCase().includes("HD");
-	const isFL = mods.toUpperCase().includes("FL");
+	const is_HD = mods.toUpperCase().includes("HD");
+	const is_FL = mods.toUpperCase().includes("FL");
 
 	n300 = Number(n300) || 0;
 	n100 = Number(n100) || 0;
@@ -33,30 +46,30 @@ function grade({ n300, n100, n50, nmiss, nkatu, ngeki, mode, mods }) {
 	ngeki = Number(ngeki) || 0;
 	nkatu = Number(nkatu) || 0;
 
-	function calculatePercentage(num, total_amount) {
-		return (num / total_amount) * 100;
+	function calculatePercentage(hits, objects) {
+		return (hits / objects) * 100;
 	}
 
 	if (mode.toLowerCase() == "osu") {
-		const total_hit = n300 + n100 + n50 + nmiss;
+		const total_objects = n300 + n100 + n50 + nmiss;
 
-		const percent = calculatePercentage(n300, total_hit);
-		const percent50 = calculatePercentage(n50, total_hit);
+		const percent_of_300 = calculatePercentage(n300, total_objects);
+		const percent_of_50 = calculatePercentage(n50, total_objects);
 
 		switch (true) {
-			case percent === 100 && !isHD && !isFL:
+			case percent_of_300 === 100 && !is_HD && !is_FL:
 				return "X";
-			case percent > 90 && !isHD && !isFL:
-				return nmiss >= 1 || percent50 > 1 ? "A" : "S";
-			case percent === 100 && (isHD || isFL):
+			case percent_of_300 > 90 && !is_HD && !is_FL:
+				return nmiss >= 1 || percent_of_50 > 1 ? "A" : "S";
+			case percent_of_300 === 100 && (is_HD || is_FL):
 				return "XH";
-			case percent > 90 && (isHD || isFL):
-				return nmiss > 0 || percent50 > 1 ? "A" : "SH";
-			case percent > 80:
+			case percent_of_300 > 90 && (is_HD || is_FL):
+				return nmiss > 0 || percent_of_50 > 1 ? "A" : "SH";
+			case percent_of_300 > 80:
 				return nmiss > 0 ? "B" : "A";
-			case percent > 70:
+			case percent_of_300 > 70:
 				return nmiss > 0 ? "C" : "B";
-			case percent > 60:
+			case percent_of_300 > 60:
 				return nmiss > 0 ? "D" : "C";
 			default:
 				return "D";
