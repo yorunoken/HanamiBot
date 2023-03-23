@@ -98,7 +98,7 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString, value, pagenum
 		const downloader = new Downloader({
 			rootPath: "./osuBeatmapCache",
 
-			filesPerSecond: 5,
+			filesPerSecond: 2,
 			synchronous: true,
 			redownload: redownload,
 		});

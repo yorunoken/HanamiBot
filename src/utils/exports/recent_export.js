@@ -216,14 +216,15 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 
 	if (server == "saber") {
 		var BaseUrl = `https://scoresaber.com/api`;
-		var response = await fetch(`${BaseUrl}/player/${user.id}/scores?limit=100&sort=recent&page=1&withMetadata=true`, { method: "GET" });
-		var data = await response.json();
+		var data = await fetch(`${BaseUrl}/player/${user.id}/scores?limit=100&sort=recent&page=1&withMetadata=true`, { method: "GET" }).then(x => x.json());
 
 		score = data.playerScores;
 		if (score.length == 0) {
 			let embed = new EmbedBuilder().setColor("Purple").setDescription(`No Beat Saber plays found for **${user.name}**`);
 			return { embed, FilterMods };
 		}
+
+		console.log(score);
 
 		function getAccuracy(score) {
 			let scoreCalc = score.score.baseScore;
@@ -250,18 +251,25 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 			}
 		}
 
+		function getDifficultyOrStarValue(input) {
+			if (input.stars > 0) {
+				return `**__[${input.stars}★]__**`;
+			}
+			return getDifficultyLabel(input.difficulty.difficulty);
+		}
+
 		function getDifficultyLabel(input) {
 			switch (input) {
 				case 1:
-					return "Easy";
+					return "**__[ Easy ]__**";
 				case 3:
-					return "Normal";
+					return "**__[ Normal ]__**";
 				case 5:
-					return "Hard";
+					return "**__[ Hard ]__**";
 				case 7:
-					return "Expert";
+					return "**__[ Expert ]__**";
 				case 9:
-					return "Expert+";
+					return "**__[ Expert+ ]__**";
 			}
 		}
 
@@ -289,15 +297,16 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		// const avatarUrl = user.profilePicture;
 
 		const TimeCreated = new Date(score[value].score.timeSet).getTime() / 1000;
-		let grade = getGrade(accuracy);
+		let grade = getGrade(Number(getAccuracy(score[value])));
 		grade = grades[grade];
 
-		const difficulty = getDifficultyLabel(score[value].leaderboard.difficulty.difficulty);
-		const title = `${score[value].leaderboard.songAuthorName} - ${score[value].leaderboard.songName} [${difficulty}]`;
+		const difficulty = getDifficultyOrStarValue(score[value].leaderboard);
+		const title = `${score[value].leaderboard.songAuthorName} - ${score[value].leaderboard.songName}`;
+
 		if (score[value].leaderboard.ranked) MapStatus = `Ranked`;
 		else if (score[value].leaderboard.qualified) MapStatus = `Qualified`;
 		else if (score[value].leaderboard.loved) MapStatus = `Loved`;
-		else MapStatus = `Unknown`;
+		else MapStatus = `Unranked`;
 
 		const HMDs = {
 			0: "Unknown",
@@ -323,7 +332,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 			})
 			.setTitle(title)
 			.setURL(`https://scoresaber.com/leaderboard/${mapId}`)
-			.setDescription(`${grade} • **__[${score[value].leaderboard.stars}★]__**\n▹**${score[value].score.pp.toFixed(2)}pp** • ${map_score} ${accuracy}\n▹[ **${valuecombo}**x ] • ${AccValues}\n▹Score Set <t:${TimeCreated}:R> • **Try #${retryCounter}**\nHeadset used: **${HMDs[score[value].score.hmd]}**`)
+			.setDescription(`${grade} • ${difficulty}\n▹**${score[value].score.pp.toFixed(2)}pp** • ${map_score} ${accuracy}\n▹[ **${valuecombo}**x ] • ${AccValues}\n▹Score Set <t:${TimeCreated}:R> • **Try #${retryCounter}**\n▹Headset used: **${HMDs[score[value].score.hmd]}**`)
 			// .setFields({ name: `**Beatmap info:**`, value: `BPM: \`${mapValues.bpm.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${mapValues.ar.toFixed(1).toString().replace(/\.0+$/, "")}\` OD: \`${mapValues.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\`` })
 			.setThumbnail(score[value].leaderboard.coverImage)
 			.setFooter({ text: `${MapStatus} map by ${creatorName} | Beat Saber`, iconURL: `https://upload.wikimedia.org/wikipedia/commons/9/91/Beat_Saber_Logo.png` });
@@ -427,7 +436,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 	const downloader = new Downloader({
 		rootPath: "./osuBeatmapCache",
 
-		filesPerSecond: 5,
+		filesPerSecond: 2,
 		synchronous: true,
 		redownload: redownload,
 	});

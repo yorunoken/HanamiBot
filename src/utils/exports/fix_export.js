@@ -61,7 +61,7 @@ async function FixFunction(mapinfo, beatmapId, user, ModeOsu, ModsString, messag
 		const downloader = new Downloader({
 			rootPath: "./osuBeatmapCache",
 
-			filesPerSecond: 5,
+			filesPerSecond: 2,
 			synchronous: true,
 			redownload: redownload,
 		});

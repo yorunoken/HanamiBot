@@ -35,7 +35,7 @@ async function LbSend(beatmapId, scores, pagenum, mapinfo, AuthorsName) {
 	const downloader = new Downloader({
 		rootPath: "./osuBeatmapCache",
 
-		filesPerSecond: 5,
+		filesPerSecond: 2,
 		synchronous: true,
 		redownload: redownload,
 	});

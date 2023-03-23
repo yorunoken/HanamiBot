@@ -31,7 +31,7 @@ async function GetuserNoChoke(user, tops, ruleset, GameMode, pageNumber) {
 			const downloader = new Downloader({
 				rootPath: "./osuBeatmapCache",
 
-				filesPerSecond: 5,
+				filesPerSecond: 2,
 				synchronous: true,
 			});
 
