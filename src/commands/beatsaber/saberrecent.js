@@ -29,8 +29,8 @@ exports.run = async (client, message, args, prefix) => {
 		}
 
 		if (isNaN(userargs)) {
-			var repsonse = await fetch(`http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${process.env.STEAM_API_KEY}&vanityurl=${userargs}`, { method: "GET" }).then(response => response.json());
-			const data = response.response;
+			var response = await fetch(`http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${process.env.STEAM_API_KEY}&vanityurl=${userargs}`, { method: "GET" }).then(response => response.json());
+			var data = response.response;
 			if (data.success != 1) {
 				message.reply(`**The user \`${userargs}\` does not exist in the Beat Saber database.**`);
 				return;
@@ -52,7 +52,7 @@ exports.run = async (client, message, args, prefix) => {
 	});
 };
 exports.name = "saberrecent";
-exports.aliases = ["saberrecent", "sr", "bsr", "brs"];
+exports.aliases = ["saberrecent", "sr", "bsr", "br"];
 exports.description = ["Displays the stats of a user\n\n**Parameters:**\n`username` get the stats from a username"];
 exports.usage = [`bsp Yoru`];
 exports.category = ["saber"];
