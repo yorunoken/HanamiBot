@@ -1,4 +1,4 @@
-function accuracy({ n300, n100, n50, nmiss, ngeki, nkatu }, mode) {
+function accuracy({ n300, n100, n50, nmiss, ngeki, nkatu, mode }) {
 	if (n300 < 0) throw new Error("Invalid 300 count");
 	if (n100 < 0) throw new Error("Invalid 100 count");
 	if (n50 < 0) throw new Error("Invalid 500 count");

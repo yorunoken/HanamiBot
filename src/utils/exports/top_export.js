@@ -286,17 +286,15 @@ async function GetUserTop(score, user, userstats, pageNumber, ModeOsu, RuleSetId
 			if (CurAttrs.effectiveMissCount > 0) {
 				Map300CountFc = objects - value100 - value50;
 
-				const FcAcc = tools.accuracy(
-					{
-						n300: Map300CountFc,
-						ngeki: valuegeki,
-						n100: value100,
-						nkatu: valuekatu,
-						n50: value50,
-						nmiss: 0,
-					},
-					ModeOsu,
-				);
+				const FcAcc = tools.accuracy({
+					n300: Map300CountFc,
+					ngeki: valuegeki,
+					n100: value100,
+					nkatu: valuekatu,
+					n50: value50,
+					nmiss: 0,
+					mode: ModeString,
+				});
 
 				pps = `**${CurAttrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}PP ▹ (**${FCAttrs.pp.toFixed(2)}**PP for **${FcAcc.toFixed(2)}%**)`;
 			} else {

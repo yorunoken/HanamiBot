@@ -196,17 +196,15 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString, value, pagenum
 			if (Attrs.effectiveMissCount > 0) {
 				Map300CountFc = objects - count_100 - count_50;
 
-				const FcAcc = tools.accuracy(
-					{
-						n300: Map300CountFc,
-						ngeki: count_geki,
-						n100: count_100,
-						nkatu: count_katu,
-						n50: count_50,
-						nmiss: 0,
-					},
-					ModeString,
-				);
+				const FcAcc = tools.accuracy({
+					n300: Map300CountFc,
+					ngeki: count_geki,
+					n100: count_100,
+					nkatu: count_katu,
+					n50: count_50,
+					nmiss: 0,
+					mode: ModeString,
+				});
 				pps = `**${Attrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}PP ▹ (**${FCAttrs.pp.toFixed(2)}**PP for **${FcAcc.toFixed(2)}%**)`;
 			}
 

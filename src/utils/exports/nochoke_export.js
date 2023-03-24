@@ -101,17 +101,15 @@ async function GetuserNoChoke(user, tops, ruleset, GameMode, pageNumber) {
 	function GetScore(score, FCMap, oldState, newState) {
 		let objects = score.beatmap.count_circles + score.beatmap.count_sliders + score.beatmap.count_spinners;
 		Map300CountFc = objects - score.statistics.count_100 - score.statistics.count_50;
-		let FcAcc = tools.accuracy(
-			{
-				n300: Map300CountFc,
-				ngeki: score.statistics.count_geki,
-				n100: score.statistics.count_100,
-				nkatu: score.statistics.count_katu,
-				n50: score.statistics.count_50,
-				nmiss: 0,
-			},
-			GameMode,
-		);
+		let FcAcc = tools.accuracy({
+			n300: Map300CountFc,
+			ngeki: score.statistics.count_geki,
+			n100: score.statistics.count_100,
+			nkatu: score.statistics.count_katu,
+			n50: score.statistics.count_50,
+			nmiss: 0,
+			mode: ModeString,
+		});
 		let modsName = score.mods.join("");
 		if (modsName.length == 0) modsName = `NM`;
 

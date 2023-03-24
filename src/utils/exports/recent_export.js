@@ -500,17 +500,15 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 	if (CurAttrs.effectiveMissCount > 0) {
 		Map300CountFc = objects - value100 - value50;
 
-		const FcAcc = tools.accuracy(
-			{
-				n300: Map300CountFc,
-				ngeki: valuegeki,
-				n100: value100,
-				nkatu: valuekatu,
-				n50: value50,
-				nmiss: 0,
-			},
-			mode,
-		);
+		const FcAcc = tools.accuracy({
+			n300: Map300CountFc,
+			ngeki: valuegeki,
+			n100: value100,
+			nkatu: valuekatu,
+			n50: value50,
+			nmiss: 0,
+			mode: ModeString,
+		});
 
 		pps = `**${CurAttrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}PP ▹ (**${FCAttrs.pp.toFixed(2)}**PP for **${FcAcc.toFixed(2)}%**)`;
 	}

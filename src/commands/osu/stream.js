@@ -306,11 +306,11 @@ exports.run = async (client, message, args, prefix) => {
 	}
 
 	const filters = [bpm_min, bpm_max, od_min, od_max, ar_min, ar_max, cs_min, cs_max, star_min, star_max, length_min, length_max, longest_min, longest_max, pp_min, pp_max, status, density_min, density_max, streamlength_min, streamlength_max, spacing_min, spacing_max];
-	const endpoint = `https://ost.sombrax79.org/api/bot/beatmap/request`;
+	const url = `https://ost.sombrax79.org/api/bot/beatmap/request`;
 	const headers = { "Content-Type": "application/json" };
 	let data;
 	try {
-		dataraw = await axios.post(endpoint, filters, { headers });
+		dataraw = await axios.post(url, filters, { headers });
 		data = dataraw.data;
 		console.log("file: stream.js:299 ~ exports.run= ~ data:", data);
 	} catch (err) {

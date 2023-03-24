@@ -96,17 +96,15 @@ async function FixFunction(mapinfo, beatmapId, user, ModeOsu, ModsString, messag
 		let row_three = "";
 		let row_four = "";
 		if (NormalPP.effectiveMissCount != 0) {
-			const FcAcc = tools.accuracy(
-				{
-					n300: score.statistics.count_300,
-					ngeki: score.statistics.count_geki,
-					n100: score.statistics.count_100,
-					nkatu: score.statistics.count_katu,
-					n50: score.statistics.count_50,
-					nmiss: 0,
-				},
-				ModeOsu,
-			);
+			const FcAcc = tools.accuracy({
+				n300: score.statistics.count_300,
+				ngeki: score.statistics.count_geki,
+				n100: score.statistics.count_100,
+				nkatu: score.statistics.count_katu,
+				n50: score.statistics.count_50,
+				nmiss: 0,
+				mode: ModeString,
+			});
 
 			//fc pp
 			let FcPP = calc.n100(score.statistics.count_100).n300(score.statistics.count_300).nMisses(0).combo(NormalPP.difficulty.maxCombo).n50(score.statistics.count_50).nGeki(score.statistics.count_geki).nKatu(score.statistics.count_katu).mods(modsID).performance(map);
