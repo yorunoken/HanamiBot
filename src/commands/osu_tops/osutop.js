@@ -1,8 +1,12 @@
+const { getTop } = require("./topFunc.js");
+
 exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping();
 	let RB = false;
 	let mode = "osu";
 	let RuleSetID = 0;
+
+	getTop(message, args, prefix, RB, mode, RuleSetID);
 };
 exports.name = ["osutop"];
 exports.aliases = ["top", "osutop", "t"];
