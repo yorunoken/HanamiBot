@@ -18,19 +18,19 @@ module.exports.run = async (client, message, args, prefix) => {
 		var server = "bancho";
 
 		let mode = "osu";
-		let RuleSetId = 0;
+		let RuleSetID = 0;
 
 		if (args.includes("-mania")) {
 			mode = "mania";
-			RuleSetId = 3;
+			RuleSetID = 3;
 		}
 		if (args.includes("-taiko")) {
 			mode = "taiko";
-			RuleSetId = 1;
+			RuleSetID = 1;
 		}
 		if (args.includes("-ctb")) {
 			mode = "fruits";
-			RuleSetId = 2;
+			RuleSetID = 2;
 		}
 
 		if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko")) {
@@ -55,7 +55,7 @@ module.exports.run = async (client, message, args, prefix) => {
 			return;
 		}
 
-		message.channel.send({ embeds: [await PlayStats(user, RuleSetId, mode, prefix)] });
+		message.channel.send({ embeds: [await PlayStats(user, RuleSetID, mode, prefix)] });
 	});
 };
 exports.name = ["playstats"];

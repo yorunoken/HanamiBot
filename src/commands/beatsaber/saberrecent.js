@@ -15,7 +15,7 @@ exports.run = async (client, message, args, prefix) => {
 		const userData = JSON.parse(data);
 
 		var server = "saber";
-		let mode, PassDetermine, RuleSetId;
+		let mode, PassDetermine, RuleSetID;
 
 		let value = 0;
 		if (args.includes("-i")) {
@@ -46,7 +46,7 @@ exports.run = async (client, message, args, prefix) => {
 			return;
 		}
 
-		const Recent = await GetRecent(value, user, mode, PassDetermine, args, RuleSetId, userstats, server);
+		const Recent = await GetRecent(value, user, mode, PassDetermine, args, RuleSetID, userstats, server);
 
 		message.channel.send({ embeds: [Recent.embed.data] });
 	});

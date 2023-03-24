@@ -15,7 +15,7 @@ module.exports.run = async (client, message, args, prefix) => {
 		const userData = JSON.parse(data);
 		let value = 0;
 		let mode = "taiko";
-		let RuleSetId = 1;
+		let RuleSetID = 1;
 		let PassDetermine = 1;
 		try {
 			server = userData[message.author.id].server || "bancho";
@@ -74,7 +74,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
 			var response = await fetch(`${Userurl}${userargs}`, { method: "GET" });
 			var userResponse = await response.json();
-			var response = await fetch(`${UserStatsurl}${userargs}&${RuleSetId}`, { method: "GET" });
+			var response = await fetch(`${UserStatsurl}${userargs}&${RuleSetID}`, { method: "GET" });
 			var userStatsResponse = await response.json();
 
 			user = userResponse.users[0];
@@ -109,7 +109,7 @@ module.exports.run = async (client, message, args, prefix) => {
 			}
 		}
 
-		const Recent = await GetRecent(value, user, mode, PassDetermine, args, RuleSetId, userstats, server);
+		const Recent = await GetRecent(value, user, mode, PassDetermine, args, RuleSetID, userstats, server);
 
 		message.channel.send({ content: Recent.FilterMods, embeds: [Recent.embed.data] });
 	});

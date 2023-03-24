@@ -17,7 +17,7 @@ module.exports.run = async (client, message, args, prefix) => {
 		let userargs;
 
 		let mode = "osu";
-		let RuleSetId = 0;
+		let RuleSetID = 0;
 
 		if (message.mentions.users.size > 0) {
 			const mentionedUser = message.mentions.users.first();
@@ -114,7 +114,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
 		const WaitMesasge = await message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setTitle("Calculating...").setDescription("Please sit still while I'm calculating your plays, this may take a while if it's your first time using this command.")] });
 
-		const Stats = await GetuserNoChoke(user, plays, RuleSetId, mode, pageNumber);
+		const Stats = await GetuserNoChoke(user, plays, RuleSetID, mode, pageNumber);
 		WaitMesasge.delete();
 		message.channel.send({ embeds: [Stats] });
 	});

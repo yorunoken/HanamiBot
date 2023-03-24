@@ -16,7 +16,7 @@ module.exports.run = async (client, message, args, prefix) => {
 		const userData = JSON.parse(data);
 		let value = 0;
 		let mode = "fruits";
-		let RuleSetId = 2;
+		let RuleSetID = 2;
 		let PassDetermine = 0;
 		try {
 			server = userData[message.author.id].server || "bancho";
@@ -71,7 +71,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
 			var response = await fetch(`${Userurl}${userargs}`, { method: "GET" });
 			var userResponse = await response.json();
-			var response = await fetch(`${UserStatsurl}${userargs}&${RuleSetId}`, { method: "GET" });
+			var response = await fetch(`${UserStatsurl}${userargs}&${RuleSetID}`, { method: "GET" });
 			var userStatsResponse = await response.json();
 
 			user = userResponse.users[0];
@@ -106,7 +106,7 @@ module.exports.run = async (client, message, args, prefix) => {
 			}
 		}
 
-		const Recent = await GetRecent(value, user, mode, PassDetermine, args, RuleSetId, userstats, server);
+		const Recent = await GetRecent(value, user, mode, PassDetermine, args, RuleSetID, userstats, server);
 
 		let row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("render").setDisabled().setStyle(ButtonStyle.Primary).setLabel("Render"));
 		if (Recent.top1k) {
@@ -133,7 +133,7 @@ module.exports.run = async (client, message, args, prefix) => {
 	});
 };
 exports.name = ["recentpassctb"];
-exports.aliases = ["recentpassctb", "rpctb", "rpc", ];
+exports.aliases = ["recentpassctb", "rpctb", "rpc"];
 exports.description = ["Displays user's recent passed osu!ctb play\n\n**Parameters:**\n`username` get the recent play of a user (must be first parameter) \n`-i (number)` get a specific play (1-100)\n`-pass` get the latest passed play (no parameters)\n`mods=(string)` get the latest play by mods"];
 exports.usage = [`rctb -pass -i 3\nrecentctb Rocma -i 5`];
 exports.category = ["osu"];

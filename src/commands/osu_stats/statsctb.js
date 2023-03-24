@@ -17,7 +17,7 @@ module.exports.run = async (client, message, args, prefix) => {
 		let userargs;
 
 		let mode = "fruits";
-		let RuleSetId = 2;
+		let RuleSetID = 2;
 
 		if (message.mentions.users.size > 0) {
 			const mentionedUser = message.mentions.users.first();
@@ -91,7 +91,7 @@ module.exports.run = async (client, message, args, prefix) => {
 
 		const WaitMesasge = await message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setTitle("Calculating...").setDescription("Please sit still while I'm calculating your plays, this may take a while if it's your first time using this command.")] });
 
-		const Stats = await GetUserTop100Stats(user, plays, RuleSetId, mode);
+		const Stats = await GetUserTop100Stats(user, plays, RuleSetID, mode);
 		WaitMesasge.delete();
 		message.channel.send({ embeds: [Stats] });
 	});

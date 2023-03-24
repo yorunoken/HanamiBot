@@ -18,7 +18,7 @@ module.exports.run = async (client, message, args, prefix) => {
 		let userargs;
 
 		let mode = "osu";
-		let RuleSetId = 0;
+		let RuleSetID = 0;
 		let mentioneduser = false;
 
 		if (message.mentions.users.size > 0) {
@@ -70,15 +70,15 @@ module.exports.run = async (client, message, args, prefix) => {
 
 				if (args.includes("-mania")) {
 					mode = "mania";
-					RuleSetId = 3;
+					RuleSetID = 3;
 				}
 				if (args.includes("-taiko")) {
 					mode = "taiko";
-					RuleSetId = 1;
+					RuleSetID = 1;
 				}
 				if (args.includes("-ctb")) {
 					mode = "fruits";
-					RuleSetId = 2;
+					RuleSetID = 2;
 				}
 
 				if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko")) {
@@ -131,7 +131,7 @@ module.exports.run = async (client, message, args, prefix) => {
 			return;
 		}
 
-		const response = await axios.get(`${endpoint}pp.php?k=${apiKey}&m=${RuleSetId}&t=rank&v=${ReachRank}`);
+		const response = await axios.get(`${endpoint}pp.php?k=${apiKey}&m=${RuleSetID}&t=rank&v=${ReachRank}`);
 		const ReponseData = response.data;
 
 		const NeededPP = ReponseData.pp - user.statistics.pp;

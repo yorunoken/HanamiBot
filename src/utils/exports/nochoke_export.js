@@ -108,7 +108,7 @@ async function GetuserNoChoke(user, tops, ruleset, GameMode, pageNumber) {
 			nkatu: score.statistics.count_katu,
 			n50: score.statistics.count_50,
 			nmiss: 0,
-			mode: ModeString,
+			mode: GameMode,
 		});
 		let modsName = score.mods.join("");
 		if (modsName.length == 0) modsName = `NM`;

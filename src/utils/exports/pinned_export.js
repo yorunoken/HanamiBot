@@ -6,7 +6,7 @@ const { Downloader, DownloadEntry } = require("osu-downloader");
 
 const { mods } = require("../../utils/mods.js");
 
-async function GetPinned(value, user, mode, RuleSetId, pageNumber) {
+async function GetPinned(value, user, mode, RuleSetID, pageNumber) {
 	await auth.login(process.env.client_id, process.env.client_secret);
 
 	const start = (pageNumber - 1) * 5 + 1;
@@ -65,7 +65,7 @@ async function GetPinned(value, user, mode, RuleSetId, pageNumber) {
 
 		const modsID = mods.id(Mods);
 		let scoreParam = {
-			mode: RuleSetId,
+			mode: RuleSetID,
 			mods: modsID,
 		};
 

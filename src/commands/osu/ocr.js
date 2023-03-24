@@ -27,13 +27,13 @@ exports.run = async (client, message, args, prefix) => {
 
 		var clock_rate = 1;
 
-		const RuleSetId = mapinfo.mode_int;
+		const RuleSetID = mapinfo.mode_int;
 		let mapParam = {
 			path: `./osuBeatmapCache/${mapId}.osu`,
 		};
 
 		let scoreParam = {
-			mode: RuleSetId,
+			mode: RuleSetID,
 			mods: 0,
 		};
 

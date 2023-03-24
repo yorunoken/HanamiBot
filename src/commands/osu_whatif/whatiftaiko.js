@@ -17,7 +17,7 @@ module.exports.run = async (client, message, args, prefix) => {
 		let userargs;
 
 		let mode = "taiko";
-		let RuleSetId = 1;
+		let RuleSetID = 1;
 		let mentioneduser = false;
 
 		if (message.mentions.users.size > 0) {
@@ -69,15 +69,15 @@ module.exports.run = async (client, message, args, prefix) => {
 
 				if (args.includes("-mania")) {
 					mode = "mania";
-					RuleSetId = 3;
+					RuleSetID = 3;
 				}
 				if (args.includes("-taiko")) {
 					mode = "taiko";
-					RuleSetId = 1;
+					RuleSetID = 1;
 				}
 				if (args.includes("-ctb")) {
 					mode = "fruits";
-					RuleSetId = 2;
+					RuleSetID = 2;
 				}
 
 				if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko")) {
@@ -197,7 +197,7 @@ module.exports.run = async (client, message, args, prefix) => {
 				differencerounded = Math.round(difference);
 			}
 
-			const response = await axios.get(`${endpoint}pp.php?k=${apiKey}&m=${RuleSetId}&t=pp&v=${newpp}`);
+			const response = await axios.get(`${endpoint}pp.php?k=${apiKey}&m=${RuleSetID}&t=pp&v=${newpp}`);
 			const ReponseData = response.data;
 			const TopPlay = scores.filter(x => x > ppraw).length + 1;
 

@@ -16,7 +16,7 @@ exports.run = async (client, message, args, prefix) => {
 		let PageNumber = 1;
 		let play_number = undefined;
 		let ModeOsu = "osu";
-		let RuleSetId = 0;
+		let RuleSetID = 0;
 		let RB = false;
 		let FailPlay = 1;
 
@@ -38,17 +38,17 @@ exports.run = async (client, message, args, prefix) => {
 		var userargs = await FindUserargs(message, args, server, prefix);
 
 		if (args.includes("-mania")) {
-			RuleSetId = 3;
+			RuleSetID = 3;
 			ModeOsu = "mania";
 		}
 
 		if (args.includes("-taiko")) {
-			RuleSetId = 1;
+			RuleSetID = 1;
 			ModeOsu = "taiko";
 		}
 
 		if (args.includes("-ctb")) {
-			RuleSetId = 2;
+			RuleSetID = 2;
 			ModeOsu = "ctb";
 		}
 
@@ -130,14 +130,14 @@ exports.run = async (client, message, args, prefix) => {
 			response = await fetch(`${Userurl}${userargs}`, { method: "GET" });
 			userResponse = await response.json();
 
-			response = await fetch(`${UserStatsurl}${userargs}&${RuleSetId}`, { method: "GET" });
+			response = await fetch(`${UserStatsurl}${userargs}&${RuleSetID}`, { method: "GET" });
 			userStatsResponse = await response.json();
 
 			user = userResponse.users[0];
 			userstats = userStatsResponse.stats;
 
 			url = `https://api.gatari.pw/user/scores/recent`;
-			const response = await fetch(`${url}?id=${user.id}&l=100&p=1&mode=${RuleSetId}&mods=${modSort}`, { method: "GET" }).then(response => response.json());
+			const response = await fetch(`${url}?id=${user.id}&l=100&p=1&mode=${RuleSetID}&mods=${modSort}`, { method: "GET" }).then(response => response.json());
 			score = response.scores;
 			if (score == null) {
 				message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No Gatari plays found for **${user.username}**`)] });
@@ -150,7 +150,7 @@ exports.run = async (client, message, args, prefix) => {
 			}
 		}
 
-		message.channel.send({ embeds: [await GetUserTop(score, user, userstats, PageNumber, ModeOsu, RuleSetId, args, argValues["mods"], play_number, RB, server)] });
+		message.channel.send({ embeds: [await GetUserTop(score, user, userstats, PageNumber, ModeOsu, RuleSetID, args, argValues["mods"], play_number, RB, server)] });
 	});
 };
 exports.name = ["recentlist"];

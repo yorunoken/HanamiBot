@@ -17,7 +17,7 @@ module.exports.run = async (client, message, args, prefix) => {
 		let server = "bancho";
 
 		let mode = "osu";
-		let RuleSetId = 0;
+		let RuleSetID = 0;
 
 		var userargs = await FindUserargs(message, args, server, prefix);
 
@@ -56,7 +56,7 @@ module.exports.run = async (client, message, args, prefix) => {
 			offset: "0",
 		});
 
-		const values = await CalculateSkill(plays, RuleSetId);
+		const values = await CalculateSkill(plays, RuleSetID);
 
 		let aimSkill = values.aim;
 		let speedSkill = values.speed;

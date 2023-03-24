@@ -28,7 +28,7 @@ exports.run = async (client, message, args, prefix) => {
 				throw new Error("ERROR CODE 409, ABORTING TASK");
 			}
 
-			const RuleSetId = DiffValues.mode_int;
+			const RuleSetID = DiffValues.mode_int;
 			let mapParam = {
 				path: `./osuBeatmapCache/${beatmapId}.osu`,
 				ar: DiffValues.ar,
@@ -38,7 +38,7 @@ exports.run = async (client, message, args, prefix) => {
 			};
 
 			let scoreParam = {
-				mode: RuleSetId,
+				mode: RuleSetID,
 			};
 
 			let map = new Beatmap(mapParam);

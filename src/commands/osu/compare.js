@@ -18,7 +18,7 @@ exports.run = async (client, message, args, prefix) => {
 		let userargs;
 		let value = undefined;
 		let pagenum = 1;
-		let RuleSetId;
+		let RuleSetID;
 		try {
 			server = userData[message.author.id].server || "bancho";
 		} catch (err) {
@@ -240,7 +240,7 @@ exports.run = async (client, message, args, prefix) => {
 								default:
 									await EmbedFunc(mapinfo, beatmapId, user, mode, value, pagenum, server, userstats);
 							}
-							
+
 							GoodToGo = true;
 							return;
 						} catch (err) {
@@ -254,22 +254,22 @@ exports.run = async (client, message, args, prefix) => {
 
 		async function EmbedFunc(mapinfo, beatmapId, user, ModeOsu, value, pagenum, server, userstats) {
 			if (args.includes("-osu")) {
-				RuleSetId = 0;
+				RuleSetID = 0;
 				mode = "osu";
 			}
 
 			if (args.includes("-mania")) {
-				RuleSetId = 3;
+				RuleSetID = 3;
 				mode = "mania";
 			}
 
 			if (args.includes("-taiko")) {
-				RuleSetId = 1;
+				RuleSetID = 1;
 				mode = "taiko";
 			}
 
 			if (args.includes("-ctb")) {
-				RuleSetId = 2;
+				RuleSetID = 2;
 				mode = "ctb";
 			}
 
@@ -289,7 +289,7 @@ exports.run = async (client, message, args, prefix) => {
 
 				userResponse = await fetch(`${Userurl}${userargs}`, { method: "GET" }).then(response => response.json());
 
-				userStatsResponse = await fetch(`${UserStatsurl}${userargs}&${RuleSetId}`, { method: "GET" }).then(response => response.json());
+				userStatsResponse = await fetch(`${UserStatsurl}${userargs}&${RuleSetID}`, { method: "GET" }).then(response => response.json());
 
 				user = userResponse.users[0];
 				userstats = userStatsResponse.stats;

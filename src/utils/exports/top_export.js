@@ -8,7 +8,7 @@ const axios = require("axios");
 const { tools } = require("../../utils/tools.js");
 const { mods } = require("../../utils/mods.js");
 
-async function GetUserTop(score, user, userstats, pageNumber, ModeOsu, RuleSetId, args, ModsSearch, play_number, rb, server) {
+async function GetUserTop(score, user, userstats, pageNumber, ModeOsu, RuleSetID, args, ModsSearch, play_number, rb, server) {
 	//determine the page of the osutop
 	const start = (pageNumber - 1) * 5 + 1;
 	const end = pageNumber * 5;
@@ -195,15 +195,15 @@ async function GetUserTop(score, user, userstats, pageNumber, ModeOsu, RuleSetId
 		}
 
 		let scoreParam = {
-			mode: RuleSetId,
+			mode: RuleSetID,
 			mods: modsID,
 		};
 
 		let AccValues;
-		if (RuleSetId == "0") AccValues = `{**${value300}**/${value100}/${value50}/${valuemiss}}`;
-		if (RuleSetId == "1") AccValues = `{**${value300}**/${value100}/${valuemiss}}`;
-		if (RuleSetId == "2") AccValues = `{**${value300}**/${value100}/${value50}/${valuemiss}}`;
-		if (RuleSetId == "3") AccValues = `{**${valuegeki}/${value300}**/${valuekatu}/${value100}/${value50}/${valuemiss}}`;
+		if (RuleSetID == "0") AccValues = `{**${value300}**/${value100}/${value50}/${valuemiss}}`;
+		if (RuleSetID == "1") AccValues = `{**${value300}**/${value100}/${valuemiss}}`;
+		if (RuleSetID == "2") AccValues = `{**${value300}**/${value100}/${value50}/${valuemiss}}`;
+		if (RuleSetID == "3") AccValues = `{**${valuegeki}/${value300}**/${valuekatu}/${value100}/${value50}/${valuemiss}}`;
 
 		let map = new Beatmap({ path: `./osuBeatmapCache/${mapId}.osu` });
 		const calc = new Calculator(scoreParam);
@@ -293,7 +293,7 @@ async function GetUserTop(score, user, userstats, pageNumber, ModeOsu, RuleSetId
 					nkatu: valuekatu,
 					n50: value50,
 					nmiss: 0,
-					mode: ModeString,
+					mode: ModeOsu,
 				});
 
 				pps = `**${CurAttrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}PP ▹ (**${FCAttrs.pp.toFixed(2)}**PP for **${FcAcc.toFixed(2)}%**)`;

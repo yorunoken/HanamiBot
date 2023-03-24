@@ -13,7 +13,7 @@ exports.run = async (client, message, args, prefix) => {
 		}
 		var server = "saber";
 		let firstPage = true;
-		let mode, RuleSetId;
+		let mode, RuleSetID;
 
 		var userargs = await FindUserargs(message, args, server, prefix);
 		if (isNaN(userargs)) {
@@ -28,13 +28,13 @@ exports.run = async (client, message, args, prefix) => {
 
 		let user, userstats;
 		var BaseUrl = `https://scoresaber.com/api`;
-		user = await fetch(`${BaseUrl}/player/${userargs}/full`, { method: "GET" }).then(response => response.json())
+		user = await fetch(`${BaseUrl}/player/${userargs}/full`, { method: "GET" }).then(response => response.json());
 		if (user.errorMessage == "Player not found") {
 			message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player with the id \`${userargs}\` does not exist in Beat Saber database**`)] });
 			return;
 		}
 
-		message.channel.send({ embeds: [await GetUserPage(firstPage, user, userstats, mode, RuleSetId, server)] });
+		message.channel.send({ embeds: [await GetUserPage(firstPage, user, userstats, mode, RuleSetID, server)] });
 	});
 };
 exports.name = "saberprofile";

@@ -15,7 +15,7 @@ exports.run = async (client, message, args, prefix) => {
 		}
 		const userData = JSON.parse(data);
 		let mode = "fruits";
-		let RuleSetId = 2;
+		let RuleSetID = 2;
 		try {
 			server = userData[message.author.id].server || "bancho";
 		} catch (err) {
@@ -56,7 +56,7 @@ exports.run = async (client, message, args, prefix) => {
 
 			var response = await fetch(`${Userurl}${userargs}`, { method: "GET" });
 			var userResponse = await response.json();
-			var response = await fetch(`${UserStatsurl}${userargs}&${RuleSetId}`, { method: "GET" });
+			var response = await fetch(`${UserStatsurl}${userargs}&${RuleSetID}`, { method: "GET" });
 			var userStatsResponse = await response.json();
 
 			user = userResponse.users[0];
@@ -70,7 +70,7 @@ exports.run = async (client, message, args, prefix) => {
 
 		if (args.join(" ").includes("-d") || args.join(" ").includes("-details")) firstPage = false;
 
-		message.channel.send({ embeds: [await GetUserPage(firstPage, user, userstats, mode, RuleSetId, server)] });
+		message.channel.send({ embeds: [await GetUserPage(firstPage, user, userstats, mode, RuleSetID, server)] });
 	});
 };
 exports.name = "ctb";

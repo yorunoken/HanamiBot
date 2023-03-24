@@ -2,7 +2,7 @@ const fs = require("fs");
 const { EmbedBuilder } = require("discord.js");
 const Table = require("easy-table");
 
-async function PlayStats(user, RuleSetId, mode, prefix) {
+async function PlayStats(user, RuleSetID, mode, prefix) {
 	return new Promise((resolve, reject) => {
 		fs.readFile("./user-recent.json", async (error, data) => {
 			if (error) {
@@ -92,6 +92,16 @@ async function PlayStats(user, RuleSetId, mode, prefix) {
 			for (let i = 0; i < scores.length; i++) {
 				if (scores[i].score.passed) Passes.push(i);
 			}
+
+			let PassPercent = [];
+			for (let i = 0; i < scores.length; i++) {
+				let objects_hit = scores[i].score.statistics.count_300 + scores[i].score.statistics.count_100 + scores[i].score.statistics.count_50 + scores[i].score.statistics.count_miss;
+				let objects = scores[i].score.beatmap.count_circles + scores[i].score.beatmap.count_sliders + scores[i].score.beatmap.count_spinners;
+				let percentage = (objects_hit / objects) * 100;
+				console.log(objects_hit);
+				if (scores[i].score.passed == true) percentage = 100;
+				PassPercent.push(percentage);
+			}
 			// const PPSS = FindPattern(scores.map(score => score.score.SSPP))
 
 			const DataForTable = [
@@ -115,6 +125,14 @@ async function PlayStats(user, RuleSetId, mode, prefix) {
 				t.cell("Maximum", Skills.max);
 				t.newRow();
 			});
+
+			const passValue = `Passed    ${Passes.length}/${scores.length}\n`;
+
+			const percentSum = PassPercent.reduce((a, b) => a + b);
+			const averagePercent = percentSum / PassPercent.length;
+
+			const passPercent = `Percent   ${averagePercent.toFixed(2)}%`;
+
 			const embed = new EmbedBuilder()
 				.setColor("Purple")
 				.setAuthor({
@@ -123,7 +141,7 @@ async function PlayStats(user, RuleSetId, mode, prefix) {
 					url: `https://osu.ppy.sh/users/${user.id}/${mode}`,
 				})
 				.setThumbnail(user.avatar_url)
-				.setFields({ name: `Statistics:`, value: `\`\`\`${t.toString()}Passed    ${Passes.length}/${scores.length}\`\`\`\n**Calculated scores:** \`${scores.length}\``, inline: false });
+				.setFields({ name: `Statistics:`, value: `\`\`\`${t.toString()}${passValue}${passPercent}\`\`\`\n**Calculated scores:** \`${scores.length}\``, inline: false });
 			resolve(embed);
 		});
 	});

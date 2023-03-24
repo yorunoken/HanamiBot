@@ -1,7 +1,7 @@
 const { v2, auth } = require("osu-api-extended");
 const { EmbedBuilder } = require("discord.js");
 
-async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) {
+async function GetUserPage(firstPage, user, userstats, mode, RuleSetID, server) {
 	//grades
 	const grades = {
 		A: "<:A_:1057763284327080036>",
@@ -70,7 +70,7 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 			.setAuthor({
 				name: `${user.username}[${user.abbr}]: ${pp}pp (#${global_rank} ${user.country}#${country_rank})`,
 				iconURL: `https://osu.ppy.sh/images/flags/${user.country}.png`,
-				url: `https://osu.gatari.pw/u/${user.id}?m=${RuleSetId}`,
+				url: `https://osu.gatari.pw/u/${user.id}?m=${RuleSetID}`,
 			})
 			.setThumbnail(`https://a.gatari.pw/${user.id}`)
 			.setDescription(`**Accuracy:** \`${acc}%\` •  **Level:** \`${UserLevel}.${lvlprogress}\`\n**Playcount:** \`${playcount}\` (\`${playhours.toFixed()} hrs\`)\n**Followers:** \`${followers}\` • **Max Combo:** \`${profile_maxcombo}\`\n**Ranks:** ${grades.XH}\`${ssh}\`${grades.X}\`${ss}\`${grades.SH}\`${sh}\`${grades.S}\`${s}\`${grades.A}\`${a}\``)
@@ -121,7 +121,7 @@ async function GetUserPage(firstPage, user, userstats, mode, RuleSetId, server) 
 			.setAuthor({
 				name: `${user.username}${clanTag}: ${pp}pp (#${global_rank} ${user.country}#${country_rank})`,
 				iconURL: `https://osu.ppy.sh/images/flags/${user.country}.png`,
-				url: `https://osu.akatsuki.pw/u/${user.id}?mode=${RuleSetId}&rx=0`,
+				url: `https://osu.akatsuki.pw/u/${user.id}?mode=${RuleSetID}&rx=0`,
 			})
 			.setThumbnail(`https://a.akatsuki.pw/${user.id}`)
 			.setDescription(`**Clan:** \`${clanName}\`\n**Accuracy:** \`${acc}%\` •  **Level:** \`${UserLevel}\`\n**Playcount:** \`${playcount}\` (\`${playhours.toFixed()} hrs\`)\n**Followers:** \`${followers}\` • **Max Combo:** \`${profile_maxcombo}\``)

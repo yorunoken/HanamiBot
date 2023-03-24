@@ -16,7 +16,7 @@ exports.run = async (client, message, args, prefix) => {
 		const userData = JSON.parse(data);
 		let userargs;
 		let mode = "osu";
-		let RuleSetId = 0;
+		let RuleSetID = 0;
 		let value = 0;
 		let PageNum = 1;
 
@@ -77,15 +77,15 @@ exports.run = async (client, message, args, prefix) => {
 
 				if (args.includes("-mania")) {
 					mode = "mania";
-					RuleSetId = 3;
+					RuleSetID = 3;
 				}
 				if (args.includes("-taiko")) {
 					mode = "taiko";
-					RuleSetId = 1;
+					RuleSetID = 1;
 				}
 				if (args.includes("-ctb")) {
 					mode = "fruits";
-					RuleSetId = 2;
+					RuleSetID = 2;
 				}
 
 				if (args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-p")) {
@@ -114,7 +114,7 @@ exports.run = async (client, message, args, prefix) => {
 			return;
 		}
 
-		const getPinned = await GetPinned(value, user, mode, RuleSetId, PageNum);
+		const getPinned = await GetPinned(value, user, mode, RuleSetID, PageNum);
 
 		message.channel.send({ content: `**I found \`${getPinned.total_pinned}\` pinned plays for ${user.username}**`, embeds: [getPinned.embed] });
 	});

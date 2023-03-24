@@ -26,11 +26,11 @@ async function FixFunction(mapinfo, beatmapId, user, ModeOsu, ModsString, messag
 
 		let status = mapinfo.status.charAt(0).toUpperCase() + mapinfo.status.slice(1);
 
-		let RuleSetId;
-		if (ModeOsu == "osu") RuleSetId = 0;
-		if (ModeOsu == "taiko") RuleSetId = 1;
-		if (ModeOsu == "fruits") RuleSetId = 2;
-		if (ModeOsu == "mania") RuleSetId = 3;
+		let RuleSetID;
+		if (ModeOsu == "osu") RuleSetID = 0;
+		if (ModeOsu == "taiko") RuleSetID = 1;
+		if (ModeOsu == "fruits") RuleSetID = 2;
+		if (ModeOsu == "mania") RuleSetID = 3;
 
 		// score set
 		const scr = await v2.user.scores.beatmap.all(beatmapId, user.id, ModeOsu);
@@ -84,7 +84,7 @@ async function FixFunction(mapinfo, beatmapId, user, ModeOsu, ModsString, messag
 		}
 
 		let scoreParam = {
-			mode: RuleSetId,
+			mode: RuleSetID,
 		};
 
 		let calc = new Calculator(scoreParam);

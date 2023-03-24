@@ -16,7 +16,7 @@ exports.run = async (client, message, args, prefix) => {
 		const userData = JSON.parse(data);
 		let userargs;
 		let mode = "mania";
-		let RuleSetId = 3;
+		let RuleSetID = 3;
 		let value = 0;
 		let PageNum = 1;
 
@@ -101,7 +101,7 @@ exports.run = async (client, message, args, prefix) => {
 			return;
 		}
 
-		const getPinned = await GetPinned(value, user, mode, RuleSetId, PageNum);
+		const getPinned = await GetPinned(value, user, mode, RuleSetID, PageNum);
 
 		message.channel.send({ content: `**I found \`${getPinned.total_pinned}\` pinned plays for ${user.username}**`, embeds: [getPinned.embed] });
 	});

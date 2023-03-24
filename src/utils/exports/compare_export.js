@@ -26,7 +26,7 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString, value, pagenum
 		five = numbers[4] - 1;
 
 		let score;
-		let RuleSetId = mapinfo.mode_int;
+		let RuleSetID = mapinfo.mode_int;
 
 		if (server == "bancho") {
 			try {
@@ -69,7 +69,7 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString, value, pagenum
 		if (server == "gatari") {
 			value = 1;
 			var url = `https://api.gatari.pw/beatmap/user/score`;
-			const response = await axios.get(`${url}?b=${mapinfo.id}&u=${user.id}&mode=${RuleSetId}`);
+			const response = await axios.get(`${url}?b=${mapinfo.id}&u=${user.id}&mode=${RuleSetID}`);
 
 			score = response.data.score;
 			if (score == null) {
@@ -86,7 +86,7 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString, value, pagenum
 			}
 			user_pp = userstats.pp.toLocaleString();
 			CountryCode = user.country;
-			profileUrl = `https://osu.gatari.pw/u/${user.id}?m=${RuleSetId}`;
+			profileUrl = `https://osu.gatari.pw/u/${user.id}?m=${RuleSetID}`;
 			avatarUrl = `https://a.gatari.pw/${user.id}`;
 		}
 
@@ -178,7 +178,7 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString, value, pagenum
 			}
 
 			let scoreParam = {
-				mode: RuleSetId,
+				mode: RuleSetID,
 			};
 
 			let calc = new Calculator(scoreParam);

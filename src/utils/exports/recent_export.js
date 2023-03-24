@@ -8,7 +8,7 @@ const axios = require("axios");
 const { tools } = require("../../utils/tools.js");
 const { mods } = require("../../utils/mods.js");
 
-async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, userstats, server) {
+async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, userstats, server) {
 	await auth.login(process.env.client_id, process.env.client_secret);
 
 	let top1k = false;
@@ -66,7 +66,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 
 	if (server == "gatari") {
 		var url = `https://api.gatari.pw/user/scores/recent`;
-		const response = await axios.get(`${url}?id=${user.id}&l=100&p=1&mode=${RuleSetId}&f=${PassDetermine}`);
+		const response = await axios.get(`${url}?id=${user.id}&l=100&p=1&mode=${RuleSetID}&f=${PassDetermine}`);
 
 		score = response.data.scores;
 		if (score == null) {
@@ -109,7 +109,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		}
 		user_pp = userstats.pp.toLocaleString();
 		CountryCode = user.country;
-		profileUrl = `https://osu.gatari.pw/u/${user.id}?m=${RuleSetId}`;
+		profileUrl = `https://osu.gatari.pw/u/${user.id}?m=${RuleSetID}`;
 		avatarUrl = `https://a.gatari.pw/${user.id}`;
 		MapsetId = score[value].beatmap.beatmapset_id;
 
@@ -139,7 +139,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 
 	if (server == "akatsuki") {
 		var BaseUrl = `https://akatsuki.pw/api/v1`;
-		var response = await axios.get(`${BaseUrl}/users/scores/recent?id=${user.id}&mode=${RuleSetId}`);
+		var response = await axios.get(`${BaseUrl}/users/scores/recent?id=${user.id}&mode=${RuleSetID}`);
 
 		score = response.data.scores;
 		if (response.data.code != 200 || score == null) {
@@ -182,7 +182,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 		user_pp = uStats.pp.toLocaleString();
 
 		CountryCode = user.country;
-		profileUrl = `https://osu.akatsuki.pw/u/${user.id}?m=${RuleSetId}`;
+		profileUrl = `https://osu.akatsuki.pw/u/${user.id}?m=${RuleSetID}`;
 		avatarUrl = `https://a.akatsuki.pw/${user.id}`;
 		MapsetId = score[value].beatmap.beatmapset_id;
 
@@ -456,7 +456,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 	}
 
 	let scoreParam = {
-		mode: RuleSetId,
+		mode: RuleSetID,
 		mods: modsID,
 	};
 
@@ -476,10 +476,10 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 
 	const retryCounter = getRetryCount(retryMap, mapId);
 
-	if (RuleSetId == "0") AccValues = `{**${value300}**/${value100}/${value50}/${valuemiss}}`;
-	if (RuleSetId == "1") AccValues = `{**${value300}**/${value100}/${valuemiss}}`;
-	if (RuleSetId == "2") AccValues = `{**${value300}**/${value100}/${value50}/${valuemiss}}`;
-	if (RuleSetId == "3") AccValues = `{**${valuegeki}/${value300}**/${valuekatu}/${value100}/${value50}/${valuemiss}}`;
+	if (RuleSetID == "0") AccValues = `{**${value300}**/${value100}/${value50}/${valuemiss}}`;
+	if (RuleSetID == "1") AccValues = `{**${value300}**/${value100}/${valuemiss}}`;
+	if (RuleSetID == "2") AccValues = `{**${value300}**/${value100}/${value50}/${valuemiss}}`;
+	if (RuleSetID == "3") AccValues = `{**${valuegeki}/${value300}**/${valuekatu}/${value100}/${value50}/${valuemiss}}`;
 
 	//formatted values for score
 	let map_score = score[value].score.toLocaleString();
@@ -507,7 +507,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetId, user
 			nkatu: valuekatu,
 			n50: value50,
 			nmiss: 0,
-			mode: ModeString,
+			mode: mode,
 		});
 
 		pps = `**${CurAttrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}PP ▹ (**${FCAttrs.pp.toFixed(2)}**PP for **${FcAcc.toFixed(2)}%**)`;

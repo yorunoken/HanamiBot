@@ -102,7 +102,7 @@ exports.run = async (client, message, args, prefix) => {
 			if (isNaN(Number(argValues["hp"]))) argValues["hp"] = DiffValues.drain;
 			if (isNaN(Number(argValues["od"]))) argValues["od"] = DiffValues.accuracy;
 
-			const RuleSetId = DiffValues.mode_int;
+			const RuleSetID = DiffValues.mode_int;
 			let mapParam = {
 				path: `./osuBeatmapCache/${beatmapId}.osu`,
 				ar: Number(argValues["ar"]),
@@ -112,7 +112,7 @@ exports.run = async (client, message, args, prefix) => {
 			};
 
 			let scoreParam = {
-				mode: RuleSetId,
+				mode: RuleSetID,
 				mods: modsID,
 			};
 
