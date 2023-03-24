@@ -90,7 +90,6 @@ const cooldowns = new Map();
 client.on("ready", async () => {
 	console.log(`Logged in as ${client.user.tag}, in ${client.guilds.cache.size} servers!`);
 	console.log("Updating osu! bearer key..");
-
 	console.log(await auth.login(process.env.client_id, process.env.client_secret));
 
 	client.user.setPresence({
@@ -98,11 +97,7 @@ client.on("ready", async () => {
 		status: "online",
 	});
 
-	try {
-		commandCount = parseInt(fs.readFileSync("commandCount.txt"), 10);
-	} catch (error) {
-		console.error(`Error reading command count from file: ${error}`);
-	}
+	commandCount = parseInt(fs.readFileSync("commandCount.txt"), 10);
 });
 
 client.on("guildCreate", guild => {
@@ -113,13 +108,16 @@ client.on("guildCreate", guild => {
 client.on("messageCreate", message => {
 	//load the prefixes for each guild
 	let prefixes = JSON.parse(fs.readFileSync("./prefixes.json", "utf8"));
-	const prefix = prefixes[message.guild.id] ?? "?";
+	let prefix = prefixes[message.guild.id] ?? "?";
+	let DefaultPrefix = `<@995999045157916763> `;
 
 	//respond with bot's prefix if bot is tagged
 	if (message.content === `<@${client.user.id}>`) return message.reply(`my prefix is **${prefix}**`);
 
+	if (message.content.startsWith(DefaultPrefix)) prefix = DefaultPrefix;
+
 	//detect whether or not a command was executed
-	if (message.content.toLowerCase().startsWith(prefix)) {
+	if (message.content.startsWith(prefix)) {
 		const args = message.content.slice(prefix.length).trim().split(/ +/g);
 		const commandName = args.shift().toLowerCase();
 		const command = client.commands.get(commandName);
@@ -139,15 +137,13 @@ client.on("messageCreate", message => {
 		}
 
 		console.log(message.content);
+
 		// execute the command
 		command.run(client, message, args, prefix, EmbedBuilder);
 
 		if (isNaN(commandCount)) commandCount = 0;
-
 		commandCount++;
-
 		console.log(commandCount);
-
 		fs.writeFileSync("commandCount.txt", commandCount.toString());
 
 		// setting the cooldown
