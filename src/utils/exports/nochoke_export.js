@@ -170,11 +170,11 @@ async function GetuserNoChoke(user, tops, ruleset, GameMode, pageNumber) {
 	let thing4 = "";
 	let thing5 = "";
 
-	thing1 = `${GetScore(ScoreMap[one], PPFcScores[one], oldScoreState[one], newScoreState[one])}\n`;
-	thing2 = `${GetScore(ScoreMap[two], PPFcScores[two], oldScoreState[two], newScoreState[two])}\n`;
-	thing3 = `${GetScore(ScoreMap[three], PPFcScores[three], oldScoreState[three], newScoreState[three])}\n`;
-	thing4 = `${GetScore(ScoreMap[four], PPFcScores[four], oldScoreState[four], newScoreState[four])}\n`;
-	thing5 = `${GetScore(ScoreMap[five], PPFcScores[five], oldScoreState[five], newScoreState[five])}`;
+	thing1 = `${GetScore(ScoreMap[one], PPFcScores[one], oldScoreState[one], newScoreState[one])}\n` || ""
+	thing2 = `${GetScore(ScoreMap[two], PPFcScores[two], oldScoreState[two], newScoreState[two])}\n` || ""
+	thing3 = `${GetScore(ScoreMap[three], PPFcScores[three], oldScoreState[three], newScoreState[three])}\n` || ""
+	thing4 = `${GetScore(ScoreMap[four], PPFcScores[four], oldScoreState[four], newScoreState[four])}\n` || ""
+	thing5 = `${GetScore(ScoreMap[five], PPFcScores[five], oldScoreState[five], newScoreState[five])}` || ""
 
 	const response = await axios.get(`${endpoint}pp.php?k=${apiKey}&m=${ruleset}&t=pp&v=${NewTotal}`);
 	const ReponseData = response.data;
