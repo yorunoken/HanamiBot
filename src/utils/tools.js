@@ -1,4 +1,5 @@
 function accuracy({ n300, n100, n50, nmiss, ngeki, nkatu, mode }) {
+	if (!mode) throw new Error("mode is not defined");
 	if (n300 < 0) throw new Error("Invalid 300 count");
 	if (n100 < 0) throw new Error("Invalid 100 count");
 	if (n50 < 0) throw new Error("Invalid 500 count");
@@ -26,7 +27,7 @@ function accuracy({ n300, n100, n50, nmiss, ngeki, nkatu, mode }) {
 }
 
 function grade({ n300, n100, n50, nmiss, nkatu, ngeki, mode, mods }) {
-	if (!mode) return undefined;
+	if (!mode) throw new Error("mode is not defined");
 	if (n300 < 0) throw new Error("Invalid 300 count");
 	if (n100 < 0) throw new Error("Invalid 100 count");
 	if (n50 < 0) throw new Error("Invalid 500 count");
