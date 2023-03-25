@@ -43,26 +43,28 @@ function getTop(message, args, prefix, mode, ruleSetID) {
 		var server = options.server;
 
 		if (args.join("").includes("+")) {
-			modsToAdd =
-				args[args.indexOf("+") + 1]
-					.slice(1)
-					.toUpperCase()
-					.match(/[A-Z]{2}/g) || [];
+			modsToAdd = args.join("").split("+")[1];
+			modsToAdd = modsToAdd.toUpperCase().match(/[A-Z]{2}/g);
+			if (modsToAdd) {
+				modsToAdd = modsToAdd.map(str => str.toUpperCase());
+			}
 		}
+		console.log(modsToAdd);
 
 		if (args.join("").includes("-")) {
-			modsToRemove =
-				args[args.indexOf("-") + 1]
-					.slice(1)
-					.toUpperCase()
-					.match(/[A-Z]{2}/g) || [];
+			modsToRemove = args.join("").split("-")[1];
+			modsToRemove = modsToRemove.toUpperCase().match(/[A-Z]{2}/g);
+			if (modsToRemove) {
+				modsToRemove = modsToRemove.map(str => str.toUpperCase());
+			}
 		}
 
 		if (args.join("").includes("!")) {
-			modsExact = args[args.indexOf("!") + 1]
-				.slice(1)
-				.toUpperCase()
-				.match(/[A-Z]{2}/g);
+			modsExact = args.join("").split("!")[1];
+			modsExact = modsExact.toUpperCase().match(/[A-Z]{2}/g);
+			if (modsExact) {
+				modsExact = modsExact.map(str => str.toUpperCase());
+			}
 			if (modsExact && modsExact.join("").includes("NM")) modsExact = [""];
 		}
 
@@ -85,21 +87,22 @@ function getTop(message, args, prefix, mode, ruleSetID) {
 		};
 		const baseURL = `https://osu.ppy.sh/api/v2`;
 
-		const [userResponse, scoreResponse] = await Promise.all([
-			fetch(`${baseURL}/users/${userArgs}/${mode}`, { headers }).then(response => response.json()),
-			fetch(`${baseURL}/users/${userArgs}/scores/best?mode=${mode}&limit=100&offset=0`, { headers }).then(response => response.json()),
-		]);
-		const user = userResponse || {};
-		const score = scoreResponse || [];
+		const userResponse = await fetch(`${baseURL}/users/${userArgs}/${mode}`, { method: "GET", headers }).then(response => response.json());
+		user = userResponse;
 
-		if (!user) {
+		const scoreResponse = await fetch(`${baseURL}/users/${user.id}/scores/best?mode=${mode}&limit=100&offset=0`, { method: "GET", headers }).then(
+			response => response.json(),
+		);
+		score = scoreResponse;
+
+		if (!user.id) {
 			message.reply({
 				embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userArgs}\` does not exist in Bancho database**`)],
 			});
 			return;
 		}
 
-		if (score.length === 0) {
+		if (score == null) {
 			message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No Bancho plays found for **${user.username}**`)] });
 			return;
 		}
