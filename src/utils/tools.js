@@ -101,17 +101,15 @@ function grade({ n300, n100, n50, nmiss, nkatu, ngeki, mode, mods }) {
 	}
 
 	if (mode.toLowerCase() == "mania") {
-		const acc = accuracy(
-			{
-				n300: n300,
-				n100: n100,
-				n50: n50,
-				nmiss: nmiss,
-				ngeki: ngeki,
-				nkatu: nkatu,
-			},
-			mode,
-		);
+		const acc = accuracy({
+			n300: n300,
+			n100: n100,
+			n50: n50,
+			nmiss: nmiss,
+			ngeki: ngeki,
+			nkatu: nkatu,
+			mode: mode,
+		});
 
 		switch (true) {
 			case acc === 100 && !mods.toUpperCase().includes("HD") && !mods.toUpperCase().includes("FL"):
@@ -134,17 +132,15 @@ function grade({ n300, n100, n50, nmiss, nkatu, ngeki, mode, mods }) {
 	}
 
 	if (mode.toLowerCase() == "fruits") {
-		const acc = accuracy(
-			{
-				n300: n300,
-				n100: n100,
-				n50: n50,
-				nmiss: nmiss,
-				ngeki: ngeki,
-				nkatu: nkatu,
-			},
-			mode,
-		);
+		const acc = accuracy({
+			n300: n300,
+			n100: n100,
+			n50: n50,
+			nmiss: nmiss,
+			ngeki: ngeki,
+			nkatu: nkatu,
+			mode: mode,
+		});
 
 		switch (true) {
 			case acc === 100 && !mods.toUpperCase().includes("HD") && !mods.toUpperCase().includes("FL"):
