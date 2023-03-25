@@ -1,8 +1,6 @@
 /**
- * this bot belongs
- * to the discord user
- * yoru#9267
- * hope you enjoy!
+  this bot belongs to the discord user yoru#9267
+  hope you enjoy!
  */
 
 //requirements
@@ -10,8 +8,6 @@ const { Client, GatewayIntentBits, ActivityType, EmbedBuilder } = require("disco
 const { auth } = require("./utils/auth.js");
 const fs = require("fs");
 require("dotenv/config");
-
-let commandCount = 0;
 
 const client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildPresences],
@@ -96,8 +92,6 @@ client.on("ready", async () => {
 		activities: [{ name: `?help`, type: ActivityType.Playing }],
 		status: "online",
 	});
-
-	commandCount = parseInt(fs.readFileSync("commandCount.txt"), 10);
 });
 
 client.on("guildCreate", guild => {
@@ -109,12 +103,9 @@ client.on("messageCreate", message => {
 	//load the prefixes for each guild
 	let prefixes = JSON.parse(fs.readFileSync("./prefixes.json", "utf8"));
 	let prefix = prefixes[message.guild.id] ?? "?";
-	let DefaultPrefix = `<@995999045157916763> `;
 
 	//respond with bot's prefix if bot is tagged
 	if (message.content === `<@${client.user.id}>`) return message.reply(`my prefix is **${prefix}**`);
-
-	if (message.content.startsWith(DefaultPrefix)) prefix = DefaultPrefix;
 
 	//detect whether or not a command was executed
 	if (message.content.startsWith(prefix)) {
@@ -140,11 +131,6 @@ client.on("messageCreate", message => {
 
 		// execute the command
 		command.run(client, message, args, prefix, EmbedBuilder);
-
-		if (isNaN(commandCount)) commandCount = 0;
-		commandCount++;
-		console.log(commandCount);
-		fs.writeFileSync("commandCount.txt", commandCount.toString());
 
 		// setting the cooldown
 		cooldowns.set(key, Date.now());
