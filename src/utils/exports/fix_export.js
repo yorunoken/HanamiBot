@@ -51,7 +51,10 @@ async function FixFunction(mapinfo, beatmapId, user, ModeOsu, ModsString, messag
 		try {
 			score.mods.join("");
 		} catch (err) {
-			const embed = new EmbedBuilder().setColor("Purple").setTitle("Error!").setDescription(`**There is no play with that mod combination. Check for spelling errors**`);
+			const embed = new EmbedBuilder()
+				.setColor("Purple")
+				.setTitle("Error!")
+				.setDescription(`**There is no play with that mod combination. Check for spelling errors**`);
 			return embed;
 		}
 
@@ -89,7 +92,16 @@ async function FixFunction(mapinfo, beatmapId, user, ModeOsu, ModsString, messag
 
 		let calc = new Calculator(scoreParam);
 
-		let NormalPP = calc.n100(score.statistics.count_100).n300(score.statistics.count_300).n50(score.statistics.count_50).nMisses(Number(score.statistics.count_miss)).combo(score.max_combo).nGeki(score.statistics.count_geki).nKatu(score.statistics.count_katu).mods(modsID).performance(map);
+		let NormalPP = calc
+			.n100(score.statistics.count_100)
+			.n300(score.statistics.count_300)
+			.n50(score.statistics.count_50)
+			.nMisses(Number(score.statistics.count_miss))
+			.combo(score.max_combo)
+			.nGeki(score.statistics.count_geki)
+			.nKatu(score.statistics.count_katu)
+			.mods(modsID)
+			.performance(map);
 
 		let row_one = `**${user.username}** already has a **${ModName}** FC worth **${NormalPP.pp.toFixed(2)}pp**`;
 		let row_two = "";
@@ -103,11 +115,20 @@ async function FixFunction(mapinfo, beatmapId, user, ModeOsu, ModsString, messag
 				nkatu: score.statistics.count_katu,
 				n50: score.statistics.count_50,
 				nmiss: 0,
-				mode: ModeString,
+				mode: ModsString,
 			});
 
 			//fc pp
-			let FcPP = calc.n100(score.statistics.count_100).n300(score.statistics.count_300).nMisses(0).combo(NormalPP.difficulty.maxCombo).n50(score.statistics.count_50).nGeki(score.statistics.count_geki).nKatu(score.statistics.count_katu).mods(modsID).performance(map);
+			let FcPP = calc
+				.n100(score.statistics.count_100)
+				.n300(score.statistics.count_300)
+				.nMisses(0)
+				.combo(NormalPP.difficulty.maxCombo)
+				.n50(score.statistics.count_50)
+				.nGeki(score.statistics.count_geki)
+				.nKatu(score.statistics.count_katu)
+				.mods(modsID)
+				.performance(map);
 
 			row_one = `A **${ModName}** FC would have pushed this score from **${NormalPP.pp.toFixed(2)}pp to ${FcPP.pp.toFixed(2)}pp**\n`;
 			row_two = `Removed **${score.statistics.count_miss}** misses\n`;
@@ -129,7 +150,10 @@ async function FixFunction(mapinfo, beatmapId, user, ModeOsu, ModsString, messag
 			.setDescription(row)
 			.setURL(`https://osu.ppy.sh/b/${mapinfo.id}`)
 			.setThumbnail(`https://assets.ppy.sh/beatmaps/${mapinfo.beatmapset_id}/covers/list.jpg`)
-			.setFooter({ text: `${status} map by ${mapinfo.beatmapset.creator}`, iconURL: `https://a.ppy.sh/${mapinfo.beatmapset.user_id}?1668890819.jpeg` });
+			.setFooter({
+				text: `${status} map by ${mapinfo.beatmapset.creator}`,
+				iconURL: `https://a.ppy.sh/${mapinfo.beatmapset.user_id}?1668890819.jpeg`,
+			});
 
 		return embed;
 	} catch (err) {
