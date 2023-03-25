@@ -48,30 +48,17 @@ function getTop(message, args, prefix, RB, mode, RuleSetID) {
 			return result;
 		}
 
+		const unAllowed = ["-page", "-p", "-r", "-recent", "-i", "mods", "+", "-g", "-am", "-amount", "-rev", "-reverse"];
+
 		const options = parseArgs(args);
 		var playNumber = options.playNumber;
 		var pageNumber = options.pageNumber;
 		var server = options.server;
 
 		var userArgs = await FindUserargs(message, args, server, prefix);
-
-		if (
-			args.join(" ").startsWith("-page") ||
-			args.join(" ").startsWith("-p") ||
-			args.join(" ").startsWith("-r") ||
-			args.join(" ").startsWith("-recent") ||
-			args.join(" ").startsWith("-i") ||
-			args.join(" ").startsWith("mods") ||
-			args.join(" ").startsWith("+") ||
-			args.join(" ").startsWith("-g") ||
-			args.join(" ").startsWith("-am") ||
-			args.join(" ").startsWith("-amount") ||
-			args.join(" ").startsWith("-rev") ||
-			args.join(" ").startsWith("-reverse")
-		) {
+		if (unAllowed.some(word => args.join(" ").startsWith(word))) {
 			try {
-				if (server == "bancho") userArgs = userData[message.author.id].BanchoUserId;
-				if (server == "gatari") userArgs = userData[message.author.id].GatariUserId;
+				userArgs = server == "bancho" ? userData[message.author.id].BanchoUserId : userData[message.author.id].GatariUserId;
 			} catch (err) {
 				message.reply({
 					embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Set your osu! username by typing "${prefix}link **your username**"`)],
