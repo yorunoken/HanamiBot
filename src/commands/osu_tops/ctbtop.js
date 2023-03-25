@@ -1,4 +1,4 @@
-const { getTop } = require("./topFunc.js");
+const { getTop } = require("../../utils/client_cmd/topFunc.js");
 
 exports.run = async (client, message, args, prefix) => {
 	await message.channel.sendTyping();
