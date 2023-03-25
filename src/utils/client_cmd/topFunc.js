@@ -32,9 +32,6 @@ function getTop(message, args, prefix, RB, mode, RuleSetID) {
 
 			if (args.includes("-p")) {
 				result.pageNumber = args[args.indexOf("-p") + 1];
-				if (result.pageNumber > 20) {
-					throw new Error("Value must not be greater than 20");
-				}
 			}
 
 			if (args.includes("-bancho")) {
@@ -73,21 +70,22 @@ function getTop(message, args, prefix, RB, mode, RuleSetID) {
 			};
 			const baseURL = `https://osu.ppy.sh/api/v2`;
 
-			const [userResponse, scoreResponse] = await Promise.all([
-				fetch(`${baseURL}/users/${userArgs}/${mode}`, { headers }).then(response => response.json()),
-				fetch(`${baseURL}/users/${userArgs}/scores/best?mode=${mode}&limit=100&offset=0`, { headers }).then(response => response.json()),
-			]);
-			user = userResponse || {};
-			score = scoreResponse || [];
+			const userResponse = await fetch(`${baseURL}/users/${userArgs}/${mode}`, { method: "GET", headers }).then(response => response.json());
+			user = userResponse;
 
-			if (!user) {
+			const scoreResponse = await fetch(`${baseURL}/users/${user.id}/scores/best?mode=${mode}&limit=100&offset=0`, { method: "GET", headers }).then(
+				response => response.json(),
+			);
+			score = scoreResponse;
+
+			if (!user.id) {
 				message.reply({
 					embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userArgs}\` does not exist in Bancho database**`)],
 				});
 				return;
 			}
 
-			if (score.length === 0) {
+			if (score == null) {
 				message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No Bancho plays found for **${user.username}**`)] });
 				return;
 			}
@@ -146,6 +144,8 @@ function getTop(message, args, prefix, RB, mode, RuleSetID) {
 			message.channel.send({ embeds: [embed] });
 			return;
 		}
+
+		console.log(score);
 
 		if (args.includes("-r") || args.includes("-recent")) RB = true;
 
