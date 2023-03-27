@@ -41,29 +41,29 @@ const num_codes = {
 	16: "HR",
 	32: "SD",
 	64: "DT",
-	128: "RX",
 	256: "HT",
-	576: "NC",
+	576: "NC", // Only set along with DoubleTime. i.e: NC only gives 576
 	1024: "FL",
-	2048: "AT",
 	4096: "SO",
-	8192: "AP",
-	16416: "PF",
-	32768: "K4",
-	65536: "K5",
-	131072: "K6",
-	262144: "K7",
-	524288: "K8",
+	16416: "PF", // Only set along with SuddenDeath. i.e: PF only gives 16416
 	1048576: "FI",
 	2097152: "RD",
-	4194304: "CM",
-	8388608: "TP",
-	16777216: "K9",
-	33554432: "KC",
-	67108864: "K1",
-	134217728: "K3",
-	268435456: "K2",
 	1073741824: "MR",
+};
+
+const mods_order = {
+	nf: 0,
+	ez: 1,
+	hd: 2,
+	dt: 3,
+	nc: 3,
+	ht: 3,
+	hr: 4,
+	so: 5,
+	sd: 5,
+	pf: 5,
+	fl: 6,
+	td: 7,
 };
 
 function id(name) {
@@ -79,19 +79,26 @@ function id(name) {
 	return BitArray.reduce((a, b) => a + b);
 }
 
-function name(id) {
-	if (isNaN(id)) return undefined;
-	if (id == 0) return "NM";
-	let binary = id.toString(2); // convert number to binary string
-	let output = "";
-	for (let i = binary.length - 1; i >= 0; i--) {
-		if (binary[i] === "1") {
-			let code = num_codes[Math.pow(2, binary.length - 1 - i)];
-			output += code;
+function name(mods) {
+	let enabled = [];
+	let _mods = mods;
+	let converted = "";
+	const values = Object.keys(num_codes).map(a => Number(a));
+	for (let i = values.length - 1; i >= 0; i--) {
+		const v = values[i];
+		if (_mods >= v) {
+			const mode = num_codes[v];
+			enabled.push({ i: mods_order[mode.toLowerCase()], n: mode });
+			_mods -= v;
 		}
 	}
-
-	return output;
+	enabled = enabled.sort((a, b) => (a.i > b.i ? 1 : b.i > a.i ? -1 : 0));
+	enabled.filter(r => (converted += r.n));
+	if (converted.endsWith("NM")) {
+		converted = converted.slice(0, -2);
+	}
+	if (converted === "") return "NM";
+	return converted;
 }
 
 module.exports = {
