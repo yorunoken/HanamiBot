@@ -31,7 +31,27 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, user
 	let FilterMods = "";
 	let ScoreGlobalRank = "";
 	let replayLink = "";
-	let score, filteredscore, ModsName, mapId, retryMap, global_rank, country_rank, user_pp, acc, objects, TimeCreated, grade, title, hitLength, totalLength, CountryCode, profileUrl, MapsetId, avatarUrl, creatorName, creatorUserId;
+	let score,
+		filteredscore,
+		ModsName,
+		mapId,
+		retryMap,
+		global_rank,
+		country_rank,
+		user_pp,
+		acc,
+		objects,
+		TimeCreated,
+		grade,
+		title,
+		hitLength,
+		totalLength,
+		CountryCode,
+		profileUrl,
+		MapsetId,
+		avatarUrl,
+		creatorName,
+		creatorUserId;
 	let valuegeki,
 		value300,
 		valuekatu,
@@ -74,6 +94,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, user
 			return { embed, FilterMods };
 		}
 
+		console.log(`mods :${score[value].mods}`);
 		ModsName = mods.name(score[value].mods).toUpperCase();
 
 		if (argValues["mods"] != undefined) {
@@ -332,7 +353,11 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, user
 			})
 			.setTitle(title)
 			.setURL(`https://scoresaber.com/leaderboard/${mapId}`)
-			.setDescription(`${grade} • ${difficulty}\n▹**${score[value].score.pp.toFixed(2)}pp** • ${map_score} ${accuracy}\n▹[ **${valuecombo}**x ] • ${AccValues}\n▹Score Set <t:${TimeCreated}:R> • **Try #${retryCounter}**\n▹Headset used: **${HMDs[score[value].score.hmd]}**`)
+			.setDescription(
+				`${grade} • ${difficulty}\n▹**${score[value].score.pp.toFixed(
+					2,
+				)}pp** • ${map_score} ${accuracy}\n▹[ **${valuecombo}**x ] • ${AccValues}\n▹Score Set <t:${TimeCreated}:R> • **Try #${retryCounter}**\n▹Headset used: **${HMDs[score[value].score.hmd]}**`,
+			)
 			// .setFields({ name: `**Beatmap info:**`, value: `BPM: \`${mapValues.bpm.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${mapValues.ar.toFixed(1).toString().replace(/\.0+$/, "")}\` OD: \`${mapValues.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\`` })
 			.setThumbnail(score[value].leaderboard.coverImage)
 			.setFooter({ text: `${MapStatus} map by ${creatorName} | Beat Saber`, iconURL: `https://upload.wikimedia.org/wikipedia/commons/9/91/Beat_Saber_Logo.png` });
@@ -539,8 +564,21 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, user
 		})
 		.setTitle(title)
 		.setURL(`https://osu.ppy.sh/b/${mapId}`)
-		.setDescription(`${grade} ${percentage}${ModDisplay} • **__[${maxAttrs.difficulty.stars.toFixed(2)}★]__** ${ScoreGlobalRank}\n▹${pps} \n▹${map_score} • ${acc}\n▹[ **${score[value].max_combo}**x/${maxAttrs.difficulty.maxCombo}x ] • ${AccValues} ${replayLink}\n▹Score Set <t:${TimeCreated}:R> • **Try #${retryCounter}**`)
-		.setFields({ name: `**Beatmap info:**`, value: `BPM: \`${mapValues.bpm.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${mapValues.ar.toFixed(1).toString().replace(/\.0+$/, "")}\` OD: \`${mapValues.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\`` })
+		.setDescription(
+			`${grade} ${percentage}${ModDisplay} • **__[${maxAttrs.difficulty.stars.toFixed(2)}★]__** ${ScoreGlobalRank}\n▹${pps} \n▹${map_score} • ${acc}\n▹[ **${score[value].max_combo}**x/${
+				maxAttrs.difficulty.maxCombo
+			}x ] • ${AccValues} ${replayLink}\n▹Score Set <t:${TimeCreated}:R> • **Try #${retryCounter}**`,
+		)
+		.setFields({
+			name: `**Beatmap info:**`,
+			value: `BPM: \`${mapValues.bpm.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${mapValues.ar
+				.toFixed(1)
+				.toString()
+				.replace(/\.0+$/, "")}\` OD: \`${mapValues.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp
+				.toFixed(2)
+				.toString()
+				.replace(/\.0+$/, "")}\``,
+		})
 		.setImage(`https://assets.ppy.sh/beatmaps/${MapsetId}/covers/cover.jpg`)
 		.setThumbnail(avatarUrl)
 		.setFooter({ text: `${MapStatus} map by ${creatorName} | osu!${server}`, iconURL: `https://a.ppy.sh/${creatorUserId}?1668890819.jpeg` });
