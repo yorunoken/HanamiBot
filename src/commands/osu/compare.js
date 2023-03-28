@@ -131,7 +131,6 @@ exports.run = async (client, message, args, prefix) => {
 				}
 
 				if (userargs.startsWith("https")) {
-					console.log("startswith");
 					userargs = userData[message.author.id].BanchoUserId;
 
 					if (args[1]) {
@@ -162,7 +161,6 @@ exports.run = async (client, message, args, prefix) => {
 						return;
 					}
 				} catch (err) {
-					console.log(err);
 					throw new Error("hids");
 				}
 			} catch (err) {
@@ -171,7 +169,6 @@ exports.run = async (client, message, args, prefix) => {
 					if (embed_author.includes("/users/")) throw new Error("Wrong embed");
 					if (embed_author.includes("/u/")) throw new Error("Wrong embed");
 					const beatmapId = embed_author.match(/\d+/)[0];
-					console.log(`embed url beatmap id ${beatmapId}`);
 
 					const mapinfo = await v2.beatmap.diff(beatmapId);
 
@@ -190,9 +187,6 @@ exports.run = async (client, message, args, prefix) => {
 					}
 					GoodToGo = true;
 				} catch (err) {
-					console.log(err);
-
-					console.log("err found, switching to author");
 
 					try {
 						const embed_author = embed.author.url;
@@ -217,9 +211,6 @@ exports.run = async (client, message, args, prefix) => {
 						}
 						GoodToGo = true;
 					} catch (err) {
-						console.log(err);
-
-						console.log("err found, switching to desc");
 						try {
 							const regex = /\/b\/(\d+)/;
 							const match = regex.exec(embed.description);
@@ -294,9 +285,6 @@ exports.run = async (client, message, args, prefix) => {
 				user = userResponse.users[0];
 				userstats = userStatsResponse.stats;
 
-				console.log(userResponse);
-				console.log(user);
-
 				if (user == undefined) {
 					message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] });
 					return;
@@ -331,7 +319,6 @@ exports.run = async (client, message, args, prefix) => {
 						if (!embedMessages[EmbedValue].embeds[0]) break;
 						const embed = embedMessages[EmbedValue].embeds[0];
 						await EmbedFetch(embed);
-						console.log(GoodToGo);
 					} while (!GoodToGo);
 				} else {
 					await message.channel.send("No embeds found in the last 100 messages");

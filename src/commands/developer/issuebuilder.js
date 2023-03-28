@@ -57,9 +57,7 @@ exports.run = async (client, message, args, prefix) => {
 							if (i.user.id != "372343076578131968") return
 
 							if (i.customId == "bug") {
-								console.log(addLabels)
 								addLabels.push("bug")
-								console.log(addLabels)
 
 								const confirm = new EmbedBuilder()
 									.setTitle("Issue builder v2")
@@ -74,9 +72,7 @@ exports.run = async (client, message, args, prefix) => {
 							}
 
 							if (i.customId == "suggestion") {
-								console.log(addLabels)
 								addLabels.push("suggestion")
-								console.log(addLabels)
 
 								const confirm = new EmbedBuilder()
 									.setTitle("Issue builder v2")
@@ -91,9 +87,7 @@ exports.run = async (client, message, args, prefix) => {
 							}
 
 							if (i.customId == "priority") {
-								console.log(addLabels)
 								addLabels.push("high priority")
-								console.log(addLabels)
 
 								const confirm = new EmbedBuilder()
 									.setTitle("Issue builder v2")
@@ -108,9 +102,7 @@ exports.run = async (client, message, args, prefix) => {
 							}
 
 							if (i.customId == "new") {
-								console.log(addLabels)
 								addLabels.push("new command")
-								console.log(addLabels)
 
 								const confirm = new EmbedBuilder()
 									.setTitle("Issue builder v2")
@@ -125,9 +117,7 @@ exports.run = async (client, message, args, prefix) => {
 							}
 
 							if (i.customId == "first") {
-								console.log(addLabels)
 								addLabels.push("good first issue")
-								console.log(addLabels)
 
 								const confirm = new EmbedBuilder()
 									.setTitle("Issue builder v2")
@@ -142,7 +132,6 @@ exports.run = async (client, message, args, prefix) => {
 							}
 
 							if (i.customId == "cancel") {
-								console.log("hii")
 								i.update({
 									content: "Successfully canceled issue builder.",
 									embeds: [],

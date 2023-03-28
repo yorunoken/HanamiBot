@@ -46,7 +46,6 @@ exports.run = async (client, message, args, prefix) => {
 		try {
 			let redownload = false;
 			if (DiffValues.status != "loved" && DiffValues.status != "ranked") redownload = true;
-			console.log("no file.");
 			const downloader = new Downloader({
 				rootPath: "./osuBeatmapCache",
 
@@ -93,9 +92,7 @@ exports.run = async (client, message, args, prefix) => {
 			if (argValues["mods"].toUpperCase().includes("HT")) clock_rate = 0.75;
 
 			if (!argValues["mods"]) argValues["mods"] = "NM";
-			console.log(argValues["mods"]);
 			const modsID = mods.id(argValues["mods"]);
-			console.log(modsID);
 
 			if (isNaN(Number(argValues["ar"]))) argValues["ar"] = DiffValues.ar;
 			if (isNaN(Number(argValues["cs"]))) argValues["cs"] = DiffValues.cs;
@@ -125,8 +122,6 @@ exports.run = async (client, message, args, prefix) => {
 			const PP99 = calc.clockRate(clock_rate).acc(99).performance(map);
 			const PP97 = calc.clockRate(clock_rate).acc(97).performance(map);
 			const PP95 = calc.clockRate(clock_rate).acc(95).performance(map);
-
-			console.log(PP100);
 
 			let AccPP = "";
 			if (argValues["acc"]) {
@@ -177,8 +172,6 @@ exports.run = async (client, message, args, prefix) => {
 			message.channel.send({ embeds: [embed] });
 			return;
 		} catch (err) {
-			console.log(err);
-			// ErrCount++
 		}
 	}
 
@@ -211,9 +204,6 @@ exports.run = async (client, message, args, prefix) => {
 			GoodToGo = true;
 			return;
 		} catch (err) {
-			console.log(err);
-
-			console.log("err found, switching to author");
 
 			try {
 				const embed_author = embed.author.url;
@@ -241,9 +231,6 @@ exports.run = async (client, message, args, prefix) => {
 				GoodToGo = true;
 				return;
 			} catch (err) {
-				console.log(err);
-
-				console.log("err found, switching to desc");
 				try {
 					const regex = /\/b\/(\d+)/;
 					const match = regex.exec(embed.description);
@@ -269,7 +256,6 @@ exports.run = async (client, message, args, prefix) => {
 					GoodToGo = true;
 					return;
 				} catch (err) {
-					console.log(err);
 					EmbedValue++;
 				}
 			}
@@ -335,7 +321,6 @@ exports.run = async (client, message, args, prefix) => {
 						if (!embedMessages[EmbedValue].embeds[0]) break;
 						const embed = embedMessages[EmbedValue].embeds[0];
 						await EmbedFetch(embed);
-						console.log(GoodToGo);
 					} while (!GoodToGo);
 				} else {
 					await message.channel.send("No embeds found in the last 100 messages");

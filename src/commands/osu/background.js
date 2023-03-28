@@ -27,7 +27,6 @@ exports.run = async (client, message, args, prefix) => {
 			if (embed_author.includes("/users/")) throw new Error("Wrong embed")
 			if (embed_author.includes("/u/")) throw new Error("Wrong embed")
 			const beatmapId = embed_author.match(/\d+/)[0]
-			console.log(beatmapId, "author")
 
 			const map = await v2.beatmap.diff(beatmapId)
 
@@ -36,10 +35,6 @@ exports.run = async (client, message, args, prefix) => {
 			await SendEmbed(map, beatmapId)
 			GoodToGo = true
 		} catch (err) {
-			console.log(err)
-
-			console.log("err found, switching to author")
-
 			try {
 				const embed_author = embed.author.url
 				const beatmapId = embed_author.match(/\d+/)[0]
@@ -51,9 +46,6 @@ exports.run = async (client, message, args, prefix) => {
 				await SendEmbed(map, beatmapId)
 				GoodToGo = true
 			} catch (err) {
-				console.log(err)
-
-				console.log("err found, switching to desc")
 				try {
 					const regex = /\/b\/(\d+)/
 					const match = regex.exec(embed.description)
@@ -66,14 +58,12 @@ exports.run = async (client, message, args, prefix) => {
 					GoodToGo = true
 					return
 				} catch (err) {
-					console.log(err)
 					EmbedValue++
 					ErrCount++
 				}
 			}
 		}
 
-		console.log(ErrCount)
 		if (ErrCount == 1) {
 			await message.reply(`**No maps found.**`)
 		}
@@ -124,7 +114,6 @@ exports.run = async (client, message, args, prefix) => {
 						if (!embedMessages[EmbedValue].embeds[0]) break
 						const embed = embedMessages[EmbedValue].embeds[0]
 						await EmbedFetch(embed)
-						console.log(GoodToGo)
 					} while (!GoodToGo)
 				} else {
 					await message.channel.send("No embeds found in the last 100 messages")

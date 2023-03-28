@@ -145,8 +145,6 @@ function getTop(message, args, prefix, RB, mode, RuleSetID) {
 			return;
 		}
 
-		console.log(score);
-
 		if (args.includes("-r") || args.includes("-recent")) RB = true;
 
 		message.channel.send({

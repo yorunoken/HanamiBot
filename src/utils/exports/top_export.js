@@ -75,7 +75,7 @@ async function GetUserTop(score, user, userstats, pageNumber, ModeOsu, RuleSetID
 
 			const scores = [...score];
 			scores.sort((a, b) => b.weight.percentage - a.weight.percentage);
-			Play_rank = scores.findIndex(play => play.id === score.id) + 1;
+			Play_rank = scores.findIndex((play) => play.id === score.id) + 1;
 		}
 		if (server == "gatari") {
 			if (args.includes("-reverse") || args.includes("-rev")) {
@@ -86,7 +86,7 @@ async function GetUserTop(score, user, userstats, pageNumber, ModeOsu, RuleSetID
 
 			const scores = [...score];
 			scores.sort((a, b) => b.pp - a.pp);
-			Play_rank = scores.findIndex(play => play.id === score.id) + 1;
+			Play_rank = scores.findIndex((play) => play.id === score.id) + 1;
 		}
 	} else {
 		if (args.includes("-reverse") || args.includes("-rev")) {
@@ -112,7 +112,7 @@ async function GetUserTop(score, user, userstats, pageNumber, ModeOsu, RuleSetID
 
 	async function ScoreGet(score) {
 		scores.sort((a, b) => b.pp - a.pp);
-		Play_rank = scores.findIndex(play => play.id === score.id) + 1;
+		Play_rank = scores.findIndex((play) => play.id === score.id) + 1;
 
 		let mapId, ModsName, modsID, grade, ScoreSetTime, MapTitle, acc, MapArtist;
 		let valuegeki,
@@ -172,7 +172,6 @@ async function GetUserTop(score, user, userstats, pageNumber, ModeOsu, RuleSetID
 		}
 
 		if (!fs.existsSync(`./osuBeatmapCache/${mapId}.osu`)) {
-			console.log("no file.");
 			const downloader = new Downloader({
 				rootPath: "./osuBeatmapCache",
 
@@ -186,8 +185,6 @@ async function GetUserTop(score, user, userstats, pageNumber, ModeOsu, RuleSetID
 				throw new Error("ERROR CODE 409, ABORTING TASK");
 			}
 		}
-
-		console.log(modsID);
 
 		if (ModsName.length == 0) {
 			ModsName = "NM";
@@ -234,8 +231,6 @@ async function GetUserTop(score, user, userstats, pageNumber, ModeOsu, RuleSetID
 		url = ``;
 
 		if (play_number) {
-			console.log("play number");
-
 			let objects, status, acc, creator, creator_id;
 			let sc_rank = " ";
 			if (server == "bancho") {
@@ -325,7 +320,16 @@ async function GetUserTop(score, user, userstats, pageNumber, ModeOsu, RuleSetID
 
 			title = Title;
 			url = `https://osu.ppy.sh/b/${score.beatmap.id}`;
-			fields = { name: `**Beatmap info:**`, value: `BPM: \`${mapValues.bpm.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${mapValues.ar.toFixed(1).toString().replace(/\.0+$/, "")}\` OD: \`${mapValues.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\`` };
+			fields = {
+				name: `**Beatmap info:**`,
+				value: `BPM: \`${mapValues.bpm.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${mapValues.ar
+					.toFixed(1)
+					.toString()
+					.replace(/\.0+$/, "")}\` OD: \`${mapValues.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp
+					.toFixed(2)
+					.toString()
+					.replace(/\.0+$/, "")}\``,
+			};
 			footer = { text: `${status} map by ${creator} | osu!${server}`, iconURL: `https://a.ppy.sh/${creator_id}?1668890819.jpeg` };
 		}
 
