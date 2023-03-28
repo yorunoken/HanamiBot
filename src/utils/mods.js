@@ -32,7 +32,7 @@ const mods = {
 	MR: 1073741824,
 };
 
-const num_codes = {
+const modsEnum = {
 	0: "NM",
 	1: "NF",
 	2: "EZ",
@@ -50,7 +50,7 @@ const num_codes = {
 	2097152: "RD",
 	1073741824: "MR",
 };
-const mods_order = {
+const modsOrder = {
 	nf: 0,
 	ez: 1,
 	hd: 2,
@@ -66,40 +66,36 @@ const mods_order = {
 };
 
 function id(name) {
-	if (name.length == 0 || name.toLowerCase() == "nm") return 0;
-	const segmentedMods = name.match(/.{1,2}/g);
-
-	let BitArray = [];
-	for (let i = 0; segmentedMods.length > i; i++) {
-		BitArray.push(mods[segmentedMods[i]]);
+	if (!name || name.toLowerCase() === "nm") {
+		return 0;
 	}
-
-	if (BitArray.length == 0) return undefined;
-	return BitArray.reduce((a, b) => a + b);
+	const segmentedMods = name.match(/.{1,2}/g) || [];
+	const enumMods = segmentedMods.map((mod) => mods[mod]);
+	return enumMods.reduce((a, b) => a + b);
 }
 
-function name(mods) {
-	let enabled = [];
-	let _mods = mods;
-	let converted = "";
-	const modValues = Object.keys(num_codes).map((a) => Number(a));
+function name(id) {
+	let modsArray = [];
+	let givenModID = id;
+	let convertedMods = "";
+	const modValues = Object.keys(modsEnum).map((a) => Number(a));
 	for (let i = modValues.length - 1; i >= 0; i--) {
 		const currentValue = modValues[i];
-		if (_mods >= currentValue) {
-			const mode = num_codes[currentValue];
-			enabled.push({ i: mods_order[mode.toLowerCase()], n: mode });
-			_mods -= currentValue;
+		if (givenModID >= currentValue) {
+			const mode = modsEnum[currentValue];
+			modsArray.push({ order: modsOrder[mode.toLowerCase()], mod: mode });
+			givenModID -= currentValue;
 		}
 	}
-	enabled = enabled.sort((a, b) => (a.i > b.i ? 1 : b.i > a.i ? -1 : 0));
-	enabled.filter((r) => (converted += r.n));
-	if (converted.endsWith("NM")) {
-		converted = converted.slice(0, -2);
+	modsArray = modsArray.sort((a, b) => (a.order > b.order ? 1 : b.order > a.order ? -1 : 0));
+	modsArray.filter((r) => (convertedMods += r.mod));
+	if (convertedMods.endsWith("NM")) {
+		convertedMods = convertedMods.slice(0, -2);
 	}
-	if (converted === "") {
+	if (convertedMods === "") {
 		return "NM";
 	}
-	return converted;
+	return convertedMods;
 }
 
 module.exports = {
