@@ -76,15 +76,15 @@ function id(name) {
 
 function name(id) {
 	let modsArray = [];
-	let givenModID = id;
+	let _mods = id;
 	let convertedMods = "";
 	const modValues = Object.keys(modsEnum).map((a) => Number(a));
 	for (let i = modValues.length - 1; i >= 0; i--) {
 		const currentValue = modValues[i];
-		if (givenModID >= currentValue) {
+		if (_mods >= currentValue) {
 			const mode = modsEnum[currentValue];
 			modsArray.push({ order: modsOrder[mode.toLowerCase()], mod: mode });
-			givenModID -= currentValue;
+			_mods -= currentValue;
 		}
 	}
 	modsArray = modsArray.sort((a, b) => (a.order > b.order ? 1 : b.order > a.order ? -1 : 0));
