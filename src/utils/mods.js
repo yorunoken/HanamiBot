@@ -50,7 +50,6 @@ const num_codes = {
 	2097152: "RD",
 	1073741824: "MR",
 };
-
 const mods_order = {
 	nf: 0,
 	ez: 1,
@@ -83,21 +82,23 @@ function name(mods) {
 	let enabled = [];
 	let _mods = mods;
 	let converted = "";
-	const values = Object.keys(num_codes).map(a => Number(a));
-	for (let i = values.length - 1; i >= 0; i--) {
-		const v = values[i];
-		if (_mods >= v) {
-			const mode = num_codes[v];
+	const modValues = Object.keys(num_codes).map((a) => Number(a));
+	for (let i = modValues.length - 1; i >= 0; i--) {
+		const currentValue = modValues[i];
+		if (_mods >= currentValue) {
+			const mode = num_codes[currentValue];
 			enabled.push({ i: mods_order[mode.toLowerCase()], n: mode });
-			_mods -= v;
+			_mods -= currentValue;
 		}
 	}
 	enabled = enabled.sort((a, b) => (a.i > b.i ? 1 : b.i > a.i ? -1 : 0));
-	enabled.filter(r => (converted += r.n));
+	enabled.filter((r) => (converted += r.n));
 	if (converted.endsWith("NM")) {
 		converted = converted.slice(0, -2);
 	}
-	if (converted === "") return "NM";
+	if (converted === "") {
+		return "NM";
+	}
 	return converted;
 }
 
