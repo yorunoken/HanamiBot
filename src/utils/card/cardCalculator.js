@@ -64,6 +64,8 @@ async function CardImage(user, aimProg, speedProg, accProg) {
 	if (pp > 12.5) BgNumber = 5;
 	if (pp > 15) BgNumber = 6;
 
+	if (BgNumber == undefined) BgNumber = 1;
+
 	ctx.rotate(0);
 	const Background = await loadImage(`${Path}bgs/star${BgNumber}.jpg`);
 	var { w, h, x, y } = BackgroundPosition;
@@ -215,7 +217,15 @@ async function CalculateSkill(scores, ruleset) {
 
 		let map = new Beatmap({ path: `./osuBeatmapCache/${score.beatmap.id}.osu` });
 
-		const pp = new Calculator(scoreParam).n100(score.statistics.count_100).n300(score.statistics.count_300).n50(score.statistics.count_50).nMisses(Number(score.statistics.count_miss)).combo(score.max_combo).nGeki(score.statistics.count_geki).nKatu(score.statistics.count_katu).performance(map);
+		const pp = new Calculator(scoreParam)
+			.n100(score.statistics.count_100)
+			.n300(score.statistics.count_300)
+			.n50(score.statistics.count_50)
+			.nMisses(Number(score.statistics.count_miss))
+			.combo(score.max_combo)
+			.nGeki(score.statistics.count_geki)
+			.nKatu(score.statistics.count_katu)
+			.performance(map);
 
 		stars.push(pp.difficulty.stars);
 		avgpp.push(pp.pp);
@@ -232,7 +242,7 @@ async function CalculateSkill(scores, ruleset) {
 		weight_sum += weight;
 	}
 
-	const map = value => Math.round(value * 100) / 100;
+	const map = (value) => Math.round(value * 100) / 100;
 
 	acc = map(acc / weight_sum);
 	aim = map(aim / weight_sum);

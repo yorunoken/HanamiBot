@@ -89,12 +89,10 @@ async function CompareEmbed(mapinfo, beatmapId, user, ModeString, value, pagenum
 			profileUrl = `https://osu.gatari.pw/u/${user.id}?m=${RuleSetID}`;
 			avatarUrl = `https://a.gatari.pw/${user.id}`;
 		}
-
 		let status = mapinfo.status.charAt(0).toUpperCase() + mapinfo.status.slice(1);
 
 		let redownload = false;
 		if (mapinfo.status != "loved" && mapinfo.status != "ranked") redownload = true;
-		console.log("no file.");
 		const downloader = new Downloader({
 			rootPath: "./osuBeatmapCache",
 
