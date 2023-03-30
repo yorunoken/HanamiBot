@@ -247,27 +247,33 @@ exports.run = async (client, message, args, prefix) => {
 
 	async function getTitleURL(embed) {
 		const embed_TitleURL = embed.url;
+		if (embed_TitleURL == null) throw new Error("null");
 		await getID(embed_TitleURL);
 	}
 
 	async function getAuthorURL(embed) {
 		const embed_AuthorURL = embed.author.url;
+		if (embed_AuthorURL == null) throw new Error("null");
 		await getID(embed_AuthorURL);
 	}
 
 	async function getDescriptionURL(embed) {
+		const embed_DescriptionURL = embed.description;
+		if (embed_DescriptionURL == null) throw new Error("null");
 		const regex = /\/(?:b|beatmaps)\/(\d+)/;
-		const match = regex.exec(embed.description);
+		const match = regex.exec();
 		const beatmapID = match[1];
-		await getID(beatmapID);
+		getID(beatmapID);
 	}
 
 	page = setPage--;
-	async function getID(urlRaw, beatmapID) {
+	async function getID(urlRaw) {
 		if (urlRaw) {
 			// check if the url has a user link
 			if (urlRaw.includes("/users/") || urlRaw.includes("/u/")) throw new Error("Wrong embed");
 			beatmapID = urlRaw.match(/\d+/)[0];
+		} else {
+			beatmapID = beatmapID;
 		}
 
 		let beatmap = await v2.beatmap.diff(beatmapID);
@@ -294,7 +300,7 @@ exports.run = async (client, message, args, prefix) => {
 	}
 
 	async function EmbedFetch(embed) {
-		getTitleURL(embed)
+		await getTitleURL(embed)
 			.catch((e) => getAuthorURL(embed))
 			.catch((e) => getDescriptionURL(embed));
 	}
