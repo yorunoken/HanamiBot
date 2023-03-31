@@ -8,8 +8,23 @@ const axios = require("axios");
 const { tools } = require("../../utils/tools.js");
 const { mods } = require("../../utils/mods.js");
 
-async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, userstats, server) {
+async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, userstats, server, offset) {
 	await auth.login(process.env.client_id, process.env.client_secret);
+
+	let offset_pagination;
+	switch (true) {
+		case value + 1 >= 150:
+			offset_pagination = 3;
+			break;
+		case value + 1 >= 100:
+			offset_pagination = 2;
+			break;
+		case value + 1 >= 50:
+			offset_pagination = 1;
+			break;
+		default:
+			offset_pagination = 0;
+	}
 
 	let top1k = false;
 	let score_id;
@@ -94,11 +109,10 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, user
 			return { embed, FilterMods };
 		}
 
-		console.log(`mods :${score[value].mods}`);
 		ModsName = mods.name(score[value].mods).toUpperCase();
 
 		if (argValues["mods"] != undefined) {
-			filteredscore = score.filter(x => mods.name(x.mods).toLowerCase() == argValues["mods"].split("").sort().join("").toLowerCase());
+			filteredscore = score.filter((x) => mods.name(x.mods).toLowerCase() == argValues["mods"].split("").sort().join("").toLowerCase());
 			score = filteredscore;
 			try {
 				FilterMods = `**Filtering mod(s): ${mods.name(score[value].mods).toUpperCase()}**`;
@@ -117,7 +131,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, user
 		valuemiss = score[value].count_miss;
 		valuecombo = score[value].max_combo;
 
-		retryMap = score.map(x => x.beatmap.beatmap_id);
+		retryMap = score.map((x) => x.beatmap.beatmap_id);
 		retryMap.splice(0, value);
 
 		//formatted values for user
@@ -171,7 +185,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, user
 		ModsName = mods.name(score[value].mods).toUpperCase();
 
 		if (argValues["mods"] != undefined) {
-			filteredscore = score.filter(x => mods.name(x.mods).toLowerCase() == argValues["mods"].split("").sort().join("").toLowerCase());
+			filteredscore = score.filter((x) => mods.name(x.mods).toLowerCase() == argValues["mods"].split("").sort().join("").toLowerCase());
 			score = filteredscore;
 			try {
 				FilterMods = `**Filtering mod(s): ${mods.name(score[value].mods).toUpperCase()}**`;
@@ -190,7 +204,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, user
 		valuemiss = score[value].count_miss;
 		valuecombo = score[value].max_combo;
 
-		retryMap = score.map(x => x.beatmap.beatmap_id);
+		retryMap = score.map((x) => x.beatmap.beatmap_id);
 		retryMap.splice(0, value);
 
 		let uStats = user.stats[0].std;
@@ -237,15 +251,13 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, user
 
 	if (server == "saber") {
 		var BaseUrl = `https://scoresaber.com/api`;
-		var data = await fetch(`${BaseUrl}/player/${user.id}/scores?limit=100&sort=recent&page=1&withMetadata=true`, { method: "GET" }).then(x => x.json());
+		var data = await fetch(`${BaseUrl}/player/${user.id}/scores?limit=100&sort=recent&page=1&withMetadata=true`, { method: "GET" }).then((x) => x.json());
 
 		score = data.playerScores;
 		if (score.length == 0) {
 			let embed = new EmbedBuilder().setColor("Purple").setDescription(`No Beat Saber plays found for **${user.name}**`);
 			return { embed, FilterMods };
 		}
-
-		console.log(score);
 
 		function getAccuracy(score) {
 			let scoreCalc = score.score.baseScore;
@@ -305,7 +317,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, user
 
 		const AccValues = `{ **Bad:**${badCut}/**Miss:**${missedNote} }`;
 
-		retryMap = score.map(x => x.leaderboard.difficulty.leaderboardId);
+		retryMap = score.map((x) => x.leaderboard.difficulty.leaderboardId);
 		retryMap.splice(0, value);
 		const retryCounter = getRetryCount(retryMap, mapId);
 
@@ -360,7 +372,10 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, user
 			)
 			// .setFields({ name: `**Beatmap info:**`, value: `BPM: \`${mapValues.bpm.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${mapValues.ar.toFixed(1).toString().replace(/\.0+$/, "")}\` OD: \`${mapValues.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\`` })
 			.setThumbnail(score[value].leaderboard.coverImage)
-			.setFooter({ text: `${MapStatus} map by ${creatorName} | Beat Saber`, iconURL: `https://upload.wikimedia.org/wikipedia/commons/9/91/Beat_Saber_Logo.png` });
+			.setFooter({
+				text: `${MapStatus} map by ${creatorName} | Beat Saber`,
+				iconURL: `https://upload.wikimedia.org/wikipedia/commons/9/91/Beat_Saber_Logo.png`,
+			});
 		return { embed, FilterMods, top1k, score_id };
 	}
 
@@ -369,10 +384,10 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, user
 		const params = {
 			include_fails: PassDetermine,
 			mode: mode,
-			limit: "100",
-			offset: "0",
+			limit: "50",
+			offset: offset_pagination,
 		};
-		Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+		Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
 		const headers = {
 			Authorization: `Bearer ${process.env.osu_bearer_key}`,
 		};
@@ -390,7 +405,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, user
 		ModsName = score[value].mods.join("").toUpperCase();
 
 		if (argValues["mods"] != undefined) {
-			filteredscore = score.filter(x => x.mods.join("").split("").sort().join("").toLowerCase() == argValues["mods"].split("").sort().join("").toLowerCase());
+			filteredscore = score.filter((x) => x.mods.join("").split("").sort().join("").toLowerCase() == argValues["mods"].split("").sort().join("").toLowerCase());
 			score = filteredscore;
 			try {
 				FilterMods = `**Filtering mod(s): ${score[value].mods.join("").toUpperCase()}**`;
@@ -432,7 +447,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, user
 		title = `${score[value].beatmapset.artist} - ${score[value].beatmapset.title} [${score[value].beatmap.version}]`;
 
 		// retry counter
-		retryMap = score.map(x => x.beatmap.id);
+		retryMap = score.map((x) => x.beatmap.id);
 		retryMap.splice(0, value);
 
 		hitLength = score[value].beatmap.hit_length;
@@ -592,10 +607,18 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, user
 		//update the user's osu! recent in the JSON file
 		const userData = JSON.parse(data);
 
-		score[value] = { ...score[value], StarRating: maxAttrs.difficulty.stars, CurPP: CurAttrs.pp, FixPP: FCAttrs.pp, SSPP: maxAttrs.pp, bpm: mapValues.bpm, mode: mode };
+		score[value] = {
+			...score[value],
+			StarRating: maxAttrs.difficulty.stars,
+			CurPP: CurAttrs.pp,
+			FixPP: FCAttrs.pp,
+			SSPP: maxAttrs.pp,
+			bpm: mapValues.bpm,
+			mode: mode,
+		};
 
 		if (userData[user.id]) {
-			if (userData[user.id].scores.findIndex(ScoreArr => ScoreArr.score.id == score[value].id) != -1) {
+			if (userData[user.id].scores.findIndex((ScoreArr) => ScoreArr.score.id == score[value].id) != -1) {
 			} else
 				userData[user.id].scores.push({
 					score: score[value],
@@ -622,7 +645,7 @@ async function GetRecent(value, user, mode, PassDetermine, args, RuleSetID, user
 				server: server,
 			};
 		}
-		fs.writeFile("./user-recent.json", JSON.stringify(userData, null, 2), error => {
+		fs.writeFile("./user-recent.json", JSON.stringify(userData, null, 2), (error) => {
 			if (error) {
 				console.log(error);
 				return;
