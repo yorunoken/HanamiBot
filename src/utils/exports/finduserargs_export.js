@@ -22,7 +22,7 @@ async function FindUserargs(message, args, server, prefix) {
 							if (server == "gatari") userargs = userData[mentionedUser.id].GatariUserId;
 							if (server == "akatsuki") userargs = userData[mentionedUser.id].AkatsukiUserId;
 							if (server == "saber") userargs = userData[mentionedUser.id].SteamUserId;
-							if (server == "minecraft") userargs = userData[mentionedUser.id].MinecraftuserID;
+							if (server == "minecraft") userargs = userData[mentionedUser.id].MinecraftUserID;
 						}
 					} catch (err) {}
 
@@ -32,7 +32,7 @@ async function FindUserargs(message, args, server, prefix) {
 							if (server == "gatari") userargs = userData[mentionedUser.id].GatariUserId;
 							if (server == "akatsuki") userargs = userData[mentionedUser.id].AkatsukiUserId;
 							if (server == "saber") userargs = userData[mentionedUser.id].SteamUserId;
-							if (server == "minecraft") userargs = userData[mentionedUser.id].MinecraftuserID;
+							if (server == "minecraft") userargs = userData[mentionedUser.id].MinecraftUserID;
 						} catch (err) {
 							message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No osu! user found for ${mentionedUser.tag}`)] });
 						}
@@ -50,7 +50,7 @@ async function FindUserargs(message, args, server, prefix) {
 							if (server == "gatari") userargs = userData[message.author.id].GatariUserId;
 							if (server == "akatsuki") userargs = userData[message.author.id].AkatsukiUserId;
 							if (server == "saber") userargs = userData[message.author.id].SteamUserId;
-							if (server == "minecraft") userargs = userData[message.author.id].MinecraftuserID;
+							if (server == "minecraft") userargs = userData[message.author.id].MinecraftUserID;
 						} catch (err) {
 							console.error(err);
 							message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Set your osu! username by typing "${prefix}link **your username**"`)] });
@@ -65,7 +65,7 @@ async function FindUserargs(message, args, server, prefix) {
 						if (server == "gatari") userargs = userData[message.author.id].GatariUserId;
 						if (server == "akatsuki") userargs = userData[message.author.id].AkatsukiUserId;
 						if (server == "saber") userargs = userData[message.author.id].SteamUserId;
-						if (server == "minecraft") userargs = userData[message.author.id].MinecraftuserID;
+						if (server == "minecraft") userargs = userData[message.author.id].MinecraftUserID;
 					} catch (err) {
 						console.error(err);
 						message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Set your osu! username by typing "${prefix}link **your username**"`)] });
