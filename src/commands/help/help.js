@@ -13,6 +13,7 @@ exports.run = async (client, message, args, prefix) => {
 		chess: [],
 		fun: [],
 		developer: [],
+		minecraft: [],
 	};
 
 	Object.entries(commands).forEach(([name, command]) => {
@@ -21,7 +22,7 @@ exports.run = async (client, message, args, prefix) => {
 
 	if (args[0]) {
 		const commandName = args[0];
-		const command = commands[commandName] || Object.values(commands).find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
+		const command = commands[commandName] || Object.values(commands).find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
 		if (command) {
 			const embed = new EmbedBuilder()
 				.setColor("Purple")
@@ -39,7 +40,20 @@ exports.run = async (client, message, args, prefix) => {
 		.setColor("Purple")
 		// .setTitle(`Available in ${client.guilds.cache.size} servers, with ${categories.osu.length+categories.general.length+categories.fun.length+categories.help.length+categories.chess.length} commands!`)
 
-		.setFields({ name: "**osu! commands**", value: `\`${categories.osu.join("` `")}\``, inline: false }, { name: "**beat saber commands**", value: `\`${categories.saber.join("` `")}\``, inline: false }, { name: "**general commands**", value: `\`${categories.general.join("` `")}\``, inline: false }, { name: "**fun commands**", value: `\`${categories.fun.join("` `")}\``, inline: false }, { name: "**chess commands**", value: `\`${categories.chess.join("` `")}\``, inline: false }, { name: "**Number of servers:**", value: `${client.guilds.cache.size}`, inline: true }, { name: "**Number of commands:**", value: `${categories.osu.length + categories.general.length + categories.fun.length + categories.saber.length + categories.help.length + categories.chess.length}`, inline: true })
+		.setFields(
+			{ name: "**osu! commands**", value: `\`${categories.osu.join("` `")}\``, inline: false },
+			{ name: "**minecraft commands**", value: `\`${categories.minecraft.join("` `")}\``, inline: false },
+			{ name: "**beat saber commands**", value: `\`${categories.saber.join("` `")}\``, inline: false },
+			{ name: "**general commands**", value: `\`${categories.general.join("` `")}\``, inline: false },
+			{ name: "**fun commands**", value: `\`${categories.fun.join("` `")}\``, inline: false },
+			{ name: "**chess commands**", value: `\`${categories.chess.join("` `")}\``, inline: false },
+			{ name: "**Number of servers:**", value: `${client.guilds.cache.size}`, inline: true },
+			{
+				name: "**Number of commands:**",
+				value: `${categories.osu.length + categories.general.length + categories.fun.length + categories.saber.length + categories.help.length + categories.chess.length}`,
+				inline: true,
+			},
+		)
 		.setThumbnail(message.author.displayAvatarURL())
 		.setFooter({ text: `for more information on a command, type: ${prefix}help {commandname}` });
 	message.channel.send({ embeds: [embed] });
