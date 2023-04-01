@@ -88,30 +88,6 @@ module.exports.run = async (client, message, args, prefix) => {
 			});
 			user = await response.json();
 
-			if (user.username == "YoruNoKen") {
-				const embed = new EmbedBuilder()
-					.setColor("Purple")
-					.setAuthor({
-						name: `YoruNoKen 7450.54pp (#13,554 TR#93) `,
-						iconURL: `https://osu.ppy.sh/images/flags/TR.png`,
-						url: "https://osu.ppy.sh/users/17279598/osu",
-					})
-					.setTitle("VINXIS - Sidetracked Day [Sojourn Collab]")
-					.setURL(`https://osu.ppy.sh/b/2111505`)
-					.setDescription(
-						`<:S_:1057763291998474283> **+NM** • **__[7.62★]__** 🌐 #181\n▹**641.24**/683.77PP \n▹108,461,790 • **(99.34%)**\n▹[ **2185**x/2186x ] • {**1592**/16/0/0}\n▹Score Set <t:1680374580:R>• **Try #1**`,
-					)
-					.setFields({
-						name: `**Beatmap info:**`,
-						value: `BPM: \`188\` Objects: \`1608\` Length: \`5:35\` (\`5:14\`)\nAR: \`9.8\` OD: \`9.5\` CS: \`4.3\` HP: \`6.0\``,
-					})
-					.setImage(`https://assets.ppy.sh/beatmaps/1008679/covers/cover.jpg`)
-					.setThumbnail("https://a.ppy.sh/17279598?1679428025.jpeg")
-					.setFooter({ text: `Ranked map by Chanci | osu!bancho`, iconURL: "https://a.ppy.sh/5522589" });
-				message.channel.send({ embeds: [embed] });
-				return;
-			}
-
 			if (user.id === undefined) {
 				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] });
 				return;

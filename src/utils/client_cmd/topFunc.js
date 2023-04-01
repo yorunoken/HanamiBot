@@ -72,26 +72,6 @@ function getTop(message, args, prefix, RB, mode, RuleSetID) {
 
 			const userResponse = await fetch(`${baseURL}/users/${userArgs}/${mode}`, { method: "GET", headers }).then((response) => response.json());
 			user = userResponse;
-			if (user.username == "YoruNoKen") {
-				const row1 = `1. [**Sidetracked Day [Sojourn Collab]**](https://osu.ppy.sh/b/2111505) **+NM** [7.62★]\n<:S_:1057763291998474283> ▹ **641.24PP** ▹ (99.34%) ▹ [ **2185**x/2186x ]\n108,461,790 ▹ {**1592**/16/0/0} <t:1680374580:R>`;
-				const row2 = `2. [**Sidetracked Day [Infinity Inside]**](https://w) **+NM** [6.80★]\n<:S_:1057763291998474283> ▹ **476.62PP** ▹ (98.74%) ▹ [**2260**x/2261x]\n116,092,230 ▹ {**1660**/32/0/0} <t:1669919430:R>`;
-				const row3 = `3. [**My Heart Will Go On [Extra]**](https://w) **+NM** [6.98★]\n<:S_:1057763291998474283> ▹ **462.48PP** ▹ (98.78%) ▹ [**1728**x/1735x]\n68,458,990 ▹ {**1291**/24/0/0} <t:1675276207:R>`;
-				const row4 = `4. [**Mynarco [Expert]**](https://w) **+NM** [6.81★]\n<:S_:1057763291998474283> ▹ **403.67PP** ▹ (99.33%) ▹ [**833**x/833x]\n17,896,620 ▹ {**688**/7/0/0} <t:1648837080:R>`;
-				const row5 = `5. [**Glory Days [AnedeuwuAAa's Extreme Collab]**](https://w) **+NM **[6.86★]\n<:A_:1057763284327080036> ▹ **391.94PP** ▹ (98.27%) ▹ [**1768**x/2431x]\n64,439,098 ▹ {**1938**/50/0/1} <t:1662056951:R>`;
-
-				const embed = new EmbedBuilder()
-					.setColor("Purple")
-					.setAuthor({
-						name: `YoruNoKen 7450.54pp (#13,554 TR#93) `,
-						iconURL: `https://osu.ppy.sh/images/flags/TR.png`,
-						url: "https://osu.ppy.sh/users/17279598/osu",
-					})
-					.setThumbnail("https://a.ppy.sh/17279598?1679428025.jpeg")
-					.setFooter({ text: `Page 1/20 | osu!bancho` })
-					.setDescription(`${row1}\n${row2}\n${row3}\n${row4}\n${row5}`);
-				message.channel.send({ embeds: [embed] });
-				return;
-			}
 
 			const scoreResponse = await fetch(`${baseURL}/users/${user.id}/scores/best?mode=${mode}&limit=100&offset=0`, { method: "GET", headers }).then((response) => response.json());
 			score = scoreResponse;
