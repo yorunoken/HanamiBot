@@ -198,7 +198,7 @@ exports.run = async (client, message, args, prefix) => {
 
 			//update the user's saber! username in the JSON file
 			const userData = JSON.parse(data);
-			userData[message.author.id] = { ...userData[message.author.id], MinecraftUserID: user_id };
+			userData[message.author.id] = { ...userData[message.author.id], MinecraftUserID: `${user_id}!{ENCRYPTED}` };
 			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), (error) => {
 				if (error) {
 					console.log(error);

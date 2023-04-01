@@ -37,6 +37,7 @@
     "minimist": "^1.2.7",
     "moment": "^2.29.4",
     "mongoose": "^6.9.0",
+    "namemc": "^1.8.16",
     "node-fetch": "^2.6.7",
     "node-osu": "^2.2.1",
     "node-reddit-js": "^0.0.11",

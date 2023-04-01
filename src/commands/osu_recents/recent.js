@@ -51,7 +51,20 @@ module.exports.run = async (client, message, args, prefix) => {
 
 		var userargs = await FindUserargs(message, args, server, prefix);
 
-		if (args.join(" ").startsWith("-gatari") || args.join(" ").startsWith("-akatsuki") || args.join(" ").startsWith("-bancho") || args.join(" ").startsWith("-mania") || args.join(" ").startsWith("-ctb") || args.join(" ").startsWith("-taiko") || args.join(" ").startsWith("-osu") || args.join(" ").startsWith("-i") || args.join(" ").startsWith("-pass") || args.join(" ").startsWith("-ps") || args.join(" ").startsWith("mods") || args.join(" ").startsWith("+")) {
+		if (
+			args.join(" ").startsWith("-gatari") ||
+			args.join(" ").startsWith("-akatsuki") ||
+			args.join(" ").startsWith("-bancho") ||
+			args.join(" ").startsWith("-mania") ||
+			args.join(" ").startsWith("-ctb") ||
+			args.join(" ").startsWith("-taiko") ||
+			args.join(" ").startsWith("-osu") ||
+			args.join(" ").startsWith("-i") ||
+			args.join(" ").startsWith("-pass") ||
+			args.join(" ").startsWith("-ps") ||
+			args.join(" ").startsWith("mods") ||
+			args.join(" ").startsWith("+")
+		) {
 			try {
 				if (server == "bancho") userargs = userData[message.author.id].BanchoUserId;
 				if (server == "gatari") userargs = userData[message.author.id].GatariUserId;
@@ -74,6 +87,30 @@ module.exports.run = async (client, message, args, prefix) => {
 				headers,
 			});
 			user = await response.json();
+
+			if (user.username == "YoruNoKen") {
+				const embed = new EmbedBuilder()
+					.setColor("Purple")
+					.setAuthor({
+						name: `YoruNoKen 7450.54pp (#13,554 TR#93) `,
+						iconURL: `https://osu.ppy.sh/images/flags/TR.png`,
+						url: "https://osu.ppy.sh/users/17279598/osu",
+					})
+					.setTitle("VINXIS - Sidetracked Day [Sojourn Collab]")
+					.setURL(`https://osu.ppy.sh/b/2111505`)
+					.setDescription(
+						`<:S_:1057763291998474283> **+NM** • **__[7.62★]__** 🌐 #181\n▹**641.24**/683.77PP \n▹108,461,790 • **(99.34%)**\n▹[ **2185**x/2186x ] • {**1592**/16/0/0}\n▹Score Set <t:1680374580:R>• **Try #1**`,
+					)
+					.setFields({
+						name: `**Beatmap info:**`,
+						value: `BPM: \`188\` Objects: \`1608\` Length: \`5:35\` (\`5:14\`)\nAR: \`9.8\` OD: \`9.5\` CS: \`4.3\` HP: \`6.0\``,
+					})
+					.setImage(`https://assets.ppy.sh/beatmaps/1008679/covers/cover.jpg`)
+					.setThumbnail("https://a.ppy.sh/17279598?1679428025.jpeg")
+					.setFooter({ text: `Ranked map by Chanci | osu!bancho`, iconURL: "https://a.ppy.sh/5522589" });
+				message.channel.send({ embeds: [embed] });
+				return;
+			}
 
 			if (user.id === undefined) {
 				message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**The player \`${userargs}\` does not exist in osu!${server}**`)] });
@@ -134,20 +171,24 @@ module.exports.run = async (client, message, args, prefix) => {
 			row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("render").setStyle(ButtonStyle.Primary).setLabel("Render"));
 			message.channel.send({ content: Recent.FilterMods, embeds: [Recent.embed.data], components: [row] });
 
-			const filter = m => m.user.id === message.author.id;
+			const filter = (m) => m.user.id === message.author.id;
 			const collector = message.channel.createMessageComponentCollector({ filter: filter, max: 1, time: 50000 });
 
-			collector.on("collect", async collected => {
+			collector.on("collect", async (collected) => {
 				let collectedm = collected.message;
 				let user = collected.user;
 				let score_id = Recent.score_id;
 
-				collected.update({ content: Recent.FilterMods, embeds: [Recent.embed.data], components: [new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("render").setDisabled().setStyle(ButtonStyle.Primary).setLabel("Render"))] });
+				collected.update({
+					content: Recent.FilterMods,
+					embeds: [Recent.embed.data],
+					components: [new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("render").setDisabled().setStyle(ButtonStyle.Primary).setLabel("Render"))],
+				});
 				GetReplay(message, collectedm, user, score_id, mode);
 				return;
 			});
 
-			collector.on("end", async m => {});
+			collector.on("end", async (m) => {});
 			return;
 		}
 		message.channel.send({ content: Recent.FilterMods, embeds: [Recent.embed.data] });
@@ -155,6 +196,8 @@ module.exports.run = async (client, message, args, prefix) => {
 };
 exports.name = ["recent"];
 exports.aliases = ["recent", "r", "rs"];
-exports.description = ["Displays user's recent osu!standard play\n\n**Parameters:**\n`username` get the recent play of a user (must be first parameter) \n`-i (number)` get a specific play (1-100)\n`-pass` get the latest passed play (no parameters)\n`mods=(string)` get the latest play by mods"];
+exports.description = [
+	"Displays user's recent osu!standard play\n\n**Parameters:**\n`username` get the recent play of a user (must be first parameter) \n`-i (number)` get a specific play (1-100)\n`-pass` get the latest passed play (no parameters)\n`mods=(string)` get the latest play by mods",
+];
 exports.usage = [`recent YoruNoKen\nrs Whitecat -i 4\nrs -pass -i 3\nrecent mods=dt -pass`];
 exports.category = ["osu"];

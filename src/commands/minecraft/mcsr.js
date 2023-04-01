@@ -10,6 +10,9 @@ exports.run = async (client, message, args, prefix) => {
 		message.channel.send({ embeds: [new EmbedBuilder().setDescription("Link your account")] });
 		return;
 	}
+	if (userArgs.endsWith("!{ENCRYPTED}")) {
+		userArgs = userArgs.replace(/!{ENCRYPTED}$/, "");
+	}
 
 	/**
 	const mojang_base_URL = "https://api.mojang.com/users";
@@ -22,7 +25,7 @@ exports.run = async (client, message, args, prefix) => {
 	const data = ranked_response.data;
 
 	if (ranked_response.status != "success") {
-		message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription("Something went wrong.. Check if the user is valid.")] });
+		message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`The user ${userArgs} does not exist in the database`)] });
 		return;
 	}
 
@@ -76,7 +79,7 @@ exports.run = async (client, message, args, prefix) => {
 	message.channel.send({ embeds: [embed] });
 };
 exports.name = "mcsr";
-exports.aliases = ["mcsr", "mc", "minecraft"];
-exports.description = ["get minecraft mcsr ranked user statistics\n[mcsr ranked website](https://mcsrranked.com/)\n[user profile website](https://disrespec.tech/elo/)"];
-exports.usage = [`mcsr yorunoken`];
+exports.aliases = ["mcsr", "mc", "minecraft", "profile"];
+exports.description = ["get mcsr ranked user statistics\n[mcsr ranked website](https://mcsrranked.com/)\n[user profile website](https://disrespec.tech/elo/)"];
+exports.usage = [`mcsr yorunoken\nmcsr feinberg`];
 exports.category = ["minecraft"];
