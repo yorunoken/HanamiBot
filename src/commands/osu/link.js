@@ -42,7 +42,7 @@ exports.run = async (client, message, args, prefix) => {
 
 			const userData = JSON.parse(data);
 			userData[message.author.id] = { ...userData[message.author.id], server: server };
-			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
+			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), (error) => {
 				if (error) {
 					console.log(error);
 				} else {
@@ -71,7 +71,7 @@ exports.run = async (client, message, args, prefix) => {
 			//update the user's osu! username in the JSON file
 			const userData = JSON.parse(data);
 			userData[message.author.id] = { ...userData[message.author.id], BanchoUserId: user_id };
-			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
+			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), (error) => {
 				if (error) {
 					console.log(error);
 				} else {
@@ -102,7 +102,7 @@ exports.run = async (client, message, args, prefix) => {
 			//update the user's osu! username in the JSON file
 			const userData = JSON.parse(data);
 			userData[message.author.id] = { ...userData[message.author.id], GatariUserId: user_id };
-			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
+			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), (error) => {
 				if (error) {
 					console.log(error);
 				} else {
@@ -137,7 +137,7 @@ exports.run = async (client, message, args, prefix) => {
 			//update the user's osu! username in the JSON file
 			const userData = JSON.parse(data);
 			userData[message.author.id] = { ...userData[message.author.id], AkatsukiUserId: user_id };
-			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
+			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), (error) => {
 				if (error) {
 					console.log(error);
 				} else {
@@ -167,7 +167,7 @@ exports.run = async (client, message, args, prefix) => {
 			//update the user's saber! username in the JSON file
 			const userData = JSON.parse(data);
 			userData[message.author.id] = { ...userData[message.author.id], SteamUserId: user_id };
-			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), error => {
+			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), (error) => {
 				if (error) {
 					console.log(error);
 				} else {
@@ -176,9 +176,42 @@ exports.run = async (client, message, args, prefix) => {
 			});
 		});
 	}
+
+	if (server == "minecraft") {
+		const ranked_base_URL = "https://mcsrranked.com/api";
+		const ranked_response = await fetch(`${ranked_base_URL}/users/${username}`).then((res) => res.json());
+		const data = ranked_response.data;
+
+		if (ranked_response.status != "success") {
+			message.reply(`**The user \`${username}\` does not exist in the Minecraft database.**`);
+			return;
+		}
+
+		var user_id = data.uuid;
+		// Read the JSON file
+		fs.readFile("./user-data.json", (error, data) => {
+			if (error) {
+				console.log(error);
+				return;
+			}
+
+			//update the user's saber! username in the JSON file
+			const userData = JSON.parse(data);
+			userData[message.author.id] = { ...userData[message.author.id], MinecraftUserID: user_id };
+			fs.writeFile("./user-data.json", JSON.stringify(userData, null, 2), (error) => {
+				if (error) {
+					console.log(error);
+				} else {
+					message.reply(`Set Minecraft uuid to **${user_id}**`);
+				}
+			});
+		});
+	}
 };
 exports.name = "link";
 exports.aliases = ["link"];
-exports.description = ["Sets a nickname as your default\n\n**Parameters:**\n`username` set your username to the argument\n`server=${server}` set your default server (only works if you don't provide a username)\n`server={server}` set the nickname in a server (only works if you provide a username)"];
+exports.description = [
+	"Sets a nickname as your default\n\n**Parameters:**\n`username` set your username to the argument\n`server=${server}` set your default server (only works if you don't provide a username)\n`server={server}` set the nickname in a server (only works if you provide a username)",
+];
 exports.usage = [`link YoruNoKen`];
 exports.category = ["osu"];
