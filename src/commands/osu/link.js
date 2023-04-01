@@ -27,6 +27,7 @@ exports.run = async (client, message, args, prefix) => {
 	if (argValues["server"] == "saber") server = "saber";
 	if (argValues["server"] == "steam") server = "saber";
 	if (argValues["server"] == "beatsaber") server = "saber";
+	if (argValues["server"] == "minecraft") server = "minecraft";
 
 	if (username == undefined) {
 		message.reply("**Please provide a username.**");
