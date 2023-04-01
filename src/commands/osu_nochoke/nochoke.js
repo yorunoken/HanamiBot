@@ -112,7 +112,14 @@ module.exports.run = async (client, message, args, prefix) => {
 
 		console.log(pageNumber);
 
-		const WaitMesasge = await message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setTitle("Calculating...").setDescription("Please sit still while I'm calculating your plays, this may take a while if it's your first time using this command.")] });
+		const WaitMesasge = await message.channel.send({
+			embeds: [
+				new EmbedBuilder()
+					.setColor("Purple")
+					.setTitle("Calculating...")
+					.setDescription("Please sit still while I'm calculating your plays, this may take a while if it's your first time using this command."),
+			],
+		});
 
 		const Stats = await GetuserNoChoke(user, plays, RuleSetID, mode, pageNumber);
 		WaitMesasge.delete();
@@ -122,5 +129,5 @@ module.exports.run = async (client, message, args, prefix) => {
 exports.name = ["nochoke"];
 exports.aliases = ["nochoke", "nc"];
 exports.description = ["Displays user's osu!standard top plays if they weren't choked.\n\n**Parameters:**\n`username`"];
-exports.usage = [`stats YoruNoKen`];
+exports.usage = [`nochoke YoruNoKen\nnc whitecat`];
 exports.category = ["osu"];
