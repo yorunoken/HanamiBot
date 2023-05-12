@@ -158,7 +158,7 @@ module.exports = {
       option
         .setName("config")
         .setDescription("Configure your options!")
-        .addNumberOption((o) => o.setName("bg_dim").setDescription("Set the skin ID | default: 3"))
+        .addNumberOption((o) => o.setName("skin_id").setDescription("Set the skin ID | default: 3"))
         .addNumberOption((o) => o.setName("bg_dim").setDescription("Set the background dim | default: 90").setMinValue(0).setMaxValue(100))
         .addNumberOption((o) => o.setName("music_volume").setDescription("Set the music volume | default: 75").setMinValue(0).setMaxValue(100))
         .addNumberOption((o) => o.setName("hitsound_volume").setDescription("Set the hitsounds volume | default: 50").setMinValue(0).setMaxValue(100))
