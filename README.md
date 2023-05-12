@@ -16,7 +16,7 @@ This bot has a variety of features, including:
 
 `replay` render a user's replay
 
-do `?help` in your server for more information.
+do `!help` in your server for more information.
 
 ## Contact me
 
