@@ -52,7 +52,8 @@ async function run(message, db, client, args) {
 
   const collection = db.collection("map_cache");
   const now5 = Date.now();
-  const embed = await buildMap(beatmap, argValues, collection, message);
+  const messageLink = `https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`;
+  const embed = await buildMap(beatmap, argValues, collection, messageLink);
   console.log(`Fetched embed in ${Date.now() - now5}ms`);
 
   message.channel.send({ embeds: [embed] });

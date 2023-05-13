@@ -10,6 +10,8 @@ module.exports = {
     const client = message.client;
     if (message.author.bot) return;
     if (message.channel.tpe === "dm") return;
+    if (message.content === ":3") return message.channel.send("3:");
+    if (message.content === "3:") return message.channel.send(":3");
 
     const guildPrefix = await collection.findOne({ [`${message.guildId}`]: { $exists: true } });
     let prefix = "!";

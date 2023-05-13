@@ -1,37 +1,44 @@
-const { EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, version } = require("discord.js");
 const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
 
 const { mods } = require("../utils/mods.js");
 
-async function buildMap(beatmap, argValues, collection, message) {
-  const downloader = new Downloader({
-    rootPath: "./cache",
+async function buildMap(beatmap, argValues, collection, messageLink, file) {
+  let ar, cs, od, RuleSetID, beatmapMode;
+  if (!file) {
+    const downloader = new Downloader({
+      rootPath: "./cache",
 
-    filesPerSecond: 0,
-    synchronous: true,
-  });
+      filesPerSecond: 0,
+      synchronous: true,
+    });
 
-  downloader.addSingleEntry(
-    new DownloadEntry({
-      id: beatmap.id,
-      save: false, // Don't save file on a disk.
-    })
-  );
-  const downloaderResponse = await downloader.downloadSingle();
-  if (downloaderResponse.status == -3) {
-    throw new Error("ERROR CODE 409, ABORTING TASK");
+    downloader.addSingleEntry(
+      new DownloadEntry({
+        id: beatmap.id,
+        save: false, // Don't save file on a disk.
+      })
+    );
+    const downloaderResponse = await downloader.downloadSingle();
+    if (downloaderResponse.status == -3) {
+      throw new Error("ERROR CODE 409, ABORTING TASK");
+    }
+    osuFile = downloaderResponse.buffer.toString();
+    await collection.insertOne({ id: `${beatmap.id}`, osuFile: osuFile });
+
+    ar = Number(argValues["ar"]) || beatmap?.ar;
+    cs = Number(argValues["cs"]) || beatmap?.cs;
+    od = Number(argValues["od"]) || beatmap?.accuracy;
+    RuleSetID = beatmap.mode_int;
+
+    beatmapMode = beatmap.mode;
+  } else {
+    osuFile = file;
   }
-  const osuFile = downloaderResponse.buffer.toString();
-  await collection.insertOne({ id: `${beatmap.id}`, osuFile: osuFile });
 
   const argMods = argValues["mods"] ?? "NM";
   const modsID = mods.id(argMods);
-
-  const bpm = argValues["bpm"] || beatmap.bpm;
-  let ar = Number(argValues["ar"]) || beatmap.ar;
-  let cs = Number(argValues["cs"]) || beatmap.cs;
-  let od = Number(argValues["od"]) || beatmap.accuracy;
 
   let clockRate =
     argValues["clock_rate"] !== undefined
@@ -44,11 +51,9 @@ async function buildMap(beatmap, argValues, collection, message) {
       ? 1.5
       : argValues["mods"]?.toUpperCase()?.includes("HT")
       ? 0.75
-      : bpm / beatmap.bpm;
+      : 1;
 
   clockRate = Number(clockRate);
-
-  const RuleSetID = beatmap.mode_int;
 
   let mapParam = {
     content: osuFile,
@@ -88,7 +93,7 @@ async function buildMap(beatmap, argValues, collection, message) {
   if (!performanceAcc100.difficulty.nFruits) performanceAcc100.difficulty.nFruits = 0;
 
   let osuEmote;
-  switch (beatmap.mode) {
+  switch (beatmapMode) {
     case "osu":
       osuEmote = "<:osu:1075928459014066286>";
       break;
@@ -102,14 +107,13 @@ async function buildMap(beatmap, argValues, collection, message) {
       osuEmote = "<:ctb:1075928456367444018>";
       break;
     default:
-      osuEmote = "No gamemode found.";
+      osuEmote = "";
   }
 
   const starsRaw = performanceAcc100.difficulty.stars;
   const starsFixed = starsRaw.toFixed(2);
   const modsUpperCase = argMods.toUpperCase();
 
-  const messageLink = `https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`;
   const beatmapObjects = performanceAcc100.difficulty.nCircles + performanceAcc100.difficulty.nSliders + performanceAcc100.difficulty.nSpinners + performanceAcc100.difficulty.nFruits;
 
   let arValue = mapValues.ar.toFixed(1);
@@ -130,8 +134,8 @@ async function buildMap(beatmap, argValues, collection, message) {
   }
 
   const beatmapMaxCombo = performanceAcc100.difficulty.maxCombo.toLocaleString();
-  const beatmapFavoriteCount = beatmap.beatmapset.favourite_count.toLocaleString();
-  const beatmapPlayCount = beatmap.beatmapset.play_count.toLocaleString();
+  const beatmapFavoriteCount = beatmap?.beatmapset.favourite_count.toLocaleString();
+  const beatmapPlayCount = beatmap?.beatmapset.play_count.toLocaleString();
 
   const acc95PP = peformanceAcc95.pp.toFixed(1);
   const acc97PP = performanceAcc97.pp.toFixed(1);
@@ -139,16 +143,16 @@ async function buildMap(beatmap, argValues, collection, message) {
   const acc100PP = performanceAcc100.pp.toFixed(1);
 
   //length
-  const lengthInSeconds = (beatmap.total_length / mapValues.clockRate).toFixed(0);
+  const lengthInSeconds = (beatmap?.total_length / mapValues.clockRate).toFixed(0);
   const minutes = Math.floor(lengthInSeconds / 60);
   const seconds = (lengthInSeconds % 60).toString().padStart(2, "0");
   const mapLength = `\`${minutes}:${seconds}\``;
 
   var options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-  const updatedDate = new Date(beatmap.last_updated).toLocaleDateString("en-US", options);
+  const updatedDate = new Date(beatmap?.last_updated).toLocaleDateString("en-US", options);
 
   let Updated_at;
-  switch (beatmap.status) {
+  switch (beatmap?.status) {
     case "ranked":
       Updated_at = `Ranked at ${updatedDate}`;
     case "loved":
@@ -158,36 +162,71 @@ async function buildMap(beatmap, argValues, collection, message) {
     default:
       Updated_at = `Last updated at ${updatedDate}`;
   }
+  if (!updatedDate) {
+    Updated_at = "Last updated at Unknown";
+  }
 
-  const field1 = {
-    name: `${osuEmote} **[${beatmap.version}]**`,
-    value: `Stars: [**[${starsFixed}★]**](${messageLink} \"${starsRaw}\") Mods: \`${modsUpperCase}\` BPM: \`${bpmValue}\`\nLength: ${mapLength} Max Combo: \`${beatmapMaxCombo}x\` Objects: \`${beatmapObjects}\`\nAR: \`${arValue}\` OD: \`${odValue}\` CS: \`${csValue}\` HP: \`${hpValue}\`\n\n:heart:**${beatmapFavoriteCount}** :play_pause:**${beatmapPlayCount}**`,
-  };
   const field2 = {
     name: "PP",
     value: `\`\`\`Acc | PP\n95%:  ${acc95PP}\n97%:  ${acc97PP}\n99%:  ${acc99PP}\n100%: ${acc100PP}${customAccPP}\`\`\``,
     inline: true,
   };
-  const field3 = {
-    name: "Links",
-    value: `:notes:[Song Preview](https://b.ppy.sh/preview/${beatmap.beatmapset_id}.mp3)\n🎬[Map Preview](https://osu.pages.dev/preview#${beatmap.id})\n🖼️[Full Background](https://assets.ppy.sh/beatmaps/${beatmap.beatmapset_id}/covers/raw.jpg)\n<:beatconnect:1075915329512931469>[Beatconnect](https://beatconnect.io/b/${beatmap.beatmapset_id})\n<:kitsu:1075915745973776405>[Kitsu](https://kitsu.moe/d/${beatmap.beatmapset_id})`,
-    inline: true,
-  };
 
-  //embed
-  const embed = new EmbedBuilder()
-    .setColor("Purple")
-    .setAuthor({
-      name: `Beatmap by ${beatmap.beatmapset.creator}`,
-      url: `https://osu.ppy.sh/users/${beatmap.user_id}`,
-      iconURL: `https://a.ppy.sh/${beatmap.user_id}?1668890819.jpeg`,
-    })
-    .setTitle(`${beatmap.beatmapset.artist} - ${beatmap.beatmapset.title}`)
-    .setFields(field1, field2, field3)
-    .setURL(`https://osu.ppy.sh/b/${beatmap.id}`)
-    .setImage(`https://assets.ppy.sh/beatmaps/${beatmap.beatmapset_id}/covers/cover.jpg`)
-    .setFooter({ text: Updated_at });
+  let field1, field3;
+  if (file) {
+    const regex = /\[Metadata\]\s*Title:(.*?)(?:\r?\n|\r)TitleUnicode:.*?(?:\r?\n|\r)Artist:(.*?)(?:\r?\n|\r)ArtistUnicode:.*?(?:\r?\n|\r)Creator:(.*?)(?:\r?\n|\r)Version:(.*?)(?:\r?\n|\r)/s;
 
+    const match = file.match(regex);
+    const [, title, artist, creator, version] = match;
+    const metadata = {
+      title: title.trim(),
+      artist: artist.trim(),
+      creator: creator.trim(),
+      version: version.trim(),
+    };
+
+    field1 = {
+      name: `${osuEmote} **[${metadata.version}]**`,
+      value: `Stars: [**[${starsFixed}★]**](${messageLink} \"${starsRaw}\") Mods: \`${modsUpperCase}\` BPM: \`${bpmValue}\`\nMax Combo: \`${beatmapMaxCombo}x\` Objects: \`${beatmapObjects}\`\nAR: \`${arValue}\` OD: \`${odValue}\` CS: \`${csValue}\` HP: \`${hpValue}\``,
+    };
+    field3 = {
+      name: "Links",
+      value: `**Unavailable**`,
+      inline: true,
+    };
+
+    embed = new EmbedBuilder()
+      .setColor("Purple")
+      .setAuthor({
+        name: `Beatmap by ${metadata.creator}`,
+      })
+      .setTitle(`${metadata.artist} - ${metadata.title}`)
+      .setFields(field1, field2, field3)
+      .setFooter({ text: Updated_at });
+  } else {
+    field1 = {
+      name: `${osuEmote} **[${beatmap.version}]**`,
+      value: `Stars: [**[${starsFixed}★]**](${messageLink} \"${starsRaw}\") Mods: \`${modsUpperCase}\` BPM: \`${bpmValue}\`\nLength: ${mapLength} Max Combo: \`${beatmapMaxCombo}x\` Objects: \`${beatmapObjects}\`\nAR: \`${arValue}\` OD: \`${odValue}\` CS: \`${csValue}\` HP: \`${hpValue}\`\n\n:heart:**${beatmapFavoriteCount}** :play_pause:**${beatmapPlayCount}**`,
+    };
+    field3 = {
+      name: "Links",
+      value: `:notes:[Song Preview](https://b.ppy.sh/preview/${beatmap.beatmapset_id}.mp3)\n🎬[Map Preview](https://osu.pages.dev/preview#${beatmap.id})\n🖼️[Full Background](https://assets.ppy.sh/beatmaps/${beatmap.beatmapset_id}/covers/raw.jpg)\n<:beatconnect:1075915329512931469>[Beatconnect](https://beatconnect.io/b/${beatmap.beatmapset_id})\n<:kitsu:1075915745973776405>[Kitsu](https://kitsu.moe/d/${beatmap.beatmapset_id})`,
+      inline: true,
+    };
+
+    embed = new EmbedBuilder()
+      .setColor("Purple")
+      .setAuthor({
+        name: `Beatmap by ${beatmap?.beatmapset?.creator}`,
+        url: `https://osu.ppy.sh/users/${beatmap?.user_id}`,
+        iconURL: `https://a.ppy.sh/${beatmap?.user_id}?1668890819.jpeg`,
+      })
+      .setTitle(`${beatmap?.beatmapset?.artist} - ${beatmap?.beatmapset?.title}`)
+      .setFields(field1, field2, field3)
+      .setURL(`https://osu.ppy.sh/b/${beatmap?.id}`)
+      .setImage(`https://assets.ppy.sh/beatmaps/${beatmap?.beatmapset_id}/covers/cover.jpg`)
+      .setFooter({ text: Updated_at });
+  }
   return embed;
 }
 
