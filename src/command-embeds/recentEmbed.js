@@ -80,7 +80,7 @@ async function buildRecentsEmbed(score, user, mode, index, db) {
   let retryMap = score.map((x) => x.beatmap.id);
   retryMap.splice(0, index);
 
-  const mapStatus = score[index].beatmapset.status.charAt(0).toUpperCase() + score[index].beatmapset.status.slice(1);
+  const mapStatus = score[index].beatmapset.status;
   const creatorID = score[index].beatmapset.user_id;
   const creatorName = score[index].beatmapset.creator;
 
@@ -199,7 +199,7 @@ async function buildRecentsEmbed(score, user, mode, index, db) {
   const avatarURL = user.avatar_url;
 
   const mapsetID = score[index].beatmapset.id;
-  const acc = `**(${Number(score[index].accuracy * 100).toFixed(2)}%)**`;
+  const acc = `${Number(score[index].accuracy * 100).toFixed(2)}%`;
 
   const scoreTime = new Date(score[index].created_at).getTime() / 1000;
   const grade = grades[score[index].rank];
@@ -212,23 +212,24 @@ async function buildRecentsEmbed(score, user, mode, index, db) {
       iconURL: `https://osu.ppy.sh/images/flags/${countryCode}.png`,
       url: profileURL,
     })
-    .setTitle(`${score[index].beatmapset.artist} - ${score[index].beatmapset.title} [${score[index].beatmap.version}]`)
+    .setTitle(`${score[index].beatmapset.artist} - ${score[index].beatmapset.title} [${score[index].beatmap.version}] [${maxAttrs.difficulty.stars.toFixed(2)}★]`)
     .setURL(`https://osu.ppy.sh/b/${mapID}`)
-    .setDescription(
-      `${grade} ${percentage}${ModDisplay} • **__[${maxAttrs.difficulty.stars.toFixed(2)}★]__**\n▹${pps} \n▹${totalScore} • ${acc}\n▹[ **${score[index].max_combo}**x/${
-        maxAttrs.difficulty.maxCombo
-      }x ] • ${accValues}\n▹Score Set <t:${scoreTime}:R> • **Try #${retryCounter}**`
+    .setFields(
+      {
+        name: `${grade} ${percentage}${ModDisplay}    ${totalScore}   ${acc}  <t:${scoreTime}:R>`,
+        value: `${pps}\n[ **${score[index].max_combo}**x/${maxAttrs.difficulty.maxCombo}x ] ${accValues} [ **Try #${retryCounter}** ]`,
+      },
+      {
+        name: `**Beatmap info:**`,
+        value: `BPM: \`${mapValues.bpm.toFixed()}\` Length: \`${minutesTotal}:${secondsTotal}\`\nAR: \`${mapValues.ar.toFixed(1).toString().replace(/\.0+$/, "")}\` OD: \`${mapValues.od
+          .toFixed(1)
+          .toString()
+          .replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\``,
+      }
     )
-    .setFields({
-      name: `**Beatmap info:**`,
-      value: `BPM: \`${mapValues.bpm.toFixed()}\` Objects: \`${objects.toLocaleString()}\` Length: \`${minutesTotal}:${secondsTotal}\` (\`${minutesHit}:${secondsHit}\`)\nAR: \`${mapValues.ar
-        .toFixed(1)
-        .toString()
-        .replace(/\.0+$/, "")}\` OD: \`${mapValues.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\``,
-    })
     .setImage(`https://assets.ppy.sh/beatmaps/${mapsetID}/covers/cover.jpg`)
     .setThumbnail(avatarURL)
-    .setFooter({ text: `${mapStatus} map by ${creatorName}`, iconURL: `https://a.ppy.sh/${creatorID}?1668890819.jpeg` });
+    .setFooter({ text: `by ${creatorName}, ${mapStatus}`, iconURL: `https://a.ppy.sh/${creatorID}?1668890819.jpeg` });
 
   return { embed, filterMods };
 }
