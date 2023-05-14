@@ -179,7 +179,7 @@ async function buildRecentsEmbed(score, user, mode, index, db) {
       mode: mode,
     });
 
-    ifFc = `\nIf FC: **${fcAttrs.pp.toFixed(2)}**pp for **${FcAcc.toFixed(2)}%** FC`;
+    ifFc = `If FC: **${fcAttrs.pp.toFixed(2)}**pp for **${FcAcc.toFixed(2)}%**`;
   }
 
   let hitLength = score[index].beatmap.hit_length.toFixed();
@@ -215,8 +215,8 @@ async function buildRecentsEmbed(score, user, mode, index, db) {
     .setURL(`https://osu.ppy.sh/b/${mapID}`)
     .setFields(
       {
-        name: `Try #${retryCounter}`,
-        value: `${grade} ${percentage}${ModDisplay}᲼᲼**${totalScore}᲼᲼${acc}**  <t:${scoreTime}:R>\n${ppValue}${ifFc}`,
+        name: `${grade} ${percentage}${ModDisplay}᲼**${totalScore}᲼${acc}** <t:${scoreTime}:R>`,
+        value: `${ppValue}\n${ifFc} Try #${retryCounter}`,
       },
       {
         name: `**Beatmap info:**`,
