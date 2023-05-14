@@ -74,12 +74,23 @@ for (const folder of slashFolders) {
   }
 }
 
+const refreshAuth = async () => {
+  try {
+    await auth(process.env.client_id, process.env.client_secret);
+    console.log("Refreshed osu! token");
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+refreshAuth();
+const hourInterval = 8;
+setInterval(refreshAuth, hourInterval * 60 * 60 * 1000);
+
 client.on("ready", async () => {
   try {
     await rest.put(Routes.applicationCommands(client.user.id), { body: slashCommands });
     console.log(`Logged in as ${client.user.tag}`);
-    await auth(process.env.client_id, process.env.client_secret);
-    console.log("Refreshed osu! token");
   } catch (error) {
     console.error(error);
   }
