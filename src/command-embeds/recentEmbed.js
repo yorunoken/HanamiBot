@@ -120,7 +120,7 @@ async function buildRecentsEmbed(score, user, mode, index, db) {
   let modsID = mods.id(modsName);
 
   if (!modsName.length) {
-    ModDisplay = "";
+    ModDisplay = "**+NM**";
     modsID = 0;
   }
 
@@ -159,12 +159,13 @@ async function buildRecentsEmbed(score, user, mode, index, db) {
   let fraction = objectshit / objects;
   let percentageRaw = Number((fraction * 100).toFixed(2));
   let percentageNum = percentageRaw.toFixed(1);
-  let percentage = `**(${percentageNum}%)** `;
+  let percentage = `(${percentageNum}%) `;
   if (percentageNum == "100.0" || score[index].passed == true) {
     percentage = " ";
   }
 
-  pps = `**${curAttrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}pp`;
+  let ppValue = `**${curAttrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}pp [ **${score[index].max_combo}**x/${maxAttrs.difficulty.maxCombo}x ] ${accValues}`;
+  let ifFc = "";
   if (curAttrs.effectiveMissCount > 0) {
     Map300CountFc = objects - value100 - value50;
 
@@ -178,7 +179,7 @@ async function buildRecentsEmbed(score, user, mode, index, db) {
       mode: mode,
     });
 
-    pps = `**${curAttrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}pp ▹ (**${fcAttrs.pp.toFixed(2)}**pp for **${FcAcc.toFixed(2)}%**)`;
+    ifFc = `\nIf FC: **${fcAttrs.pp.toFixed(2)}**pp for **${FcAcc.toFixed(2)}%** FC`;
   }
 
   let hitLength = score[index].beatmap.hit_length.toFixed();
@@ -188,9 +189,6 @@ async function buildRecentsEmbed(score, user, mode, index, db) {
     totalLength = (totalLength / 1.5).toFixed();
   }
 
-  //length
-  let minutesHit = Math.floor(hitLength / 60).toFixed();
-  let secondsHit = (hitLength % 60).toString().padStart(2, "0");
   let minutesTotal = Math.floor(totalLength / 60).toFixed();
   let secondsTotal = (totalLength % 60).toString().padStart(2, "0");
 
@@ -209,15 +207,16 @@ async function buildRecentsEmbed(score, user, mode, index, db) {
     .setColor("Purple")
     .setAuthor({
       name: `${user.username} ${userPP}pp (#${globalRank} ${countryCode}#${countryRank}) `,
-      iconURL: `https://osu.ppy.sh/images/flags/${countryCode}.png`,
+      // iconURL: `https://osu.ppy.sh/images/flags/${countryCode}.png`,
+      iconURL: avatarURL,
       url: profileURL,
     })
     .setTitle(`${score[index].beatmapset.artist} - ${score[index].beatmapset.title} [${score[index].beatmap.version}] [${maxAttrs.difficulty.stars.toFixed(2)}★]`)
     .setURL(`https://osu.ppy.sh/b/${mapID}`)
     .setFields(
       {
-        name: `${grade} ${percentage}${ModDisplay}    ${totalScore}   ${acc}  <t:${scoreTime}:R>`,
-        value: `${pps}\n[ **${score[index].max_combo}**x/${maxAttrs.difficulty.maxCombo}x ] ${accValues} [ **Try #${retryCounter}** ]`,
+        name: `Try #${retryCounter}`,
+        value: `${grade} ${percentage}${ModDisplay}᲼᲼**${totalScore}᲼᲼${acc}**  <t:${scoreTime}:R>\n${ppValue}${ifFc}`,
       },
       {
         name: `**Beatmap info:**`,
@@ -227,8 +226,7 @@ async function buildRecentsEmbed(score, user, mode, index, db) {
           .replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\``,
       }
     )
-    .setImage(`https://assets.ppy.sh/beatmaps/${mapsetID}/covers/cover.jpg`)
-    .setThumbnail(avatarURL)
+    .setThumbnail(`https://assets.ppy.sh/beatmaps/${mapsetID}/covers/list.jpg`)
     .setFooter({ text: `by ${creatorName}, ${mapStatus}`, iconURL: `https://a.ppy.sh/${creatorID}?1668890819.jpeg` });
 
   return { embed, filterMods };

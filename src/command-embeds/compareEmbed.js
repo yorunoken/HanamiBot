@@ -5,7 +5,7 @@ const { Downloader, DownloadEntry } = require("osu-downloader");
 const { tools } = require("../utils/tools.ts");
 const { mods } = require("../utils/mods.js");
 
-async function buildCompareEmbed(tops, user, pageNumber, mode, index, reverse, db, beatmap) {
+async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, db, beatmap) {
   const collection = db.collection("map_cache"); // initialize map cache collection
 
   const start = (pageNumber - 1) * 5 + 1;
@@ -42,9 +42,9 @@ async function buildCompareEmbed(tops, user, pageNumber, mode, index, reverse, d
   const userURL = `https://osu.ppy.sh/users/${user.id}/osu`;
 
   if (reverse) {
-    tops.sort((b, a) => new Date(b.pp) - new Date(a.pp));
+    score.sort((b, a) => new Date(b.pp) - new Date(a.pp));
   } else {
-    tops.sort((b, a) => new Date(a.pp) - new Date(b.pp));
+    score.sort((b, a) => new Date(a.pp) - new Date(b.pp));
   }
 
   //define the grades
@@ -60,7 +60,7 @@ async function buildCompareEmbed(tops, user, pageNumber, mode, index, reverse, d
     XH: "<:XH_:1057763296717045891>",
   };
 
-  const scores = [...tops];
+  const scores = [...score];
 
   const mapID = beatmap.id;
 
@@ -151,7 +151,7 @@ async function buildCompareEmbed(tops, user, pageNumber, mode, index, reverse, d
     const maxComboMap = maxAttrs.difficulty.maxCombo;
 
     let first_row = `**${playRank}. +${modsName}** [${stars}★]\n`;
-    let second_row = `${grade} ▹ **${curAttrs.pp.toFixed(2)}PP** ▹ ${acc} ▹ [**${Number(score.max_combo)}x**/${maxComboMap}x]\n`;
+    let second_row = `${grade} ▹ **${curAttrs.pp.toFixed(2)}PP** ${acc} [**${Number(score.max_combo)}x**/${maxComboMap}x]\n`;
     let third_row = `${score.score.toLocaleString()} ▹ ${accValues} <t:${scoreTime}:R>`;
     let fourth_row = "";
     let fifth_row = "";
@@ -233,13 +233,13 @@ async function buildCompareEmbed(tops, user, pageNumber, mode, index, reverse, d
   }
 
   if (index) {
-    if (index > tops.length) {
-      const embed = new EmbedBuilder().setColor("Purple").setDescription(`Please provide a number not greater than ${tops.length}`);
+    if (index > score.length) {
+      const embed = new EmbedBuilder().setColor("Purple").setDescription(`Please provide a number not greater than ${score.length}`);
       return embed;
     }
 
-    const setID = tops[index - 1].beatmapset.id;
-    const scoreinfo = await getScoreEach(tops[index - 1]);
+    const setID = score[index - 1].beatmapset.id;
+    const scoreinfo = await getScoreEach(score[index - 1]);
 
     const embed = new EmbedBuilder()
       .setColor("Purple")
@@ -257,7 +257,7 @@ async function buildCompareEmbed(tops, user, pageNumber, mode, index, reverse, d
 
     return embed;
   }
-  const totalPage = Math.ceil(tops.length / 5);
+  const totalPage = Math.ceil(score.length / 5);
 
   if (pageNumber > totalPage) {
     const embed = new EmbedBuilder().setColor("Purple").setDescription(`Please provide a value not greater than ${totalPage}`);
@@ -266,8 +266,8 @@ async function buildCompareEmbed(tops, user, pageNumber, mode, index, reverse, d
 
   const things = [];
   for (const index of indices) {
-    if (tops[index]) {
-      things.push(`${(await getScoreEach(tops[index])).rows}\n`);
+    if (score[index]) {
+      things.push(`${(await getScoreEach(score[index])).rows}\n`);
     } else {
       things.push("");
     }
