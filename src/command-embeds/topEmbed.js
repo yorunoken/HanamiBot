@@ -156,11 +156,15 @@ async function buildTopsEmbed(tops, user, pageNumber, mode, index, reverse, rece
     const stars = maxAttrs.difficulty.stars.toFixed(2);
     const maxComboMap = maxAttrs.difficulty.maxCombo;
 
+    let ppShown = `**${curAttrs.pp.toFixed(2)}pp**`;
+    if (curAttrs.effectiveMissCount > 0) {
+      ppShown = `**${curAttrs.pp.toFixed(2)}pp** [**~~${fcAttrs.pp.toFixed(2)}pp~~**]`;
+    }
+
     let first_row = `**${playRank}.** [**${mapTitle} [${score.beatmap.version}]**](https://osu.ppy.sh/b/${mapID}) **+${modsName}** [${stars}★]\n`;
-    let second_row = `${grade} ▹ **${curAttrs.pp.toFixed(2)}PP** ▹ ${acc} ▹ [**${Number(score.max_combo)}x**/${maxComboMap}x]\n`;
+    let second_row = `${grade} ${ppShown} ${acc} [**${Number(score.max_combo)}x**/${maxComboMap}x]\n`;
     let third_row = `${score.score.toLocaleString()} ▹ ${accValues} <t:${scoreTime}:R>`;
     let fourth_row = "";
-    let fifth_row = "";
 
     let fields = "";
     let footer = "";
@@ -219,8 +223,7 @@ async function buildTopsEmbed(tops, user, pageNumber, mode, index, reverse, rece
       first_row = `__**Personal Best #${playRank}:**__\n`;
       second_row = `${grade} ** +${modsName}** • ${score.score.toLocaleString()} • **${acc}**\n`;
       third_row = `${pps}\n`;
-      fourth_row = `[**${score.max_combo}**x/${curAttrs.difficulty.maxCombo}x] • ${accValues}\n`;
-      fifth_row = `Score Set <t:${scoreTime}:R>`;
+      fourth_row = `[**${score.max_combo}**x/${curAttrs.difficulty.maxCombo}x] • ${accValues} <t:${scoreTime}:R>`;
 
       title = Title;
       url = `https://osu.ppy.sh/b/${score.beatmap.id}`;
@@ -234,7 +237,7 @@ async function buildTopsEmbed(tops, user, pageNumber, mode, index, reverse, rece
       footer = { text: `${status} map by ${creator}`, iconURL: `https://a.ppy.sh/${creator_id}?1668890819.jpeg` };
     }
 
-    const rows = `${first_row}${second_row}${third_row}${fourth_row}${fifth_row}`;
+    const rows = `${first_row}${second_row}${third_row}${fourth_row}`;
 
     return { rows, title, url, fields, footer };
   }
