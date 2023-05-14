@@ -2,10 +2,10 @@ const { buildTopsEmbed } = require("../../../command-embeds/topEmbed");
 const { EmbedBuilder } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernamePrefix");
 
-async function run(message, username, mode, options, db) {
+async function run(message, username, mode, options, db, i) {
   await message.channel.sendTyping();
 
-  const index = options.index ?? options.i ?? undefined;
+  const index = i ?? undefined;
   const page = options.page ?? options.p ?? 1;
   const recent = false;
   const reverse = false;
@@ -53,7 +53,7 @@ module.exports = {
   name: "top",
   aliases: ["top", "t"],
   cooldown: 5000,
-  run: async (client, message, args, prefix, db) => {
+  run: async (client, message, args, prefix, db, index) => {
     const collection = db.collection("user_data");
     const username = await getUsername(message, args, collection);
     if (!username) return;
@@ -62,7 +62,7 @@ module.exports = {
     const modes = wanted.filter((word) => args.indexOf(word) >= 0).map((word) => word.replace("-", ""));
     const mode = modes[0] ?? "osu";
 
-    wanted = ["-p", "-page", "-i", "-index"];
+    wanted = ["-p", "-page"];
     let options = [];
     wanted.forEach((word) => {
       if (args.includes(word)) {
@@ -72,6 +72,6 @@ module.exports = {
       }
     });
 
-    await run(message, username, mode, options, db);
+    await run(message, username, mode, options, db, index);
   },
 };

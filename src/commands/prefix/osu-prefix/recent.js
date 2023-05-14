@@ -2,10 +2,10 @@ const { buildRecentsEmbed } = require("../../../command-embeds/recentEmbed");
 const { EmbedBuilder } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernamePrefix");
 
-async function run(message, username, mode, options, db) {
+async function run(message, username, mode, db, i) {
   await message.channel.sendTyping();
 
-  const index = options.index ?? options.i ?? 1;
+  const index = i ?? 1;
   const pass = false;
 
   const user = await getUser(username, mode);
@@ -58,7 +58,7 @@ module.exports = {
   name: "recent",
   aliases: ["rs", "recent", "r"],
   cooldown: 5000,
-  run: async (client, message, args, prefix, db) => {
+  run: async (client, message, args, prefix, db, index) => {
     const collection = db.collection("user_data");
 
     const username = await getUsername(message, args, collection);
@@ -72,16 +72,6 @@ module.exports = {
     // const passes = wanted.filter((word) => args.indexOf(word) >= 0)
     // const pass = passes[0] ?? false;
 
-    const newWanted = ["-i", "-index"];
-    let options = {};
-    newWanted.forEach((word) => {
-      if (args.includes(word)) {
-        const key = word.replace("-", "");
-        const value = args[args.indexOf(word) + 1];
-        options[key] = value;
-      }
-    });
-
-    await run(message, username, mode, options, db);
+    await run(message, username, mode, db, index);
   },
 };
