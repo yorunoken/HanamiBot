@@ -174,15 +174,18 @@ async function buildMap(beatmap, argValues, collection, messageLink, file) {
 
   let field1, field3;
   if (file) {
-    const regex = /\[Metadata\]\s*Title:(.*?)(?:\r?\n|\r)TitleUnicode:.*?(?:\r?\n|\r)Artist:(.*?)(?:\r?\n|\r)ArtistUnicode:.*?(?:\r?\n|\r)Creator:(.*?)(?:\r?\n|\r)Version:(.*?)(?:\r?\n|\r)/s;
+    const regex = /\[Metadata\]\s*Title:(.*?)(?:\r?\n|\r)TitleUnicode:(.*?)(?:\r?\n|\r)?(?:Artist:(.*?)(?:\r?\n|\r))?ArtistUnicode:(.*?)(?:\r?\n|\r)?(?:Creator:(.*?)(?:\r?\n|\r))?Version:(.*?)(?:\r?\n|\r)/s;
 
     const match = file.match(regex);
     const [, title, artist, creator, version] = match;
+    if (!match) {
+      return new EmbedBuilder().setDescription("Your .osu file has no metadata values.");
+    }
     const metadata = {
-      title: title.trim(),
-      artist: artist.trim(),
-      creator: creator.trim(),
-      version: version.trim(),
+      title: title ? title.trim() : "",
+      artist: artist ? artist.trim() : "",
+      creator: creator ? creator.trim() : "",
+      version: version ? version.trim() : "",
     };
 
     field1 = {
