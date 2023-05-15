@@ -10,7 +10,6 @@ const axios = require("axios");
 
 async function run(client, interaction, db) {
   await interaction.deferReply();
-  console.log("deffered");
   let page = interaction.options.getInteger("page") ?? 1;
 
   const collection = db.collection("map_cache");

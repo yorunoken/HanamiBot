@@ -46,7 +46,6 @@ async function buildRecentsEmbed(score, user, mode, index, db) {
       rulesetID = 1;
       break;
   }
-  console.log(score);
 
   let modsName = score[index].mods.join("").toUpperCase();
 

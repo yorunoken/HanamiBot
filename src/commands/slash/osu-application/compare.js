@@ -121,7 +121,6 @@ function findBeatmapID(embed) {
     }
   }
 
-  console.log(beatmapID);
   if (!beatmapIDFound) {
     return false;
   }

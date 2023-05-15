@@ -34,7 +34,6 @@ module.exports = {
   cooldown: 5000,
   run: async (client, message, args, prefix, db) => {
     const collection = db.collection("user_data");
-    console.log("----------");
 
     const username = await getUsername(message, args, collection);
     if (!username) return;

@@ -8,7 +8,6 @@ const fs = require("fs");
 
 async function config(interaction) {
   const subCommands = interaction.options.getSubcommand(false);
-  console.log(subCommands);
 
   switch (subCommands) {
     case "level":
