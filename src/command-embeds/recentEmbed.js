@@ -215,7 +215,7 @@ async function buildRecentsEmbed(score, user, mode, index, db) {
     .setURL(`https://osu.ppy.sh/b/${mapID}`)
     .setFields(
       {
-        name: `${grade} ${percentage}${ModDisplay}᲼**${totalScore}᲼${acc}** <t:${scoreTime}:R>`,
+        name: `${grade} ${percentage}${ModDisplay} **${totalScore} ${acc}** <t:${scoreTime}:R>`,
         value: `${ppValue}\n${ifFc} Try #${retryCounter}`,
       },
       {
