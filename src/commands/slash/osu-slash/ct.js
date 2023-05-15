@@ -24,7 +24,7 @@ async function run(client, interaction, db) {
 
   let beatmapID = interaction.options.getString("link");
   if (beatmapID) {
-    const regex = /\d+/;
+    const regex = /\d+$/;
     beatmapID = beatmapID.match(regex)[0];
   } else {
     beatmapID = await cycleThroughEmbeds(client, interaction);
