@@ -26,8 +26,6 @@ async function run(client, interaction, db) {
   const message = await interaction.channel.messages.fetch(messageId);
   const user = message.author;
 
-  console.log(message);
-
   let embeds = [];
   if (message.embeds && message.content.trim() === "") {
     const embed = message.embeds[0];

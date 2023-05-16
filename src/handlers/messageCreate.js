@@ -20,7 +20,7 @@ module.exports = {
 
     const document = await collection.findOne({ _id: message.guildId });
     let prefix = "!";
-    if (document) {
+    if (document.prefix) {
       prefix = document.prefix;
     }
     if (!message.content.startsWith(prefix)) return;
