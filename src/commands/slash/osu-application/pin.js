@@ -28,22 +28,41 @@ async function run(client, interaction, db) {
 
   let embeds = [];
   if (message.embeds && message.content.trim() === "") {
-    const embed = message.embeds[0];
-    embeds.push(new EmbedBuilder().setColor("Random").addFields({ name: "Source", value: `[Go to message](https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${messageId})` }), embed);
+    if (!message.embeds[0]) {
+      embeds.push(
+        new EmbedBuilder()
+          .setAuthor({ name: user.tag, iconURL: user.avatarURL({ size: 128 }) })
+          .setColor("Random")
+          .setURL("https://yoru.com.tr")
+          .addFields({ name: "Source", value: `[Go to message](https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${messageId})` })
+      );
+    } else {
+      embeds.push(
+        new EmbedBuilder()
+          .setAuthor({ name: user.tag, iconURL: user.avatarURL({ size: 128 }) })
+          .setColor("Random")
+          .setURL("https://yoru.com.tr")
+          .addFields({ name: "Source", value: `[Go to message](https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${messageId})` }),
+        message.embeds[0]
+      );
+    }
   } else {
     embeds.push(
       new EmbedBuilder()
         .setColor("Random")
         .setURL("https://yoru.com.tr")
         .setAuthor({ name: user.tag, iconURL: user.avatarURL({ size: 128 }) })
-        .setDescription(message.content.length > 0 ? message.content : "\u200B")
+        .setDescription(message.content.trim().length > 0 ? message.content : "\u200B")
         .addFields({ name: "Source", value: `[Go to message](https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${messageId})` })
     );
   }
 
   if (message.attachments) {
-    message.attachments.map((x) => embeds.push(new EmbedBuilder().setURL("https://yoru.com.tr").setImage(x.url)));
+    message.attachments.map((x) => {
+      embeds.push(new EmbedBuilder().setURL("https://yoru.com.tr").setImage(x.url));
+    });
   }
+  console.log(embeds);
 
   channel.send({ embeds: embeds });
   interaction.editReply({ embeds: [new EmbedBuilder().setDescription(`<@${interaction.user.id}> pinned [a message](https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${messageId})`)] });
