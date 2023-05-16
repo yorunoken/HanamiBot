@@ -1,11 +1,16 @@
-const { Collection } = require("discord.js");
+const { Collection, Message } = require("discord.js");
 const ms = require("ms");
 const cooldown = new Collection();
 
 module.exports = {
   name: "messageCreate",
+  /**
+   *
+   * @param {Message} message
+   * @returns
+   */
   execute: async (message, db) => {
-    const collection = db.collection("server_prefixes");
+    const collection = db.collection("server_config");
 
     const client = message.client;
     if (message.author.bot) return;
@@ -13,10 +18,10 @@ module.exports = {
     if (message.content === ":3") return message.channel.send("3:");
     if (message.content === "3:") return message.channel.send(":3");
 
-    const guildPrefix = await collection.findOne({ [`${message.guildId}`]: { $exists: true } });
+    const document = await collection.findOne({ _id: message.guildId });
     let prefix = "!";
-    if (guildPrefix) {
-      prefix = guildPrefix[message.guildId];
+    if (document) {
+      prefix = document.prefix;
     }
     if (!message.content.startsWith(prefix)) return;
 

@@ -64,7 +64,7 @@ async function run(interaction, username, db) {
           row = new ActionRowBuilder().addComponents(prevPage, nextPage);
         }
 
-        await i.update({ content: "updating...", components: [_row] });
+        await i.update({ components: [_row] });
         const embed = await buildRecentsEmbed(recents, user, mode, index - 1, db);
         await interaction.editReply({ content: "", embeds: [embed.embed], components: [row] });
       } else if (i.customId == "prev") {
@@ -82,7 +82,7 @@ async function run(interaction, username, db) {
           row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled().setDisabled(false));
         }
 
-        await i.update({ content: "updating...", components: [_row] });
+        await i.update({ components: [_row] });
         const embed = await buildRecentsEmbed(recents, user, mode, index - 1, db);
         await interaction.editReply({ content: "", embeds: [embed.embed], components: [row] });
       }

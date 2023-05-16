@@ -2,20 +2,17 @@ const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require("disc
 
 async function run(interaction, db) {
   await interaction.deferReply();
-  const collection = db.collection("server_prefixes");
+  const collection = db.collection("server_config");
 
-  const currentPrefix = await collection.findOne({ [`${interaction.guildId}`]: { $exists: true } });
-  let oldPrefix = "NONE";
-  if (currentPrefix) {
-    oldPrefix = currentPrefix[interaction.guildId];
+  const document = await collection.findOne({ _id: interaction.guildId });
+  let oldPrefix = "null";
+  if (document?.prefix) {
+    oldPrefix = document.prefix;
   }
 
   const newPrefix = interaction.options.getString("prefix");
 
-  const update = { $set: { [`${interaction.guildId}`]: newPrefix } };
-  const options = { upsert: true };
-
-  await collection.updateOne({}, update, options);
+  await collection.updateOne({ _id: interaction.guildId }, { $set: { prefix: newPrefix } }, { upsert: true });
 
   const embed = new EmbedBuilder().setTitle("Successful!").setColor("Green").setDescription(`The server prefix has been changed from \`${oldPrefix}\` to \`${newPrefix}\``);
   interaction.editReply({ embeds: [embed] });
