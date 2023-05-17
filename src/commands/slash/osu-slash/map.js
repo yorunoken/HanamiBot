@@ -34,7 +34,6 @@ async function run(client, interaction, collection) {
     interaction.editReply({ embeds: [embed] });
     return;
   }
-  EmbedValue = 0;
   const link = interaction.options.getString("link");
 
   const regex = /\/osu\.ppy\.sh\/(b|beatmaps|beatmapsets)\/\d+/;

@@ -6,9 +6,6 @@ const { getUsername } = require("../../../utils/getUsernameInteraction");
 async function run(interaction, username, db, client) {
   await interaction.deferReply();
 
-  GoodToGo = false;
-  EmbedValue = 0;
-
   const index = interaction.options.getInteger("index") ?? undefined;
   const page = 1;
   const reverse = interaction.options.getBoolean("reverse") ?? false;
@@ -99,7 +96,6 @@ function findID(embed) {
       beatmapID = embed.url.match(/\d+/)[0];
       if (beatmapID !== undefined) {
         beatmapIDFound = true;
-        GoodToGo = true;
       }
     }
   }
@@ -109,7 +105,6 @@ function findID(embed) {
       beatmapID = embed.description.match(/\d+/)[0];
       if (beatmapID !== undefined) {
         beatmapIDFound = true;
-        GoodToGo = true;
       }
     }
   }
@@ -119,14 +114,11 @@ function findID(embed) {
       beatmapID = embed.author?.url.match(/\d+/)[0];
       if (beatmapID !== undefined) {
         beatmapIDFound = true;
-        GoodToGo = true;
       }
     }
   }
 
   if (!beatmapIDFound) {
-    EmbedValue++;
-    GoodToGo = false;
     return false;
   }
   return beatmapID;

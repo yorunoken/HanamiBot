@@ -132,7 +132,6 @@ function findID(embed) {
       beatmapID = embed.url.match(/\d+/)[0];
       if (beatmapID !== undefined) {
         beatmapIDFound = true;
-        GoodToGo = true;
       }
     }
   }
@@ -142,7 +141,6 @@ function findID(embed) {
       beatmapID = embed.description.match(/\d+/)[0];
       if (beatmapID !== undefined) {
         beatmapIDFound = true;
-        GoodToGo = true;
       }
     }
   }
@@ -152,14 +150,11 @@ function findID(embed) {
       beatmapID = embed.author?.url.match(/\d+/)[0];
       if (beatmapID !== undefined) {
         beatmapIDFound = true;
-        GoodToGo = true;
       }
     }
   }
 
   if (!beatmapIDFound) {
-    EmbedValue++;
-    GoodToGo = false;
     return false;
   }
   return beatmapID;

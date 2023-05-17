@@ -9,8 +9,6 @@ const { database } = require("../../../../index.js"); // we import our database 
 
 async function run(message, db, client, args) {
   await message.channel.sendTyping();
-  GoodToGo = false;
-  EmbedValue = 0;
   const regex = /\/osu\.ppy\.sh\/(b|beatmaps|beatmapsets)\/\d+/;
 
   let beatmapID;
@@ -93,7 +91,6 @@ function findID(embed) {
       beatmapID = embed.url.match(/\d+/)[0];
       if (beatmapID !== undefined) {
         beatmapIDFound = true;
-        GoodToGo = true;
       }
     }
   }
@@ -103,7 +100,6 @@ function findID(embed) {
       beatmapID = embed.description.match(/\d+/)[0];
       if (beatmapID !== undefined) {
         beatmapIDFound = true;
-        GoodToGo = true;
       }
     }
   }
@@ -113,14 +109,11 @@ function findID(embed) {
       beatmapID = embed.author.url.match(/\d+/)[0];
       if (beatmapID !== undefined) {
         beatmapIDFound = true;
-        GoodToGo = true;
       }
     }
   }
 
   if (!beatmapIDFound) {
-    EmbedValue++;
-    GoodToGo = false;
     return false;
   }
   return beatmapID;
