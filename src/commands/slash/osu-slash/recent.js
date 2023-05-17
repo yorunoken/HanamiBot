@@ -30,22 +30,24 @@ async function run(interaction, username, db) {
 
   const nextPage = new ButtonBuilder().setCustomId("next").setLabel("➡️").setStyle(ButtonStyle.Secondary);
   const prevPage = new ButtonBuilder().setCustomId("prev").setLabel("⬅️").setStyle(ButtonStyle.Secondary);
-  let row = new ActionRowBuilder().addComponents(prevPage, nextPage);
+  let row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(true));
 
   if (index === 1) {
-    row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled().setDisabled(false));
-  } else if (recents.length <= 5) {
+    if (recents.length > 5) {
+      row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(false));
+    }
+  } else if (recents.length <= 1) {
     row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(true));
-  } else if (index === Math.ceil(recents.length) / 5) {
+  } else if (index === recents.length) {
     row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
-  } else if (index !== Math.ceil(recents.length) / 5) {
+  } else {
     row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
   }
 
   const now3 = Date.now();
   const embed = await buildRecentsEmbed(recents, user, mode, index - 1, db);
   console.log(`got embed in ${Date.now() - now3}ms`);
-  const response = await interaction.editReply({ content: "", embeds: [embed.embed], components: [row] });
+  const response = await interaction.editReply({ embeds: [embed.embed], components: [row] });
 
   const filter = (i) => i.user.id === interaction.user.id;
   const collector = response.createMessageComponentCollector({ time: 35000, filter: filter });
@@ -53,38 +55,31 @@ async function run(interaction, username, db) {
   collector.on("collect", async (i) => {
     try {
       if (i.customId == "next") {
-        if (!(index + 1 > recents.length)) {
+        if (!(index + 1 > Math.ceil(score.length / 5))) {
           index++;
-          row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage);
-        }
-        if (index === recents.length) {
-          row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
-        }
-        if (index !== recents.length) {
-          row = new ActionRowBuilder().addComponents(prevPage, nextPage);
+          if (index === Math.ceil(score.length / 5)) {
+            row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
+          } else {
+            row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
+          }
         }
 
         await i.update({ components: [_row] });
         const embed = await buildRecentsEmbed(recents, user, mode, index - 1, db);
-        await interaction.editReply({ content: "", embeds: [embed.embed], components: [row] });
+        await interaction.editReply({ embeds: [embed.embed], components: [row] });
       } else if (i.customId == "prev") {
-        if (!(0 >= index)) {
+        if (!(index <= 1)) {
           index--;
-          row = new ActionRowBuilder().addComponents(prevPage, nextPage);
-        }
-        if (index === Math.ceil(recents.length) / 5) {
-          row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
-        }
-        if (index !== Math.ceil(recents.length) / 5) {
-          row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
-        }
-        if (index === 1) {
-          row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled().setDisabled(false));
+          if (index === 1) {
+            row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(false));
+          } else {
+            row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
+          }
         }
 
         await i.update({ components: [_row] });
         const embed = await buildRecentsEmbed(recents, user, mode, index - 1, db);
-        await interaction.editReply({ content: "", embeds: [embed.embed], components: [row] });
+        await interaction.editReply({ embeds: [embed.embed], components: [row] });
       }
     } catch (e) {}
   });

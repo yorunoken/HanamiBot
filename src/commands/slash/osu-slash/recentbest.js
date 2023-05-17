@@ -28,15 +28,17 @@ async function run(interaction, username, db) {
 
   const nextPage = new ButtonBuilder().setCustomId("next").setLabel("➡️").setStyle(ButtonStyle.Secondary);
   const prevPage = new ButtonBuilder().setCustomId("prev").setLabel("⬅️").setStyle(ButtonStyle.Secondary);
-  let row = new ActionRowBuilder().addComponents(prevPage, nextPage.setDisabled());
+  let row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(true));
 
   if (page === 1) {
-    row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled().setDisabled(false));
+    if (tops.length > 5) {
+      row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(false));
+    }
   } else if (tops.length <= 5) {
     row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(true));
-  } else if (page === Math.ceil(tops.length) / 5) {
+  } else if (page === Math.ceil(tops.length / 5)) {
     row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
-  } else if (page !== Math.ceil(tops.length) / 5) {
+  } else {
     row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
   }
 
@@ -49,38 +51,31 @@ async function run(interaction, username, db) {
   collector.on("collect", async (i) => {
     try {
       if (i.customId == "next") {
-        if (!(page + 1 > Math.ceil(tops.length) / 5)) {
+        if (!(page + 1 > Math.ceil(tops.length / 5))) {
           page++;
-          row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage);
-        }
-        if (page === Math.ceil(tops.length) / 5) {
-          row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
-        }
-        if (page !== Math.ceil(tops.length) / 5) {
-          row = new ActionRowBuilder().addComponents(prevPage, nextPage);
+          if (page === Math.ceil(tops.length / 5)) {
+            row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
+          } else {
+            row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
+          }
         }
 
-        await i.update({ content: "updating...", components: [_row] });
+        await i.update({ components: [_row] });
         const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent, db);
-        await interaction.editReply({ content: "", embeds: [embed], components: [row] });
+        await interaction.editReply({ embeds: [embed], components: [row] });
       } else if (i.customId == "prev") {
-        if (!(0 >= page)) {
+        if (!(page <= 1)) {
           page--;
-          row = new ActionRowBuilder().addComponents(prevPage, nextPage);
-        }
-        if (page === Math.ceil(tops.length) / 5) {
-          row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
-        }
-        if (page !== Math.ceil(tops.length) / 5) {
-          row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
-        }
-        if (page === 1) {
-          row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled().setDisabled(false));
+          if (page === 1) {
+            row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(false));
+          } else {
+            row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
+          }
         }
 
-        await i.update({ content: "updating...", components: [_row] });
+        await i.update({ components: [_row] });
         const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent, db);
-        await interaction.editReply({ content: "", embeds: [embed], components: [row] });
+        await interaction.editReply({ embeds: [embed], components: [row] });
       }
     } catch (e) {
       console.error(e);

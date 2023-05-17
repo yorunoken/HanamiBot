@@ -1,12 +1,12 @@
 const { buildTopsEmbed } = require("../../../command-embeds/topEmbed");
-const { EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernamePrefix");
 
 async function run(message, username, mode, options, db, i) {
   await message.channel.sendTyping();
 
   const index = i ?? undefined;
-  const page = options.page ?? options.p ?? 1;
+  let page = options.page ?? options.p ?? 1;
   const recent = false;
   const reverse = false;
 
@@ -21,8 +21,69 @@ async function run(message, username, mode, options, db, i) {
     return;
   }
 
+  const _ = new ButtonBuilder().setCustomId("next").setLabel("➡️").setStyle(ButtonStyle.Secondary).setDisabled(true);
+  const _b = new ButtonBuilder().setCustomId("prev").setLabel("⬅️").setStyle(ButtonStyle.Secondary).setDisabled(true);
+  let _row = new ActionRowBuilder().addComponents(_b, _);
+
+  const nextPage = new ButtonBuilder().setCustomId("next").setLabel("➡️").setStyle(ButtonStyle.Secondary);
+  const prevPage = new ButtonBuilder().setCustomId("prev").setLabel("⬅️").setStyle(ButtonStyle.Secondary);
+  let row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(true));
+
+  if (page === 1) {
+    if (tops.length > 5) {
+      row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(false));
+    }
+  } else if (tops.length <= 5) {
+    row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(true));
+  } else if (page === Math.ceil(tops.length / 5)) {
+    row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
+  } else {
+    row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
+  }
+
   const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent, db);
-  message.channel.send({ embeds: [embed] });
+  const response = await message.channel.send({ embeds: [embed], components: [row] });
+
+  const filter = (i) => i.user.id === message.author.id;
+  const collector = response.createMessageComponentCollector({ time: 35000, filter: filter });
+
+  collector.on("collect", async (i) => {
+    try {
+      if (i.customId == "next") {
+        if (!(page + 1 > Math.ceil(tops.length / 5))) {
+          page++;
+          if (page === Math.ceil(tops.length / 5)) {
+            row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
+          } else {
+            row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
+          }
+        }
+
+        await i.update({ components: [_row] });
+        const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent, db);
+        await response.edit({ embeds: [embed], components: [row] });
+      } else if (i.customId == "prev") {
+        if (!(page <= 1)) {
+          page--;
+          if (page === 1) {
+            row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(false));
+          } else {
+            row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
+          }
+        }
+
+        await i.update({ components: [_row] });
+        const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent, db);
+        await response.edit({ embeds: [embed], components: [row] });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  });
+
+  collector.on("end", async (i) => {
+    await response.edit({ components: [] });
+  });
 }
 
 async function getTops(user, mode) {
