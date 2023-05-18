@@ -48,7 +48,6 @@ async function run(message, username, mode, db, i) {
   collector.on("collect", async (i) => {
     try {
       if (i.customId == "next") {
-        console.log(index, recents.length); // returns 2, 14
         if (index + 1 < recents.length) {
           index++;
           if (index === recents.length) {
@@ -57,7 +56,6 @@ async function run(message, username, mode, db, i) {
             row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
           }
         }
-        console.log("done");
 
         await i.update({ components: [_row] });
         const embed = await buildRecentsEmbed(recents, user, mode, index - 1, db);

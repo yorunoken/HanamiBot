@@ -12,25 +12,21 @@ async function getUsername(message, args, collection, client) {
     return true;
   });
 
-  const users = (await collection.findOne({})).users;
-
   const argsJoined = args.join(" ");
-
   let user;
-
-  user = getByString(argsJoined, users, message);
+  user = await getByTag(argsJoined, collection);
   if (user) {
     console.log(`got user in ${Date.now() - now}ms`);
     return user;
   }
 
-  user = getByTag(argsJoined, users);
+  user = await getByID(argsJoined, collection);
   if (user) {
     console.log(`got user in ${Date.now() - now}ms`);
     return user;
   }
 
-  user = getByID(argsJoined, users);
+  user = await getByString(argsJoined, collection, message);
   if (user) {
     console.log(`got user in ${Date.now() - now}ms`);
     return user;
@@ -40,60 +36,41 @@ async function getUsername(message, args, collection, client) {
   return false;
 }
 
-function getByString(user, users, message) {
+async function getByTag(user, collection) {
+  const regex = /<@(\d+)>/;
+  const match = user.match(regex);
+  if (match) {
+    const userID = match[1];
+    const userData = await collection.findOne({ _id: userID });
+    user = userData.BanchoUserId ?? false;
+    return user;
+  }
+  return undefined;
+}
+
+async function getByID(user, collection) {
+  const regex = /.*(\d{17,}).*/;
+  if (regex.test(user)) {
+    const userID = user.match(/\d+/)[0];
+    const userData = await collection.findOne({ _id: userID });
+    user = userData.BanchoUserId ?? false;
+
+    return user;
+  }
+  return undefined;
+}
+
+async function getByString(user, collection, message) {
   if (!user || user.length === 0) {
     const userID = message.author.id;
-    try {
-      user =
-        users[userID].BanchoUserId ??
-        (() => {
-          throw new Error("no userarg");
-        })();
-    } catch (err) {
-      return false;
-    }
+    const userData = await collection.findOne({ _id: userID });
+
+    user = userData.BanchoUserId ?? false;
     return user;
   }
 
   user = user.replace(/["']/g, "");
   return user;
-}
-
-function getByTag(user, users) {
-  const regex = /<@(\d+)>/;
-  const match = user.match(regex);
-  if (match) {
-    const userID = match[1];
-    try {
-      user =
-        users[userID].BanchoUserId ??
-        (() => {
-          throw new Error("no userarg");
-        })();
-    } catch (err) {
-      return false;
-    }
-    return user;
-  }
-  return undefined;
-}
-
-function getByID(user, users) {
-  const regex = /.*(\d{17,}).*/;
-  if (regex.test(user)) {
-    const userID = user.match(/\d+/)[0];
-    try {
-      user =
-        users[userID].BanchoUserId ??
-        (() => {
-          throw new Error("no userarg");
-        })();
-    } catch (err) {
-      return false;
-    }
-    return user;
-  }
-  return undefined;
 }
 
 module.exports = { getUsername };

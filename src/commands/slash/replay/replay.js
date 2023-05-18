@@ -9,11 +9,10 @@ const { Client } = require("ordr.js");
  */
 
 async function render(_client, interaction, collection) {
-  const userData = (await collection.findOne({})).users;
-  const skinID = userData[interaction.user.id]?.replayConfig?.skinID ?? "3";
+  const userData = await collection.findOne({ _id: interaction.user.id });
+  const skinID = userData?.replayConfig?.skinID ?? "3";
   const client = new Client(process.env.ORDR_TOKEN);
   let renderDone = false;
-  console.log(userData[interaction.user.id]);
 
   const replayFile = interaction.options.getAttachment("file");
   if (!replayFile.name.endsWith(".osr")) {
@@ -69,26 +68,26 @@ async function getReplay(file, userData, skinID, client, userID) {
     replay = await client.newRender({
       skip: true,
       username: "Mia",
-      breakBGDim: userData[userID]?.replayConfig?.bg_dim,
-      introBGDim: userData[userID]?.replayConfig?.bg_dim,
-      BGParallax: userData[userID]?.replayConfig?.parallax,
-      cursorRipples: userData[userID]?.replayConfig?.cursor_ripples,
-      cursorSize: userData[userID]?.replayConfig?.cursor_size,
-      inGameBGDim: userData[userID]?.replayConfig?.bg_dim,
-      loadStoryboard: userData[userID]?.replayConfig?.storyboard,
-      loadVideo: userData[userID]?.replayConfig?.bg_video,
-      showKeyOverlay: userData[userID]?.replayConfig?.key_overlay,
-      musicVolume: userData[userID]?.replayConfig?.music_volume,
-      hitsoundVolume: userData[userID]?.replayConfig?.hitsound_volume,
-      showDanserLogo: userData[userID]?.replayConfig?.danser_logo,
-      useSkinColors: userData[userID]?.replayConfig?.skin_colors,
-      playNightcoreSamples: userData[userID]?.replayConfig?.nightcore_hs,
-      skip: userData[userID]?.replayConfig?.skip_intro,
-      showAimErrorMeter: userData[userID]?.replayConfig?.aim_ur,
-      showUnstableRate: userData[userID]?.replayConfig?.ur,
-      showPPCounter: userData[userID]?.replayConfig?.pp_counter,
-      sliderSnakingIn: userData[userID]?.replayConfig?.snaking_slider,
-      sliderSnakingOut: userData[userID]?.replayConfig?.snaking_slider,
+      breakBGDim: userData?.replayConfig?.bg_dim,
+      introBGDim: userData?.replayConfig?.bg_dim,
+      BGParallax: userData?.replayConfig?.parallax,
+      cursorRipples: userData?.replayConfig?.cursor_ripples,
+      cursorSize: userData?.replayConfig?.cursor_size,
+      inGameBGDim: userData?.replayConfig?.bg_dim,
+      loadStoryboard: userData?.replayConfig?.storyboard,
+      loadVideo: userData?.replayConfig?.bg_video,
+      showKeyOverlay: userData?.replayConfig?.key_overlay,
+      musicVolume: userData?.replayConfig?.music_volume,
+      hitsoundVolume: userData?.replayConfig?.hitsound_volume,
+      showDanserLogo: userData?.replayConfig?.danser_logo,
+      useSkinColors: userData?.replayConfig?.skin_colors,
+      playNightcoreSamples: userData?.replayConfig?.nightcore_hs,
+      skip: userData?.replayConfig?.skip_intro,
+      showAimErrorMeter: userData?.replayConfig?.aim_ur,
+      showUnstableRate: userData?.replayConfig?.ur,
+      showPPCounter: userData?.replayConfig?.pp_counter,
+      sliderSnakingIn: userData?.replayConfig?.snaking_slider,
+      sliderSnakingOut: userData?.replayConfig?.snaking_slider,
       resolution: "1280x720",
       skin: `${skinID}`,
       replayURL: file.url,
@@ -102,7 +101,7 @@ async function getReplay(file, userData, skinID, client, userID) {
 }
 
 async function config(interaction, collection) {
-  const userData = (await collection.findOne({})).users;
+  let userData = await collection.findOne({ _id: interaction.user.id });
 
   const numberArr = { bg_dim: 90, music_volume: 75, hitsound_volume: 50, cursor_size: 1, skinID: 3 };
   const booleanArr = {
@@ -125,9 +124,8 @@ async function config(interaction, collection) {
     ...getNumber(interaction, numberArr),
     ...getBoolean(interaction, booleanArr),
   };
-  userData[interaction.user.id].replayConfig = options;
-  const update = { $set: { users: userData } };
-  await collection.updateOne({}, update);
+  userData.replayConfig = options;
+  await collection.updateOne({ _id: key }, { $set: { userData } }, { upsert: true });
   interaction.editReply({ embeds: [new EmbedBuilder().setTitle("Successful!").setColor("Green").setDescription("Your selected options have been applied!")] });
 }
 

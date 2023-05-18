@@ -62,7 +62,6 @@ async function run(client, interaction, db) {
       embeds.push(new EmbedBuilder().setURL("https://yoru.com.tr").setImage(x.url));
     });
   }
-  console.log(embeds);
 
   channel.send({ embeds: embeds });
   interaction.editReply({ embeds: [new EmbedBuilder().setDescription(`<@${interaction.user.id}> pinned [a message](https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${messageId})`)] });

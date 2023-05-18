@@ -5,9 +5,9 @@ async function getUsername(interaction, collection) {
   if (regex.test(user)) {
     const userID = user.match(/\d+/)[0];
     try {
-      const users = (await collection.findOne({})).users;
+      const userData = await collection.findOne({ _id: userID });
       user =
-        users[userID].BanchoUserId ??
+        userData.BanchoUserId ??
         (() => {
           throw new Error("no userarg");
         })();
@@ -19,9 +19,9 @@ async function getUsername(interaction, collection) {
   }
   if (!user) {
     try {
-      const users = (await collection.findOne({})).users;
+      const userData = await collection.findOne({ _id: userID });
       user =
-        users[interaction.user.id].BanchoUserId ??
+        userData.BanchoUserId ??
         (() => {
           throw new Error("no userarg");
         })();

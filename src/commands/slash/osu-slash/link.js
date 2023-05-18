@@ -7,11 +7,8 @@ async function run(interaction, username, db) {
   const user = await fetchUser(username);
 
   const collection = db.collection("user_data");
-  const filter = {};
-  const update = { $set: { [`users.${interaction.user.id}.BanchoUserId`]: `${user.id}` } };
-  const options = { upsert: true };
 
-  await collection.updateOne(filter, update, options);
+  await collection.updateOne({ _id: interaction.user.id }, { $set: { BanchoUserId: user.id } }, { upsert: true });
 
   const embed = new EmbedBuilder().setColor("Green").setTitle(`Account linking successful`).setDescription(`Linked Discord account <@${interaction.user.id}>\nto \`${user.username}\``).setThumbnail(avatar_url);
   await interaction.editReply({ embeds: [embed] });
