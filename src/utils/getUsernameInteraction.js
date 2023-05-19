@@ -19,7 +19,7 @@ async function getUsername(interaction, collection) {
   }
   if (!user) {
     try {
-      const userData = await collection.findOne({ _id: userID });
+      const userData = await collection.findOne({ _id: interaction.user.id });
       user =
         userData.BanchoUserId ??
         (() => {
