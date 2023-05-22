@@ -4,7 +4,7 @@ const { Downloader, DownloadEntry } = require("osu-downloader");
 
 const { mods } = require("../utils/mods.js");
 
-async function buildMap(beatmap, argValues, collection, messageLink, file) {
+async function buildMap(beatmap, argValues, messageLink, file) {
   let ar, cs, od, RuleSetID, beatmapMode;
   if (!file) {
     const downloader = new Downloader({
@@ -24,8 +24,20 @@ async function buildMap(beatmap, argValues, collection, messageLink, file) {
     if (downloaderResponse.status == -3) {
       throw new Error("ERROR CODE 409, ABORTING TASK");
     }
+    let mapQuery = await query({ query: `SELECT file FROM maps WHERE id = ${beatmap.id}`, type: "get", name: "file" });
+
     osuFile = downloaderResponse.buffer.toString();
-    await collection.insertOne({ id: `${beatmap.id}`, osuFile: osuFile });
+    if (mapQuery) {
+      const q = `UPDATE users
+      SET file = ?
+      WHERE id = ?`;
+
+      query({ query: q, parameters: [mapQuery, beatmap.id], type: "run" });
+    } else {
+      const q = `INSERT INTO maps (id, file) VALUES (?, ?)`;
+
+      query({ query: q, parameters: [beatmap.id, mapQuery], type: "run" });
+    }
 
     ar = Number(argValues["ar"]) || beatmap?.ar;
     cs = Number(argValues["cs"]) || beatmap?.cs;

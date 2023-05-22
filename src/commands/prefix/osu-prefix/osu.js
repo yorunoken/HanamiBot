@@ -32,10 +32,8 @@ module.exports = {
   name: "osu",
   aliases: ["osu", "profile"],
   cooldown: 5000,
-  run: async (client, message, args, prefix, db) => {
-    const collection = db.collection("user_data");
-
-    const username = await getUsername(message, args, collection);
+  run: async (client, message, args, prefix) => {
+    const username = await getUsername(message, args);
     if (!username) return;
 
     const wanted = ["-osu", "-mania", "-taiko", "-fruits"];

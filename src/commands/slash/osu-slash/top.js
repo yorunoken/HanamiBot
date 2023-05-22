@@ -3,7 +3,7 @@ const { buildTopsEmbed } = require("../../../command-embeds/topEmbed");
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernameInteraction");
 
-async function run(interaction, username, db) {
+async function run(interaction, username) {
   await interaction.deferReply();
   const mode = interaction.options.getString("mode") ?? "osu";
   const reverse = interaction.options.getBoolean("reverse") ?? false;
@@ -42,7 +42,7 @@ async function run(interaction, username, db) {
     row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
   }
 
-  const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent, db);
+  const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent);
   const response = await interaction.editReply({ embeds: [embed], components: [row] });
 
   const filter = (i) => i.user.id === interaction.user.id;
@@ -61,7 +61,7 @@ async function run(interaction, username, db) {
         }
 
         await i.update({ components: [_row] });
-        const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent, db);
+        const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent);
         await interaction.editReply({ embeds: [embed], components: [row] });
       } else if (i.customId == "prev") {
         if (!(page <= 1)) {
@@ -74,7 +74,7 @@ async function run(interaction, username, db) {
         }
 
         await i.update({ components: [_row] });
-        const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent, db);
+        const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent);
         await interaction.editReply({ embeds: [embed], components: [row] });
       }
     } catch (e) {
@@ -122,11 +122,10 @@ module.exports = {
     .addIntegerOption((option) => option.setName("page").setDescription("The page").setMinValue(1).setMaxValue(20))
     .addIntegerOption((option) => option.setName("index").setDescription("The index of the play you want").setMinValue(1).setMaxValue(100))
     .addBooleanOption((option) => option.setName("reverse").setDescription("Whether or not to reverse the order")),
-  run: async (client, interaction, db) => {
-    const collection = db.collection("user_data");
-    const username = await getUsername(interaction, collection);
+  run: async (client, interaction) => {
+    const username = await getUsername(interaction);
     if (!username) return;
 
-    await run(interaction, username, db);
+    await run(interaction, username);
   },
 };

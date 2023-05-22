@@ -3,7 +3,7 @@ const { buildRecentsEmbed } = require("../../../command-embeds/recentEmbed");
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernameInteraction");
 
-async function run(interaction, username, db) {
+async function run(interaction, username) {
   await interaction.deferReply();
   const mode = interaction.options.getString("mode") ?? "osu";
   let index = interaction.options.getInteger("index") ?? 1;
@@ -45,7 +45,7 @@ async function run(interaction, username, db) {
   }
 
   const now3 = Date.now();
-  const embed = await buildRecentsEmbed(recents, user, mode, index - 1, db);
+  const embed = await buildRecentsEmbed(recents, user, mode, index - 1);
   console.log(`got embed in ${Date.now() - now3}ms`);
   const response = await interaction.editReply({ embeds: [embed.embed], components: [row] });
 
@@ -65,7 +65,7 @@ async function run(interaction, username, db) {
         }
 
         await i.update({ components: [_row] });
-        const embed = await buildRecentsEmbed(recents, user, mode, index - 1, db);
+        const embed = await buildRecentsEmbed(recents, user, mode, index - 1);
         await interaction.editReply({ embeds: [embed.embed], components: [row] });
       } else if (i.customId == "prev") {
         if (!(index <= 1)) {
@@ -78,7 +78,7 @@ async function run(interaction, username, db) {
         }
 
         await i.update({ components: [_row] });
-        const embed = await buildRecentsEmbed(recents, user, mode, index - 1, db);
+        const embed = await buildRecentsEmbed(recents, user, mode, index - 1);
         await interaction.editReply({ embeds: [embed.embed], components: [row] });
       }
     } catch (e) {}
@@ -133,11 +133,10 @@ module.exports = {
     .addIntegerOption((option) => option.setName("index").setDescription("The index of a recent play.").setMinValue(1).setMaxValue(50))
     .addBooleanOption((option) => option.setName("passes").setDescription("Specify whether only passes should be considered."))
     .addStringOption((option) => option.setName("mods").setDescription("Specify what mods to consider.")),
-  run: async (client, interaction, db) => {
-    const collection = db.collection("user_data");
-    const username = await getUsername(interaction, collection);
+  run: async (client, interaction) => {
+    const username = await getUsername(interaction);
     if (!username) return;
 
-    await run(interaction, username, db);
+    await run(interaction, username);
   },
 };

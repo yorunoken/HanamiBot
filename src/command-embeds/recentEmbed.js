@@ -1,6 +1,7 @@
 const { EmbedBuilder } = require("discord.js");
 const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
+const { query } = require("../utils/getQuery.js");
 
 const { tools } = require("../utils/tools.ts");
 const { mods } = require("../utils/mods.js");
@@ -28,9 +29,7 @@ function getRetryCount(retryMap, mapId) {
   return retryCounter;
 }
 
-async function buildRecentsEmbed(score, user, mode, index, db) {
-  const collection = db.collection("map_cache"); // initialize collection of db
-
+async function buildRecentsEmbed(score, user, mode, index) {
   let rulesetID;
   switch (mode) {
     case "osu":
@@ -84,10 +83,10 @@ async function buildRecentsEmbed(score, user, mode, index, db) {
   const creatorName = score[index].beatmapset.creator;
 
   const now = Date.now();
-  let foundMap = await collection.findOne({ id: `${mapID}` });
+  let mapQuery = await query({ query: `SELECT file FROM maps WHERE id = ${mapID}`, type: "get", name: "file" });
   console.log(`took ${Date.now() - now}ms to find map`);
 
-  if (!foundMap || (score[index].beatmapset.status !== "ranked" && score[index].beatmapset.status !== "loved" && score[index].beatmapset.status !== "approved")) {
+  if (!mapQuery || (score[index].beatmapset.status !== "ranked" && score[index].beatmapset.status !== "loved" && score[index].beatmapset.status !== "approved")) {
     const downloader = new Downloader({
       rootPath: "./cache",
 
@@ -106,13 +105,19 @@ async function buildRecentsEmbed(score, user, mode, index, db) {
     if (downloaderResponse.status == -3) {
       throw new Error("ERROR CODE 409, ABORTING TASK");
     }
-    const osuFile = downloaderResponse.buffer.toString();
+    osuFile = downloaderResponse.buffer.toString();
+    if (mapQuery) {
+      const q = `UPDATE users
+      SET file = ?
+      WHERE id = ?`;
 
-    await collection.insertOne({ id: `${mapID}`, osuFile: osuFile });
+      await query({ query: q, parameters: [osuFile, mapID], type: "run" });
+    } else {
+      const q = `INSERT INTO maps (id, file) VALUES (?, ?)`;
 
-    foundMap = {
-      osuFile: osuFile,
-    };
+      await query({ query: q, parameters: [mapID, osuFile], type: "run" });
+    }
+    mapQuery = osuFile;
   }
 
   let ModDisplay = `**+${modsName}**`;
@@ -127,7 +132,7 @@ async function buildRecentsEmbed(score, user, mode, index, db) {
     mode: rulesetID,
     mods: modsID,
   };
-  let map = new Beatmap({ content: foundMap.osuFile });
+  let map = new Beatmap({ content: mapQuery });
   let calc = new Calculator(scoreParam);
 
   const mapValues = calc.mapAttributes(map);

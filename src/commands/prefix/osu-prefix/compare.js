@@ -2,7 +2,7 @@ const { buildCompareEmbed } = require("../../../command-embeds/compareEmbed");
 const { EmbedBuilder } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernamePrefix");
 
-async function run(message, username, mode, options, db, client, i) {
+async function run(message, username, mode, options, client, i) {
   await message.channel.sendTyping();
 
   const index = i ?? undefined;
@@ -52,7 +52,7 @@ async function run(message, username, mode, options, db, client, i) {
   console.log(`Fetched scores in ${Date.now() - now4}ms`);
 
   const now5 = Date.now();
-  const embed = await buildCompareEmbed(scores.scores, user, page, mode, index, reverse, db, beatmap);
+  const embed = await buildCompareEmbed(scores.scores, user, page, mode, index, reverse, beatmap);
   console.log(`Fetched embed in ${Date.now() - now5}ms`);
 
   message.channel.send({ embeds: [embed] });
@@ -164,9 +164,8 @@ module.exports = {
   name: "compare",
   aliases: ["compare", "c", "cp"],
   cooldown: 5000,
-  run: async (client, message, args, prefix, db, index) => {
-    const collection = db.collection("user_data");
-    const username = await getUsername(message, args, collection, client);
+  run: async (client, message, args, prefix, index) => {
+    const username = await getUsername(message, args, client);
     if (!username) return;
 
     wanted = ["-osu", "-mania", "-taiko", "-fruits"];
@@ -183,6 +182,6 @@ module.exports = {
       }
     });
 
-    await run(message, username, mode, options, db, client, index);
+    await run(message, username, mode, options, client, index);
   },
 };

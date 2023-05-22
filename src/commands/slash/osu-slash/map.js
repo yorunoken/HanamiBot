@@ -6,7 +6,7 @@ const { EmbedBuilder, SlashCommandBuilder, ChatInputCommandInteraction } = requi
  * @param {ChatInputCommandInteraction} interaction
  */
 
-async function run(client, interaction, collection) {
+async function run(client, interaction) {
   await interaction.deferReply();
   const messageLink = `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${interaction.id}`;
 
@@ -28,7 +28,7 @@ async function run(client, interaction, collection) {
     osuFile = await osuFile.text();
 
     const now5 = Date.now();
-    const embed = await buildMap(undefined, argValues, collection, messageLink, osuFile);
+    const embed = await buildMap(undefined, argValues, messageLink, osuFile);
     console.log(`Fetched embed in ${Date.now() - now5}ms`);
 
     interaction.editReply({ embeds: [embed] });
@@ -59,7 +59,7 @@ async function run(client, interaction, collection) {
   console.log(`Fetched beatmap in ${Date.now() - now3}ms`);
 
   const now5 = Date.now();
-  const embed = await buildMap(beatmap, argValues, collection, messageLink, osuFile);
+  const embed = await buildMap(beatmap, argValues, messageLink, osuFile);
   console.log(`Fetched embed in ${Date.now() - now5}ms`);
 
   interaction.editReply({ embeds: [embed] });
@@ -133,8 +133,7 @@ module.exports = {
     .addNumberOption((o) => o.setName("cs").setDescription("Circle size of the map").setMinValue(0).setMaxValue(10))
     .addNumberOption((o) => o.setName("bpm").setDescription("The map's beats per minute").setMinValue(60).setMaxValue(2000)),
 
-  run: async (client, interaction, db) => {
-    const collection = db.collection("map_cache");
-    await run(client, interaction, collection);
+  run: async (client, interaction) => {
+    await run(client, interaction);
   },
 };

@@ -3,3 +3,5 @@ node_modules/
 test.js
 .idea
 .cache
+database.sqlite/
+database.sqlite

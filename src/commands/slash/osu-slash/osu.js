@@ -37,10 +37,10 @@ module.exports = {
     .addStringOption((option) =>
       option.setName("mode").setDescription("Select an osu! mode").setRequired(false).addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "fruits", value: "fruits" })
     ),
-  run: async (client, interaction, db) => {
+  run: async (client, interaction) => {
     const mode = interaction.options.getString("mode") ?? "osu";
 
-    const collection = db.collection("user_data");
+    const collection = "users";
     const username = await getUsername(interaction, collection);
     if (!username) return;
 

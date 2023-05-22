@@ -8,11 +8,9 @@ const axios = require("axios");
  * @param {ChatInputCommandInteraction} interaction
  */
 
-async function run(client, interaction, db) {
+async function run(client, interaction) {
   await interaction.deferReply();
   let page = interaction.options.getInteger("page") ?? 1;
-
-  const collection = db.collection("map_cache");
 
   let modsRaw = interaction.options.getString("mods");
   let modifiedMods = "";
@@ -59,7 +57,7 @@ async function run(client, interaction, db) {
     row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
   }
 
-  const embed = await leaderboard(collection, beatmapID, scores, page, beatmap);
+  const embed = await leaderboard(beatmapID, scores, page, beatmap);
   const response = await interaction.editReply({ content: "", embeds: [embed], components: [row] });
 
   const filter = (i) => i.user.id === interaction.user.id;
@@ -79,7 +77,7 @@ async function run(client, interaction, db) {
         }
 
         await i.update({ components: [_row] });
-        const embed = await leaderboard(collection, beatmapID, scores, page, beatmap);
+        const embed = await leaderboard(beatmapID, scores, page, beatmap);
         await interaction.editReply({ content: "", embeds: [embed], components: [row] });
       } else if (i.customId == "prev") {
         if (!(page <= 1)) {
@@ -92,7 +90,7 @@ async function run(client, interaction, db) {
         }
 
         await i.update({ components: [_row] });
-        const embed = await leaderboard(collection, beatmapID, scores, page, beatmap);
+        const embed = await leaderboard(beatmapID, scores, page, beatmap);
         await interaction.editReply({ embeds: [embed], components: [row] });
       }
     } catch (e) {
@@ -178,7 +176,7 @@ module.exports = {
     .addStringOption((option) => option.setName("mods").setDescription("Sort by mods"))
     .addStringOption((option) => option.setName("link").setDescription("Get leaderboard by its beatmap link"))
     .addIntegerOption((option) => option.setName("page").setDescription("Specify what page it should be.")),
-  run: async (client, interaction, db) => {
-    await run(client, interaction, db);
+  run: async (client, interaction) => {
+    await run(client, interaction);
   },
 };

@@ -1,5 +1,6 @@
 const { EmbedBuilder, ChatInputCommandInteraction, SlashCommandBuilder } = require("discord.js");
 const { Client } = require("ordr.js");
+const { query } = require("../../../utils/getQuery.js");
 
 /**
  *
@@ -8,9 +9,10 @@ const { Client } = require("ordr.js");
  * @returns
  */
 
-async function render(_client, interaction, collection) {
-  const userData = await collection.findOne({ _id: interaction.user.id });
-  const skinID = userData?.replayConfig?.skinID ?? "3";
+async function render(_client, interaction) {
+  const userData = await query({ query: `SELECT * FROM users WHERE id = ?`, parameters: [interaction.user.id], name: "value", type: "get" });
+  const skinData = userData?.replayConfig;
+  const skinID = skinData?.skinID ?? "3";
   const client = new Client(process.env.ORDR_TOKEN);
   let renderDone = false;
 
@@ -21,7 +23,7 @@ async function render(_client, interaction, collection) {
   }
   client.start();
 
-  const replay = await getReplay(replayFile, userData, skinID, client, interaction.user.id);
+  const replay = await getReplay(replayFile, skinData, skinID, client, interaction.user.id);
   if (replay?.current === false) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Red").setTitle("Hmmm..").setDescription(`Something went wrong... Check if your file is on a submitted map.\n${replay.err}`)] });
     return;
@@ -49,7 +51,7 @@ async function render(_client, interaction, collection) {
     }
   };
 
-  client.on("render_progress", await renderProgressListener);
+  client.on("render_progress", renderProgressListener);
   client.on("render_done", (data) => {
     renderDone = true;
     if (data.renderID === replay.renderID) {
@@ -62,32 +64,32 @@ async function render(_client, interaction, collection) {
   });
 }
 
-async function getReplay(file, userData, skinID, client, userID) {
+async function getReplay(file, skinData, skinID, client) {
   let replay;
   try {
     replay = await client.newRender({
       skip: true,
       username: "Mia",
-      breakBGDim: userData?.replayConfig?.bg_dim,
-      introBGDim: userData?.replayConfig?.bg_dim,
-      BGParallax: userData?.replayConfig?.parallax,
-      cursorRipples: userData?.replayConfig?.cursor_ripples,
-      cursorSize: userData?.replayConfig?.cursor_size,
-      inGameBGDim: userData?.replayConfig?.bg_dim,
-      loadStoryboard: userData?.replayConfig?.storyboard,
-      loadVideo: userData?.replayConfig?.bg_video,
-      showKeyOverlay: userData?.replayConfig?.key_overlay,
-      musicVolume: userData?.replayConfig?.music_volume,
-      hitsoundVolume: userData?.replayConfig?.hitsound_volume,
-      showDanserLogo: userData?.replayConfig?.danser_logo,
-      useSkinColors: userData?.replayConfig?.skin_colors,
-      playNightcoreSamples: userData?.replayConfig?.nightcore_hs,
-      skip: userData?.replayConfig?.skip_intro,
-      showAimErrorMeter: userData?.replayConfig?.aim_ur,
-      showUnstableRate: userData?.replayConfig?.ur,
-      showPPCounter: userData?.replayConfig?.pp_counter,
-      sliderSnakingIn: userData?.replayConfig?.snaking_slider,
-      sliderSnakingOut: userData?.replayConfig?.snaking_slider,
+      breakBGDim: skinData?.bg_dim,
+      introBGDim: skinData?.bg_dim,
+      BGParallax: skinData?.parallax,
+      cursorRipples: skinData?.cursor_ripples,
+      cursorSize: skinData?.cursor_size,
+      inGameBGDim: skinData?.bg_dim,
+      loadStoryboard: skinData?.storyboard,
+      loadVideo: skinData?.bg_video,
+      showKeyOverlay: skinData?.key_overlay,
+      musicVolume: skinData?.music_volume,
+      hitsoundVolume: skinData?.hitsound_volume,
+      showDanserLogo: skinData?.danser_logo,
+      useSkinColors: skinData?.skin_colors,
+      playNightcoreSamples: skinData?.nightcore_hs,
+      skip: skinData?.skip_intro,
+      showAimErrorMeter: skinData?.aim_ur,
+      showUnstableRate: skinData?.ur,
+      showPPCounter: skinData?.pp_counter,
+      sliderSnakingIn: skinData?.snaking_slider,
+      sliderSnakingOut: skinData?.snaking_slider,
       resolution: "1280x720",
       skin: `${skinID}`,
       replayURL: file.url,
@@ -100,8 +102,8 @@ async function getReplay(file, userData, skinID, client, userID) {
   return replay;
 }
 
-async function config(interaction, collection) {
-  let userData = await collection.findOne({ _id: interaction.user.id });
+async function config(interaction) {
+  const qUser = await query({ query: `SELECT * FROM users WHERE id = ?`, parameters: [interaction.user.id], name: "value", type: "get" });
 
   const numberArr = { bg_dim: 90, music_volume: 75, hitsound_volume: 50, cursor_size: 1, skinID: 3 };
   const booleanArr = {
@@ -124,8 +126,24 @@ async function config(interaction, collection) {
     ...getNumber(interaction, numberArr),
     ...getBoolean(interaction, booleanArr),
   };
-  userData.replayConfig = options;
-  await collection.updateOne({ _id: key }, { $set: { userData } }, { upsert: true });
+
+  let q = `UPDATE users
+  SET value = JSON_SET(value, ${Object.keys(options)
+    .map((key) => `'$.${key}', ?`)
+    .join(", ")})
+  WHERE id = ?`;
+  let parameters = [...Object.values(options), interaction.user.id];
+
+  if (!qUser) {
+    q = `INSERT INTO users (id, value) VALUES (?, JSON_OBJECT(${Object.keys(options)
+      .map((key) => `'${key}', ?`)
+      .join(", ")}))`;
+    parameters = [interaction.user.id, ...Object.values(options)];
+
+    await query({ query: q, parameters: parameters, type: "run" });
+    return interaction.editReply({ embeds: [new EmbedBuilder().setTitle("Successful!").setColor("Green").setDescription("Your selected options have been applied!")] });
+  }
+  await query({ query: q, parameters: parameters, type: "run" });
   interaction.editReply({ embeds: [new EmbedBuilder().setTitle("Successful!").setColor("Green").setDescription("Your selected options have been applied!")] });
 }
 
@@ -181,17 +199,16 @@ module.exports = {
         .setDescription("Get a list of all available skins.")
         .addNumberOption((o) => o.setName("page").setDescription("Page Number"))
     ),
-  run: async (client, interaction, db) => {
+  run: async (client, interaction) => {
     await interaction.deferReply();
     const subs = interaction.options.getSubcommand(false);
-    const collection = db.collection("user_data");
 
     switch (subs) {
       case "render":
-        await render(client, interaction, collection);
+        await render(client, interaction);
         break;
       case "config":
-        await config(interaction, collection);
+        await config(interaction);
         break;
     }
   },

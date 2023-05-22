@@ -1,13 +1,15 @@
-async function getUsername(interaction, collection) {
+const { query } = require("./getQuery.js");
+
+async function getUsername(interaction) {
   const now = Date.now();
   let user = interaction.options.getString("user");
   const regex = /^<@\d+>$/;
   if (regex.test(user)) {
     const userID = user.match(/\d+/)[0];
     try {
-      const userData = await collection.findOne({ _id: userID });
+      const res = await query({ query: `SELECT value FROM users WHERE id = ${userID}`, type: "get", name: "value" });
       user =
-        userData.BanchoUserId ??
+        res.BanchoUserId ??
         (() => {
           throw new Error("no userarg");
         })();
@@ -19,9 +21,9 @@ async function getUsername(interaction, collection) {
   }
   if (!user) {
     try {
-      const userData = await collection.findOne({ _id: interaction.user.id });
+      const res = await query({ query: `SELECT value FROM users WHERE id = ${interaction.user.id}`, type: "get", name: "value" });
       user =
-        userData.BanchoUserId ??
+        res.BanchoUserId ??
         (() => {
           throw new Error("no userarg");
         })();

@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { EmbedBuilder } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernameInteraction");
 
-async function run(interaction, username, db, client) {
+async function run(interaction, username, client) {
   await interaction.deferReply();
 
   const index = interaction.options.getInteger("index") ?? undefined;
@@ -44,7 +44,7 @@ async function run(interaction, username, db, client) {
   console.log(`Fetched scores in ${Date.now() - now4}ms`);
 
   const now5 = Date.now();
-  const embed = await buildCompareEmbed(scores.scores, user, page, mode, index, reverse, db, beatmap);
+  const embed = await buildCompareEmbed(scores.scores, user, page, mode, index, reverse, beatmap);
   console.log(`Fetched embed in ${Date.now() - now5}ms`);
 
   interaction.editReply({ embeds: [embed] });
@@ -151,11 +151,10 @@ module.exports = {
     .addIntegerOption((option) => option.setName("index").setDescription("The index of a recent play.").setMinValue(1).setMaxValue(50))
     .addBooleanOption((option) => option.setName("reverse").setDescription("Select if pp order should be reversed"))
     .addStringOption((option) => option.setName("mods").setDescription("Specify what mods to consider.")),
-  run: async (client, interaction, db) => {
-    const collection = db.collection("user_data");
-    const username = await getUsername(interaction, collection);
+  run: async (client, interaction) => {
+    const username = await getUsername(interaction);
     if (!username) return;
 
-    await run(interaction, username, db, client);
+    await run(interaction, username, client);
   },
 };

@@ -1,9 +1,11 @@
 const { EmbedBuilder } = require("discord.js");
 const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
+const { query } = require("../utils/getQuery.js");
+
 const { mods } = require("../utils/mods.js");
 
-async function leaderboard(collection, beatmapID, scores, pageNumber, beatmap, requesterName) {
+async function leaderboard(beatmapID, scores, pageNumber, beatmap, requesterName) {
   const start = (pageNumber - 1) * 5 + 1;
   const end = pageNumber * 5;
   const numbers = [];
@@ -24,9 +26,11 @@ async function leaderboard(collection, beatmapID, scores, pageNumber, beatmap, r
     return embed;
   }
 
-  let foundMap = await collection.findOne({ id: `${beatmapID}` });
+  const now = Date.now();
+  let mapQuery = await query({ query: `SELECT file FROM maps WHERE id = ${beatmapID}`, type: "get", name: "file" });
+  console.log(`took ${Date.now() - now}ms to find map`);
 
-  if (!foundMap) {
+  if (!mapQuery) {
     const downloader = new Downloader({
       rootPath: "./osuBeatmapCache",
 
@@ -45,16 +49,23 @@ async function leaderboard(collection, beatmapID, scores, pageNumber, beatmap, r
     if (downloaderResponse.status == -3) {
       throw new Error("ERROR CODE 409, ABORTING TASK");
     }
-    const osuFile = downloaderResponse.buffer.toString();
+    osuFile = downloaderResponse.buffer.toString();
 
-    await collection.insertOne({ id: `${beatmapID}`, osuFile: osuFile });
+    if (mapQuery) {
+      const q = `UPDATE users
+      SET file = ?
+      WHERE id = ?`;
 
-    foundMap = {
-      osuFile: osuFile,
-    };
+      query({ query: q, parameters: [mapQuery, beatmapID], type: "run" });
+    } else {
+      const q = `INSERT INTO maps (id, file) VALUES (?, ?)`;
+
+      query({ query: q, parameters: [beatmapID, mapQuery], type: "run" });
+    }
+    mapQuery = osuFile;
   }
 
-  let map = new Beatmap({ content: foundMap.osuFile });
+  let map = new Beatmap({ content: mapQuery });
 
   const grades = {
     A: "<:A_:1057763284327080036>",

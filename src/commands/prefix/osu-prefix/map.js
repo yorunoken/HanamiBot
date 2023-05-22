@@ -4,10 +4,9 @@ const { database } = require("../../../../index.js"); // we import our database 
 
 /**
  * @param {Message} message
- * @param {database} db
  */
 
-async function run(message, db, client, args) {
+async function run(message, client, args) {
   await message.channel.sendTyping();
   const regex = /\/osu\.ppy\.sh\/(b|beatmaps|beatmapsets)\/\d+/;
 
@@ -48,10 +47,9 @@ async function run(message, db, client, args) {
     }
   }
 
-  const collection = db.collection("map_cache");
   const now5 = Date.now();
   const messageLink = `https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`;
-  const embed = await buildMap(beatmap, argValues, collection, messageLink);
+  const embed = await buildMap(beatmap, argValues, messageLink);
   console.log(`Fetched embed in ${Date.now() - now5}ms`);
 
   message.channel.send({ embeds: [embed] });
@@ -139,9 +137,7 @@ module.exports = {
   name: "map",
   aliases: ["map", "m"],
   cooldown: 5000,
-  run: async (client, message, args, prefix, db) => {
-    const collection = db.collection("user_data");
-
-    await run(message, db, client, args);
+  run: async (client, message, args, prefix) => {
+    await run(message, client, args);
   },
 };

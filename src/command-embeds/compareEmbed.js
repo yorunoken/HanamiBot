@@ -1,13 +1,12 @@
 const { EmbedBuilder } = require("discord.js");
 const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
+const { query } = require("../utils/getQuery.js");
 
 const { tools } = require("../utils/tools.ts");
 const { mods } = require("../utils/mods.js");
 
-async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, db, beatmap) {
-  const collection = db.collection("map_cache"); // initialize map cache collection
-
+async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, beatmap) {
   const start = (pageNumber - 1) * 5 + 1;
   const end = pageNumber * 5;
   const numbers = [];
@@ -64,9 +63,11 @@ async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, 
 
   const mapID = beatmap.id;
 
-  let foundMap = await collection.findOne({ id: `${mapID}` });
+  const now = Date.now();
+  let mapQuery = await query({ query: `SELECT file FROM maps WHERE id = ${mapID}`, type: "get", name: "file" });
+  console.log(`took ${Date.now() - now}ms to find map`);
 
-  if (!foundMap) {
+  if (!mapQuery) {
     const downloader = new Downloader({
       rootPath: "./osuBeatmapCache",
 
@@ -85,13 +86,20 @@ async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, 
     if (downloaderResponse.status == -3) {
       throw new Error("ERROR CODE 409, ABORTING TASK");
     }
-    const osuFile = downloaderResponse.buffer.toString();
+    osuFile = downloaderResponse.buffer.toString();
 
-    await collection.insertOne({ id: `${mapID}`, osuFile: osuFile });
+    if (mapQuery) {
+      const q = `UPDATE users
+      SET file = ?
+      WHERE id = ?`;
 
-    foundMap = {
-      osuFile: osuFile,
-    };
+      query({ query: q, parameters: [mapQuery, mapID], type: "run" });
+    } else {
+      const q = `INSERT INTO maps (id, file) VALUES (?, ?)`;
+
+      query({ query: q, parameters: [mapID, mapQuery], type: "run" });
+    }
+    mapQuery = osuFile;
   }
 
   async function getScoreEach(score) {
@@ -135,7 +143,7 @@ async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, 
     if (rulesetID == "2") accValues = `{**${value300}**/${value100}/${value50}/${valueMiss}}`;
     if (rulesetID == "3") accValues = `{**${valueGeki}/${value300}**/${valueKatu}/${value100}/${value50}/${valueMiss}}`;
 
-    const map = new Beatmap({ content: foundMap.osuFile });
+    const map = new Beatmap({ content: mapQuery });
     const calc = new Calculator(scoreParam);
 
     // ss pp

@@ -1,4 +1,6 @@
-async function getUsername(message, args, collection, client) {
+const { query } = require("./getQuery.js");
+
+async function getUsername(message, args) {
   const now = Date.now();
 
   const unOsu = ["-mania", "-osu", "-fruits", "-taiko"];
@@ -14,19 +16,19 @@ async function getUsername(message, args, collection, client) {
 
   const argsJoined = args.join(" ");
   let user;
-  user = await getByTag(argsJoined, collection);
+  user = await getByTag(argsJoined);
   if (user) {
     console.log(`got user in ${Date.now() - now}ms`);
     return user;
   }
 
-  user = await getByID(argsJoined, collection);
+  user = await getByID(argsJoined);
   if (user) {
     console.log(`got user in ${Date.now() - now}ms`);
     return user;
   }
 
-  user = await getByString(argsJoined, collection, message);
+  user = await getByString(argsJoined, message);
   if (user) {
     console.log(`got user in ${Date.now() - now}ms`);
     return user;
@@ -36,36 +38,34 @@ async function getUsername(message, args, collection, client) {
   return false;
 }
 
-async function getByTag(user, collection) {
+async function getByTag(user) {
   const regex = /<@(\d+)>/;
   const match = user.match(regex);
   if (match) {
     const userID = match[1];
-    const userData = await collection.findOne({ _id: userID });
-    user = userData.BanchoUserId ?? false;
+    const res = await query({ query: `SELECT value FROM users WHERE id = ${userID}`, type: "get", name: "value" });
+    const user = res.BanchoUserId;
     return user;
   }
   return undefined;
 }
 
-async function getByID(user, collection) {
+async function getByID(user) {
   const regex = /.*(\d{17,}).*/;
   if (regex.test(user)) {
     const userID = user.match(/\d+/)[0];
-    const userData = await collection.findOne({ _id: userID });
-    user = userData.BanchoUserId ?? false;
-
+    const res = await query({ query: `SELECT value FROM users WHERE id = ${userID}`, type: "get", name: "value" });
+    const user = res.BanchoUserId;
     return user;
   }
   return undefined;
 }
 
-async function getByString(user, collection, message) {
+async function getByString(user, message) {
   if (!user || user.length === 0) {
     const userID = message.author.id;
-    const userData = await collection.findOne({ _id: userID });
-
-    user = userData.BanchoUserId ?? false;
+    const res = await query({ query: `SELECT value FROM users WHERE id = ${userID}`, type: "get", name: "value" });
+    const user = res.BanchoUserId;
     return user;
   }
 

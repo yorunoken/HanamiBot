@@ -4,13 +4,10 @@ const { getUsername } = require("../../../utils/getUsernameInteraction");
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { buildCompareEmbed } = require("../../../command-embeds/compareEmbed");
 
-async function run(client, interaction, db) {
+async function run(client, interaction) {
   await interaction.deferReply();
 
-  const collection = db.collection("user_data");
-
-  const mode = "osu";
-  const username = await getUsername(interaction, collection);
+  const username = await getUsername(interaction);
   if (!username) return;
 
   const guild = await client.guilds.fetch(interaction.guildId);
@@ -27,14 +24,16 @@ async function run(client, interaction, db) {
   const prevPage = new ButtonBuilder().setCustomId("prev").setLabel("⬅️").setStyle(ButtonStyle.Secondary);
   const row = new ActionRowBuilder().addComponents(prevPage, nextPage);
 
-  const user = await getUser(username, mode);
-  if (user.error === null) {
-    interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`The user \`${username}\` was not found.`)] });
-    return;
-  }
   const beatmap = await getMap(beatmapID);
   if (!beatmap) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Beatmap doesn't exist. check if you replied to a beatmapset.`)] });
+    return;
+  }
+  const mode = beatmap.mode;
+
+  const user = await getUser(username, mode);
+  if (user.error === null) {
+    interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`The user \`${username}\` was not found.`)] });
     return;
   }
   const scores = await getScores(user, beatmapID);
@@ -46,7 +45,7 @@ async function run(client, interaction, db) {
   let reverse;
   const page = 1;
 
-  const embed = await buildCompareEmbed(scores.scores, user, page, mode, index, reverse, db, beatmap);
+  const embed = await buildCompareEmbed(scores.scores, user, page, mode, index, reverse, beatmap);
   const response = await interaction.editReply({ embeds: [embed], components: [row] });
 }
 
@@ -139,7 +138,7 @@ function testRegex(URL, regex) {
 
 module.exports = {
   data: new ContextMenuCommandBuilder().setName("Compare score").setType(ApplicationCommandType.Message),
-  run: async (client, interaction, db) => {
-    await run(client, interaction, db);
+  run: async (client, interaction) => {
+    await run(client, interaction);
   },
 };

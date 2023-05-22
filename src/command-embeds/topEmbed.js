@@ -1,13 +1,12 @@
 const { EmbedBuilder } = require("discord.js");
 const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
+const { query } = require("../utils/getQuery.js");
 
 const { tools } = require("../utils/tools.ts");
 const { mods } = require("../utils/mods.js");
 
-async function buildTopsEmbed(tops, user, pageNumber, mode, index, reverse, recent, db) {
-  const collection = db.collection("map_cache"); // initialize collection of db
-
+async function buildTopsEmbed(tops, user, pageNumber, mode, index, reverse, recent) {
   const start = (pageNumber - 1) * 5 + 1;
   const end = pageNumber * 5;
   const numbers = [];
@@ -94,10 +93,10 @@ async function buildTopsEmbed(tops, user, pageNumber, mode, index, reverse, rece
     const acc = `(${Number(score.accuracy * 100).toFixed(2)}%)`;
 
     const now = Date.now();
-    let foundMap = await collection.findOne({ id: `${mapID}` });
+    let mapQuery = await query({ query: `SELECT file FROM maps WHERE id = ${mapID}`, type: "get", name: "file" });
     console.log(`took ${Date.now() - now}ms to find map`);
 
-    if (!foundMap) {
+    if (!mapQuery) {
       const downloader = new Downloader({
         rootPath: "./osuBeatmapCache",
 
@@ -116,13 +115,19 @@ async function buildTopsEmbed(tops, user, pageNumber, mode, index, reverse, rece
       if (downloaderResponse.status == -3) {
         throw new Error("ERROR CODE 409, ABORTING TASK");
       }
-      const osuFile = downloaderResponse.buffer.toString();
+      osuFile = downloaderResponse.buffer.toString();
+      if (mapQuery) {
+        const q = `UPDATE users
+        SET file = ?
+        WHERE id = ?`;
 
-      await collection.insertOne({ id: `${mapID}`, osuFile: osuFile });
+        await query({ query: q, parameters: [osuFile, mapID], type: "run" });
+      } else {
+        const q = `INSERT INTO maps (id, file) VALUES (?, ?)`;
 
-      foundMap = {
-        osuFile: osuFile,
-      };
+        await query({ query: q, parameters: [mapID, osuFile], type: "run" });
+      }
+      mapQuery = osuFile;
     }
 
     if (modsName.length == 0) {
@@ -141,7 +146,7 @@ async function buildTopsEmbed(tops, user, pageNumber, mode, index, reverse, rece
     if (rulesetID == "2") accValues = `{**${value300}**/${value100}/${value50}/${valueMiss}}`;
     if (rulesetID == "3") accValues = `{**${valueGeki}/${value300}**/${valueKatu}/${value100}/${value50}/${valueMiss}}`;
 
-    const map = new Beatmap({ content: foundMap.osuFile });
+    const map = new Beatmap({ content: mapQuery });
     const calc = new Calculator(scoreParam);
 
     // ss pp

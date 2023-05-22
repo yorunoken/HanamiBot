@@ -2,7 +2,7 @@ const { buildTopsEmbed } = require("../../../command-embeds/topEmbed");
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernamePrefix");
 
-async function run(message, username, mode, options, db, i) {
+async function run(message, username, mode, options, i) {
   await message.channel.sendTyping();
 
   const index = i ?? undefined;
@@ -41,7 +41,7 @@ async function run(message, username, mode, options, db, i) {
     row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
   }
 
-  const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent, db);
+  const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent);
   const response = await message.channel.send({ embeds: [embed], components: [row] });
 
   const filter = (i) => i.user.id === message.author.id;
@@ -60,7 +60,7 @@ async function run(message, username, mode, options, db, i) {
         }
 
         await i.update({ components: [_row] });
-        const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent, db);
+        const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent);
         await response.edit({ embeds: [embed], components: [row] });
       } else if (i.customId == "prev") {
         if (!(page <= 1)) {
@@ -73,7 +73,7 @@ async function run(message, username, mode, options, db, i) {
         }
 
         await i.update({ components: [_row] });
-        const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent, db);
+        const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent);
         await response.edit({ embeds: [embed], components: [row] });
       }
     } catch (e) {
@@ -114,9 +114,8 @@ module.exports = {
   name: "recentbest",
   aliases: ["rb", "recentbest"],
   cooldown: 5000,
-  run: async (client, message, args, prefix, db, index) => {
-    const collection = db.collection("user_data");
-    const username = await getUsername(message, args, collection);
+  run: async (client, message, args, prefix, index) => {
+    const username = await getUsername(message, args);
     if (!username) return;
 
     wanted = ["-osu", "-mania", "-taiko", "-fruits"];
@@ -133,6 +132,6 @@ module.exports = {
       }
     });
 
-    await run(message, username, mode, options, db, index);
+    await run(message, username, mode, options, index);
   },
 };

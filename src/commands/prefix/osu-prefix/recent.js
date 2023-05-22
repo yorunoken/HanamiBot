@@ -2,9 +2,10 @@ const { buildRecentsEmbed } = require("../../../command-embeds/recentEmbed");
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernamePrefix");
 
-async function run(message, username, mode, db, i) {
+async function run(message, username, mode, i) {
   await message.channel.sendTyping();
 
+  console.log(i);
   let index = i ?? 1;
   const pass = false;
 
@@ -39,7 +40,7 @@ async function run(message, username, mode, db, i) {
     row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
   }
 
-  const embed = await buildRecentsEmbed(recents, user, mode, index - 1, db);
+  const embed = await buildRecentsEmbed(recents, user, mode, index - 1);
   const response = await message.channel.send({ content: "", embeds: [embed.embed], components: [row] });
 
   const filter = (i) => i.user.id === message.author.id;
@@ -58,7 +59,7 @@ async function run(message, username, mode, db, i) {
         }
 
         await i.update({ components: [_row] });
-        const embed = await buildRecentsEmbed(recents, user, mode, index - 1, db);
+        const embed = await buildRecentsEmbed(recents, user, mode, index - 1);
         response.edit({ content: "", embeds: [embed.embed], components: [row] });
       } else if (i.customId == "prev") {
         if (!(index <= 1)) {
@@ -71,7 +72,7 @@ async function run(message, username, mode, db, i) {
         }
 
         await i.update({ components: [_row] });
-        const embed = await buildRecentsEmbed(recents, user, mode, index - 1, db);
+        const embed = await buildRecentsEmbed(recents, user, mode, index - 1);
         response.edit({ content: "", embeds: [embed.embed], components: [row] });
       }
     } catch (e) {}
@@ -119,10 +120,8 @@ module.exports = {
   name: "recent",
   aliases: ["rs", "recent", "r"],
   cooldown: 5000,
-  run: async (client, message, args, prefix, db, index) => {
-    const collection = db.collection("user_data");
-
-    const username = await getUsername(message, args, collection);
+  run: async (client, message, args, prefix, index) => {
+    const username = await getUsername(message, args);
     if (!username) return;
 
     wanted = ["-osu", "-mania", "-taiko", "-fruits"];
@@ -133,6 +132,6 @@ module.exports = {
     // const passes = wanted.filter((word) => args.indexOf(word) >= 0)
     // const pass = passes[0] ?? false;
 
-    await run(message, username, mode, db, index);
+    await run(message, username, mode, index);
   },
 };
