@@ -1,6 +1,7 @@
-const { EmbedBuilder, version } = require("discord.js");
+const { EmbedBuilder } = require("discord.js");
 const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
+const { query } = require("../utils/getQuery.js");
 
 const { mods } = require("../utils/mods.js");
 
