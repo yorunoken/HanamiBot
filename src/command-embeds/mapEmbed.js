@@ -33,11 +33,11 @@ async function buildMap(beatmap, argValues, messageLink, file) {
       SET file = ?
       WHERE id = ?`;
 
-      query({ query: q, parameters: [mapQuery, beatmap.id], type: "run" });
+      await query({ query: q, parameters: [mapQuery, beatmap.id], type: "run" });
     } else {
       const q = `INSERT INTO maps (id, file) VALUES (?, ?)`;
 
-      query({ query: q, parameters: [beatmap.id, mapQuery], type: "run" });
+      await query({ query: q, parameters: [beatmap.id, mapQuery], type: "run" });
     }
 
     ar = Number(argValues["ar"]) || beatmap?.ar;

@@ -5,7 +5,7 @@ const { query } = require("../utils/getQuery.js");
 
 const { mods } = require("../utils/mods.js");
 
-async function leaderboard(beatmapID, scores, pageNumber, beatmap, requesterName) {
+async function leaderboard(beatmapID, scores, pageNumber, beatmap, requesterName, user) {
   const start = (pageNumber - 1) * 5 + 1;
   const end = pageNumber * 5;
   const numbers = [];
@@ -157,16 +157,18 @@ async function leaderboard(beatmapID, scores, pageNumber, beatmap, requesterName
     things.push("**No scores found.**");
   }
 
+  console.log(requesterName);
+
   user_score = "";
   if (requesterName) {
     let index = scores.scores.findIndex((x) => x.user.id == requesterName);
-    if (index == -1) {
+    if (index < -1) {
       index = scores.scores.findIndex((x) => x.user.username == requesterName);
     }
-    if (index == -1) {
-    } else {
+    console.log(index);
+    if (index >= 0) {
       YourScore = true;
-      user_score = `\n__**Your score:**__\n${await ScoreGet(scores.scores[index], index, YourScore)}`;
+      user_score = `\n__**<@${user.id}>'s score:**__\n${await ScoreGet(scores.scores[index], index, YourScore)}`;
     }
   }
 

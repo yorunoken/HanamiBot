@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, ChatInputCommandInteraction } = require("discord.js");
 const { leaderboard } = require("../../../command-embeds/leaderboardEmbed.js");
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { query } = require("../../../utils/getQuery.js");
 const axios = require("axios");
 
 /**
@@ -11,6 +12,9 @@ const axios = require("axios");
 async function run(client, interaction) {
   await interaction.deferReply();
   let page = interaction.options.getInteger("page") ?? 1;
+
+  const requester = await query({ query: `SELECT value FROM users WHERE id = '${interaction.user.id}'`, type: "get", name: "value" });
+  const requesterBancho = requester?.BanchoUserId;
 
   let modsRaw = interaction.options.getString("mods");
   let modifiedMods = "";
@@ -57,7 +61,7 @@ async function run(client, interaction) {
     row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
   }
 
-  const embed = await leaderboard(beatmapID, scores, page, beatmap);
+  const embed = await leaderboard(beatmapID, scores, page, beatmap, requesterBancho, interaction.user);
   const response = await interaction.editReply({ content: "", embeds: [embed], components: [row] });
 
   const filter = (i) => i.user.id === interaction.user.id;
@@ -77,7 +81,7 @@ async function run(client, interaction) {
         }
 
         await i.update({ components: [_row] });
-        const embed = await leaderboard(beatmapID, scores, page, beatmap);
+        const embed = await leaderboard(beatmapID, scores, page, beatmap, requesterBancho, interaction.user);
         await interaction.editReply({ content: "", embeds: [embed], components: [row] });
       } else if (i.customId == "prev") {
         if (!(page <= 1)) {
@@ -90,7 +94,7 @@ async function run(client, interaction) {
         }
 
         await i.update({ components: [_row] });
-        const embed = await leaderboard(beatmapID, scores, page, beatmap);
+        const embed = await leaderboard(beatmapID, scores, page, beatmap, requesterBancho, interaction.user);
         await interaction.editReply({ embeds: [embed], components: [row] });
       }
     } catch (e) {
