@@ -221,7 +221,7 @@ async function buildRecentsEmbed(score, user, mode, index) {
     .setTitle(`${score[index].beatmapset.artist} - ${score[index].beatmapset.title} [${score[index].beatmap.version}] [${maxAttrs.difficulty.stars.toFixed(2)}★]`)
     .setURL(`https://osu.ppy.sh/b/${mapID}`)
     .setDescription(
-      `${scoreGlobalRank}\n${grade} ${percentage}${ModDisplay}  **${totalScore}  ${acc}** <t:${scoreTime}:R>\n${ppValue}\n${ifFc} Try #${retryCounter}\n\nBPM: \`${mapValues.bpm.toFixed()}\` Length: \`${minutesTotal}:${secondsTotal}\`\nAR: \`${mapValues.ar
+      `${grade} ${percentage}${ModDisplay}  **${totalScore}  ${acc}** <t:${scoreTime}:R>\n${ppValue}\n${ifFc} Try #${retryCounter}\n\nBPM: \`${mapValues.bpm.toFixed()}\` Length: \`${minutesTotal}:${secondsTotal}\`\nAR: \`${mapValues.ar
         .toFixed(1)
         .toString()
         .replace(/\.0+$/, "")}\` OD: \`${mapValues.od.toFixed(1).toString().replace(/\.0+$/, "")}\` CS: \`${mapValues.cs.toFixed(1).toString().replace(/\.0+$/, "")}\` HP: \`${mapValues.hp.toFixed(2).toString().replace(/\.0+$/, "")}\``
