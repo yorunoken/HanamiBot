@@ -20,7 +20,7 @@ async function run(message, username, mode) {
   const embed = buildPage1(user, mode);
   const response = await message.channel.send({ embeds: [embed], components: [showMore] });
 
-  const filter = (i) => i.user.id === interaction.user.id;
+  const filter = (i) => i.user.id === message.author.id;
   const collector = response.createMessageComponentCollector({ time: 60000, filter: filter });
 
   collector.on("collect", async (i) => {
