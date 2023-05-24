@@ -209,9 +209,11 @@ async function buildRecentsEmbed(score, user, mode, index) {
 
   let scoreGlobalRank = "";
   if (score[index].passed === true) {
-    const scoreGlobal = await v2.scores.details(score[index].best_id.toString(), score[index].beatmap.mode);
-    const scoreRank = scoreGlobal.rank_global;
-    scoreGlobalRank = `__Global Rank #${scoreRank}__\n`;
+    const scoreGlobal = await v2.scores.details(score[index].best_id?.toString(), score[index].beatmap?.mode);
+    if (score[index].id === score[index].best_id) {
+      const scoreRank = scoreGlobal.rank_global;
+      scoreGlobalRank = `__Global Rank #${scoreRank}__\n`;
+    }
   }
 
   //score embed
