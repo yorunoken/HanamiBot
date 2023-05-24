@@ -164,9 +164,9 @@ async function buildRecentsEmbed(score, user, mode, index) {
   let fraction = objectshit / objects;
   let percentageRaw = Number((fraction * 100).toFixed(2));
   let percentageNum = percentageRaw.toFixed(1);
-  let percentage = ` @${percentageNum}% `;
+  let percentage = `@${percentageNum}% `;
   if (percentageNum == "100.0" || score[index].passed == true) {
-    percentage = " ";
+    percentage = "";
   }
 
   let ppValue = `**${curAttrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}pp [ **${score[index].max_combo}**x/${maxAttrs.difficulty.maxCombo}x ] ${accValues}`;
