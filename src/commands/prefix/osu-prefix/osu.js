@@ -47,16 +47,12 @@ async function run(message, username, mode) {
 
 module.exports = {
   name: "osu",
-  aliases: ["osu", "profile"],
+  aliases: ["osu", "mania", "taiko", "fruits"],
   cooldown: 5000,
-  run: async ({ message, args }) => {
+  run: async ({ message, args, commandName }) => {
     const username = await getUsername(message, args);
     if (!username) return;
 
-    const wanted = ["-osu", "-mania", "-taiko", "-fruits"];
-    const modes = wanted.filter((word) => args.indexOf(word) >= 0).map((word) => word.replace("-", ""));
-    const mode = modes[0] ?? "osu";
-
-    await run(message, username, mode);
+    await run(message, username, commandName);
   },
 };

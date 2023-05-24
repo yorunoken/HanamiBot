@@ -18,7 +18,7 @@ async function run(message, username, mode, options, i) {
   }
   const tops = await v2.scores.user.category(user.id, "best", { mode: mode, limit: 100 });
   if (tops.length === 0) {
-    message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No plays found for ${user.username}.`)] });
+    message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No plays found for ${user.username} in osu!${mode}.`)] });
     return;
   }
 
@@ -91,15 +91,24 @@ async function run(message, username, mode, options, i) {
 
 module.exports = {
   name: "top",
-  aliases: ["top", "t"],
+  aliases: ["top", "t", "topt", "toptaiko", "topc", "topfruits", "topm", "topmania"],
   cooldown: 5000,
-  run: async ({ message, args, index }) => {
+  run: async ({ message, args, index, commandName }) => {
     const username = await getUsername(message, args);
     if (!username) return;
 
-    wanted = ["-osu", "-mania", "-taiko", "-fruits"];
-    const modes = wanted.filter((word) => args.indexOf(word) >= 0).map((word) => word.replace("-", ""));
-    const mode = modes[0] ?? "osu";
+    let mode = "osu";
+    switch (commandName) {
+      case "topt" || "toptaiko":
+        mode = "taiko";
+        break;
+      case "topc" || "topfruits":
+        mode = "fruits";
+        break;
+      case "topm" || "topmania":
+        mode = "mania";
+        break;
+    }
 
     wanted = ["-p", "-page"];
     let options = [];

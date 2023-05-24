@@ -14,9 +14,9 @@ async function run(message, username, mode, i) {
     message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`The user \`${username}\` was not found.`)] });
     return;
   }
-  const recents = await v2.scores.user.category(user.id, "recent", { include_fails: pass, limit: 100 });
+  const recents = await v2.scores.user.category(user.id, "recent", { include_fails: pass, limit: 100, mode: mode });
   if (recents.length === 0) {
-    message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No recent plays found for ${user.username}.`)] });
+    message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No recent plays found for ${user.username} in osu!${mode}.`)] });
     return;
   }
 
@@ -87,15 +87,24 @@ async function run(message, username, mode, i) {
 
 module.exports = {
   name: "recent",
-  aliases: ["rs", "recent", "r"],
+  aliases: ["rs", "recent", "r", "rt", "recenttaiko", "rc", "recentfruits", "rm", "recentmania"],
   cooldown: 5000,
-  run: async ({ message, args, index }) => {
+  run: async ({ message, args, index, commandName }) => {
     const username = await getUsername(message, args);
     if (!username) return;
 
-    wanted = ["-osu", "-mania", "-taiko", "-fruits"];
-    const modes = wanted.filter((word) => args.indexOf(word) >= 0).map((word) => word.replace("-", ""));
-    const mode = modes[0] ?? "osu";
+    let mode = "osu";
+    switch (commandName) {
+      case "rt" || "recenttaiko":
+        mode = "taiko";
+        break;
+      case "rc" || "recentfruits":
+        mode = "fruits";
+        break;
+      case "rm" || "recentmania":
+        mode = "mania";
+        break;
+    }
 
     // wanted = ["-pass", "-ps", "-passes"];
     // const passes = wanted.filter((word) => args.indexOf(word) >= 0)
