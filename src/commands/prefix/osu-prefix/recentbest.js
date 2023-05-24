@@ -16,7 +16,7 @@ async function run(message, username, mode, options, i) {
     message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`The user \`${username}\` was not found.`)] });
     return;
   }
-  const tops = await v2.scores.user.category(user.id, "best", { mode: mode });
+  const tops = await v2.scores.user.category(user.id, "best", { mode: mode, limit: 100 });
   if (tops.length === 0) {
     message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No plays found for ${user.username}.`)] });
     return;
