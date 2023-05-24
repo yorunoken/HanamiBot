@@ -162,8 +162,8 @@ async function buildRecentsEmbed(score, user, mode, index) {
 
   const objects = score[index].beatmap.count_circles + score[index].beatmap.count_sliders + score[index].beatmap.count_spinners;
   let fraction = objectshit / objects;
-  let percentageRaw = Number((fraction * 100).toFixed(2));
-  let percentageNum = percentageRaw.toFixed(1);
+  let percentageRaw = Number(fraction * 100).toFixed(1);
+  let percentageNum = percentageRaw;
   let percentage = `@${percentageNum}% `;
   if (percentageNum == "100.0" || score[index].passed == true) {
     percentage = "";
@@ -172,7 +172,7 @@ async function buildRecentsEmbed(score, user, mode, index) {
   let ppValue = `**${curAttrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}pp [ **${score[index].max_combo}**x/${maxAttrs.difficulty.maxCombo}x ] ${accValues}`;
   let ifFc = "";
   if (curAttrs.effectiveMissCount > 0) {
-    Map300CountFc = objects - value100 - value50;
+    const Map300CountFc = objects - value100 - value50;
 
     const FcAcc = tools.accuracy({
       n300: Map300CountFc,

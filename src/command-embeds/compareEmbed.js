@@ -158,10 +158,28 @@ async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, 
     const stars = maxAttrs.difficulty.stars.toFixed(2);
     const maxComboMap = maxAttrs.difficulty.maxCombo;
 
+    let ifFc = "";
+    if (curAttrs.effectiveMissCount > 0) {
+      const objects = beatmap.count_circles + beatmap.count_sliders + beatmap.count_spinners;
+      Map300CountFc = objects - value100 - value50;
+
+      const FcAcc = tools.accuracy({
+        n300: Map300CountFc,
+        ngeki: valueGeki,
+        n100: value100,
+        nkatu: valueKatu,
+        n50: value50,
+        nmiss: 0,
+        mode: mode,
+      });
+
+      ifFc = `\nIf FC: **${fcAttrs.pp.toFixed(2)}**pp for **${FcAcc.toFixed(2)}%**`;
+    }
+
     let first_row = `**#${playRank} +${modsName}** [${stars}★]\n`;
-    let second_row = `${grade} ▹ **${curAttrs.pp.toFixed(2)}PP** ${acc} [**${Number(score.max_combo)}x**/${maxComboMap}x]\n`;
-    let third_row = `${score.score.toLocaleString()} ▹ ${accValues} <t:${scoreTime}:R>`;
-    let fourth_row = "";
+    let second_row = ` ${grade} ▹ **${curAttrs.pp.toFixed(2)}PP** ${acc} [**${Number(score.max_combo)}x**/${maxComboMap}x]\n`;
+    let third_row = ` ${score.score.toLocaleString()} ▹ ${accValues} <t:${scoreTime}:R>`;
+    let fourth_row = ifFc;
     let fifth_row = "";
 
     let fields = "";

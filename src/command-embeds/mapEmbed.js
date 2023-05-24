@@ -28,16 +28,17 @@ async function buildMap(beatmap, argValues, messageLink, file) {
     let mapQuery = await query({ query: `SELECT file FROM maps WHERE id = ${beatmap.id}`, type: "get", name: "file" });
 
     osuFile = downloaderResponse.buffer.toString();
-    if (mapQuery) {
-      const q = `UPDATE users
-      SET file = ?
-      WHERE id = ?`;
-
-      await query({ query: q, parameters: [mapQuery, beatmap.id], type: "run" });
-    } else {
+    if (!mapQuery) {
       const q = `INSERT INTO maps (id, file) VALUES (?, ?)`;
 
       await query({ query: q, parameters: [beatmap.id, mapQuery], type: "run" });
+    }
+    if (beatmap.status != "ranked" && beatmap.status != "loved" && beatmap.status != "approved") {
+      const q = `UPDATE maps
+        SET file = ?
+        WHERE id = ?`;
+
+      await query({ query: q, parameters: [mapQuery, beatmap.id], type: "run" });
     }
 
     ar = Number(argValues["ar"]) || beatmap?.ar;
