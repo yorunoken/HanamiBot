@@ -17,7 +17,7 @@ const options = {
   timeZone: "UTC",
 };
 
-function buildUserEmbed(user, mode) {
+function buildPage1(user, mode) {
   const globalRank = user.statistics.global_rank?.toLocaleString() || "-";
   const countryRank = user.statistics.country_rank?.toLocaleString() || "-";
   const pp = user.statistics.pp.toLocaleString();
@@ -61,12 +61,15 @@ function buildUserEmbed(user, mode) {
       url: `https://osu.ppy.sh/users/${user.id}/${mode}`,
     })
     .setThumbnail(user.avatar_url)
-    .setDescription(
-      `**Accuracy:** \`${acc}%\` •  **Level:** \`${
-        user.statistics.level.current
-      }.${lvlProgress}\`\n${time}**Playcount:** \`${playCount}\` (\`${playHours.toFixed()} hrs\`)\n**Followers:** \`${followers}\` • **Max Combo:** \`${maxCombo}\`\n**Ranks:** ${grades.XH}\`${ssh}\`${grades.X}\`${ss}\`${grades.SH}\`${sh}\`${
-        grades.S
-      }\`${s}\`${grades.A}\`${a}\``
+    .setFields(
+      {
+        name: "Statistics",
+        value: `**Accuracy:** \`${acc}%\` •  **Level:** \`${user.statistics.level.current}.${lvlProgress}\`\n${time}**Playcount:** \`${playCount}\` (\`${playHours.toFixed()} hrs\`)\n**Followers:** \`${followers}\` • **Max Combo:** \`${maxCombo}\``,
+      },
+      {
+        name: "Grades",
+        value: `${grades.XH}\`${ssh}\`${grades.X}\`${ss}\`${grades.SH}\`${sh}\`${grades.S}\`${s}\`${grades.A}\`${a}\``,
+      }
     )
     .setImage(user.cover_url)
     .setFooter({
@@ -76,4 +79,53 @@ function buildUserEmbed(user, mode) {
   return embed;
 }
 
-module.exports = { buildUserEmbed };
+function buildPage2(user, mode) {
+  const globalRank = user.statistics.global_rank?.toLocaleString() || "-";
+  const countryRank = user.statistics.country_rank?.toLocaleString() || "-";
+  const pp = user.statistics.pp.toLocaleString();
+
+  const division = user.statistics.pp / (user.statistics.play_time / 3600);
+  const ppPerHour = division;
+
+  // score
+  const rankedScore = user.statistics.ranked_score;
+  const totalScore = user.statistics.total_score;
+  const objectsHit = user.statistics.total_hits;
+
+  // profile
+  const occupation = `**Occupation:**\n \`${user.occupation}\`\n` ?? "";
+  const interest = `**Interests:**\n \`${user.interests}\`\n` ?? "";
+  const location = `**Location:**\n \`${user.location}\`` ?? "";
+
+  //convert the time difference to months
+  const date = new Date(user.join_date);
+  const months = Math.floor((new Date() - date) / (1000 * 60 * 60 * 24 * 30));
+  const userJoinedAgo = (months / 12).toFixed(1);
+  const formattedDate = date.toLocaleDateString("en-US", options);
+
+  //embed
+  const embed = new EmbedBuilder()
+    .setColor("Purple")
+    .setAuthor({
+      name: `${user.username}: ${pp}pp (#${globalRank} ${user.country.code}#${countryRank})`,
+      iconURL: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
+      url: `https://osu.ppy.sh/users/${user.id}/${mode}`,
+    })
+    .setThumbnail(user.avatar_url)
+    .setFields(
+      {
+        name: "Score",
+        value: `**Ranked Score:** \`${rankedScore.toLocaleString()}\`\n**Total Score:** \`${totalScore.toLocaleString()}\`\n**Objects Hit:** \`${objectsHit.toLocaleString()}\``,
+        inline: true,
+      },
+      { name: "Profile", value: `${occupation}${interest}${location}`, inline: true }
+    )
+    .setImage(user.cover_url)
+    .setFooter({
+      text: `Joined osu! ${formattedDate} (${userJoinedAgo} years ago)`,
+    });
+
+  return embed;
+}
+
+module.exports = { buildPage1, buildPage2 };

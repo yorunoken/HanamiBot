@@ -94,9 +94,9 @@ async function run(interaction, username) {
   });
 
   collector.on("end", async (i) => {
-    if (i.message !== undefined) {
+    try {
       await interaction.editReply({ components: [] });
-    }
+    } catch (e) {}
   });
 }
 

@@ -83,7 +83,9 @@ async function run(message, username, mode, options, i) {
   });
 
   collector.on("end", async (i) => {
-    await response.edit({ components: [] });
+    try {
+      await response.edit({ components: [] });
+    } catch (e) {}
   });
 }
 

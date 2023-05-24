@@ -84,7 +84,9 @@ async function run(interaction, username) {
   });
 
   collector.on("end", async (i) => {
-    await interaction.editReply({ components: [] });
+    try {
+      await interaction.editReply({ components: [] });
+    } catch (e) {}
   });
 }
 

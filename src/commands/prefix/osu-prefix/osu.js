@@ -1,6 +1,6 @@
-const { buildUserEmbed } = require("../../../command-embeds/osuEmbed");
+const { buildPage1, buildPage2 } = require("../../../command-embeds/osuEmbed");
 const { getUsername } = require("../../../utils/getUsernamePrefix");
-const { EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { v2 } = require("osu-api-extended");
 
 async function run(message, username, mode) {
@@ -11,8 +11,38 @@ async function run(message, username, mode) {
     message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`The user \`${username}\` was not found.`)] });
     return;
   }
-  const embed = buildUserEmbed(user, mode);
-  message.channel.send({ embeds: [embed] });
+
+  let _row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("wating").setLabel("Waiting..").setStyle(ButtonStyle.Secondary).setDisabled(true));
+
+  let showMore = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("more").setLabel("Show More").setStyle(ButtonStyle.Success));
+  let showLess = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("less").setLabel("Show Less").setStyle(ButtonStyle.Success));
+
+  const embed = buildPage1(user, mode);
+  const response = await message.channel.send({ embeds: [embed] });
+
+  const filter = (i) => i.user.id === interaction.user.id;
+  const collector = response.createMessageComponentCollector({ time: 60000, filter: filter });
+
+  collector.on("collect", async (i) => {
+    try {
+      if (i.customId === "more") {
+        const embed = buildPage2(user, mode);
+        console.log(embed);
+        await i.update({ components: [_row] });
+        response.edit({ embeds: [embed], components: [showLess] });
+      } else if (i.customId === "less") {
+        await i.update({ components: [_row] });
+        const embed = buildPage1(user, mode);
+        response.edit({ embeds: [embed], components: [showMore] });
+      }
+    } catch (e) {}
+  });
+
+  collector.on("end", async (i) => {
+    try {
+      await response.edit({ components: [] });
+    } catch (e) {}
+  });
 }
 
 module.exports = {

@@ -79,9 +79,9 @@ async function run(message, username, mode, i) {
   });
 
   collector.on("end", async (i) => {
-    if (i.message !== undefined) {
+    try {
       await response.edit({ components: [] });
-    }
+    } catch (e) {}
   });
 }
 
