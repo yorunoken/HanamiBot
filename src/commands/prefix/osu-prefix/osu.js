@@ -18,7 +18,7 @@ async function run(message, username, mode) {
   let showLess = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("less").setLabel("Show Less").setStyle(ButtonStyle.Success));
 
   const embed = buildPage1(user, mode);
-  const response = await message.channel.send({ embeds: [embed] });
+  const response = await message.channel.send({ embeds: [embed], components: [showMore] });
 
   const filter = (i) => i.user.id === interaction.user.id;
   const collector = response.createMessageComponentCollector({ time: 60000, filter: filter });
