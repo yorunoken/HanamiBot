@@ -11,7 +11,7 @@ module.exports = {
   name: "lmgt",
   aliases: ["lmgt"],
   cooldown: 5000,
-  run: async (client, message, args, prefix) => {
+  run: async ({ message, args }) => {
     await run(message, args);
   },
 };

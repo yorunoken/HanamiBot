@@ -10,7 +10,7 @@ module.exports = {
       command.run({ client, interaction, db });
     } catch (e) {
       console.error(e);
-      interaction.reply({ content: "There was an error with this interaction. Please try again.", ephemeral: true });
+      interaction.reply({ content: `There was an error with this interaction. Please try again. ${e}`, ephemeral: true });
     }
   },
 };

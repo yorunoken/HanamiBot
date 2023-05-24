@@ -9,7 +9,7 @@ module.exports = {
   name: "ping",
   aliases: ["pong"],
   cooldown: 5000,
-  run: async (client, message, args, prefix) => {
+  run: async ({ message }) => {
     await run(message);
   },
 };
