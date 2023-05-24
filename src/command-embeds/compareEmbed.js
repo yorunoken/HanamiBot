@@ -158,7 +158,7 @@ async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, 
     const stars = maxAttrs.difficulty.stars.toFixed(2);
     const maxComboMap = maxAttrs.difficulty.maxCombo;
 
-    let first_row = `**${playRank}. +${modsName}** [${stars}★]\n`;
+    let first_row = `**#${playRank} +${modsName}** [${stars}★]\n`;
     let second_row = `${grade} ▹ **${curAttrs.pp.toFixed(2)}PP** ${acc} [**${Number(score.max_combo)}x**/${maxComboMap}x]\n`;
     let third_row = `${score.score.toLocaleString()} ▹ ${accValues} <t:${scoreTime}:R>`;
     let fourth_row = "";

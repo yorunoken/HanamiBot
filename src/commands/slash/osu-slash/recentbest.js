@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { buildTopsEmbed } = require("../../../command-embeds/topEmbed");
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernameInteraction");
+const { v2 } = require("osu-api-extended");
 
 async function run(interaction, username) {
   await interaction.deferReply();
@@ -11,12 +12,12 @@ async function run(interaction, username) {
   const index = interaction.options.getInteger("index");
   const recent = true;
 
-  const user = await getUser(username, mode);
+  const user = await v2.user.details(username, mode);
   if (user.error === null) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`The user \`${username}\` was not found.`)] });
     return;
   }
-  const tops = await getTops(user, mode);
+  const tops = await v2.scores.user.category(user.id, "best", { mode: mode });
   if (tops.length === 0) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No plays found for ${user.username}.`)] });
     return;
@@ -87,30 +88,6 @@ async function run(interaction, username) {
   });
 }
 
-async function getTops(user, mode) {
-  const url = `https://osu.ppy.sh/api/v2/users/${user.id}/scores/best?mode=${mode}&limit=100`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  return await response.json();
-}
-
-async function getUser(username, mode) {
-  const url = `https://osu.ppy.sh/api/v2/users/${username}/${mode}`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  return await response.json();
-}
-
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("recentbest")
@@ -122,7 +99,7 @@ module.exports = {
     .addIntegerOption((option) => option.setName("page").setDescription("The page").setMinValue(1).setMaxValue(20))
     .addIntegerOption((option) => option.setName("index").setDescription("The index of the play you want").setMinValue(1).setMaxValue(100))
     .addBooleanOption((option) => option.setName("reverse").setDescription("Whether or not to reverse the order")),
-  run: async (client, interaction) => {
+  run: async ({ interaction }) => {
     const username = await getUsername(interaction);
     if (!username) return;
 

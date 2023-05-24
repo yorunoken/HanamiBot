@@ -2,31 +2,18 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { buildUserEmbed } = require("../../../command-embeds/osuEmbed");
 const { getUsername } = require("../../../utils/getUsernameInteraction");
 const { EmbedBuilder } = require("discord.js");
+const { v2 } = require("osu-api-extended");
 
 async function run(interaction, username, mode) {
   await interaction.deferReply();
 
-  const user = await getUser(username, mode);
+  const user = await v2.user.details(username, mode);
   if (user.error === null) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`The user \`${username}\` was not found.`)] });
     return;
   }
   const embed = buildUserEmbed(user, mode);
   interaction.editReply({ embeds: [embed] });
-}
-
-async function getUser(username, mode) {
-  const now = Date.now();
-  const url = `https://osu.ppy.sh/api/v2/users/${username}/${mode}`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  console.log(`Got user in ${Date.now() - now}ms`);
-  return await response.json();
 }
 
 module.exports = {
@@ -37,11 +24,9 @@ module.exports = {
     .addStringOption((option) =>
       option.setName("mode").setDescription("Select an osu! mode").setRequired(false).addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "fruits", value: "fruits" })
     ),
-  run: async (client, interaction) => {
+  run: async ({ interaction }) => {
     const mode = interaction.options.getString("mode") ?? "osu";
-
-    const collection = "users";
-    const username = await getUsername(interaction, collection);
+    const username = await getUsername(interaction);
     if (!username) return;
 
     await run(interaction, username, mode);

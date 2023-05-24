@@ -1,8 +1,9 @@
 const { SlashCommandBuilder, ChatInputCommandInteraction } = require("discord.js");
 const { leaderboard } = require("../../../command-embeds/leaderboardEmbed.js");
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { query } = require("../../../utils/getQuery.js");
 const axios = require("axios");
+const { v2 } = require("osu-api-extended");
 
 /**
  *
@@ -32,7 +33,7 @@ async function run(client, interaction) {
     beatmapID = await cycleThroughEmbeds(client, interaction);
   }
 
-  const beatmap = await getMap(beatmapID);
+  const beatmap = await v2.beatmap.id.details(beatmapID);
   if (beatmap.status != "ranked" && beatmap.status != "loved" && beatmap.status != "approved") {
     interaction.editReply("It seems like that map doesn't have a leaderboard..");
   }
@@ -107,18 +108,6 @@ async function run(client, interaction) {
   });
 }
 
-async function getMap(beatmapID) {
-  const url = `https://osu.ppy.sh/api/v2/beatmaps/${beatmapID}`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  return await response.json();
-}
-
 function findID(embed) {
   const regex = /^https?:\/\/osu\.ppy\.sh\/(b|beatmaps)\/\d+$/;
   let beatmapIDFound = false;
@@ -180,7 +169,7 @@ module.exports = {
     .addStringOption((option) => option.setName("mods").setDescription("Sort by mods"))
     .addStringOption((option) => option.setName("link").setDescription("Get leaderboard by its beatmap link"))
     .addIntegerOption((option) => option.setName("page").setDescription("Specify what page it should be.")),
-  run: async (client, interaction) => {
+  run: async ({ client, interaction }) => {
     await run(client, interaction);
   },
 };

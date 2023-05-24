@@ -110,7 +110,7 @@ async function getDare() {
 
 module.exports = {
   data: new SlashCommandBuilder().setName("truth").setDescription("Get a truth question."),
-  run: async (client, interaction) => {
+  run: async ({ interaction }) => {
     const firstTime = true;
     await run(interaction, QuestionType.truth, firstTime);
   },

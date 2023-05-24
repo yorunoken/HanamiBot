@@ -28,7 +28,7 @@ module.exports = {
     .setDescription("pin configs")
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .addChannelOption((o) => o.setName("channel").setDescription("Choose a text channel I can send the messages to.").addChannelTypes(ChannelType.GuildText)),
-  run: async (client, interaction, db) => {
+  run: async ({ client, interaction, db }) => {
     await run(client, interaction, db);
   },
 };

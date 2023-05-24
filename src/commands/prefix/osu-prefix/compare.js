@@ -1,6 +1,7 @@
 const { buildCompareEmbed } = require("../../../command-embeds/compareEmbed");
 const { EmbedBuilder } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernamePrefix");
+const { v2 } = require("osu-api-extended");
 
 async function run(message, username, mode, options, client, i) {
   await message.channel.sendTyping();
@@ -28,7 +29,7 @@ async function run(message, username, mode, options, client, i) {
   console.log(`found ID in ${Date.now() - now}ms`);
 
   const now2 = Date.now();
-  const user = await getUser(username, mode);
+  const user = await v2.user.details(username, mode);
   console.log(`Fetched user in ${Date.now() - now2}ms`);
   if (user.error === null) {
     message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`The user \`${username}\` was not found.`)] });
@@ -36,7 +37,7 @@ async function run(message, username, mode, options, client, i) {
   }
 
   const now3 = Date.now();
-  const beatmap = await getMap(beatmapID);
+  const beatmap = await v2.beatmap.id.details(beatmapID);
   if (!beatmap) {
     message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Beatmap doesn't exist. check if you replied to a beatmapset.`)] });
     return;
@@ -44,54 +45,21 @@ async function run(message, username, mode, options, client, i) {
   console.log(`Fetched beatmap in ${Date.now() - now3}ms`);
 
   const now4 = Date.now();
-  const scores = await getScores(user, beatmapID);
-  if (scores.scores.length === 0) {
+  const scores = await v2.scores.user.beatmap(beatmapID, user.id, {
+    mode: mode,
+  });
+  console.log(scores);
+  if (scores.length === 0) {
     message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No plays found for ${user.username}. Skill issue.`)] });
     return;
   }
   console.log(`Fetched scores in ${Date.now() - now4}ms`);
 
   const now5 = Date.now();
-  const embed = await buildCompareEmbed(scores.scores, user, page, mode, index, reverse, beatmap);
+  const embed = await buildCompareEmbed(scores, user, page, mode, index, reverse, beatmap);
   console.log(`Fetched embed in ${Date.now() - now5}ms`);
 
   message.channel.send({ embeds: [embed] });
-}
-
-async function getScores(user, beatmapID) {
-  const url = `https://osu.ppy.sh/api/v2/beatmaps/${beatmapID}/scores/users/${user.id}/all`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  return await response.json();
-}
-
-async function getUser(username, mode) {
-  const url = `https://osu.ppy.sh/api/v2/users/${username}/${mode}`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  return await response.json();
-}
-
-async function getMap(beatmapID) {
-  const url = `https://osu.ppy.sh/api/v2/beatmaps/${beatmapID}`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  return await response.json();
 }
 
 async function getEmbedFromReply(message, client) {
@@ -164,7 +132,7 @@ module.exports = {
   name: "compare",
   aliases: ["compare", "c", "cp"],
   cooldown: 5000,
-  run: async (client, message, args, prefix, index) => {
+  run: async ({ client, message, args, index }) => {
     const username = await getUsername(message, args, client);
     if (!username) return;
 

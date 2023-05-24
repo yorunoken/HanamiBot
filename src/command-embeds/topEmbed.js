@@ -166,7 +166,7 @@ async function buildTopsEmbed(tops, user, pageNumber, mode, index, reverse, rece
       ppShown = `**${curAttrs.pp.toFixed(2)}pp** [**~~${fcAttrs.pp.toFixed(2)}pp~~**]`;
     }
 
-    let first_row = `**${playRank}.** [**${mapTitle} [${score.beatmap.version}]**](https://osu.ppy.sh/b/${mapID}) **+${modsName}** [${stars}★]\n`;
+    let first_row = `**#${playRank}** [**${mapTitle} [${score.beatmap.version}]**](https://osu.ppy.sh/b/${mapID}) **+${modsName}** [${stars}★]\n`;
     let second_row = `${grade} ${ppShown} ${acc} [**${Number(score.max_combo)}x**/${maxComboMap}x]\n`;
     let third_row = `${score.score.toLocaleString()} ▹ ${accValues} <t:${scoreTime}:R>`;
     let fourth_row = "";

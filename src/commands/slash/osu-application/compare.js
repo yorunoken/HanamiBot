@@ -3,6 +3,7 @@ const { ApplicationCommandType } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernameInteraction");
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { buildCompareEmbed } = require("../../../command-embeds/compareEmbed");
+const { v2 } = require("osu-api-extended");
 
 async function run(client, interaction) {
   await interaction.deferReply();
@@ -24,19 +25,21 @@ async function run(client, interaction) {
   const prevPage = new ButtonBuilder().setCustomId("prev").setLabel("⬅️").setStyle(ButtonStyle.Secondary);
   const row = new ActionRowBuilder().addComponents(prevPage, nextPage);
 
-  const beatmap = await getMap(beatmapID);
+  const beatmap = await v2.beatmap.id.details(beatmapID);
   if (!beatmap) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Beatmap doesn't exist. check if you replied to a beatmapset.`)] });
     return;
   }
   const mode = beatmap.mode;
 
-  const user = await getUser(username, mode);
+  const user = await v2.user.details(username, mode);
   if (user.error === null) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`The user \`${username}\` was not found.`)] });
     return;
   }
-  const scores = await getScores(user, beatmapID);
+  const scores = await v2.scores.user.beatmap(beatmapID, user.id, {
+    mode: mode,
+  });
   if (scores.length === 0) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No plays found for ${user.username}. Skill issue.`)] });
     return;
@@ -45,44 +48,8 @@ async function run(client, interaction) {
   let reverse;
   const page = 1;
 
-  const embed = await buildCompareEmbed(scores.scores, user, page, mode, index, reverse, beatmap);
+  const embed = await buildCompareEmbed(scores, user, page, mode, index, reverse, beatmap);
   const response = await interaction.editReply({ embeds: [embed], components: [row] });
-}
-
-async function getScores(user, beatmapID) {
-  const url = `https://osu.ppy.sh/api/v2/beatmaps/${beatmapID}/scores/users/${user.id}/all`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  return await response.json();
-}
-
-async function getUser(username, mode) {
-  const url = `https://osu.ppy.sh/api/v2/users/${username}/${mode}`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  return await response.json();
-}
-
-async function getMap(beatmapID) {
-  const url = `https://osu.ppy.sh/api/v2/beatmaps/${beatmapID}`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  return await response.json();
 }
 
 function findBeatmapID(embed) {
@@ -138,7 +105,7 @@ function testRegex(URL, regex) {
 
 module.exports = {
   data: new ContextMenuCommandBuilder().setName("Compare score").setType(ApplicationCommandType.Message),
-  run: async (client, interaction) => {
+  run: async ({ client, interaction }) => {
     await run(client, interaction);
   },
 };

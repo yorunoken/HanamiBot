@@ -10,7 +10,7 @@ async function run(interaction) {
 
 module.exports = {
   data: new SlashCommandBuilder().setName("ping").setDescription("Check if bot is alive."),
-  run: async (client, interaction) => {
+  run: async ({ interaction }) => {
     await run(interaction);
   },
 };

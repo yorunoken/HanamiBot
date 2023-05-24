@@ -130,12 +130,12 @@ async function leaderboard(beatmapID, scores, pageNumber, beatmap, requesterName
     const date = new Date(score.ended_at);
     const UnixDate = date.getTime() / 1000;
 
-    let first_row = `**${num + 1}.** ${grade} [**${score.user.username}**](https://osu.ppy.sh/users/${score.user.id}) ${modShow}**__[${CurAttrs.difficulty.stars.toFixed(2)}★]__**\n`;
+    let first_row = `**#${num + 1}** ${grade} [**${score.user.username}**](https://osu.ppy.sh/users/${score.user.id}) ${modShow}**__[${CurAttrs.difficulty.stars.toFixed(2)}★]__**\n`;
     let second_row = `▹${PP} ▹ (${(score.accuracy * 100).toFixed(2)}%) • ${score.total_score.toLocaleString()}\n`;
     let third_row = `▹[ **${score.max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] • ${accValues} <t:${UnixDate}:R>`;
 
     if (YourScore) {
-      first_row = `**${num + 1}.** ${grade} [**${score.user.username}**](https://osu.ppy.sh/users/${score.user.id}) (${(score.accuracy * 100).toFixed(2)}%) ${modShow} **${score.statistics.miss}**<:hit00:1061254490075955231> <t:${UnixDate}:R>\n`;
+      first_row = `**#${num + 1}** ${grade} [**${score.user.username}**](https://osu.ppy.sh/users/${score.user.id}) (${(score.accuracy * 100).toFixed(2)}%) ${modShow} **${score.statistics.miss}**<:hit00:1061254490075955231> <t:${UnixDate}:R>\n`;
       second_row = `▹ ${PP} [ **${score.max_combo}x**/${maxAttrs.difficulty.maxCombo}x ] **__[${CurAttrs.difficulty.stars.toFixed(2)}★]__**`;
       third_row = ``;
     }

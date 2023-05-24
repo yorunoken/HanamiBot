@@ -1,6 +1,7 @@
 const { buildTopsEmbed } = require("../../../command-embeds/topEmbed");
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernamePrefix");
+const { v2 } = require("osu-api-extended");
 
 async function run(message, username, mode, options, i) {
   await message.channel.sendTyping();
@@ -10,12 +11,12 @@ async function run(message, username, mode, options, i) {
   const reverse = false;
   const recent = true;
 
-  const user = await getUser(username, mode);
+  const user = await v2.user.details(username, mode);
   if (user.error === null) {
     message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`The user \`${username}\` was not found.`)] });
     return;
   }
-  const tops = await getTops(user, mode);
+  const tops = await v2.scores.user.category(user.id, "best", { mode: mode });
   if (tops.length === 0) {
     message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No plays found for ${user.username}.`)] });
     return;
@@ -86,35 +87,11 @@ async function run(message, username, mode, options, i) {
   });
 }
 
-async function getTops(user, mode) {
-  const url = `https://osu.ppy.sh/api/v2/users/${user.id}/scores/best?mode=${mode}&limit=100`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  return await response.json();
-}
-
-async function getUser(username, mode) {
-  const url = `https://osu.ppy.sh/api/v2/users/${username}/${mode}`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  return await response.json();
-}
-
 module.exports = {
   name: "recentbest",
   aliases: ["rb", "recentbest"],
   cooldown: 5000,
-  run: async (client, message, args, prefix, index) => {
+  run: async ({ message, args, index }) => {
     const username = await getUsername(message, args);
     if (!username) return;
 

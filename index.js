@@ -22,8 +22,8 @@ const client = new Client({
 });
 require("dotenv/config");
 const { MongoClient } = require("mongodb");
+const { auth } = require("osu-api-extended");
 const fs = require("fs");
-const { auth } = require("./src/utils/auth");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v10");
 
@@ -76,16 +76,13 @@ for (const folder of slashFolders) {
 
 const refreshAuth = async () => {
   try {
-    await auth(process.env.client_id, process.env.client_secret);
+    await auth.login(process.env.client_id, process.env.client_secret);
     console.log("Refreshed osu! token");
   } catch (error) {
     console.error(error);
   }
 };
-
 refreshAuth();
-const hourInterval = 8;
-setInterval(refreshAuth, 1000 * 60 * 60 * hourInterval);
 
 client.on("ready", async () => {
   try {

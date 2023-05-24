@@ -199,7 +199,7 @@ module.exports = {
         .setDescription("Get a list of all available skins.")
         .addNumberOption((o) => o.setName("page").setDescription("Page Number"))
     ),
-  run: async (client, interaction) => {
+  run: async ({ client, interaction }) => {
     await interaction.deferReply();
     const subs = interaction.options.getSubcommand(false);
 

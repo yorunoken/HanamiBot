@@ -1,5 +1,6 @@
 const { buildMap } = require("../../../command-embeds/mapEmbed");
 const { EmbedBuilder, SlashCommandBuilder, ChatInputCommandInteraction } = require("discord.js");
+const { v2 } = require("osu-api-extended");
 
 /**
  *
@@ -51,7 +52,7 @@ async function run(client, interaction) {
   console.log(`found ID in ${Date.now() - now}ms`);
 
   const now3 = Date.now();
-  const beatmap = await getMap(beatmapID);
+  const beatmap = await v2.beatmap.id.details(beatmapID);
   if (!beatmap) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Beatmap doesn't exist. check if you replied to a beatmapset.`)] });
     return;
@@ -63,18 +64,6 @@ async function run(client, interaction) {
   console.log(`Fetched embed in ${Date.now() - now5}ms`);
 
   interaction.editReply({ embeds: [embed] });
-}
-
-async function getMap(beatmapID) {
-  const url = `https://osu.ppy.sh/api/v2/beatmaps/${beatmapID}`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  return await response.json();
 }
 
 function findID(embed) {
@@ -133,7 +122,7 @@ module.exports = {
     .addNumberOption((o) => o.setName("cs").setDescription("Circle size of the map").setMinValue(0).setMaxValue(10))
     .addNumberOption((o) => o.setName("bpm").setDescription("The map's beats per minute").setMinValue(60).setMaxValue(2000)),
 
-  run: async (client, interaction) => {
+  run: async ({ client, interaction }) => {
     await run(client, interaction);
   },
 };

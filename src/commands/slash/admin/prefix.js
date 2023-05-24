@@ -24,7 +24,7 @@ module.exports = {
     .setDescription("Set the prefix of a server.")
     .addStringOption((option) => option.setName("prefix").setDescription("Your new prefix").setRequired(true))
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
-  run: async (client, interaction, db) => {
+  run: async ({ interaction, db }) => {
     await run(interaction, db);
   },
 };

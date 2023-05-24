@@ -1,20 +1,20 @@
 const { buildRecentsEmbed } = require("../../../command-embeds/recentEmbed");
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernamePrefix");
+const { v2 } = require("osu-api-extended");
 
 async function run(message, username, mode, i) {
   await message.channel.sendTyping();
 
-  console.log(i);
   let index = i ?? 1;
-  const pass = false;
+  const pass = 1;
 
-  const user = await getUser(username, mode);
+  const user = await v2.user.details(username, mode);
   if (user.error === null) {
     message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`The user \`${username}\` was not found.`)] });
     return;
   }
-  const recents = await getRecents(user, mode, pass);
+  const recents = await v2.scores.user.category(user.id, "recent", { include_fails: pass, limit: 100 });
   if (recents.length === 0) {
     message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No recent plays found for ${user.username}.`)] });
     return;
@@ -29,7 +29,7 @@ async function run(message, username, mode, i) {
   let row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(true));
 
   if (index === 1) {
-    if (recents.length > 5) {
+    if (recents.length > 1) {
       row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(false));
     }
   } else if (recents.length <= 1) {
@@ -85,42 +85,11 @@ async function run(message, username, mode, i) {
   });
 }
 
-async function getRecents(user, mode, passes) {
-  let includes = passes;
-  switch (passes) {
-    case passes === true:
-      includes = 0;
-    default:
-      includes = 1;
-  }
-  const url = `https://osu.ppy.sh/api/v2/users/${user.id}/scores/recent?mode=${mode}&limit=50&include_fails=${includes}`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  return await response.json();
-}
-
-async function getUser(username, mode) {
-  const url = `https://osu.ppy.sh/api/v2/users/${username}/${mode}`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  return await response.json();
-}
-
 module.exports = {
   name: "recent",
   aliases: ["rs", "recent", "r"],
   cooldown: 5000,
-  run: async (client, message, args, prefix, index) => {
+  run: async ({ message, args, index }) => {
     const username = await getUsername(message, args);
     if (!username) return;
 

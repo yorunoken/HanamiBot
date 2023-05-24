@@ -69,7 +69,7 @@ async function run(client, interaction, db) {
 
 module.exports = {
   data: new ContextMenuCommandBuilder().setName("Pin a message").setType(ApplicationCommandType.Message),
-  run: async (client, interaction, db) => {
+  run: async ({ client, interaction, db }) => {
     await run(client, interaction, db);
   },
 };

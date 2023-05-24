@@ -10,7 +10,7 @@ module.exports = {
     .setName("lmgt")
     .setDescription("Let me google that for you!")
     .addStringOption((option) => option.setName("query").setDescription("Your query").setRequired(true)),
-  run: async (client, interaction) => {
+  run: async ({ interaction }) => {
     let query = interaction.options.getString("query");
     query = query.replace(/\s+/g, "+");
     await run(interaction, query);

@@ -1,6 +1,6 @@
 const { buildMap } = require("../../../command-embeds/mapEmbed");
 const { EmbedBuilder, Message } = require("discord.js");
-const { database } = require("../../../../index.js"); // we import our database from where we first initialized it
+const { v2 } = require("osu-api-extended");
 
 /**
  * @param {Message} message
@@ -31,7 +31,7 @@ async function run(message, client, args) {
   console.log(`found ID in ${Date.now() - now}ms`);
 
   const now3 = Date.now();
-  const beatmap = await getMap(beatmapID);
+  const beatmap = await v2.beatmap.id.details(beatmapID);
   if (!beatmap) {
     message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Beatmap doesn't exist. check if you replied to a beatmapset.`)] });
     return;
@@ -53,18 +53,6 @@ async function run(message, client, args) {
   console.log(`Fetched embed in ${Date.now() - now5}ms`);
 
   message.channel.send({ embeds: [embed] });
-}
-
-async function getMap(beatmapID) {
-  const url = `https://osu.ppy.sh/api/v2/beatmaps/${beatmapID}`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  return await response.json();
 }
 
 async function getEmbedFromReply(message, client) {
@@ -137,7 +125,7 @@ module.exports = {
   name: "map",
   aliases: ["map", "m"],
   cooldown: 5000,
-  run: async (client, message, args, prefix) => {
+  run: async ({ client, message, args }) => {
     await run(message, client, args);
   },
 };

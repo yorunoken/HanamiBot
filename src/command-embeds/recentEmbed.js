@@ -2,6 +2,7 @@ const { EmbedBuilder } = require("discord.js");
 const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
 const { query } = require("../utils/getQuery.js");
+const { v2 } = require("osu-api-extended");
 
 const { tools } = require("../utils/tools.ts");
 const { mods } = require("../utils/mods.js");
@@ -163,7 +164,7 @@ async function buildRecentsEmbed(score, user, mode, index) {
   let fraction = objectshit / objects;
   let percentageRaw = Number((fraction * 100).toFixed(2));
   let percentageNum = percentageRaw.toFixed(1);
-  let percentage = `(${percentageNum}%) `;
+  let percentage = ` @${percentageNum}% `;
   if (percentageNum == "100.0" || score[index].passed == true) {
     percentage = " ";
   }
@@ -206,7 +207,13 @@ async function buildRecentsEmbed(score, user, mode, index) {
   const scoreTime = new Date(score[index].created_at).getTime() / 1000;
   const grade = grades[score[index].rank];
 
+  let scoreGlobalRank = "";
   if (score[index].passed === true) {
+    const scoreGlobal = await v2.scores.details(score[index].best_id.toString(), score[index].beatmap.mode);
+    const scoreRank = scoreGlobal.rank_global;
+    if (scoreRank >= 1000) {
+      scoreGlobalRank = `Global Rank #${scoreRank}`;
+    }
   }
 
   //score embed
@@ -221,7 +228,7 @@ async function buildRecentsEmbed(score, user, mode, index) {
     .setTitle(`${score[index].beatmapset.artist} - ${score[index].beatmapset.title} [${score[index].beatmap.version}] [${maxAttrs.difficulty.stars.toFixed(2)}★]`)
     .setURL(`https://osu.ppy.sh/b/${mapID}`)
     .setFields({
-      name: `${grade} ${percentage}${ModDisplay}  **${totalScore}  ${acc}** <t:${scoreTime}:R>`,
+      name: `${scoreGlobalRank}${grade} ${percentage}${ModDisplay}  **${totalScore}  ${acc}** <t:${scoreTime}:R>`,
       value: `${ppValue}\n${ifFc} Try #${retryCounter}\n\nBPM: \`${mapValues.bpm.toFixed()}\` Length: \`${minutesTotal}:${secondsTotal}\`\nAR: \`${mapValues.ar.toFixed(1).toString().replace(/\.0+$/, "")}\` OD: \`${mapValues.od
         .toFixed(1)
         .toString()

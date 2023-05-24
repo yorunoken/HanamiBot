@@ -2,22 +2,31 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { buildRecentsEmbed } = require("../../../command-embeds/recentEmbed");
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernameInteraction");
+const { v2 } = require("osu-api-extended");
 
 async function run(interaction, username) {
   await interaction.deferReply();
   const mode = interaction.options.getString("mode") ?? "osu";
   let index = interaction.options.getInteger("index") ?? 1;
-  const passes = interaction.options.getBoolean("passes");
+  let pass = interaction.options.getBoolean("passes") ?? 1;
+  switch (pass) {
+    case true:
+      pass = 0;
+      break;
+    case false:
+      pass = 1;
+      break;
+  }
 
   const now1 = Date.now();
-  const user = await getUser(username, mode);
+  const user = await v2.user.details(username, mode);
   console.log(`got user in ${Date.now() - now1}ms`);
   if (user.error === null) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`The user \`${username}\` was not found.`)] });
     return;
   }
   const now2 = Date.now();
-  const recents = await getRecents(user, mode, passes);
+  const recents = await v2.scores.user.category(user.id, "recent", { include_fails: pass, limit: 100 });
   console.log(`got recents in ${Date.now() - now2}ms`);
   if (recents.length === 0) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No recent plays found for ${user.username}.`)] });
@@ -33,7 +42,7 @@ async function run(interaction, username) {
   let row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(true));
 
   if (index === 1) {
-    if (recents.length > 5) {
+    if (recents.length > 1) {
       row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(false));
     }
   } else if (recents.length <= 1) {
@@ -55,9 +64,9 @@ async function run(interaction, username) {
   collector.on("collect", async (i) => {
     try {
       if (i.customId == "next") {
-        if (!(index + 1 > Math.ceil(score.length / 5))) {
+        if (index + 1 < recents.length) {
           index++;
-          if (index === Math.ceil(score.length / 5)) {
+          if (index === recents.length) {
             row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
           } else {
             row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
@@ -91,37 +100,6 @@ async function run(interaction, username) {
   });
 }
 
-async function getRecents(user, mode, passes) {
-  let includes = passes;
-  switch (passes) {
-    case passes === true:
-      includes = 0;
-    default:
-      includes = 1;
-  }
-  const url = `https://osu.ppy.sh/api/v2/users/${user.id}/scores/recent?mode=${mode}&limit=50&include_fails=${includes}`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  return await response.json();
-}
-
-async function getUser(username, mode) {
-  const url = `https://osu.ppy.sh/api/v2/users/${username}/${mode}`;
-  const headers = {
-    Authorization: `Bearer ${process.env.osu_bearer_key}`,
-  };
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
-  return await response.json();
-}
-
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("rs")
@@ -133,7 +111,7 @@ module.exports = {
     .addIntegerOption((option) => option.setName("index").setDescription("The index of a recent play.").setMinValue(1).setMaxValue(50))
     .addBooleanOption((option) => option.setName("passes").setDescription("Specify whether only passes should be considered."))
     .addStringOption((option) => option.setName("mods").setDescription("Specify what mods to consider.")),
-  run: async (client, interaction) => {
+  run: async ({ interaction }) => {
     const username = await getUsername(interaction);
     if (!username) return;
 

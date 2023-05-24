@@ -6,7 +6,7 @@ const { SlashCommandBuilder, Client, ChatInputCommandInteraction, EmbedBuilder }
  * @param {ChatInputCommandInteraction} interaction
  */
 
-async function run(client, interaction) {
+async function run(interaction) {
   let dot = false;
   let height = interaction.options.getNumber("height").toString();
   const weight = interaction.options.getNumber("weight");
@@ -30,8 +30,8 @@ module.exports = {
     .setDescription("Calculate a BMI")
     .addNumberOption((option) => option.setName("height").setDescription("Height of the user").setRequired(true))
     .addNumberOption((option) => option.setName("weight").setDescription("Weight of the user").setRequired(true)),
-  run: async (client, interaction) => {
+  run: async ({ interaction }) => {
     await interaction.deferReply();
-    await run(client, interaction);
+    await run(interaction);
   },
 };

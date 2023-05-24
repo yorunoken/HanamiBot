@@ -39,7 +39,7 @@ module.exports = {
     .setName("link")
     .setDescription("Link your osu! account to the bot")
     .addStringOption((option) => option.setName("username").setDescription("Your minecraft username").setRequired(true)),
-  run: async (client, interaction) => {
+  run: async ({ interaction }) => {
     await run(interaction, username);
   },
 };
