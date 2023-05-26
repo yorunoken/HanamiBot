@@ -169,7 +169,7 @@ async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, 
           100: value100,
           katu: valueKatu,
           50: value50,
-          miss: 0,
+          0: 0,
         },
         mode
       );
@@ -205,15 +205,17 @@ async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, 
       if (curAttrs.effectiveMissCount > 0) {
         Map300CountFc = objects - value100 - value50;
 
-        const FcAcc = tools.accuracy({
-          n300: Map300CountFc,
-          ngeki: valueGeki,
-          n100: value100,
-          nkatu: valueKatu,
-          n50: value50,
-          nmiss: 0,
-          mode: mode,
-        });
+        const FcAcc = tools.accuracy(
+          {
+            300: Map300CountFc,
+            geki: valueGeki,
+            100: value100,
+            katu: valueKatu,
+            50: value50,
+            0: 0,
+          },
+          mode
+        );
 
         pps = `**${curAttrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}PP ▹ (**${fcAttrs.pp.toFixed(2)}**PP for **${FcAcc.toFixed(2)}%**)`;
       } else {

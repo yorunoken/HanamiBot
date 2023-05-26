@@ -1,20 +1,30 @@
 const { buildRecentsEmbed } = require("../../../command-embeds/recentEmbed");
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernamePrefix");
-const { v2 } = require("osu-api-extended");
+const { v2, mods } = require("osu-api-extended");
 
-async function run(message, username, mode, i) {
+async function run(message, username, mode, i, args) {
   await message.channel.sendTyping();
 
   let index = i ?? 1;
   const pass = 1;
+
+  let argValues = {};
+  for (const arg of args) {
+    const [key, value] = arg.split("=");
+    if (key && value) {
+      argValues[key.toLowerCase()] = Number(value) || value.toLowerCase();
+    }
+  }
+  let modsRaw = argValues["mods"];
+  const modID = modsRaw ? mods.id(modsRaw) : undefined;
 
   const user = await v2.user.details(username, mode);
   if (user.error === null) {
     message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`The user \`${username}\` was not found.`)] });
     return;
   }
-  const recents = await v2.scores.user.category(user.id, "recent", { include_fails: pass, limit: 100, mode: mode });
+  const recents = await v2.scores.user.category(user.id, "recent", { include_fails: pass, limit: 100, mode: mode, mods: modID });
   if (recents.length === 0) {
     message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No recent plays found for ${user.username} in osu!${mode === "osu" ? "standard" : mode}.`)] });
     return;
@@ -49,7 +59,7 @@ async function run(message, username, mode, i) {
   collector.on("collect", async (i) => {
     try {
       if (i.customId == "next") {
-        if (index + 1 < recents.length) {
+        if (index + 1 <= recents.length) {
           index++;
           if (index === recents.length) {
             row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
@@ -110,6 +120,6 @@ module.exports = {
     // const passes = wanted.filter((word) => args.indexOf(word) >= 0)
     // const pass = passes[0] ?? false;
 
-    await run(message, username, mode, index);
+    await run(message, username, mode, index, args);
   },
 };

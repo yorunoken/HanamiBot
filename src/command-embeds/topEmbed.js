@@ -200,7 +200,7 @@ async function buildTopsEmbed(tops, user, pageNumber, mode, index, reverse, rece
             100: value100,
             katu: valueKatu,
             50: value50,
-            miss: 0,
+            0: 0,
           },
           mode
         );

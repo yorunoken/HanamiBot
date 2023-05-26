@@ -1,6 +1,7 @@
 const { Collection, Message } = require("discord.js");
 const ms = require("ms");
 const cooldown = new Collection();
+const { login } = require("../utils/handleLogin.js");
 
 module.exports = {
   name: "messageCreate",
@@ -10,6 +11,10 @@ module.exports = {
    * @returns
    */
   execute: async (message, db) => {
+    // if (message.channel.id === "1111679796058017917") {
+    //   await login(message);
+    //   return;
+    // }
     const collection = db.collection("server_config");
 
     const client = message.client;
@@ -41,7 +46,7 @@ module.exports = {
     if (!command) command = client.prefixCommands.get(client.aliases.get(commandName));
     if (!command) return;
     if (!command.cooldown) {
-      command.run({ client, message, args, prefix, index: number, commandName });
+      command.run({ client, message, args, prefix, index: number, commandName, db });
       return;
     }
     if (cooldown.has(`${command.name}${message.author.id}`))
@@ -50,7 +55,7 @@ module.exports = {
           content: `Try again in \`${ms(cooldown.get(`${command.name}${message.author.id}`) - Date.now(), { long: true })}\``,
         })
         .then((msg) => setTimeout(() => msg.delete(), cooldown.get(`${command.name}${message.author.id}`) - Date.now()));
-    command.run({ client, message, args, prefix, index: number, commandName });
+    command.run({ client, message, args, prefix, index: number, commandName, db });
     cooldown.set(`${command.name}${message.author.id}`, Date.now() + command.cooldown);
     setTimeout(() => {
       cooldown.delete(`${command.name}${message.author.id}`);

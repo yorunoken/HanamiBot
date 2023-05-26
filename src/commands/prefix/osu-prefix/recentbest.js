@@ -51,7 +51,7 @@ async function run(message, username, mode, options, i) {
   collector.on("collect", async (i) => {
     try {
       if (i.customId == "next") {
-        if (!(page + 1 > Math.ceil(tops.length / 5))) {
+        if (!(page + 1 >= Math.ceil(tops.length / 5))) {
           page++;
           if (page === Math.ceil(tops.length / 5)) {
             row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));

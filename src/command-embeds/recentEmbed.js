@@ -180,7 +180,7 @@ async function buildRecentsEmbed(score, user, mode, index) {
         100: value100,
         katu: valueKatu,
         50: value50,
-        miss: 0,
+        0: 0,
       },
       mode
     );

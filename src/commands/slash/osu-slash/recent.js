@@ -2,21 +2,16 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { buildRecentsEmbed } = require("../../../command-embeds/recentEmbed");
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernameInteraction");
-const { v2 } = require("osu-api-extended");
+const { v2, mods } = require("osu-api-extended");
 
 async function run(interaction, username) {
   await interaction.deferReply();
   const mode = interaction.options.getString("mode") ?? "osu";
+  const modsInt = interaction.options.getString("mods");
   let index = interaction.options.getInteger("index") ?? 1;
-  let pass = interaction.options.getBoolean("passes") ?? 1;
-  switch (pass) {
-    case true:
-      pass = 0;
-      break;
-    case false:
-      pass = 1;
-      break;
-  }
+  let pass = !interaction.options.getBoolean("passes") ?? true;
+
+  const modID = modsInt ? mods.id(modsInt) : undefined;
 
   const now1 = Date.now();
   const user = await v2.user.details(username, mode);
@@ -26,12 +21,13 @@ async function run(interaction, username) {
     return;
   }
   const now2 = Date.now();
-  const recents = await v2.scores.user.category(user.id, "recent", { include_fails: pass, limit: 100 });
+  const recents = await v2.scores.user.category(user.id, "recent", { include_fails: pass, limit: 100, mods: modID });
   console.log(`got recents in ${Date.now() - now2}ms`);
   if (recents.length === 0) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No recent plays found for ${user.username} in osu!${mode === "osu" ? "standard" : mode}.`)] });
     return;
   }
+  console.log(recents);
 
   const _ = new ButtonBuilder().setCustomId("next").setLabel("➡️").setStyle(ButtonStyle.Secondary).setDisabled(true);
   const _b = new ButtonBuilder().setCustomId("prev").setLabel("⬅️").setStyle(ButtonStyle.Secondary).setDisabled(true);
@@ -64,7 +60,7 @@ async function run(interaction, username) {
   collector.on("collect", async (i) => {
     try {
       if (i.customId == "next") {
-        if (index + 1 < recents.length) {
+        if (index + 1 <= recents.length) {
           index++;
           if (index === recents.length) {
             row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
