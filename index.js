@@ -76,7 +76,7 @@ for (const folder of slashFolders) {
 
 const refreshAuth = async () => {
   try {
-    await auth.login(process.env.client_id, process.env.client_secret, "public");
+    await auth.login(process.env.client_id, process.env.client_secret, ["public"]);
     console.log("Refreshed osu! token");
   } catch (error) {
     console.error(error);
