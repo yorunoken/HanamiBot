@@ -39,7 +39,6 @@ async function run(message, client, args) {
   console.log(`Fetched beatmap in ${Date.now() - now3}ms`);
 
   let argValues = {};
-
   for (const arg of args) {
     const [key, value] = arg.split("=");
     if (key && value) {

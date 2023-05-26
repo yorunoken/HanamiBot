@@ -18,7 +18,7 @@ async function run(message, username, mode, options, i) {
   }
   const tops = await v2.scores.user.category(user.id, "best", { mode: mode, limit: 100 });
   if (tops.length === 0) {
-    message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No plays found for ${user.username} in osu!${mode}.`)] });
+    message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No plays found for ${user.username} in osu!${mode === "osu" ? "standard" : mode}.`)] });
     return;
   }
 

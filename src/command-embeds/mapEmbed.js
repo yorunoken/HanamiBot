@@ -3,7 +3,7 @@ const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
 const { query } = require("../utils/getQuery.js");
 
-const { mods } = require("../utils/mods.js");
+const { mods } = require("osu-api-extended");
 
 async function buildMap(beatmap, argValues, messageLink, file) {
   let ar, cs, od, RuleSetID, beatmapMode;

@@ -4,8 +4,7 @@ const { Downloader, DownloadEntry } = require("osu-downloader");
 const { query } = require("../utils/getQuery.js");
 const { v2 } = require("osu-api-extended");
 
-const { tools } = require("../utils/tools.ts");
-const { mods } = require("../utils/mods.js");
+const { tools, mods } = require("osu-api-extended");
 
 //grades
 const grades = {
@@ -174,15 +173,17 @@ async function buildRecentsEmbed(score, user, mode, index) {
   if (curAttrs.effectiveMissCount > 0) {
     const Map300CountFc = objects - value100 - value50;
 
-    const FcAcc = tools.accuracy({
-      n300: Map300CountFc,
-      ngeki: valueGeki,
-      n100: value100,
-      nkatu: valueKatu,
-      n50: value50,
-      nmiss: 0,
-      mode: mode,
-    });
+    const FcAcc = tools.accuracy(
+      {
+        300: Map300CountFc,
+        geki: valueGeki,
+        100: value100,
+        katu: valueKatu,
+        50: value50,
+        miss: 0,
+      },
+      mode
+    );
 
     ifFc = `If FC: **${fcAttrs.pp.toFixed(2)}**pp for **${FcAcc.toFixed(2)}%**`;
   }

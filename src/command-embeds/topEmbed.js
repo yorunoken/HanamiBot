@@ -3,8 +3,7 @@ const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
 const { query } = require("../utils/getQuery.js");
 
-const { tools } = require("../utils/tools.ts");
-const { mods } = require("../utils/mods.js");
+const { tools, mods } = require("osu-api-extended");
 
 async function buildTopsEmbed(tops, user, pageNumber, mode, index, reverse, recent) {
   const start = (pageNumber - 1) * 5 + 1;
@@ -194,15 +193,17 @@ async function buildTopsEmbed(tops, user, pageNumber, mode, index, reverse, rece
       if (curAttrs.effectiveMissCount > 0) {
         Map300CountFc = objects - value100 - value50;
 
-        const FcAcc = tools.accuracy({
-          n300: Map300CountFc,
-          ngeki: valueGeki,
-          n100: value100,
-          nkatu: valueKatu,
-          n50: value50,
-          nmiss: 0,
-          mode: mode,
-        });
+        const FcAcc = tools.accuracy(
+          {
+            300: Map300CountFc,
+            geki: valueGeki,
+            100: value100,
+            katu: valueKatu,
+            50: value50,
+            miss: 0,
+          },
+          mode
+        );
 
         pps = `**${curAttrs.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}PP ▹ (**${fcAttrs.pp.toFixed(2)}**PP for **${FcAcc.toFixed(2)}%**)`;
       } else {

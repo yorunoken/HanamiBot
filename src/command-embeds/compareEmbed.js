@@ -3,8 +3,7 @@ const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
 const { query } = require("../utils/getQuery.js");
 
-const { tools } = require("../utils/tools.ts");
-const { mods } = require("../utils/mods.js");
+const { tools, mods } = require("osu-api-extended");
 
 async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, beatmap) {
   const start = (pageNumber - 1) * 5 + 1;
@@ -163,15 +162,17 @@ async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, 
       const objects = beatmap.count_circles + beatmap.count_sliders + beatmap.count_spinners;
       Map300CountFc = objects - value100 - value50;
 
-      const FcAcc = tools.accuracy({
-        n300: Map300CountFc,
-        ngeki: valueGeki,
-        n100: value100,
-        nkatu: valueKatu,
-        n50: value50,
-        nmiss: 0,
-        mode: mode,
-      });
+      const FcAcc = tools.accuracy(
+        {
+          300: Map300CountFc,
+          geki: valueGeki,
+          100: value100,
+          katu: valueKatu,
+          50: value50,
+          miss: 0,
+        },
+        mode
+      );
 
       ifFc = `\nIf FC: **${fcAttrs.pp.toFixed(2)}**pp for **${FcAcc.toFixed(2)}%**`;
     }

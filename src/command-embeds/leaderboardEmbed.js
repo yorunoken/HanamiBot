@@ -3,7 +3,7 @@ const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
 const { query } = require("../utils/getQuery.js");
 
-const { mods } = require("../utils/mods.js");
+const { mods } = require("osu-api-extended");
 
 async function leaderboard(beatmapID, scores, pageNumber, beatmap, requesterName, user) {
   const start = (pageNumber - 1) * 5 + 1;

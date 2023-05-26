@@ -29,7 +29,7 @@ async function run(interaction, username) {
   const recents = await v2.scores.user.category(user.id, "recent", { include_fails: pass, limit: 100 });
   console.log(`got recents in ${Date.now() - now2}ms`);
   if (recents.length === 0) {
-    interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No recent plays found for ${user.username}.`)] });
+    interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No recent plays found for ${user.username} in osu!${mode === "osu" ? "standard" : mode}.`)] });
     return;
   }
 

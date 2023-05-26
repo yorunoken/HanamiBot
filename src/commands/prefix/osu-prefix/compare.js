@@ -50,7 +50,7 @@ async function run(message, username, mode, options, client, i) {
   });
   console.log(scores);
   if (scores.length === 0) {
-    message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No plays found for ${user.username}. Skill issue.`)] });
+    message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No plays found for ${user.username} in osu!${mode === "osu" ? "standard" : mode}.`)] });
     return;
   }
   console.log(`Fetched scores in ${Date.now() - now4}ms`);

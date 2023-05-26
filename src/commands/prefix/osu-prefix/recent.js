@@ -16,7 +16,7 @@ async function run(message, username, mode, i) {
   }
   const recents = await v2.scores.user.category(user.id, "recent", { include_fails: pass, limit: 100, mode: mode });
   if (recents.length === 0) {
-    message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No recent plays found for ${user.username} in osu!${mode}.`)] });
+    message.reply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No recent plays found for ${user.username} in osu!${mode === "osu" ? "standard" : mode}.`)] });
     return;
   }
 

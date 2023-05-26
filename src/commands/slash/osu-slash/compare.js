@@ -41,7 +41,7 @@ async function run(interaction, username, client) {
     mode: mode,
   });
   if (scores.length === 0) {
-    interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No plays found for ${user.username}. Skill issue.`)] });
+    interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No recent plays found for ${user.username} in osu!${mode === "osu" ? "standard" : mode}.`)] });
     return;
   }
   console.log(`Fetched scores in ${Date.now() - now4}ms`);
