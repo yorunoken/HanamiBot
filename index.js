@@ -83,6 +83,7 @@ const refreshAuth = async () => {
   }
 };
 refreshAuth();
+setInterval(refreshAuth, 1000 * 60 * 60 * 8);
 
 client.on("ready", async () => {
   try {
