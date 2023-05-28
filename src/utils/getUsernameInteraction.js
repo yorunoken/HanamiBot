@@ -28,7 +28,7 @@ async function getUsername(interaction) {
           throw new Error("no userarg");
         })();
     } catch (err) {
-      await interaction.reply({ ephmeral: true, content: "Either specify a username, or connect your account with /link" });
+      await interaction.reply({ ephmeral: true, content: "Either specify a username, or connect your account using </link:1106913256339148911>" });
       return false;
     }
   }
