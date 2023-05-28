@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { buildRecentsEmbed } = require("../../../command-embeds/recentEmbed");
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernameInteraction");
+const { query } = require("../../../utils/getQuery.js");
 const { v2, mods } = require("osu-api-extended");
 
 async function run(interaction, username) {
@@ -21,13 +22,13 @@ async function run(interaction, username) {
     return;
   }
   const now2 = Date.now();
+
   const recents = await v2.scores.user.category(user.id, "recent", { include_fails: pass, limit: 100, mods: modID });
   console.log(`got recents in ${Date.now() - now2}ms`);
   if (recents.length === 0) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No recent plays found for ${user.username} in osu!${mode === "osu" ? "standard" : mode}.`)] });
     return;
   }
-  console.log(recents);
 
   const _ = new ButtonBuilder().setCustomId("next").setLabel("➡️").setStyle(ButtonStyle.Secondary).setDisabled(true);
   const _b = new ButtonBuilder().setCustomId("prev").setLabel("⬅️").setStyle(ButtonStyle.Secondary).setDisabled(true);
@@ -49,10 +50,16 @@ async function run(interaction, username) {
     row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
   }
 
+  let content = "";
+  if (modID) {
+    content = `sorting by mods: \`${modsInt}\``;
+  }
+
   const now3 = Date.now();
-  const embed = await buildRecentsEmbed(recents, user, mode, index - 1);
+  const tops = await get100thPlay(user, mode, recents[index - 1]);
+  const embed = await buildRecentsEmbed(recents, user, mode, index - 1, tops);
   console.log(`got embed in ${Date.now() - now3}ms`);
-  const response = await interaction.editReply({ embeds: [embed.embed], components: [row] });
+  const response = await interaction.editReply({ content: content, embeds: [embed.embed], components: [row] });
 
   const filter = (i) => i.user.id === interaction.user.id;
   const collector = response.createMessageComponentCollector({ time: 35000, filter: filter });
@@ -70,8 +77,9 @@ async function run(interaction, username) {
         }
 
         await i.update({ components: [_row] });
-        const embed = await buildRecentsEmbed(recents, user, mode, index - 1);
-        await interaction.editReply({ embeds: [embed.embed], components: [row] });
+        const tops = await get100thPlay(user, mode, recents[index - 1]);
+        const embed = await buildRecentsEmbed(recents, user, mode, index - 1, tops);
+        await interaction.editReply({ content: content, embeds: [embed.embed], components: [row] });
       } else if (i.customId == "prev") {
         if (!(index <= 1)) {
           index--;
@@ -83,8 +91,9 @@ async function run(interaction, username) {
         }
 
         await i.update({ components: [_row] });
-        const embed = await buildRecentsEmbed(recents, user, mode, index - 1);
-        await interaction.editReply({ embeds: [embed.embed], components: [row] });
+        const tops = await get100thPlay(user, mode, recents[index - 1]);
+        const embed = await buildRecentsEmbed(recents, user, mode, index - 1, tops);
+        await interaction.editReply({ content: content, embeds: [embed.embed], components: [row] });
       }
     } catch (e) {}
   });
@@ -96,6 +105,41 @@ async function run(interaction, username) {
   });
 }
 
+async function get100thPlay(user, mode, recent) {
+  var doc = await query({ query: `SELECT * FROM osuUser WHERE id = ?`, parameters: [user.id], name: "value", type: "get" });
+  if (!doc) {
+    var tops = await v2.scores.user.category(user.id, "best", { mode: mode, limit: 100 });
+    await query({ query: `INSERT INTO osuUser (id, value) VALUES (?, json_object('pp100', ?))`, parameters: [user.id, tops[tops.length - 1].pp], type: "run" });
+    var doc = await query({ query: `SELECT value FROM osuUser WHERE id = ${user.id}`, name: "value", type: "get" });
+  }
+  const top100 = doc?.pp100;
+  if (recent.pp < top100) {
+    return "";
+  }
+  if (!recent.pp) {
+    return "";
+  }
+  if (!tops) {
+    var tops = await v2.scores.user.category(user.id, "best", { mode: mode, limit: 100 });
+  }
+  const newValue = recent.pp;
+  const index = getIndex(tops, newValue);
+
+  return recent.beatmap.status === "ranked" ? `Personal Best #${index}` : `Personal Best #${index} (if ranked)`;
+}
+
+function getIndex(tops, value) {
+  let insertIndex = 1;
+  for (const element of tops) {
+    const pp = element.pp;
+    if (pp <= value) {
+      break;
+    }
+    insertIndex++;
+  }
+  return insertIndex;
+}
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("rs")
@@ -104,9 +148,9 @@ module.exports = {
     .addStringOption((option) =>
       option.setName("mode").setDescription("Select an osu! mode").setRequired(false).addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "fruits", value: "fruits" })
     )
+    .addStringOption((option) => option.setName("mods").setDescription("Specify a mod combination").setRequired(false))
     .addIntegerOption((option) => option.setName("index").setDescription("The index of a recent play.").setMinValue(1).setMaxValue(50))
-    .addBooleanOption((option) => option.setName("passes").setDescription("Specify whether only passes should be considered."))
-    .addStringOption((option) => option.setName("mods").setDescription("Specify what mods to consider.")),
+    .addBooleanOption((option) => option.setName("passes").setDescription("Specify whether only passes should be considered.")),
   run: async ({ interaction }) => {
     const username = await getUsername(interaction);
     if (!username) return;

@@ -1,6 +1,7 @@
 const { buildRecentsEmbed } = require("../../../command-embeds/recentEmbed");
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernamePrefix");
+const { query } = require("../../../utils/getQuery.js");
 const { v2, mods } = require("osu-api-extended");
 
 async function run(message, username, mode, i, args) {
@@ -50,8 +51,9 @@ async function run(message, username, mode, i, args) {
     row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
   }
 
-  const embed = await buildRecentsEmbed(recents, user, mode, index - 1);
-  const response = await message.channel.send({ content: "", embeds: [embed.embed], components: [row] });
+  const tops = await get100thPlay(user, mode, recents[index - 1]);
+  const embed = await buildRecentsEmbed(recents, user, mode, index - 1, tops);
+  const response = await message.channel.send({ embeds: [embed.embed], components: [row] });
 
   const filter = (i) => i.user.id === message.author.id;
   const collector = response.createMessageComponentCollector({ time: 35000, filter: filter });
@@ -69,8 +71,9 @@ async function run(message, username, mode, i, args) {
         }
 
         await i.update({ components: [_row] });
-        const embed = await buildRecentsEmbed(recents, user, mode, index - 1);
-        response.edit({ content: "", embeds: [embed.embed], components: [row] });
+        const tops = await get100thPlay(user, mode, recents[index - 1]);
+        const embed = await buildRecentsEmbed(recents, user, mode, index - 1, tops);
+        response.edit({ embeds: [embed.embed], components: [row] });
       } else if (i.customId == "prev") {
         if (!(index <= 1)) {
           index--;
@@ -82,8 +85,9 @@ async function run(message, username, mode, i, args) {
         }
 
         await i.update({ components: [_row] });
-        const embed = await buildRecentsEmbed(recents, user, mode, index - 1);
-        response.edit({ content: "", embeds: [embed.embed], components: [row] });
+        const tops = await get100thPlay(user, mode, recents[index - 1]);
+        const embed = await buildRecentsEmbed(recents, user, mode, index - 1, tops);
+        response.edit({ embeds: [embed.embed], components: [row] });
       }
     } catch (e) {}
   });
@@ -93,6 +97,41 @@ async function run(message, username, mode, i, args) {
       await response.edit({ components: [] });
     } catch (e) {}
   });
+}
+
+async function get100thPlay(user, mode, recent) {
+  var doc = await query({ query: `SELECT * FROM osuUser WHERE id = ?`, parameters: [user.id], name: "value", type: "get" });
+  if (!doc) {
+    var tops = await v2.scores.user.category(user.id, "best", { mode: mode, limit: 100 });
+    await query({ query: `INSERT INTO osuUser (id, value) VALUES (?, json_object('pp100', ?))`, parameters: [user.id, tops[tops.length - 1].pp], type: "run" });
+    var doc = await query({ query: `SELECT value FROM osuUser WHERE id = ${user.id}`, name: "value", type: "get" });
+  }
+  const top100 = doc?.pp100;
+  if (recent.pp < top100) {
+    return "";
+  }
+  if (!recent.pp) {
+    return "";
+  }
+  if (!tops) {
+    var tops = await v2.scores.user.category(user.id, "best", { mode: mode, limit: 100 });
+  }
+  const newValue = recent.pp;
+  const index = getIndex(tops, newValue);
+
+  return recent.beatmap.status === "ranked" ? `Personal Best #${index}` : `Personal Best #${index} (if ranked)`;
+}
+
+function getIndex(tops, value) {
+  let insertIndex = 1;
+  for (const element of tops) {
+    const pp = element.pp;
+    if (pp <= value) {
+      break;
+    }
+    insertIndex++;
+  }
+  return insertIndex;
 }
 
 module.exports = {

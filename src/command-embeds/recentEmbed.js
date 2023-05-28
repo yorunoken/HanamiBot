@@ -2,9 +2,7 @@ const { EmbedBuilder } = require("discord.js");
 const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
 const { query } = require("../utils/getQuery.js");
-const { v2 } = require("osu-api-extended");
-
-const { tools, mods } = require("osu-api-extended");
+const { v2, tools, mods } = require("osu-api-extended");
 
 //grades
 const grades = {
@@ -29,7 +27,7 @@ function getRetryCount(retryMap, mapId) {
   return retryCounter;
 }
 
-async function buildRecentsEmbed(score, user, mode, index) {
+async function buildRecentsEmbed(score, user, mode, index, pbIndex) {
   let rulesetID;
   switch (mode) {
     case "osu":
@@ -209,12 +207,18 @@ async function buildRecentsEmbed(score, user, mode, index) {
   const grade = grades[score[index].rank];
 
   let scoreGlobalRank = "";
+  if (pbIndex.length > 1) {
+    scoreGlobalRank += `__${pbIndex}__`;
+  }
   if (score[index].passed === true) {
     const scoreGlobal = await v2.scores.details(score[index].best_id?.toString(), score[index].beatmap?.mode);
     if (score[index].id === score[index].best_id) {
       const scoreRank = scoreGlobal.rank_global;
-      scoreGlobalRank = `__Global Rank #${scoreRank}__\n`;
+      scoreGlobalRank += `__Global Rank #${scoreRank}__`;
     }
+  }
+  if (scoreGlobalRank.length > 1) {
+    scoreGlobalRank += "\n";
   }
 
   //score embed
