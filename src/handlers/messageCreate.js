@@ -1,7 +1,8 @@
 const { Collection, Message } = require("discord.js");
 const ms = require("ms");
 const cooldown = new Collection();
-const { login } = require("../utils/handleLogin.js");
+// const { login } = require("../utils/handleLogin.js");
+const { query } = require("../utils/getQuery.js");
 
 module.exports = {
   name: "messageCreate",
@@ -15,7 +16,6 @@ module.exports = {
     //   await login(message);
     //   return;
     // }
-    const collection = db.collection("server_config");
 
     const client = message.client;
     if (message.author.bot) return;
@@ -23,11 +23,14 @@ module.exports = {
     if (message.content === ":3") return message.channel.send("3:");
     if (message.content === "3:") return message.channel.send(":3");
 
-    const document = await collection.findOne({ _id: message.guildId });
-    let prefix = "!";
-    if (document?.prefix) {
-      prefix = document.prefix;
+    const document = await query({ query: `SELECT * FROM servers WHERE id = ?`, parameters: [message.guildId], type: "get", name: "value" });
+    let prefixOptions = ["!"];
+    if (document && document.length > 0) {
+      prefixOptions = document;
     }
+    let prefix = prefixOptions.find((p) => message.content.startsWith(p));
+    if (!prefix) return;
+
     if (!message.content.startsWith(prefix)) return;
 
     const args = message.content.slice(prefix.length).trim().split(/ +/g);

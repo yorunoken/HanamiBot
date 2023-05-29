@@ -25,7 +25,9 @@ async function render(_client, interaction) {
 
   const replay = await getReplay(replayFile, skinData, skinID, client, interaction.user.id);
   if (replay?.current === false) {
-    interaction.editReply({ embeds: [new EmbedBuilder().setColor("Red").setTitle("Hmmm..").setDescription(`Something went wrong... Check if your file is on a submitted map.\n${replay.err}`)] });
+    interaction.editReply({
+      embeds: [new EmbedBuilder().setColor("Red").setTitle("Hmmm..").setDescription(`Something went wrong... I might not have permissions to send messages on this channel. Or check if your file is on a submitted map.\n${replay.err}`)],
+    });
     return;
   }
 

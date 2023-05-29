@@ -18,26 +18,32 @@ const db = new sqlite3.Database("database.sqlite");
 async function query({ query, parameters, type, name }) {
   return new Promise((resolve, reject) => {
     const callback = (err, res) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
       if (type === "run") {
         resolve("done");
+        return;
       }
+
       if (res) {
-        if (name == "value") {
-          res = JSON.parse(res.value);
-          resolve(res);
+        if (name === "value") {
+          resolve(JSON.parse(res.value));
         } else {
           resolve(res.file);
         }
       } else {
         resolve(null);
       }
-      reject(err);
     };
 
     if (parameters) {
-      return db[type](query, parameters, callback);
+      db[type](query, parameters, callback);
+    } else {
+      db[type](query, callback);
     }
-    return db[type](query, callback);
   });
 }
 module.exports = {
