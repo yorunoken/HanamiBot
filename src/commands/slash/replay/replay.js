@@ -1,5 +1,6 @@
 const { EmbedBuilder, ChatInputCommandInteraction, SlashCommandBuilder } = require("discord.js");
 const { Client } = require("ordr.js");
+const client = new Client(process.env.ORDR_TOKEN);
 const { query } = require("../../../utils/getQuery.js");
 
 /**
@@ -9,11 +10,10 @@ const { query } = require("../../../utils/getQuery.js");
  * @returns
  */
 
-async function render(_client, interaction) {
+async function render(interaction) {
   const userData = await query({ query: `SELECT * FROM users WHERE id = ?`, parameters: [interaction.user.id], name: "value", type: "get" });
   const skinData = userData?.replayConfig;
   const skinID = skinData?.skinID ?? "3";
-  const client = new Client(process.env.ORDR_TOKEN);
   let renderDone = false;
 
   const replayFile = interaction.options.getAttachment("file");
@@ -162,6 +162,30 @@ function getBoolean(interaction, arr) {
   }, {});
 }
 
+async function skins(interaction) {
+  const page = interaction.options.getNumber("page") ?? 1;
+
+  let skins = [];
+  const skinPage = await getSkins(page);
+  for (let i = 0; i < skinPage.SkinID.length; i++) {
+    const name = skinPage.presentationNames[i];
+    const id = skinPage.SkinID[i];
+    skins.push(`\`#${id}\` **${name}**`);
+  }
+  const embed = new EmbedBuilder()
+    .setTitle(`Skins list`)
+    .setDescription(skins.join("\n"))
+    .setFooter({ text: `page ${page}/23` });
+  interaction.editReply({ embeds: [embed] });
+}
+
+async function getSkins(page) {
+  const data = await client.skins({ pageSize: 20, page: page });
+  const presentationNames = data.skins.map((x) => x.presentationName);
+  const SkinID = data.skins.map((x) => x.id);
+  return { presentationNames, SkinID };
+}
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("replay")
@@ -201,16 +225,19 @@ module.exports = {
         .setDescription("Get a list of all available skins.")
         .addNumberOption((o) => o.setName("page").setDescription("Page Number"))
     ),
-  run: async ({ client, interaction }) => {
+  run: async ({ interaction }) => {
     await interaction.deferReply();
     const subs = interaction.options.getSubcommand(false);
 
     switch (subs) {
       case "render":
-        await render(client, interaction);
+        await render(interaction);
         break;
       case "config":
         await config(interaction);
+        break;
+      case "skins":
+        await skins(interaction);
         break;
     }
   },
