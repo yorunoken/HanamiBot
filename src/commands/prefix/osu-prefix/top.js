@@ -99,16 +99,20 @@ module.exports = {
 
     let mode = "osu";
     switch (commandName) {
-      case "topt" || "toptaiko":
+      case "topt":
+      case "toptaiko":
         mode = "taiko";
         break;
-      case "topc" || "topfruits":
+      case "topc":
+      case "topfruits":
         mode = "fruits";
         break;
-      case "topm" || "topmania":
+      case "topm":
+      case "topmania":
         mode = "mania";
         break;
     }
+    console.log(mode, commandName);
 
     wanted = ["-p", "-page"];
     let options = [];

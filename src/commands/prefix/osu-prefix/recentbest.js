@@ -99,13 +99,16 @@ module.exports = {
 
     let mode = "osu";
     switch (commandName) {
-      case "rbm" || "rbtaiko":
+      case "rbm":
+      case "rbtaiko":
         mode = "taiko";
         break;
-      case "rbc" || "rbfruits":
+      case "rbc":
+      case "rbfruits":
         mode = "fruits";
         break;
-      case "rbm" || "rbmania":
+      case "rbm":
+      case "rbmania":
         mode = "mania";
         break;
     }
