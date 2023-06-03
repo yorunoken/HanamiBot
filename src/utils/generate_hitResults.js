@@ -1,181 +1,225 @@
-function generate_hitresults_osu(objectCount, data) {
-  const n_objects = objectCount;
+const { Beatmap, Calculator } = require("rosu-pp");
 
-  let n300 = data.n300 !== undefined ? data.n300 : 0;
-  let n100 = data.n100 !== undefined ? data.n100 : 0;
-  let n50 = data.n50 !== undefined ? data.n50 : 0;
-  const n_misses = data.n_miss !== undefined ? data.n_miss : 0;
+function generate_hitResults_osu(data, objectCount) {
+  let n300;
 
-  if (data.acc !== undefined) {
-    const acc = data.acc / 100.0;
-    const target_total = Math.round(acc * n_objects * 6);
+  let nmiss = data.n_misses ?? 0;
+  let n50 = data.n50 ?? 0;
+  let n100 = data.n100 ?? 0;
+  let acc = data.acc ? data.acc / 100 : undefined;
+  const totalResultCount = objectCount;
 
-    switch (true) {
-      case data.n300 !== undefined && data.n100 !== undefined && data.n50 !== undefined:
-        n300 += Math.max(0, n_objects - (n300 + n100 + n50 + n_misses));
-        break;
-      case data.n300 !== undefined && data.n100 !== undefined && data.n50 === undefined:
-        n50 = Math.max(0, n_objects - (n300 + n100 + n_misses));
-        break;
-      case data.n300 !== undefined && data.n100 === undefined && data.n50 !== undefined:
-        n100 = Math.max(0, n_objects - (n300 + n50 + n_misses));
-        break;
-      case data.n300 === undefined && data.n100 !== undefined && data.n50 !== undefined:
-        n300 = Math.max(0, n_objects - (n100 + n50 + n_misses));
-        break;
-      case data.n300 !== undefined && data.n100 === undefined && data.n50 === undefined:
-        delta = Math.max(0, target_total - (n_objects - n_misses));
-        n100 = delta % 5;
-        n50 = Math.max(0, n_objects - (n300 + n100 + n_misses));
-        curr_total = 6 * n300 + 2 * n100 + n50;
-        if (curr_total < target_total) {
-          const n = Math.min(target_total - curr_total, n50);
-          n50 -= n;
-          n100 += n;
-        } else {
-          const n = Math.min(curr_total - target_total, n100);
-          n100 -= n;
-          n50 += n;
-        }
-        break;
-      case data.n300 === undefined && data.n100 !== undefined && data.n50 === undefined:
-        delta = Math.max(0, target_total - (n_objects - n_misses));
-        n300 = Math.floor(delta / 5);
-        if (n300 + n100 + n_misses > n_objects) {
-          n300 -= n300 + n100 + n_misses - n_objects;
-        }
-        n50 = n_objects - n300 - n100 - n_misses;
-        break;
-      case data.n300 === undefined && data.n100 === undefined && data.n50 !== undefined:
-        delta = Math.max(0, target_total - (n_objects - n_misses));
-        n300 = Math.floor(delta / 5);
-        n100 = delta % 5;
-        if (n300 + n100 + n50 + n_misses > n_objects) {
-          const too_many = n300 + n100 + n50 + n_misses - n_objects;
-          if (too_many > n100) {
-            n300 -= too_many - n100;
-            n100 = 0;
-          } else {
-            n100 -= too_many;
-          }
-        }
-        n100 += Math.max(0, n_objects - (n300 + n100 + n50 + n_misses));
-        const curr_total = 6 * n300 + 2 * n100 + n50;
-        if (curr_total < target_total) {
-          const n = Math.min(n100, Math.floor((target_total - curr_total) / 4));
-          n100 -= n;
-          n300 += n;
-        } else {
-          const n = Math.min(n300, Math.floor((curr_total - target_total) / 4));
-          n300 -= n;
-          n100 += n;
-        }
-        break;
-      case data.n300 === undefined && data.n100 === undefined && data.n50 === undefined:
-        const delta = Math.max(0, target_total - (n_objects - n_misses));
-        n300 = Math.floor(delta / 5);
-        n100 = delta % 5;
-        n50 = Math.max(0, n_objects - (n300 + n100 + n_misses));
-        const n = Math.min(n300, Math.floor(n50 / 4));
-        n300 -= n;
-        n100 += 5 * n;
-        n50 -= 4 * n;
-        break;
+  if (acc) {
+    console.log("null");
+    const targetTotal = Math.round(acc * totalResultCount * 6);
+    const delta = targetTotal - (totalResultCount - nmiss);
+
+    n300 = Math.floor(delta / 5);
+    n100 = Math.min(delta % 5, totalResultCount - n300 - nmiss);
+    n50 = totalResultCount - n300 - n100 - nmiss;
+
+    const n = Math.min(n300, Math.floor(n50 / 4));
+    n300 -= n;
+    n100 += 5 * n;
+    n50 -= 4 * n;
+  } else {
+    console.log("not null");
+    n300 = totalResultCount - n100 - n50 - nmiss;
+  }
+
+  return {
+    n300: n300,
+    n100: n100,
+    n50: n50,
+    n_misses: nmiss,
+  };
+}
+
+function generate_hitResults_taiko(data, objectCount) {
+  let acc = data.acc ? data.acc / 100 : undefined;
+  let n300 = data.n300 ?? undefined;
+  let n100 = data.n100 ?? undefined;
+  let nmiss = data.n_misses ?? 0;
+
+  const remaining = objectCount - (n300 ?? 0) - (n100 ?? 0) - nmiss;
+
+  if (acc) {
+    if (n300 && n100) {
+      n300 = n300 + remaining;
+    } else if (n300 && !n100) {
+      n100 = remaining;
+    } else if (!n300 && n100) {
+      n300 = objectCount - (n100 + nmiss);
+    } else {
+      const targetTotal = Math.round(acc * objectCount * 2);
+      n300 = targetTotal - (objectCount - nmiss);
+      n100 = objectCount - (n300 + nmiss);
     }
   } else {
-    const remaining = n_objects - (n300 + n100 + n50 + n_misses);
-    if (data.n300 === undefined) {
+    if (n300 && !n100) {
+      n100 = remaining;
+    } else if (n300 && n100) {
+      n300 = n300 + remaining;
+    } else if (!n300 && n100) {
       n300 = remaining;
+    }
+  }
+
+  return {
+    n300: n300,
+    n100: n100,
+    n_misses: nmiss,
+  };
+}
+
+function generate_hitResults_mania(data, objectCount) {
+  let n_objects = objectCount;
+
+  let n320 = data.n_geki ? parseInt(data.n_geki) : 0;
+  let n300 = data.n300 ? parseInt(data.n300) : 0;
+  let n200 = data.n_katu ? parseInt(data.n_katu) : 0;
+  let n100 = data.n100 ? parseInt(data.n100) : 0;
+  let n50 = data.n50 ? parseInt(data.n50) : 0;
+  let n_misses = data.n_miss ? parseInt(data.n_miss) : 0;
+
+  if (data.acc !== undefined) {
+    let acc = parseInt(data.acc) / 100.0;
+    let target_total = Math.round(acc * (n_objects * 6));
+
+    if (data.n_geki !== undefined && data.n300 !== undefined && data.n_katu !== undefined && data.n100 !== undefined && data.n50 !== undefined) {
+      let remaining = n_objects - (n320 + n300 + n200 + n100 + n50 + n_misses);
+      n320 += remaining;
+    } else if (data.n_geki !== undefined && !data.n300 && data.n_katu !== undefined && data.n100 !== undefined && data.n50 !== undefined) {
+      n300 = n_objects - (n320 + n200 + n100 + n50 + n_misses);
+    } else if (!data.n_geki && data.n300 !== undefined && data.n_katu !== undefined && data.n100 !== undefined && data.n50 !== undefined) {
+      n320 = n_objects - (n300 + n200 + n100 + n50 + n_misses);
+    } else if (data.n_geki !== undefined && (data.n_katu !== undefined || data.n100 !== undefined) && data.n50 !== undefined) {
+      n50 = n_objects - (n320 + n300 + n200 + n100 + n_misses);
+    } else if ((data.n_geki !== undefined || data.n300 !== undefined) && (data.n_katu !== undefined || data.n100 === undefined || data.n50 === undefined)) {
+      let n3x0 = n320 + n300;
+      let delta = target_total - (n_objects - n_misses) - n3x0 * 5 - n200 * 3;
+
+      n100 = delta % 5;
+      n50 = n_objects - (n3x0 + n200 + n100 + n_misses);
+
+      let curr_total = 6 * n3x0 + 4 * n200 + 2 * n100 + n50;
+
+      if (curr_total < target_total) {
+        let n = Math.min(target_total - curr_total, n50);
+        n50 -= n;
+        n100 += n;
+      } else {
+        let n = Math.min(curr_total - target_total, n100);
+        n100 -= n;
+        n50 += n;
+      }
+    } else if ((data.n_geki !== undefined || data.n300 !== undefined) && (data.n_katu !== undefined || data.n100 !== undefined || data.n50 === undefined)) {
+      let n3x0 = n320 + n300;
+      let delta = target_total - (n_objects - n_misses) - n3x0 * 5 - n100;
+
+      n200 = Math.floor(delta / 3);
+      n50 = n_objects - (n3x0 + n200 + n100 + n_misses);
+    } else if ((data.n_geki !== undefined || data.n300 !== undefined) && (data.n_katu === undefined || data.n100 !== undefined || data.n50 !== undefined)) {
+      n100 = n_objects - (n320 + n300 + n50 + n_misses);
+    } else if (!data.n_geki && !data.n300 && data.n_katu !== undefined && data.n100 !== undefined && data.n50 !== undefined) {
+      n320 = n_objects - (n200 + n100 + n50 + n_misses);
+    } else if (!data.n_geki && !data.n300 && !data.n_katu && data.n100 !== undefined && data.n50 !== undefined) {
+      let delta = target_total - (n_objects - n_misses) - n100;
+
+      n320 = Math.floor(delta / 5);
+      n200 = n_objects - (n320 + n100 + n50 + n_misses);
+
+      let curr_total = 6 * (n320 + n300) + 4 * n200 + 2 * n100 + n50;
+
+      if (curr_total < target_total) {
+        let n = Math.min(target_total - curr_total, n200);
+        n200 -= n;
+        n320 += n;
+      } else {
+        let n = Math.min(n320 + n300, curr_total - target_total);
+        n200 += n;
+        n320 -= n;
+      }
+    } else if (!data.n_geki && !data.n300 && data.n_katu === undefined && data.n100 === undefined && data.n50 === undefined) {
+      let delta = target_total - (n_objects - n_misses);
+
+      n320 = Math.floor(delta / 5);
+      n100 = delta % 5;
+      n50 = n_objects - (n320 + n300 + n100 + n_misses);
+
+      let n = Math.min(n320, Math.floor(n50 / 4));
+      n320 -= n;
+      n100 += 5 * n;
+      n50 -= 4 * n;
+    }
+  } else {
+    let remaining = n_objects - (n320 + n300 + n200 + n100 + n50 + n_misses);
+
+    if (data.n_geki === undefined) {
+      n320 = remaining;
+    } else if (data.n300 === undefined) {
+      n300 = remaining;
+    } else if (data.n_katu === undefined) {
+      n200 = remaining;
     } else if (data.n100 === undefined) {
       n100 = remaining;
     } else if (data.n50 === undefined) {
       n50 = remaining;
     } else {
-      n300 += remaining;
+      n320 += remaining;
     }
   }
 
-  const state = {
+  return {
+    n_geki: n320,
     n300: n300,
+    n_katu: n200,
     n100: n100,
     n50: n50,
-    n_misses: n_misses,
-    max_combo: 0,
+    n_miss: n_misses,
   };
-
-  return state;
 }
 
-function generate_hitresults_taiko(data) {
-  const total_result_count = data.max_combo !== undefined ? data.max_combo : 0;
+function generate_hitResults_fruits(data, objectCount) {
+  let max_combo = objectCount;
 
-  let n300 = data.n300 !== undefined ? data.n300 : 0;
-  let n100 = data.n100 !== undefined ? data.n100 : 0;
-  const n_misses = data.n_miss !== undefined ? data.n_miss : 0;
+  let n_fruits = max_combo;
+  let n_droplets = 0;
+  let n_tiny_droplets = 0;
+  let n_tiny_droplet_misses = 0;
+  let n_misses = 0;
 
-  if (data.acc !== undefined) {
-    const acc = data.acc / 100.0;
-
-    switch (true) {
-      case data.n300 !== undefined && data.n100 !== undefined:
-        n300 += Math.max(0, total_result_count - (n300 + n100 + n_misses));
-        break;
-      case data.n300 !== undefined && data.n100 === undefined:
-        n100 += Math.max(0, total_result_count - (n300 + n_misses));
-        break;
-      case data.n300 === undefined && data.n100 !== undefined:
-        n300 += Math.max(0, total_result_count - (n100 + n_misses));
-        break;
-      case data.n300 === undefined && data.n100 === undefined:
-        const target_total = Math.round(acc * total_result_count * 2);
-        n300 = target_total - (total_result_count - n_misses);
-        n100 = total_result_count - (n300 + n_misses);
-        break;
-    }
-  } else {
-    const remaining = total_result_count - (n300 + n100 + n_misses);
-
-    switch (true) {
-      case data.n300 !== undefined && data.n100 === undefined:
-        n100 = remaining;
-        break;
-      case data.n300 !== undefined && data.n100 !== undefined:
-        n300 += remaining;
-        break;
-      case data.n300 === undefined && data.n100 !== undefined:
-        n300 = remaining;
-        break;
-    }
-  }
-
-  const state = {
-    n300: n300,
-    n100: n100,
-    n_misses: n_misses,
-    max_combo: 0,
+  return {
+    n300: n_fruits,
+    n100: n_droplets,
+    n50: n_tiny_droplets,
+    n_katu: n_tiny_droplet_misses,
+    n_miss: n_misses,
   };
-
-  return state;
 }
 
 /**
  * Generates hit results based on the provided map, data, and mode.
  *
- * @param {number | string} objectCount - The map object.
+ * @param {number} objectCount - Total amount of objects.
  * @param {object} data - The data object.
- * @param {string} mode - The mode to generate hit results for (e.g., "osu", "taiko").
- * @returns {{ n300: number, n100: number, n50: number, n_misses: number, max_combo: number }} The generated hit results.
+ * @param {"taiko", "osu", "mania", "fruits"} mode - The gamemode (eg. "osu", "mania", "fruits", "taiko")
+ * @returns {{ n300: number, n100: number, n50: number, n_katu: number, n_geki: number, n_misses: number }} The generated hit results.
  */
 
-function generate_hitresults(objectCount, data, mode) {
-  switch (mode) {
+function generateHitResults({ data, objectCount, mode }) {
+  switch (mode.toLowerCase()) {
     case "osu":
-      return generate_hitresults_osu(objectCount, data);
+      return generate_hitResults_osu(data, objectCount);
     case "taiko":
-      return generate_hitresults_taiko(data);
+      return generate_hitResults_taiko(data, objectCount);
+    case "mania":
+      return generate_hitResults_mania(data, objectCount);
+    case "fruits":
+      return generate_hitResults_fruits(data, objectCount);
   }
 }
 
 module.exports = {
-  generate_hitresults,
+  generateHitResults,
 };

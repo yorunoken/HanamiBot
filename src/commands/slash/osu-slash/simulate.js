@@ -11,16 +11,19 @@ async function run(client, interaction) {
   await interaction.deferReply();
   const messageLink = `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${interaction.id}`;
 
-  const argValues = {
+  const data = {
     mods: interaction.options.getString("mods"),
+    bpm: interaction.options.getNumber("bpm"),
     ar: interaction.options.getNumber("ar"),
     od: interaction.options.getNumber("od"),
     cs: interaction.options.getNumber("cs"),
-    n300: interaction.options.getNumber("n300"),
-    n100: interaction.options.getString("n100"),
-    n50: interaction.options.getNumber("n50"),
-    acc: interaction.options.getNumber("accuracy"),
-    n_misses: interaction.options.getNumber("misses"),
+    n300: interaction.options.getNumber("n300") ?? undefined,
+    n100: interaction.options.getNumber("n100") ?? undefined,
+    n50: interaction.options.getNumber("n50") ?? undefined,
+    n_geki: interaction.options.getNumber("ngeki") ?? undefined,
+    n_katu: interaction.options.getNumber("nkatu") ?? undefined,
+    acc: interaction.options.getNumber("accuracy") ?? undefined,
+    n_misses: interaction.options.getNumber("misses") ?? undefined,
   };
 
   let osuFile = interaction.options.getAttachment("file");
@@ -33,8 +36,26 @@ async function run(client, interaction) {
     osuFile = await fetch(attachment);
     osuFile = await osuFile.text();
 
+    const mode = interaction.options.getString("mode") ?? "osu";
+    let RuleSetID = 0;
+    switch (mode) {
+      case "osu":
+        RuleSetID = 0;
+        break;
+      case "mania":
+        RuleSetID = 3;
+        break;
+      case "fruits":
+        RuleSetID = 2;
+        break;
+      case "taiko":
+        RuleSetID = 1;
+        break;
+    }
+    const beatmap = undefined;
+
     const now5 = Date.now();
-    const embed = await buildSim(undefined, argValues, messageLink, osuFile, "osu", 0);
+    const embed = await buildSim(beatmap, data, messageLink, osuFile, mode, RuleSetID);
     console.log(`Fetched embed in ${Date.now() - now5}ms`);
 
     interaction.editReply({ content: "Disclaimer: This command only works for standard.", embeds: [embed] });
@@ -65,13 +86,9 @@ async function run(client, interaction) {
   console.log(`Fetched beatmap in ${Date.now() - now3}ms`);
 
   const mode = beatmap.mode;
-  if (mode == "mania" || mode == "fruits") {
-    const embed = new EmbedBuilder().setDescription("Sorry, but the simulate command only works for `osu` and `taiko`. :(");
-    return interaction.editReply({ embeds: [embed] });
-  }
 
   const now5 = Date.now();
-  const embed = await buildSim(beatmap, argValues, messageLink, osuFile, mode, beatmap.mode_int);
+  const embed = await buildSim(beatmap, data, messageLink, osuFile, mode, beatmap.mode_int);
   console.log(`Fetched embed in ${Date.now() - now5}ms`);
 
   interaction.editReply({ embeds: [embed] });
@@ -127,11 +144,16 @@ module.exports = {
     .setDescription("Simulate a score!")
     .addStringOption((o) => o.setName("link").setDescription("The link of a beatmap"))
     .addAttachmentOption((o) => o.setName("file").setDescription(".osu file to calculate maps that aren't submitted"))
+    .addStringOption((o) =>
+      o.setName("mode").setDescription("Select an osu mode (only for unsubmitted maps)").addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "fruits", value: "fruits" })
+    )
     .addStringOption((o) => o.setName("mods").setDescription("Calculate the pp based on mods"))
     .addNumberOption((o) => o.setName("accuracy").setDescription("What the accuracy of the simulated play should be"))
     .addNumberOption((o) => o.setName("n300").setDescription("How many 300s should be simulated"))
     .addNumberOption((o) => o.setName("n100").setDescription("How many 100s should be simulated"))
     .addNumberOption((o) => o.setName("n50").setDescription("How many 50s should be simulated"))
+    .addNumberOption((o) => o.setName("ngeki").setDescription("How many gekis should be simulated"))
+    .addNumberOption((o) => o.setName("nkatu").setDescription("How many katus should be simulated"))
     .addNumberOption((o) => o.setName("misses").setDescription("How many misses should be simulated"))
     .addNumberOption((o) => o.setName("ar").setDescription("Approach rate of the map").setMinValue(0).setMaxValue(11))
     .addNumberOption((o) => o.setName("od").setDescription("Overall difficulty of the map").setMinValue(0).setMaxValue(11))

@@ -25,13 +25,13 @@ async function buildMap(beatmap, argValues, messageLink, file) {
     if (downloaderResponse.status == -3) {
       throw new Error("ERROR CODE 409, ABORTING TASK");
     }
-    let mapQuery = await query({ query: `SELECT file FROM maps WHERE id = ${beatmap.id}`, type: "get", name: "file" });
+    let mapQuery = await query({ query: `SELECT * FROM maps WHERE id = ${beatmap.id}`, type: "get", name: "file" });
 
     osuFile = downloaderResponse.buffer.toString();
     if (!mapQuery) {
       const q = `INSERT INTO maps (id, file) VALUES (?, ?)`;
 
-      await query({ query: q, parameters: [beatmap.id, mapQuery], type: "run" });
+      await query({ query: q, parameters: [beatmap.id, osuFile], type: "run" });
     }
     if (beatmap.status != "ranked" && beatmap.status != "loved" && beatmap.status != "approved") {
       const q = `UPDATE maps

@@ -3,7 +3,7 @@ const { Beatmap, Calculator } = require("rosu-pp");
 const { Downloader, DownloadEntry } = require("osu-downloader");
 const { query } = require("../utils/getQuery.js");
 const { tools, mods } = require("osu-api-extended");
-const { generate_hitresults } = require("../utils/generate_hitResults.js");
+const { generateHitResults } = require("../utils/generate_hitResults.js");
 
 async function buildSim(beatmap, argValues, messageLink, file, mode, RuleSetID) {
   let ar, cs, od;
@@ -29,9 +29,7 @@ async function buildSim(beatmap, argValues, messageLink, file, mode, RuleSetID) 
 
     osuFile = downloaderResponse.buffer.toString();
     if (!mapQuery) {
-      const q = `INSERT INTO maps (id, file) VALUES (?, ?)`;
-
-      await query({ query: q, parameters: [beatmap.id, mapQuery], type: "run" });
+      await query({ query: `INSERT INTO maps (id, file) VALUES (?, ?)`, parameters: [beatmap.id.toString(), osuFile], type: "run" });
     }
     if (beatmap.status != "ranked" && beatmap.status != "loved" && beatmap.status != "approved") {
       const q = `UPDATE maps
@@ -80,12 +78,21 @@ async function buildSim(beatmap, argValues, messageLink, file, mode, RuleSetID) 
   let map = new Beatmap(mapParam);
   let calc = new Calculator(scoreParam);
 
-  const mapValues = calc.clockRate(clockRate).mapAttributes(map);
+  let mapValues = calc.clockRate(clockRate).mapAttributes(map);
+  if (argValues["bpm"]) {
+    console.log("bpm");
+    clockRate = argValues["bpm"] / mapValues.bpm;
+    mapValues = calc.clockRate(clockRate).mapAttributes(map);
+  }
 
   let maxAttrs = calc.clockRate(clockRate).acc(100).performance(map);
 
-  const objects = (maxAttrs.difficulty.nCircles ?? 0) + (maxAttrs.difficulty.nDroplets ?? 0) + (maxAttrs.difficulty.nFruits ?? 0) + (maxAttrs.difficulty.nSliders ?? 0) + (maxAttrs.difficulty.nSpinners ?? 0);
-  const hits = generate_hitresults(objects, argValues, mode);
+  const objects =
+    mode === "taiko"
+      ? maxAttrs.difficulty.maxCombo
+      : (maxAttrs.difficulty.nCircles ?? beatmap.count_circles ?? 0) + (maxAttrs.difficulty.nDroplets ?? 0) + (maxAttrs.difficulty.nFruits ?? 0) + (maxAttrs.difficulty.nSliders ?? beatmap.count_sliders ?? 0) + (maxAttrs.difficulty.nSpinners ?? 0);
+  const hits = generateHitResults({ data: argValues, objectCount: objects, mode: mode });
+  console.log(hits);
 
   let performance = calc
     .clockRate(clockRate)
@@ -93,6 +100,14 @@ async function buildSim(beatmap, argValues, messageLink, file, mode, RuleSetID) 
     .n100(hits.n100 ?? 0)
     .n50(hits.n50 ?? 0)
     .nMisses(hits.n_misses ?? 0)
+    .performance(map);
+
+  let fcPerformance = calc
+    .clockRate(clockRate)
+    .n300(hits.n300 ?? 0)
+    .n100(hits.n100 ?? 0)
+    .n50(hits.n50 ?? 0)
+    .nMisses(0)
     .performance(map);
 
   if (!performance.difficulty.nCircles) performance.difficulty.nCircles = 0;
@@ -176,7 +191,6 @@ async function buildSim(beatmap, argValues, messageLink, file, mode, RuleSetID) 
     X: "<:X_:1057763294707974215>",
     XH: "<:XH_:1057763296717045891>",
   };
-  console.log(performance);
 
   const scoreRank = tools.rank({ 0: hits.n_misses ?? 0, 100: hits.n100 ?? 0, 300: hits.n300 ?? 0, 50: hits.n50 ?? 0 }, argMods, mode);
   const grade = grades[scoreRank];
@@ -184,9 +198,9 @@ async function buildSim(beatmap, argValues, messageLink, file, mode, RuleSetID) 
   const acc = tools.accuracy(
     {
       300: hits.n300 ?? 0,
-      // geki: valueGeki,
+      geki: hits.n_geki ?? 0,
       100: hits.n100 ?? 0,
-      // katu: valueKatu,
+      katu: hits.n_katu ?? 0,
       50: hits.n50 ?? 0,
       0: hits.n_misses ?? 0,
     },
@@ -201,27 +215,32 @@ async function buildSim(beatmap, argValues, messageLink, file, mode, RuleSetID) 
     case "taiko":
       accValues = `{ ${hits.n300 ?? 0}/${hits.n100 ?? 0}/${hits.n_misses ?? 0} }`;
       break;
+    case "mania":
+      accValues = `{ ${hits.n_geki ?? 0}/${hits.n_katu}/${hits.n300 ?? 0}/${hits.n100 ?? 0}/${hits.n50 ?? 0}/${hits.n_misses ?? 0} }`;
+      break;
+    case "fruits":
+      accValues = `{ ${hits.n300 ?? 0}/${hits.n100 ?? 0}/${hits.n50 ?? 0}/${hits.n_katu}/${hits.n_misses ?? 0} }`;
+      break;
   }
 
-  const topRow = `${grade} +${modsUpperCase}  (**${acc}%**)\n`;
-  let ppValue = `**${performance.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}pp [ **${performance.difficulty.maxCombo}**x/${maxAttrs.difficulty.maxCombo}x ] ${accValues}`;
+  let ppValue = `**${performance.pp.toFixed(2)}**/${maxAttrs.pp.toFixed(2)}pp`;
+  const otherValues = `[ **${performance.difficulty.maxCombo}**x/${maxAttrs.difficulty.maxCombo}x ] ${accValues}`;
+  const topRow = `${grade} ${ppValue} **+${modsUpperCase}**  (${acc}%)`;
   let ifFc = "";
   if (performance.effectiveMissCount > 0) {
-    const Map300CountFc = objects - hits.n100 - hits.n50;
-
     const FcAcc = tools.accuracy(
       {
-        300: Map300CountFc,
-        // geki: valueGeki,
-        100: hits.n100,
-        // katu: valueKatu,
-        50: hits.n50,
-        0: 0,
+        300: hits.n300 + hits.n_misses ?? 0,
+        geki: hits.n_geki ?? 0,
+        100: hits.n100 ?? 0,
+        katu: hits.n_katu ?? 0,
+        50: hits.n50 ?? 0,
+        0: hits.n_misses ?? 0,
       },
       mode
     );
 
-    ifFc = `\nIf FC: **${fcAttrs.pp.toFixed(2)}**pp for **${FcAcc.toFixed(2)}%**`;
+    ifFc = `\nIf FC: **${fcPerformance.pp.toFixed(2)}**pp for **${FcAcc.toFixed(2)}%**`;
   }
 
   if (file) {
@@ -240,8 +259,8 @@ async function buildSim(beatmap, argValues, messageLink, file, mode, RuleSetID) 
     };
 
     const field = {
-      name: `${osuEmote} **[${metadata.version}]** **[${starsFixed}★]**`,
-      value: `${topRow}${ppValue}${ifFc}\n\nBPM: \`${bpmValue}\`\nMax Combo: \`${beatmapMaxCombo}x\` Objects: \`${objects}\`\nAR: \`${arValue}\` OD: \`${odValue}\` CS: \`${csValue}\` HP: \`${hpValue}\``,
+      name: `${osuEmote} **__[${metadata.version}] [${starsFixed}★]__**`,
+      value: `${topRow}\n${otherValues}${ifFc}\n\nBPM: \`${bpmValue}\`\nMax Combo: \`${beatmapMaxCombo}x\` Objects: \`${objects}\`\nAR: \`${arValue}\` OD: \`${odValue}\` CS: \`${csValue}\` HP: \`${hpValue}\``,
     };
 
     embed = new EmbedBuilder()
@@ -254,8 +273,8 @@ async function buildSim(beatmap, argValues, messageLink, file, mode, RuleSetID) 
       .setFooter({ text: Updated_at });
   } else {
     const field = {
-      name: `${osuEmote} **[${beatmap.version}]** **[${starsFixed}★]**`,
-      value: `${topRow}${ppValue}${ifFc}\n\nLength: ${mapLength} Max Combo: \`${beatmapMaxCombo}x\` Objects: \`${objects}\`\nBPM: \`${bpmValue}\` AR: \`${arValue}\` OD: \`${odValue}\` CS: \`${csValue}\` HP: \`${hpValue}\``,
+      name: `${osuEmote} **__[${beatmap.version}] [${starsFixed}★]__**`,
+      value: `${topRow}\n${otherValues}${ifFc}\n\nLength: ${mapLength} Max Combo: \`${beatmapMaxCombo}x\` Objects: \`${objects}\`\nBPM: \`${bpmValue}\` AR: \`${arValue}\` OD: \`${odValue}\` CS: \`${csValue}\` HP: \`${hpValue}\``,
     };
 
     embed = new EmbedBuilder()
