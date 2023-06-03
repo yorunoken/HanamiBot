@@ -45,6 +45,11 @@ async function run(message, client, args) {
       argValues[key.toLowerCase()] = Number(value) || value.toLowerCase();
     }
   }
+  if (args.join("").includes("+")) {
+    const index = args.indexOf("+") + 1;
+    var mods = args[index]?.slice(1);
+    argValues["mods"] = mods;
+  }
 
   const now5 = Date.now();
   const messageLink = `https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`;

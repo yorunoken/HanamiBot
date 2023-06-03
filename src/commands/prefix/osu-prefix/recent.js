@@ -17,6 +17,12 @@ async function run(message, username, mode, i, args) {
       argValues[key.toLowerCase()] = Number(value) || value.toLowerCase();
     }
   }
+  if (args.join("").includes("+")) {
+    const index = args.indexOf("+") + 1;
+    var mods = args[index]?.slice(1);
+    argValues["mods"] = mods;
+  }
+
   let modsRaw = argValues["mods"];
   const modID = modsRaw ? mods.id(modsRaw) : undefined;
 

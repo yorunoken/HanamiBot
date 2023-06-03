@@ -14,6 +14,9 @@ async function getUsername(message, args) {
     if (arg.match(/=.*/)) {
       return false;
     }
+    if (arg.match(/^\+.*/)) {
+      return false;
+    }
     return true;
   });
 

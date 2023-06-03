@@ -22,8 +22,12 @@ async function run(message, client, args, name, options) {
   let modsRaw = argValues["mods"];
   let modifiedMods = "";
   if (modsRaw) {
-    modsRaw = modsRaw.toUpperCase();
-    const modsArr = modsRaw.match(/.{1,2}/g);
+    const matchMods = modsRaw.toUpperCase();
+    const modsArr = matchMods.match(/.{1,2}/g);
+    modifiedMods = modsArr?.map((mod) => `&mods[]=${mod}`).join("");
+  } else if (options.mods) {
+    const matchMods = options.mods.toUpperCase();
+    const modsArr = matchMods.match(/.{1,2}/g);
     modifiedMods = modsArr?.map((mod) => `&mods[]=${mod}`).join("");
   }
 
@@ -203,6 +207,11 @@ module.exports = {
       }
     });
 
+    if (args.join("").includes("+")) {
+      const index = args.indexOf("+") + 1;
+      var mods = args[index]?.slice(1);
+      options["mods"] = mods;
+    }
     await run(message, client, args, name, options);
   },
 };
