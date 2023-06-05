@@ -91,7 +91,7 @@ async function run(message, username, mode, options, i) {
 
 module.exports = {
   name: "top",
-  aliases: ["top", "t", "topt", "toptaiko", "topc", "topfruits", "topm", "topmania"],
+  aliases: ["top", "t", "topt", "toptaiko", "topc", "topfruits", "topcatch", "topctb", "topm", "topmania"],
   cooldown: 5000,
   run: async ({ message, args, index, commandName }) => {
     const username = await getUsername(message, args);
@@ -105,6 +105,8 @@ module.exports = {
         break;
       case "topc":
       case "topfruits":
+      case "topctb":
+      case "topcatch":
         mode = "fruits";
         break;
       case "topm":

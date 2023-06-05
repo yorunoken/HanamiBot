@@ -91,7 +91,7 @@ async function run(message, username, mode, options, i) {
 
 module.exports = {
   name: "recentbest",
-  aliases: ["rb", "recentbest", "rbm", "rbmania", "rbt", "rbtaiko", "rbc", "rbfruits"],
+  aliases: ["rb", "recentbest", "rbm", "rbmania", "rbt", "rbtaiko", "rbc", "rbfruits", "rbcatch", "rbctb"],
   cooldown: 5000,
   run: async ({ message, args, index, commandName }) => {
     const username = await getUsername(message, args);
@@ -105,6 +105,8 @@ module.exports = {
         break;
       case "rbc":
       case "rbfruits":
+      case "rbctb":
+      case "rbcatch":
         mode = "fruits";
         break;
       case "rbm":

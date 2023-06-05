@@ -47,11 +47,18 @@ async function run(message, username, mode) {
 
 module.exports = {
   name: "osu",
-  aliases: ["osu", "mania", "taiko", "fruits"],
+  aliases: ["osu", "mania", "taiko", "fruits", "ctb", "catch"],
   cooldown: 5000,
   run: async ({ message, args, commandName }) => {
     const username = await getUsername(message, args);
     if (!username) return;
+
+    if (commandName === "ctb") {
+      commandName = "fruits";
+    }
+    if (commandName === "catch") {
+      commandName = "fruits";
+    }
 
     await run(message, username, commandName);
   },

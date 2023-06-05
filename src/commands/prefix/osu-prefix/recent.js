@@ -142,7 +142,7 @@ function getIndex(tops, value) {
 
 module.exports = {
   name: "recent",
-  aliases: ["rs", "recent", "r", "rt", "recenttaiko", "rc", "recentfruits", "rm", "recentmania"],
+  aliases: ["rs", "recent", "r", "rt", "recenttaiko", "rc", "recentfruits", "rctb", "recentctb", "rm", "recentmania"],
   cooldown: 5000,
   run: async ({ message, args, index, commandName }) => {
     const username = await getUsername(message, args);
@@ -156,6 +156,8 @@ module.exports = {
         break;
       case "rc":
       case "recentfruits":
+      case "rctb":
+      case "recentctb":
         mode = "fruits";
         break;
       case "rm":
