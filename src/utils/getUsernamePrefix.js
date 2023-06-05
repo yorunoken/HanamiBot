@@ -50,8 +50,7 @@ async function getByTag(user) {
   if (match) {
     const userID = match[1];
     const res = await query({ query: `SELECT value FROM users WHERE id = ${userID}`, type: "get", name: "value" });
-    const user = res?.BanchoUserId;
-    return user;
+    return res?.BanchoUserId;
   }
   return undefined;
 }
@@ -61,8 +60,7 @@ async function getByID(user) {
   if (regex.test(user)) {
     const userID = user.match(/\d+/)[0];
     const res = await query({ query: `SELECT value FROM users WHERE id = ${userID}`, type: "get", name: "value" });
-    const user = res?.BanchoUserId;
-    return user;
+    return res?.BanchoUserId;
   }
   return undefined;
 }
@@ -71,8 +69,7 @@ async function getByString(user, message) {
   if (!user || user.length === 0) {
     const userID = message.author.id;
     const res = await query({ query: `SELECT value FROM users WHERE id = ${userID}`, type: "get", name: "value" });
-    const user = res?.BanchoUserId;
-    return user;
+    return res?.BanchoUserId;
   }
 
   user = user.replace(/["']/g, "");
