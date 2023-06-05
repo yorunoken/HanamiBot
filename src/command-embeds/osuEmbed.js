@@ -37,6 +37,8 @@ function buildPage1(user, mode) {
   const s = user.statistics.grade_counts.s.toLocaleString();
   const a = user.statistics.grade_counts.a.toLocaleString();
 
+  const starRating = user.statistics.pp ** 0.4 * 0.195;
+
   //convert the time difference to months
   const date = new Date(user.join_date);
   const months = Math.floor((new Date() - date) / (1000 * 60 * 60 * 24 * 30));
@@ -64,7 +66,9 @@ function buildPage1(user, mode) {
     .setFields(
       {
         name: "Statistics",
-        value: `**Accuracy:** \`${acc}%\` •  **Level:** \`${user.statistics.level.current}.${lvlProgress}\`\n${time}**Playcount:** \`${playCount}\` (\`${playHours.toFixed()} hrs\`)\n**Followers:** \`${followers}\` • **Max Combo:** \`${maxCombo}\``,
+        value: `**Accuracy:** \`${acc}%\` •  **Level:** \`${
+          user.statistics.level.current
+        }.${lvlProgress}\`\n${time}**Playcount:** \`${playCount}\` (\`${playHours.toFixed()} hrs\`)\n**Followers:** \`${followers}\` • **Max Combo:** \`${maxCombo}\`\n**Recommended Star Rating:** \`${starRating.toFixed(2)}★\``,
       },
       {
         name: "Grades",
