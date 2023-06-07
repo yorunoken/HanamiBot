@@ -6,10 +6,6 @@
  */
 
 function articles(number, capital) {
-  if (typeof number !== "number") {
-    throw new Error("Please input a valid number.");
-  }
-
   let article = "a";
   const lastTwoDigits = Math.abs(number % 100);
 
@@ -30,10 +26,6 @@ function articles(number, capital) {
  */
 
 function suffixes(number) {
-  if (typeof number !== "number") {
-    throw new Error("Please input a valid number.");
-  }
-
   let suffix = "th";
 
   const lastTwoDigits = Math.abs(number % 100);

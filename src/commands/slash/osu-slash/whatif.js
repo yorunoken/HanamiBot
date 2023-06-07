@@ -27,7 +27,7 @@ async function run(interaction) {
 
   const capital = true;
   const article = articles(added_pp, capital);
-  const suffix = suffixes(options.pp_placement);
+  const suffix = suffixes(Number(options.pp_placement));
 
   if (!options) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`**${article} \`${added_pp}pp\` play would not be in ${user.username}'s top plays.**`)] });
