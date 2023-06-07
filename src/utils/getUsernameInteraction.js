@@ -17,7 +17,6 @@ async function getUsername(interaction) {
       await interaction.reply({ ephmeral: true, content: "The discord user you have provided does not have an account linked." });
       return false;
     }
-    user = user.replace(/!{ENCRYPTED}$/, "");
   }
   if (!user) {
     try {
