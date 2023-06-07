@@ -48,11 +48,26 @@ async function run(interaction) {
   const type = "pp";
   const rank = await fetch(`https://osudaily.net/api/pp.php?k=${process.env.osu_daily_token}&t=${type}&v=${options.new_sum}&m=${mode_enum}`).then((res) => res.json());
 
+  const globalRank = user.statistics.global_rank?.toLocaleString() || "-";
+  const countryRank = user.statistics.country_rank?.toLocaleString() || "-";
+  const pp = user.statistics.pp.toLocaleString();
+  console.log(rank);
+  console.log(options);
+
   const embed = new EmbedBuilder()
     .setThumbnail(user.avatar_url)
     .setColor("Purple")
+    .setAuthor({
+      name: `${user.username}: ${pp}pp (#${globalRank} ${user.country.code}#${countryRank})`,
+      iconURL: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
+      url: `https://osu.ppy.sh/users/${user.id}/${mode}`,
+    })
     .setTitle(`What If ${user.username} Got ${article} \`${added_pp}pp\` Play?`)
-    .setDescription(`**${article} \`${added_pp}pp\` play would be ${user.username}'s ${options.pp_placement}${suffix} top play, gaining \`${options.difference.toFixed(2)}\` pp, and pushing them up to rank \`#${rank.rank?.toLocaleString()}\`**`);
+    .setDescription(
+      `**${article} \`${added_pp}pp\` play would be ${user.username}'s ${options.pp_placement}${suffix} top play, pushing their pp to \`${options.new_sum.toFixed(2)}(+${options.difference.toFixed(
+        2
+      )})\`, and pushing their up to rank \`#${rank.rank?.toLocaleString()}\`**`
+    );
 
   interaction.editReply({ embeds: [embed] });
 }

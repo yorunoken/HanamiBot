@@ -47,7 +47,7 @@ function calculator(plays, added_pp, user) {
     pp_placement++;
   }
 
-  total_sum_new = total_sum_new;
+  total_sum_new = total_sum_new + bonus_pp;
   total_sum_old = total_sum_old + bonus_pp;
 
   return {
@@ -55,7 +55,7 @@ function calculator(plays, added_pp, user) {
     old_sum: total_sum_old,
     pp_placement,
     bonus_pp,
-    difference: total_sum_old - total_sum_new,
+    difference: total_sum_new - total_sum_old,
   };
 }
 module.exports = { calculator };
