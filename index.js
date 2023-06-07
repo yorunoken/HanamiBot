@@ -24,55 +24,16 @@ require("dotenv/config");
 const { MongoClient } = require("mongodb");
 const { auth } = require("osu-api-extended");
 const fs = require("fs");
+const { load } = require("./src/utils/loadCommands.js");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v10");
 
 const token = process.env.TOKEN;
+const rest = new REST({ version: "10" }).setToken(token);
 
 client.slashCommands = new Collection();
 client.prefixCommands = new Collection();
 client.aliases = new Collection();
-
-const rest = new REST({ version: "10" }).setToken(token);
-
-// slash command handler
-const prefixCommands = [];
-const prefixFolders = fs.readdirSync("./src/commands/prefix");
-for (const folder of prefixFolders) {
-  const commandFiles = fs.readdirSync(`./src/commands/prefix/${folder}`);
-
-  for (const file of commandFiles) {
-    const command = require(`./src/commands/prefix/${folder}/${file}`);
-    client.prefixCommands.set(command.name, command);
-    prefixCommands.push(command.name, command);
-    if (command.aliases && Array.isArray(command.aliases)) {
-      command.aliases.forEach((alias) => {
-        client.aliases.set(alias, command.name);
-      });
-    }
-  }
-}
-
-// slash command handler
-const slashCommands = [];
-const slashFolders = fs.readdirSync("./src/commands/slash");
-for (const folder of slashFolders) {
-  const commandFiles = fs.readdirSync(`./src/commands/slash/${folder}`);
-
-  for (const file of commandFiles) {
-    const command = require(`./src/commands/slash/${folder}/${file}`);
-    let jsonData;
-    try {
-      jsonData = JSON.parse(command.data);
-    } catch (e) {}
-    if (jsonData) {
-      slashCommands.push(command.data.toJSON());
-    } else {
-      slashCommands.push(command.data);
-    }
-    client.slashCommands.set(command.data.name, command);
-  }
-}
 
 const refreshAuth = async () => {
   try {
@@ -87,8 +48,10 @@ setInterval(refreshAuth, 1000 * 60 * 60 * 8);
 
 client.on("ready", async () => {
   try {
-    await rest.put(Routes.applicationCommands(client.user.id), { body: slashCommands });
-    console.log(`Logged in as ${client.user.tag}`);
+    load(client).then(async (slashCommands) => {
+      await rest.put(Routes.applicationCommands(client.user.id), { body: slashCommands });
+      console.log(`Logged in as ${client.user.tag}`);
+    });
   } catch (error) {
     console.error(error);
   }
