@@ -16,7 +16,6 @@ function calculator(plays, added_pp, user) {
 
   let total_sum_old = weighted_plays_old.reduce((a, b) => a + b);
   let total_sum_new = weighted_plays_new.reduce((a, b) => a + b);
-  const bonus_pp = user.statistics.pp - total_sum_old;
 
   let pp_placement = 0;
   for (let i = 0; i < non_weighted_plays_new.length; i++) {
@@ -25,16 +24,17 @@ function calculator(plays, added_pp, user) {
     }
     pp_placement++;
   }
-
-  total_sum_new = total_sum_new + bonus_pp;
-  total_sum_old = total_sum_old + bonus_pp;
+  let bonus_pp = user.statistics.pp - total_sum_old;
+  let new_sum = total_sum_new + bonus_pp;
+  let old_sum = total_sum_old + bonus_pp;
+  let difference = total_sum_new - total_sum_old;
 
   return {
-    new_sum: total_sum_new,
-    old_sum: total_sum_old,
+    new_sum,
+    old_sum,
     pp_placement,
     bonus_pp,
-    difference: total_sum_new - total_sum_old,
+    difference,
   };
 }
 module.exports = { calculator };
