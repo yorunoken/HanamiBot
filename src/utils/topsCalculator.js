@@ -3,36 +3,16 @@ function calculator(plays, added_pp, user) {
   if (added_pp <= plays[plays.length - 1].pp) {
     return false;
   }
-  let plays_pp = [];
-  for (const play of plays) {
-    plays_pp.push(play.pp);
-  }
-  plays_pp.push(added_pp);
-  plays_pp = plays_pp.sort((a, b) => b - a);
 
-  let weighted_plays_new = [];
-  for (let i = 0; i < plays_pp.length; i++) {
-    const play = plays_pp[i];
-    let weighted_pp = play * 0.95 ** i - 1;
-    weighted_plays_new.push(weighted_pp);
-  }
-  weighted_plays_new.pop();
+  const plays_pp = plays
+    .map((play) => play.pp)
+    .concat(added_pp)
+    .sort((a, b) => b - a);
 
-  let non_weighted_plays_new = [];
-  for (let i = 0; i < plays_pp.length; i++) {
-    const play = plays_pp[i];
-    let weighted_pp = play;
-    non_weighted_plays_new.push(weighted_pp);
-  }
-  non_weighted_plays_new.pop();
+  const weighted_plays_new = plays_pp.map((play, i) => play * 0.95 ** i - 1).slice(0, -1);
+  const non_weighted_plays_new = plays_pp.slice(0, -1);
 
-  let weighted_plays_old = [];
-  for (let i = 0; i < plays.length; i++) {
-    const play = plays[i].pp;
-    let weighted_pp = play * 0.95 ** i - 1;
-    weighted_plays_old.push(weighted_pp);
-  }
-  weighted_plays_old.pop();
+  const weighted_plays_old = plays.map((play, i) => play.pp * 0.95 ** i - 1).slice(0, -1);
 
   let total_sum_old = weighted_plays_old.reduce((a, b) => a + b);
   let total_sum_new = weighted_plays_new.reduce((a, b) => a + b);
@@ -40,8 +20,7 @@ function calculator(plays, added_pp, user) {
 
   let pp_placement = 0;
   for (let i = 0; i < non_weighted_plays_new.length; i++) {
-    const pp = non_weighted_plays_new[i];
-    if (pp < added_pp) {
+    if (non_weighted_plays_new[i] < added_pp) {
       break;
     }
     pp_placement++;

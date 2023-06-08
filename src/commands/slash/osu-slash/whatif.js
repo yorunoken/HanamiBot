@@ -51,8 +51,6 @@ async function run(interaction) {
   const globalRank = user.statistics.global_rank?.toLocaleString() || "-";
   const countryRank = user.statistics.country_rank?.toLocaleString() || "-";
   const pp = user.statistics.pp.toLocaleString();
-  console.log(rank);
-  console.log(options);
 
   const embed = new EmbedBuilder()
     .setThumbnail(user.avatar_url)
