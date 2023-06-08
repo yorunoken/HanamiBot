@@ -54,14 +54,16 @@ async function render(interaction) {
   };
 
   client.on("render_progress", renderProgressListener);
+
+  let isMessageSent = false;
   client.on("render_done", (data) => {
     renderDone = true;
-    if (data.renderID === replay.renderID) {
+    if (data.renderID === replay.renderID && !isMessageSent) {
       const embed = new EmbedBuilder().setTitle("Replay rendering is done").setColor("Purple").setDescription(replay_description);
 
       interaction.channel.send(`<@${interaction.user.id}> ${data.videoUrl}`);
       interaction.channel.send({ embeds: [embed] });
-      return;
+      isMessageSent = true;
     }
   });
 }
