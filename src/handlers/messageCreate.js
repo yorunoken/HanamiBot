@@ -50,7 +50,7 @@ module.exports = {
     const match = cmd.match(/(\D+)(\d+)/);
     if (match) {
       commandName = match[1];
-      number = match[2];
+      number = Number(match[2]);
     }
 
     let command = client.prefixCommands.get(commandName);

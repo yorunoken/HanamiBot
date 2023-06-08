@@ -6,8 +6,8 @@ const { v2 } = require("osu-api-extended");
 async function run(message, username, mode, options, i) {
   await message.channel.sendTyping();
 
-  const index = i ?? undefined;
-  const page = options.page ?? options.p ?? 1;
+  let index = i ?? undefined;
+  let page = options.page ?? options.p ?? 1;
   const reverse = false;
   const recent = true;
 
@@ -30,16 +30,30 @@ async function run(message, username, mode, options, i) {
   const prevPage = new ButtonBuilder().setCustomId("prev").setLabel("⬅️").setStyle(ButtonStyle.Secondary);
   let row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(true));
 
-  if (page === 1) {
-    if (tops.length > 5) {
-      row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(false));
+  if (index) {
+    if (index === 1) {
+      if (tops.length > 1) {
+        row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(false));
+      }
+    } else if (tops.length <= 1) {
+      row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(true));
+    } else if (index === tops.length) {
+      row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
+    } else {
+      row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
     }
-  } else if (tops.length <= 5) {
-    row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(true));
-  } else if (page === Math.ceil(tops.length / 5)) {
-    row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
   } else {
-    row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
+    if (page === 1) {
+      if (tops.length > 5) {
+        row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(false));
+      }
+    } else if (tops.length <= 5) {
+      row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(true));
+    } else if (page === Math.ceil(tops.length / 5)) {
+      row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
+    } else {
+      row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
+    }
   }
 
   const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent);
@@ -51,7 +65,14 @@ async function run(message, username, mode, options, i) {
   collector.on("collect", async (i) => {
     try {
       if (i.customId == "next") {
-        if (!(page + 1 >= Math.ceil(tops.length / 5))) {
+        if (index && index + 1 <= tops.length) {
+          index++;
+          if (index === tops.length) {
+            row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
+          } else {
+            row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
+          }
+        } else if (!(page + 1 >= Math.ceil(tops.length / 5))) {
           page++;
           if (page === Math.ceil(tops.length / 5)) {
             row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
@@ -64,7 +85,14 @@ async function run(message, username, mode, options, i) {
         const embed = await buildTopsEmbed(tops, user, page, mode, index, reverse, recent);
         await response.edit({ embeds: [embed], components: [row] });
       } else if (i.customId == "prev") {
-        if (!(page <= 1)) {
+        if (index && !(index <= 1)) {
+          index--;
+          if (index === 1) {
+            row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(false));
+          } else {
+            row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(false));
+          }
+        } else if (!(page <= 1)) {
           page--;
           if (page === 1) {
             row = new ActionRowBuilder().addComponents(prevPage.setDisabled(true), nextPage.setDisabled(false));
