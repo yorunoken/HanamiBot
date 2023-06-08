@@ -1,4 +1,5 @@
 const { Collection, Message } = require("discord.js");
+const { PermissionFlagsBits } = require("discord.js");
 const ms = require("ms");
 const cooldown = new Collection();
 // const { login } = require("../utils/handleLogin.js");
@@ -16,10 +17,17 @@ module.exports = {
     //   await login(message);
     //   return;
     // }
-
     const client = message.client;
+
     if (message.author.bot) return;
     if (message.channel.type === "dm") return;
+
+    const botMember = message.guild.members.cache.get(client.user.id);
+    const botPermissions = message.channel.permissionsFor(botMember);
+    const permissionCheck = botPermissions.has(PermissionFlagsBits.SendMessages);
+
+    if (!permissionCheck) return;
+
     if (message.content === ":3") return message.channel.send("3:");
     if (message.content === "3:") return message.channel.send(":3");
 
