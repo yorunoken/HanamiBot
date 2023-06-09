@@ -1,4 +1,4 @@
-const { Client, Collection, GatewayIntentBits, Partials } = require("discord.js");
+const { Client, Collection, GatewayIntentBits, Partials, ActivityType } = require("discord.js");
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -27,6 +27,7 @@ const fs = require("fs");
 const { load } = require("./src/utils/loadCommands.js");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v10");
+const { verseGenerator } = require("./src/utils/quranVerseGenerator.js");
 
 const token = process.env.TOKEN;
 const rest = new REST({ version: "10" }).setToken(token);
@@ -46,12 +47,21 @@ const refreshAuth = async () => {
 refreshAuth();
 setInterval(refreshAuth, 1000 * 60 * 60 * 8);
 
+const refreshVerse = async () => {
+  const verse = await verseGenerator();
+  client.user.setActivity({ name: `${verse.verse}\n${verse.surah}:${verse.number}` });
+  console.log("Updated activitiy.");
+};
+
 client.on("ready", async () => {
   try {
-    load(client).then(async (slashCommands) => {
-      await rest.put(Routes.applicationCommands(client.user.id), { body: slashCommands });
-      console.log(`Logged in as ${client.user.tag}`);
-    });
+    const slashCommands = await load(client);
+    await rest.put(Routes.applicationCommands(client.user.id), { body: slashCommands });
+    console.log(`Logged in as ${client.user.tag}`);
+
+    let minutesToLoop = 10;
+    refreshVerse();
+    setInterval(refreshVerse, 1000 * 60 * minutesToLoop);
   } catch (error) {
     console.error(error);
   }
