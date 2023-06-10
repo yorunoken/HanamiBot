@@ -39,6 +39,7 @@ client.aliases = new Collection();
 const refreshAuth = async () => {
   try {
     await auth.login(process.env.client_id, process.env.client_secret, ["public"]);
+    await auth.login_lazer(process.env.lazer_username, process.env.lazer_password);
     console.log("Refreshed osu! token");
   } catch (error) {
     console.error(error);
