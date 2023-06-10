@@ -52,7 +52,7 @@ async function leaderboard(beatmapID, scores, pageNumber, beatmap, requesterName
     osuFile = downloaderResponse.buffer.toString();
 
     if (mapQuery) {
-      const q = `UPDATE users
+      const q = `UPDATE maps
       SET file = ?
       WHERE id = ?`;
 

@@ -88,7 +88,7 @@ async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, 
     osuFile = downloaderResponse.buffer.toString();
 
     if (mapQuery) {
-      const q = `UPDATE users
+      const q = `UPDATE maps
       SET file = ?
       WHERE id = ?`;
 
