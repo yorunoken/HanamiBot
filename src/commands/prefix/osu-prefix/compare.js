@@ -3,7 +3,7 @@ const { EmbedBuilder } = require("discord.js");
 const { getUsername } = require("../../../utils/getUsernamePrefix");
 const { v2 } = require("osu-api-extended");
 
-async function run(message, username, mode, options, client, i) {
+async function run(message, username, mode, options, client, i, mapID) {
   await message.channel.sendTyping();
 
   const index = i ?? undefined;
@@ -12,7 +12,10 @@ async function run(message, username, mode, options, client, i) {
 
   let beatmapID;
   const now = Date.now();
-  if (message.reference) {
+
+  if (mapID) {
+    beatmapID = mapID;
+  } else if (message.reference) {
     beatmapID = await getEmbedFromReply(message, client);
 
     if (!beatmapID) {
@@ -133,6 +136,18 @@ module.exports = {
   aliases: ["compare", "c", "cp"],
   cooldown: 5000,
   run: async ({ client, message, args, index }) => {
+    // Extracting the number from the URL
+    const numberRegex = /(\d+)$/;
+    const numbers = args.map((arg) => {
+      if (arg.includes("osu.ppy.sh")) {
+        const matches = arg.match(numberRegex);
+        return matches ? matches[1] : null;
+      }
+      return null;
+    });
+    const mapID = numbers[0];
+    args = args.filter((arg) => !arg.includes("osu.ppy.sh"));
+
     const username = await getUsername(message, args, client);
     if (!username) return;
 
@@ -149,7 +164,6 @@ module.exports = {
         options[key] = value;
       }
     });
-
-    await run(message, username, mode, options, client, index);
+    await run(message, username, mode, options, client, index, mapID);
   },
 };

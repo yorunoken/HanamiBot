@@ -273,7 +273,7 @@ async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, 
     const embed = new EmbedBuilder()
       .setColor("Purple")
       .setAuthor({
-        name: `${user.username} ${userPP}pp (#${globalRank} ${countryCode}#${countryRank}) `,
+        name: `${user.username} ${userPP}pp (#${globalRank} ${countryCode}#${countryRank})`,
         iconURL: `https://osu.ppy.sh/images/flags/${countryCode}.png`,
         url: `https://osu.ppy.sh/users/${user.id}`,
       })
@@ -309,13 +309,12 @@ async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, 
     .setColor("Purple")
     .setAuthor({
       name: `${user.username}: ${userPP}pp (#${globalRank} ${countryCode}#${countryRank})`,
-      iconURL: `https://osu.ppy.sh/images/flags/${countryCode}.png`,
+      iconURL: userAvatar,
       url: `${userURL}`,
     })
-    .setThumbnail(userAvatar)
     .setDescription(things.join(""))
     .setTitle(`${beatmap.beatmapset.title} [${beatmap.version}]`)
-    .setImage(`https://assets.ppy.sh/beatmaps/${beatmap.beatmapset_id}/covers/cover.jpg`)
+    .setThumbnail(`https://assets.ppy.sh/beatmaps/${beatmap.beatmapset_id}/covers/list.jpg`)
     .setURL(`https://osu.ppy.sh/b/${beatmap.id}`)
     .setFooter({ text: `Page ${pageNumber}/${totalPage}` });
   return embed;

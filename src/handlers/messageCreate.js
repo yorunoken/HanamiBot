@@ -28,8 +28,12 @@ module.exports = {
 
     if (!permissionCheck) return;
 
-    if (message.content === ":3") return message.channel.send("3:");
-    if (message.content === "3:") return message.channel.send(":3");
+    const randomNumber = Math.floor(Math.random() * 100);
+    console.log(randomNumber);
+    if (randomNumber > 70) {
+      if (message.content === ":3") return message.channel.send("3:");
+      if (message.content === "3:") return message.channel.send(":3");
+    }
 
     const document = await query({ query: `SELECT * FROM servers WHERE id = ?`, parameters: [message.guildId], type: "get", name: "value" });
     let prefixOptions = ["!"];

@@ -225,7 +225,7 @@ async function buildRecentsEmbed(score, user, mode, index, pbIndex) {
   const embed = new EmbedBuilder()
     .setColor("Purple")
     .setAuthor({
-      name: `${user.username} ${userPP}pp (#${globalRank} ${countryCode}#${countryRank}) `,
+      name: `${user.username} ${userPP}pp (#${globalRank} ${countryCode}#${countryRank})`,
       // iconURL: `https://osu.ppy.sh/images/flags/${countryCode}.png`,
       iconURL: avatarURL,
       url: profileURL,

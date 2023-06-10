@@ -260,7 +260,7 @@ async function buildTopsEmbed(tops, user, pageNumber, mode, index, reverse, rece
     const embed = new EmbedBuilder()
       .setColor("Purple")
       .setAuthor({
-        name: `${user.username} ${userPP}pp (#${globalRank} ${countryCode}#${countryRank}) `,
+        name: `${user.username} ${userPP}pp (#${globalRank} ${countryCode}#${countryRank})`,
         iconURL: `https://osu.ppy.sh/images/flags/${countryCode}.png`,
         url: `https://osu.ppy.sh/users/${user.id}`,
       })
