@@ -30,5 +30,6 @@ module.exports = {
       console.error(e);
       interaction.reply({ content: `There was an error with this interaction. Please try again. ${e}`, ephemeral: true });
     }
+    console.log(`(interaction) responded to ${interaction.user.username} for ${interaction.commandName}`);
   },
 };

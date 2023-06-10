@@ -28,7 +28,6 @@ async function leaderboard(beatmapID, scores, pageNumber, beatmap, requesterName
 
   const now = Date.now();
   let mapQuery = await query({ query: `SELECT file FROM maps WHERE id = ${beatmapID}`, type: "get", name: "file" });
-  console.log(`took ${Date.now() - now}ms to find map`);
 
   if (!mapQuery) {
     const downloader = new Downloader({
@@ -157,15 +156,13 @@ async function leaderboard(beatmapID, scores, pageNumber, beatmap, requesterName
     things.push("**No scores found.**");
   }
 
-  console.log(requesterName);
-
   user_score = "";
   if (requesterName) {
     let index = scores.scores.findIndex((x) => x.user.id == requesterName);
     if (index < -1) {
       index = scores.scores.findIndex((x) => x.user.username == requesterName);
     }
-    console.log(index);
+
     if (index >= 0) {
       YourScore = true;
       user_score = `\n__**<@${user.id}>'s score:**__\n${await ScoreGet(scores.scores[index], index, YourScore)}`;

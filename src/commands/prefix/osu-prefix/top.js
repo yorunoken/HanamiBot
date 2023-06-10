@@ -142,7 +142,6 @@ module.exports = {
         mode = "mania";
         break;
     }
-    console.log(mode, commandName);
 
     wanted = ["-p", "-page"];
     let options = [];

@@ -56,7 +56,6 @@ async function run(client, interaction) {
 
     const now5 = Date.now();
     const embed = await buildSim(beatmap, data, messageLink, osuFile, mode, RuleSetID);
-    console.log(`Fetched embed in ${Date.now() - now5}ms`);
 
     interaction.editReply({ content: "Disclaimer: This command only works for standard.", embeds: [embed] });
     return;
@@ -75,7 +74,6 @@ async function run(client, interaction) {
       return;
     }
   }
-  console.log(`found ID in ${Date.now() - now}ms`);
 
   const now3 = Date.now();
   const beatmap = await v2.beatmap.id.details(beatmapID);
@@ -83,13 +81,11 @@ async function run(client, interaction) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Beatmap doesn't exist. check if you replied to a beatmapset.`)] });
     return;
   }
-  console.log(`Fetched beatmap in ${Date.now() - now3}ms`);
 
   const mode = beatmap.mode;
 
   const now5 = Date.now();
   const embed = await buildSim(beatmap, data, messageLink, osuFile, mode, beatmap.mode_int);
-  console.log(`Fetched embed in ${Date.now() - now5}ms`);
 
   interaction.editReply({ embeds: [embed] });
 }

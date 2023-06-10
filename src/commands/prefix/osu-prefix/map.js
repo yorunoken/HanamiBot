@@ -28,7 +28,6 @@ async function run(message, client, args) {
       return;
     }
   }
-  console.log(`found ID in ${Date.now() - now}ms`);
 
   const now3 = Date.now();
   const beatmap = await v2.beatmap.id.details(beatmapID);
@@ -36,7 +35,6 @@ async function run(message, client, args) {
     message.channel.send({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Beatmap doesn't exist. check if you replied to a beatmapset.`)] });
     return;
   }
-  console.log(`Fetched beatmap in ${Date.now() - now3}ms`);
 
   let argValues = {};
   for (const arg of args) {
@@ -54,7 +52,6 @@ async function run(message, client, args) {
   const now5 = Date.now();
   const messageLink = `https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`;
   const embed = await buildMap(beatmap, argValues, messageLink);
-  console.log(`Fetched embed in ${Date.now() - now5}ms`);
 
   message.channel.send({ embeds: [embed] });
 }

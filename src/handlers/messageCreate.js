@@ -29,7 +29,7 @@ module.exports = {
     if (!permissionCheck) return;
 
     const randomNumber = Math.floor(Math.random() * 100);
-    console.log(randomNumber);
+
     if (randomNumber > 70) {
       if (message.content === ":3") return message.channel.send("3:");
       if (message.content === "3:") return message.channel.send(":3");
@@ -75,6 +75,7 @@ module.exports = {
     setTimeout(() => {
       cooldown.delete(`${command.name}${message.author.id}`);
     }, command.cooldown);
+    console.log(`(prefix) responded to ${message.author.username} for ${commandName}`);
 
     module.exports = {
       client,

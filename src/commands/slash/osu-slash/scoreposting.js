@@ -24,7 +24,6 @@ async function getScore(score, user, mode, sliderbreakCount, unstableRate) {
 
   const now = Date.now();
   let mapQuery = await query({ query: `SELECT file FROM maps WHERE id = ${mapID}`, type: "get", name: "file" });
-  console.log(`took ${Date.now() - now}ms to find map`);
 
   if (!mapQuery || (score.beatmapset.status !== "ranked" && score.beatmapset.status !== "loved" && score.beatmapset.status !== "approved")) {
     const downloader = new Downloader({

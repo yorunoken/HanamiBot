@@ -80,7 +80,6 @@ async function buildSim(beatmap, argValues, messageLink, file, mode, RuleSetID) 
 
   let mapValues = calc.clockRate(clockRate).mapAttributes(map);
   if (argValues["bpm"]) {
-    console.log("bpm");
     clockRate = argValues["bpm"] / mapValues.bpm;
     mapValues = calc.clockRate(clockRate).mapAttributes(map);
   }
@@ -92,7 +91,6 @@ async function buildSim(beatmap, argValues, messageLink, file, mode, RuleSetID) 
       ? maxAttrs.difficulty.maxCombo
       : (maxAttrs.difficulty.nCircles ?? beatmap.count_circles ?? 0) + (maxAttrs.difficulty.nDroplets ?? 0) + (maxAttrs.difficulty.nFruits ?? 0) + (maxAttrs.difficulty.nSliders ?? beatmap.count_sliders ?? 0) + (maxAttrs.difficulty.nSpinners ?? 0);
   const hits = generateHitResults({ data: argValues, objectCount: objects, mode: mode });
-  console.log(hits);
 
   let performance = calc
     .clockRate(clockRate)

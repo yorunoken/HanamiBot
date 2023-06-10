@@ -27,7 +27,7 @@ async function run(message, username, mode) {
     try {
       if (i.customId === "more") {
         const embed = buildPage2(user, mode);
-        console.log(embed);
+
         await i.update({ components: [_row] });
         response.edit({ embeds: [embed], components: [showLess] });
       } else if (i.customId === "less") {

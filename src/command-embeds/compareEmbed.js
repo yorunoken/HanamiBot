@@ -64,7 +64,6 @@ async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, 
 
   const now = Date.now();
   let mapQuery = await query({ query: `SELECT file FROM maps WHERE id = ${mapID}`, type: "get", name: "file" });
-  console.log(`took ${Date.now() - now}ms to find map`);
 
   if (!mapQuery) {
     const downloader = new Downloader({

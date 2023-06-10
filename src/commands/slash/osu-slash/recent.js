@@ -16,7 +16,7 @@ async function run(interaction, username) {
 
   const now1 = Date.now();
   const user = await v2.user.details(username, mode);
-  console.log(`got user in ${Date.now() - now1}ms`);
+
   if (user.error === null) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`The user \`${username}\` was not found.`)] });
     return;
@@ -24,7 +24,7 @@ async function run(interaction, username) {
   const now2 = Date.now();
 
   const recents = await v2.scores.user.category(user.id, "recent", { include_fails: pass, limit: 100, mods: modID });
-  console.log(`got recents in ${Date.now() - now2}ms`);
+
   if (recents.length === 0) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No recent plays found for ${user.username} in osu!${mode === "osu" ? "standard" : mode}.`)] });
     return;
@@ -58,7 +58,7 @@ async function run(interaction, username) {
   const now3 = Date.now();
   const tops = await get100thPlay(user, mode, recents[index - 1]);
   const embed = await buildRecentsEmbed(recents, user, mode, index - 1, tops);
-  console.log(`got embed in ${Date.now() - now3}ms`);
+
   const response = await interaction.editReply({ content: content, embeds: [embed.embed], components: [row] });
 
   const filter = (i) => i.user.id === interaction.user.id;

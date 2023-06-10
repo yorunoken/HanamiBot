@@ -30,7 +30,6 @@ async function run(client, interaction) {
 
     const now5 = Date.now();
     const embed = await buildMap(undefined, argValues, messageLink, osuFile);
-    console.log(`Fetched embed in ${Date.now() - now5}ms`);
 
     interaction.editReply({ embeds: [embed] });
     return;
@@ -49,7 +48,6 @@ async function run(client, interaction) {
       return;
     }
   }
-  console.log(`found ID in ${Date.now() - now}ms`);
 
   const now3 = Date.now();
   const beatmap = await v2.beatmap.id.details(beatmapID);
@@ -57,11 +55,9 @@ async function run(client, interaction) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Beatmap doesn't exist. check if you replied to a beatmapset.`)] });
     return;
   }
-  console.log(`Fetched beatmap in ${Date.now() - now3}ms`);
 
   const now5 = Date.now();
   const embed = await buildMap(beatmap, argValues, messageLink, osuFile);
-  console.log(`Fetched embed in ${Date.now() - now5}ms`);
 
   interaction.editReply({ embeds: [embed] });
 }

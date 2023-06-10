@@ -18,11 +18,10 @@ async function run(interaction, username, client) {
     interaction.reply({ content: "No embeds found in the last 100 messages.", ephemeral: true });
     return;
   }
-  console.log(`found ID in ${Date.now() - now}ms`);
 
   const now2 = Date.now();
   const user = await v2.user.details(username, mode);
-  console.log(`Fetched user in ${Date.now() - now2}ms`);
+
   if (user.error === null) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`The user \`${username}\` was not found.`)] });
     return;
@@ -34,7 +33,6 @@ async function run(interaction, username, client) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`Beatmap doesn't exist. check if you replied to a beatmapset.`)] });
     return;
   }
-  console.log(`Fetched beatmap in ${Date.now() - now3}ms`);
 
   const now4 = Date.now();
   const scores = await v2.scores.user.beatmap(beatmapID, user.id, {
@@ -44,11 +42,9 @@ async function run(interaction, username, client) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No recent plays found for ${user.username} in osu!${mode === "osu" ? "standard" : mode}.`)] });
     return;
   }
-  console.log(`Fetched scores in ${Date.now() - now4}ms`);
 
   const now5 = Date.now();
   const embed = await buildCompareEmbed(scores, user, page, mode, index, reverse, beatmap);
-  console.log(`Fetched embed in ${Date.now() - now5}ms`);
 
   interaction.editReply({ embeds: [embed] });
 }

@@ -10,7 +10,6 @@ function generate_hitResults_osu(data, objectCount) {
   const totalResultCount = objectCount;
 
   if (acc) {
-    console.log("null");
     const targetTotal = Math.round(acc * totalResultCount * 6);
     const delta = targetTotal - (totalResultCount - nmiss);
 
@@ -23,7 +22,6 @@ function generate_hitResults_osu(data, objectCount) {
     n100 += 5 * n;
     n50 -= 4 * n;
   } else {
-    console.log("not null");
     n300 = totalResultCount - n100 - n50 - nmiss;
   }
 

@@ -24,19 +24,16 @@ async function getUsername(message, args) {
   let user;
   user = await getByTag(argsJoined);
   if (user) {
-    console.log(`got user in ${Date.now() - now}ms`);
     return user;
   }
 
   user = await getByID(argsJoined);
   if (user) {
-    console.log(`got user in ${Date.now() - now}ms`);
     return user;
   }
 
   user = await getByString(argsJoined, message);
   if (user) {
-    console.log(`got user in ${Date.now() - now}ms`);
     return user;
   }
 

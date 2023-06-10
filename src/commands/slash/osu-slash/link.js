@@ -17,7 +17,7 @@ async function run(interaction, username) {
     WHERE id = ?`;
     await query({ query: q, parameters: [user.id, interaction.user.id], type: "run" });
   }
-  console.log(`took ${Date.now() - now}ms`);
+
   const avatar_url = `https://a.ppy.sh/${user.id}?1683992429.jpeg`;
   const embed = new EmbedBuilder().setColor("Green").setTitle(`Account linking successful`).setDescription(`Linked Discord account <@${interaction.user.id}>\nto \`${user.username}\``).setThumbnail(avatar_url);
   await interaction.editReply({ embeds: [embed] });

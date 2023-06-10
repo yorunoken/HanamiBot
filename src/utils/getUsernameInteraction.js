@@ -31,7 +31,7 @@ async function getUsername(interaction) {
       return false;
     }
   }
-  console.log(`got username in ${Date.now() - now}ms`);
+
   return user;
 }
 
