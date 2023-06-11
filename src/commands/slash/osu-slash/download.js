@@ -17,7 +17,7 @@ async function run(interaction) {
 
   let setId = beatmap.beatmapset.id;
   let file_path = `./osz/${mapID}.osz`;
-  let host_name = "osu";
+  let host_name = "sayobot";
   let no_video = true;
   const callback = (progress) => {
     const random = Math.floor(Math.random() * 100);
@@ -38,7 +38,7 @@ async function run(interaction) {
   interaction.editReply(`Downloaded .osz file, uploading to google drive...`);
 
   const url = await authorize(setId, path);
-  interaction.editReply(`<@${interaction.user.id}>: ${url}`);
+  interaction.channel.send(`<@${interaction.user.id}>: ${url}`);
 }
 
 module.exports = {
