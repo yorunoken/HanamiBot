@@ -1,15 +1,13 @@
 async function run(message, client) {
   if (message.author.id !== "372343076578131968") {
-    message.reply("You must be the bot's owner to use this command.");
-    return;
+    return message.reply("You must be the owner to use this command.");
   }
-  message.reply("Terminated.");
-  client.destroy();
+  message.reply("Terminated instance.").then(() => client.destroy());
 }
 
 module.exports = {
-  name: "terminate",
-  aliases: ["terminate"],
+  name: "avatar",
+  aliases: ["avatar"],
   cooldown: 5000,
   run: async ({ message, client }) => {
     await run(message, client);
