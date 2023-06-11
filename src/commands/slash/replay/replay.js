@@ -12,11 +12,12 @@ const { query } = require("../../../utils/getQuery.js");
 
 async function render(interaction) {
   const userData = await query({ query: `SELECT * FROM users WHERE id = ?`, parameters: [interaction.user.id], name: "value", type: "get" });
-  const skinData = userData?.replayConfig;
+  const skinDataRaw = userData?.replayConfig;
+  const skinData = userData ? JSON.parse(skinDataRaw) : skinDataRaw;
   const skinID = skinData?.skinID ?? "3";
   let renderDone = false;
 
-  const replayFile = interaction.options.getAttachment("file");
+  playFile = interaction.options.getAttachment("file");
   if (!replayFile.name.endsWith(".osr")) {
     interaction.editReply("Please provide a valid osu! replay file. (ends in .osr)");
     return;
@@ -48,7 +49,6 @@ async function render(interaction) {
       }
     } catch (err) {
       interaction.editReply("There was an error! Please try again.");
-      client.removeListener("render_progress", renderProgressListener);
       return;
     }
   };
@@ -126,27 +126,19 @@ async function config(interaction) {
     skip_intro: true,
   };
 
-  const options = {
+  const replayConfig = {
     ...getNumber(interaction, numberArr),
     ...getBoolean(interaction, booleanArr),
   };
 
-  let q = `UPDATE users
-  SET value = JSON_SET(value, ${Object.keys(options)
-    .map((key) => `'$.${key}', ?`)
-    .join(", ")})
-  WHERE id = ?`;
-  let parameters = [...Object.values(options), interaction.user.id];
+  const q = qUser
+    ? `UPDATE users
+     SET value = JSON_SET(value, '$.replayConfig', ?)
+     WHERE id = ?`
+    : `INSERT INTO users (id, value) VALUES (?, JSON_OBJECT('replayConfig', ?))`;
 
-  if (!qUser) {
-    q = `INSERT INTO users (id, value) VALUES (?, JSON_OBJECT(${Object.keys(options)
-      .map((key) => `'${key}', ?`)
-      .join(", ")}))`;
-    parameters = [interaction.user.id, ...Object.values(options)];
+  const parameters = qUser ? [JSON.stringify(replayConfig), interaction.user.id] : [interaction.user.id, JSON.stringify(replayConfig)];
 
-    await query({ query: q, parameters: parameters, type: "run" });
-    return interaction.editReply({ embeds: [new EmbedBuilder().setTitle("Successful!").setColor("Green").setDescription("Your selected options have been applied!")] });
-  }
   await query({ query: q, parameters: parameters, type: "run" });
   interaction.editReply({ embeds: [new EmbedBuilder().setTitle("Successful!").setColor("Green").setDescription("Your selected options have been applied!")] });
 }
