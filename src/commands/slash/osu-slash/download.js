@@ -20,13 +20,20 @@ async function run(interaction) {
   let host_name = "sayobot";
   let no_video = true;
 
-  let progressCount = 0;
+  let lastCallTime = 0;
+  const minimumDelay = 3000;
+  let downloaded = false;
   const callback = (progress) => {
-    let multipleOf25 = progress.toFixed() % 20 === 0;
-    if (multipleOf25) {
-      interaction.editReply(`Download in progress: ${progress.toFixed(1)}%`);
+    const currentTime = Date.now();
+
+    if (currentTime - lastCallTime >= minimumDelay) {
+      lastCallTime = currentTime;
+      const roundedProgress = progress.toFixed(1);
+      interaction.editReply(`Download in progress: ${roundedProgress}%`);
     }
-    progressCount++;
+    if (downloaded) {
+      interaction.editReply(`Downloaded .osz file, uploading to google drive...`);
+    }
   };
   await interaction.editReply("Searching database for map...");
   const fileId = await authorize_file(setId);
@@ -38,7 +45,7 @@ async function run(interaction) {
 
   await interaction.editReply(`Map not found, starting download..`);
   const path = await v2.beatmap.set.download(setId, file_path, host_name, no_video, callback);
-  interaction.editReply(`Downloaded .osz file, uploading to google drive...`);
+  downloaded = true;
 
   const url = await authorize(setId, path);
   interaction.channel.send(`<@${interaction.user.id}>: ${url}`);
