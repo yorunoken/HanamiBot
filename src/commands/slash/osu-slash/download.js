@@ -45,6 +45,7 @@ async function run(interaction) {
 
   await interaction.editReply(`Map not found, starting download..`);
   const path = await v2.beatmap.set.download(setId, file_path, host_name, no_video, callback);
+  interaction.editReply(`Downloaded .osz file, uploading to google drive...`);
   downloaded = true;
 
   const url = await authorize(setId, path);
