@@ -19,11 +19,14 @@ async function run(interaction) {
   let file_path = `./osz/${mapID}.osz`;
   let host_name = "sayobot";
   let no_video = true;
+
+  let progressCount = 0;
   const callback = (progress) => {
-    const random = Math.floor(Math.random() * 100);
-    if (random < 50) {
+    let multipleOf25 = progress.toFixed() % 20 === 0;
+    if (multipleOf25) {
       interaction.editReply(`Download in progress: ${progress.toFixed(1)}%`);
     }
+    progressCount++;
   };
   await interaction.editReply("Searching database for map...");
   const fileId = await authorize_file(setId);

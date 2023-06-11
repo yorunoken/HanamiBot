@@ -49,6 +49,7 @@ async function render(interaction) {
       }
     } catch (err) {
       interaction.editReply("There was an error! Please try again.");
+      client.removeListener("render_progress", renderProgressListener);
       return;
     }
   };
