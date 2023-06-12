@@ -18,7 +18,7 @@ async function render(interaction) {
   let renderDone = false;
 
   playFile = interaction.options.getAttachment("file");
-  if (!replayFile.name.endsWith(".osr")) {
+  if (!playFile.name.endsWith(".osr")) {
     interaction.editReply("Please provide a valid osu! replay file. (ends in .osr)");
     return;
   }
