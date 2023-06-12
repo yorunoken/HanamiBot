@@ -174,7 +174,7 @@ function options(interaction) {
       modeInt = 3;
       break;
   }
-  let mapID = link.match(/\d+$/)[0];
+  let mapID = link?.match(/\d+$/)[0];
 
   return { username, description, unstableRate, ppFc, sliderbreakCount, mods, mode, modeInt, mapID };
 }
