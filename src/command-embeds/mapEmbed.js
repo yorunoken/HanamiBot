@@ -227,7 +227,7 @@ async function buildMap(beatmap, argValues, messageLink, file) {
     };
     field3 = {
       name: "Links",
-      value: `:notes:[Song Preview](https://b.ppy.sh/preview/${beatmap.beatmapset_id}.mp3)\n🎬[Map Preview](https://osu.pages.dev/preview#${beatmap.id})\n🖼️[Full Background](https://assets.ppy.sh/beatmaps/${beatmap.beatmapset_id}/covers/raw.jpg)\n<:beatconnect:1075915329512931469>[Beatconnect](https://beatconnect.io/b/${beatmap.beatmapset_id})\n<:kitsu:1075915745973776405>[Kitsu](https://kitsu.moe/d/${beatmap.beatmapset_id})`,
+      value: `<:chimu:1117792339549761576>[Chimu](https://chimu.moe/d/${beatmap.beatmapset_id})\n<:beatconnect:1075915329512931469>[Beatconnect](https://beatconnect.io/b/${beatmap.beatmapset_id})\n:notes:[Song Preview](https://b.ppy.sh/preview/${beatmap.beatmapset_id}.mp3)\n🎬[Map Preview](https://osu.pages.dev/preview#${beatmap.id})\n🖼️[Full Background](https://assets.ppy.sh/beatmaps/${beatmap.beatmapset_id}/covers/raw.jpg)`,
       inline: true,
     };
 
