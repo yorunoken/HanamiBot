@@ -23,6 +23,7 @@ async function run(client, interaction) {
     n_geki: interaction.options.getNumber("ngeki") ?? undefined,
     n_katu: interaction.options.getNumber("nkatu") ?? undefined,
     acc: interaction.options.getNumber("accuracy") ?? undefined,
+    combo: interaction.options.getNumber("combo") ?? undefined,
     n_misses: interaction.options.getNumber("misses") ?? undefined,
   };
 
@@ -145,6 +146,7 @@ module.exports = {
     )
     .addStringOption((o) => o.setName("mods").setDescription("Calculate the pp based on mods"))
     .addNumberOption((o) => o.setName("accuracy").setDescription("What the accuracy of the simulated play should be"))
+    .addNumberOption((o) => o.setName("combo").setDescription("What the accuracy of the simulated play should be"))
     .addNumberOption((o) => o.setName("n300").setDescription("How many 300s should be simulated"))
     .addNumberOption((o) => o.setName("n100").setDescription("How many 100s should be simulated"))
     .addNumberOption((o) => o.setName("n50").setDescription("How many 50s should be simulated"))

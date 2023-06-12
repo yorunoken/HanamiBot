@@ -98,6 +98,7 @@ async function buildSim(beatmap, argValues, messageLink, file, mode, RuleSetID) 
     .n100(hits.n100 ?? 0)
     .n50(hits.n50 ?? 0)
     .nMisses(hits.n_misses ?? 0)
+    .combo(argValues.combo)
     .performance(map);
 
   let fcPerformance = calc
@@ -105,6 +106,7 @@ async function buildSim(beatmap, argValues, messageLink, file, mode, RuleSetID) 
     .n300(hits.n300 ?? 0)
     .n100(hits.n100 ?? 0)
     .n50(hits.n50 ?? 0)
+    .combo(argValues.combo)
     .nMisses(0)
     .performance(map);
 
