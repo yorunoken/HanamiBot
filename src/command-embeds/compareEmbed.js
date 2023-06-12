@@ -40,9 +40,9 @@ async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, 
   const userURL = `https://osu.ppy.sh/users/${user.id}/osu`;
 
   if (reverse) {
-    score.sort((b, a) => new Date(b.pp) - new Date(a.pp));
+    score?.sort((b, a) => new Date(b.pp) - new Date(a.pp));
   } else {
-    score.sort((b, a) => new Date(a.pp) - new Date(b.pp));
+    score?.sort((b, a) => new Date(a.pp) - new Date(b.pp));
   }
 
   //define the grades
