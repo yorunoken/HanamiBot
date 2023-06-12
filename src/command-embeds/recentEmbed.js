@@ -213,7 +213,7 @@ async function buildRecentsEmbed(score, user, mode, index, pbIndex) {
     const scoreGlobal = await v2.scores.details(score[index].best_id?.toString(), score[index].beatmap?.mode);
     if (scoreGlobal && scoreGlobal?.rank_global < 10000) {
       const scoreRank = scoreGlobal.rank_global;
-      scoreGlobalRank += `__Global Rank #${scoreRank}__`;
+      scoreGlobalRank += ` __Global Rank #${scoreRank}__`;
     }
   }
   if (scoreGlobalRank.length > 1) {
