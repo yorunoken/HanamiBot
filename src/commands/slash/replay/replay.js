@@ -13,7 +13,11 @@ const { query } = require("../../../utils/getQuery.js");
 async function render(interaction) {
   const userData = await query({ query: `SELECT * FROM users WHERE id = ?`, parameters: [interaction.user.id], name: "value", type: "get" });
   const skinDataRaw = userData?.replayConfig;
-  const skinData = userData ? JSON.parse(skinDataRaw) : skinDataRaw;
+  try {
+    var skinData = JSON.parse(skinDataRaw);
+  } catch (err) {
+    var skinData = skinDataRaw;
+  }
   const skinID = skinData?.skinID ?? "3";
   let renderDone = false;
 
