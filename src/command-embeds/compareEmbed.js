@@ -95,7 +95,13 @@ async function buildCompareEmbed(score, user, pageNumber, mode, index, reverse, 
     } else {
       const q = `INSERT INTO maps (id, file) VALUES (?, ?)`;
 
-      query({ query: q, parameters: [mapID, mapQuery], type: "run" });
+      try {
+        await query({ query: q, parameters: [mapID, osuFile], type: "run" });
+      } catch (error) {
+        // Handle the case where a duplicate id was inserted by updating the existing row instead
+        const q = `UPDATE maps SET file = ? WHERE id = ?`;
+        await query({ query: q, parameters: [osuFile, mapID], type: "run" });
+      }
     }
     mapQuery = osuFile;
   }

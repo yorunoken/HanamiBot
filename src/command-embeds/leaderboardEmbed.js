@@ -59,7 +59,13 @@ async function leaderboard(beatmapID, scores, pageNumber, beatmap, requesterName
     } else {
       const q = `INSERT INTO maps (id, file) VALUES (?, ?)`;
 
-      query({ query: q, parameters: [beatmapID, mapQuery], type: "run" });
+      try {
+        await query({ query: q, parameters: [beatmapID, osuFile], type: "run" });
+      } catch (error) {
+        // Handle the case where a duplicate id was inserted by updating the existing row instead
+        const q = `UPDATE maps SET file = ? WHERE id = ?`;
+        await query({ query: q, parameters: [osuFile, beatmapID], type: "run" });
+      }
     }
     mapQuery = osuFile;
   }

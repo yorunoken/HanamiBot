@@ -31,7 +31,13 @@ async function buildMap(beatmap, argValues, messageLink, file) {
     if (!mapQuery) {
       const q = `INSERT INTO maps (id, file) VALUES (?, ?)`;
 
-      await query({ query: q, parameters: [beatmap.id, osuFile], type: "run" });
+      try {
+        await query({ query: q, parameters: [beatmap.id, osuFile], type: "run" });
+      } catch (error) {
+        // Handle the case where a duplicate id was inserted by updating the existing row instead
+        const q = `UPDATE maps SET file = ? WHERE id = ?`;
+        await query({ query: q, parameters: [osuFile, beatmap.id], type: "run" });
+      }
     }
     if (beatmap.status != "ranked" && beatmap.status != "loved" && beatmap.status != "approved") {
       const q = `UPDATE maps
