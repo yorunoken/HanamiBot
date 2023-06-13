@@ -112,7 +112,13 @@ async function buildRecentsEmbed(score, user, mode, index, pbIndex) {
     } else {
       const q = `INSERT INTO maps (id, file) VALUES (?, ?)`;
 
-      await query({ query: q, parameters: [mapID, osuFile], type: "run" });
+      try {
+        await query({ query: q, parameters: [mapID, osuFile], type: "run" });
+      } catch (error) {
+        // Handle the case where a duplicate id was inserted by updating the existing row instead
+        const q = `UPDATE maps SET file = ? WHERE id = ?`;
+        await query({ query: q, parameters: [osuFile, mapID], type: "run" });
+      }
     }
     mapQuery = osuFile;
   }
