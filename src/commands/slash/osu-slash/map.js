@@ -16,6 +16,7 @@ async function run(client, interaction) {
     ar: interaction.options.getNumber("ar"),
     od: interaction.options.getNumber("od"),
     cs: interaction.options.getNumber("cs"),
+    cs: interaction.options.getNumber("bpm"),
   };
 
   let osuFile = interaction.options.getAttachment("file");

@@ -91,6 +91,9 @@ async function buildMap(beatmap, argValues, messageLink, file) {
   let calc = new Calculator(scoreParam);
 
   const mapValues = calc.clockRate(clockRate).mapAttributes(map);
+  if (argValues["bpm"]) {
+    clockRate = Number(argValues["bpm"]) / mapValues.bpm;
+  }
 
   const performanceAcc100 = calc.clockRate(clockRate).acc(100).performance(map);
   const performanceAcc99 = calc.clockRate(clockRate).acc(99).performance(map);
