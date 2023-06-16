@@ -4,11 +4,10 @@ const { getUsername } = require("../../../utils/getUsernamePrefix");
 const { query } = require("../../../utils/getQuery.js");
 const { v2, mods } = require("osu-api-extended");
 
-async function run(message, username, mode, i, args) {
+async function run(message, username, mode, i, args, pass) {
   await message.channel.sendTyping();
 
   let index = i ?? 1;
-  const pass = 1;
 
   let argValues = {};
   for (const arg of args) {
@@ -142,7 +141,7 @@ function getIndex(tops, value) {
 
 module.exports = {
   name: "recent",
-  aliases: ["rs", "recent", "r", "rt", "recenttaiko", "rc", "recentfruits", "rctb", "recentctb", "rm", "recentmania"],
+  aliases: ["rs", "recent", "r", "rt", "recenttaiko", "rc", "recentfruits", "rctb", "recentctb", "rm", "recentmania", "rsp", "recentpass", "rp", "rtp", "recenttaikopass", "rcp", "recentfruitspass", "rctbp", "recentctbpass", "rmp", "recentmaniapass"],
   cooldown: 5000,
   run: async ({ message, args, index, commandName }) => {
     const username = await getUsername(message, args);
@@ -166,10 +165,15 @@ module.exports = {
         break;
     }
 
+    let pass = true;
+    if (commandName.includes("p")) {
+      pass = false;
+    }
+
     // wanted = ["-pass", "-ps", "-passes"];
     // const passes = wanted.filter((word) => args.indexOf(word) >= 0)
     // const pass = passes[0] ?? false;
 
-    await run(message, username, mode, index, args);
+    await run(message, username, mode, index, args, pass);
   },
 };
