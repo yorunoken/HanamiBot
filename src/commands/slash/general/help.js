@@ -53,7 +53,8 @@ async function display_commands(interaction) {
     }
   }
 
-  const embed = new EmbedBuilder();
+  let inviteLink = "https://discord.com/api/oauth2/authorize?client_id=995999045157916763&permissions=3263558&scope=bot";
+  const embed = new EmbedBuilder().setDescription(`Invite the bot using [this link](${inviteLink})`);
   const categories = [
     { category: "osu", commands: osu },
     { category: "admin", commands: admin },
