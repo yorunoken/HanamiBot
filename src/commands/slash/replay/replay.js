@@ -52,6 +52,7 @@ async function render(interaction) {
         thing.delete();
       }
     } catch (err) {
+      console.log(err);
       interaction.editReply("There was an error! Please try again.");
       client.removeListener("render_progress", renderProgressListener);
       return;
