@@ -11,7 +11,7 @@ const { query } = require("../../../utils/getQuery.js");
  * @param {string} mode
  */
 
-async function getScore(score, user, mode, sliderbreakCount, unstableRate) {
+async function getScore(score, user, mode, sliderbreakCount, unstableRate, ppFc) {
   let modsName = score.mods.join("").toUpperCase();
   let mapID = score.beatmap.id;
   const valueGeki = score.statistics.count_geki;
