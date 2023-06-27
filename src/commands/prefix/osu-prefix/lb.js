@@ -89,7 +89,7 @@ async function run(message, client, args, name, options) {
     const score = scores.scores;
     try {
       if (i.customId == "next") {
-        if (!(page + 1 >= Math.ceil(score.length / 5))) {
+        if (!(page + 1 > Math.ceil(score.length / 5))) {
           page++;
           if (page === Math.ceil(score.length / 5)) {
             row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));

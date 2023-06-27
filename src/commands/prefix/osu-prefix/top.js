@@ -65,7 +65,7 @@ async function run(message, username, mode, options, i) {
   collector.on("collect", async (i) => {
     try {
       if (i.customId == "next") {
-        if (index && index + 1 <= tops.length) {
+        if (index && index + 1 < tops.length) {
           index++;
           if (index === tops.length) {
             row = new ActionRowBuilder().addComponents(prevPage.setDisabled(false), nextPage.setDisabled(true));
