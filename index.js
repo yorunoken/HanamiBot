@@ -35,16 +35,8 @@ client.slashCommands = new Collection();
 client.prefixCommands = new Collection();
 client.aliases = new Collection();
 
-const refreshAuth = async () => {
-  try {
-    await auth.login(process.env.client_id, process.env.client_secret, ["public"]);
-    console.log("Refreshed osu! token");
-  } catch (error) {
-    console.error(error);
-  }
-};
-refreshAuth();
-setInterval(refreshAuth, 1000 * 60 * 60 * 8);
+auth.login(process.env.client_id, process.env.client_secret, ["public"]).then((res) => console.log("Refreshed osu! token"));
+
 client.on("ready", async () => {
   try {
     const slashCommands = await load(client);
@@ -54,6 +46,8 @@ client.on("ready", async () => {
     console.error(error);
   }
 });
+
+client.addListener("debug", console.log);
 
 async function events() {
   const client = await MongoClient.connect(process.env.MONGO);
@@ -86,4 +80,4 @@ process.on("uncaughtExceptionMonitor", (e) => {
   console.error(e);
 });
 
-client.login(token);
+client.login(token).catch((e) => console.log);
