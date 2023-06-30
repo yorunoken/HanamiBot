@@ -35,7 +35,11 @@ client.slashCommands = new Collection();
 client.prefixCommands = new Collection();
 client.aliases = new Collection();
 
-auth.login(process.env.client_id, process.env.client_secret, ["public"]).then((res) => console.log("Refreshed osu! token"));
+const callback = () => auth.login(process.env.client_id, process.env.client_secret, ["public"]).then((res) => console.log("Refreshed osu! token"));
+callback();
+
+let hoursBy = 6;
+setInterval(callback, 1000 * 60 * 60 * 24 * hoursBy);
 
 client.on("ready", async () => {
   try {
