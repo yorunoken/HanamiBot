@@ -51,8 +51,6 @@ client.on("ready", async () => {
   }
 });
 
-client.addListener("debug", console.log);
-
 async function events() {
   const client = await MongoClient.connect(process.env.MONGO);
   console.log("Successfully connected to MongoDB!");
