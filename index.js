@@ -39,7 +39,7 @@ const callback = () => auth.login(process.env.client_id, process.env.client_secr
 callback();
 
 let hoursBy = 6;
-setInterval(callback, 1000 * 60 * 60 * 24 * hoursBy);
+setInterval(callback, 1000 * 60 * 60 * hoursBy);
 
 client.on("ready", async () => {
   try {
