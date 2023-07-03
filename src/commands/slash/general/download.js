@@ -20,8 +20,8 @@ async function run(interaction) {
     vCodec: "h264",
     vQuality: interaction.options.getString("quality") ?? "720",
     aFormat: interaction.options.getString("a_format") ?? "mp3",
-    isAudioOnly: interaction.options.getString("audio_only") ?? false,
-    isAudioMuted: interaction.options.getString("audio_muted") ?? false,
+    isAudioOnly: interaction.options.getBoolean("audio_only") ?? false,
+    isAudioMuted: interaction.options.getBoolean("audio_muted") ?? false,
   };
 
   let properties = "";
