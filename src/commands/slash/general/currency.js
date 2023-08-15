@@ -37,6 +37,10 @@ const run = async ({ interaction }) => {
   }
 
   const exchangeRates = await makeRequest(curr1, curr2, curr1Value);
+  if (exchangeRates.status === 402) {
+    return interaction.editReply(`Unfortunately, a free plan doesn't support comparing two currencies that aren't USD. Maybe donate? :)`);
+  }
+
   if (!curr1Value) {
     return interaction.editReply(`\`1\` ${exchangeRates.base} equals \`${exchangeRates.rates[curr2]}\` ${curr2}.`);
   } else {
