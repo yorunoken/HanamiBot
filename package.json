@@ -24,6 +24,10 @@
     "osu-api-extended": "^2.7.2",
     "osu-downloader": "^0.8.1",
     "rosu-pp": "^0.9.4",
-    "sqlite3": "^5.1.6"
+    "sqlite3": "^5.1.6",
+    "string-similarity": "^4.0.4"
+  },
+  "devDependencies": {
+    "ts-migrate": "^0.1.35"
   }
 }
