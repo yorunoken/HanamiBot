@@ -26,7 +26,7 @@ async function run(interaction, username) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`The user \`${username}\` was not found.`)] });
     return;
   }
-  const tops = await v2.scores.user.category(user.id, "best", { mode: mode, limit: 100, mods: modsSelected });
+  const tops = await v2.scores.user.category(user.id, "best", { mode, limit: 100, mods: modsSelected });
   if (tops.length === 0) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No recent plays found for ${user.username} in osu!${mode === "osu" ? "standard" : mode}.`)] });
     return;
@@ -137,9 +137,7 @@ module.exports = {
     .setName("top")
     .setDescription("Displays a user's top 100 plays specified by mode")
     .addStringOption((option) => option.setName("user").setDescription("Specify a username. (or tag someone)").setRequired(false))
-    .addStringOption((option) =>
-      option.setName("mode").setDescription("Select an osu! mode").setRequired(false).addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "fruits", value: "fruits" })
-    )
+    .addStringOption((option) => option.setName("mode").setDescription("Select an osu! mode").setRequired(false).addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "catch", value: "fruits" }))
     .addStringOption((option) => option.setName("mods").setDescription("Specify a mod combination").setRequired(false))
     .addIntegerOption((option) => option.setName("page").setDescription("The page").setMinValue(1).setMaxValue(20))
     .addIntegerOption((option) => option.setName("index").setDescription("The index of the play you want").setMinValue(1).setMaxValue(100))

@@ -61,11 +61,7 @@ async function run(interaction) {
       url: `https://osu.ppy.sh/users/${user.id}/${mode}`,
     })
     .setTitle(`What If ${user.username} Got ${article} \`${added_pp}pp\` Play?`)
-    .setDescription(
-      `**${article} \`${added_pp}pp\` play would be ${user.username}'s ${options.pp_placement}${suffix} top play, pushing their pp to \`${options.new_sum.toFixed(2)}(+${options.difference.toFixed(
-        2
-      )})\`, and pushing their up to rank \`#${rank.rank?.toLocaleString()}\`**`
-    );
+    .setDescription(`**${article} \`${added_pp}pp\` play would be ${user.username}'s ${options.pp_placement}${suffix} top play, pushing their pp to \`${options.new_sum.toFixed(2)}(+${options.difference.toFixed(2)})\`, and pushing their up to rank \`#${rank.rank?.toLocaleString()}\`**`);
 
   interaction.editReply({ embeds: [embed] });
 }
@@ -76,9 +72,7 @@ module.exports = {
     .setDescription("Calculates the pp gain of a play")
     .addNumberOption((o) => o.setName("pp").setDescription("The pp value of the hypothetical play").setRequired(true))
     .addStringOption((o) => o.setName("user").setDescription("The user"))
-    .addStringOption((option) =>
-      option.setName("mode").setDescription("Select an osu! mode").setRequired(false).addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "fruits", value: "fruits" })
-    ),
+    .addStringOption((option) => option.setName("mode").setDescription("Select an osu! mode").setRequired(false).addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "catch", value: "fruits" })),
   run: async ({ interaction }) => {
     await run(interaction);
   },

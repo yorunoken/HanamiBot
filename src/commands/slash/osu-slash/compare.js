@@ -108,9 +108,7 @@ module.exports = {
     .setName("compare")
     .setDescription("Displays a user's best score(s) on a beatmap")
     .addStringOption((option) => option.setName("user").setDescription("Specify a username. (or tag someone)").setRequired(false))
-    .addStringOption((option) =>
-      option.setName("mode").setDescription("Select an osu! mode").setRequired(false).addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "fruits", value: "fruits" })
-    )
+    .addStringOption((option) => option.setName("mode").setDescription("Select an osu! mode").setRequired(false).addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "catch", value: "fruits" }))
     .addIntegerOption((option) => option.setName("index").setDescription("The index of a recent play.").setMinValue(1).setMaxValue(50))
     .addBooleanOption((option) => option.setName("reverse").setDescription("Select if pp order should be reversed"))
     .addStringOption((option) => option.setName("mods").setDescription("Specify what mods to consider.")),

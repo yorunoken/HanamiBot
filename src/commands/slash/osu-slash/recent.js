@@ -23,7 +23,7 @@ async function run(interaction, username) {
   }
   const now2 = Date.now();
 
-  const recents = await v2.scores.user.category(user.id, "recent", { include_fails: pass, limit: 100, mods: modID });
+  const recents = await v2.scores.user.category(user.id, "recent", { include_fails: pass, limit: 100, mods: modID, mode });
 
   if (recents.length === 0) {
     interaction.editReply({ embeds: [new EmbedBuilder().setColor("Purple").setDescription(`No recent plays found for ${user.username} in osu!${mode === "osu" ? "standard" : mode}.`)] });
@@ -145,9 +145,7 @@ module.exports = {
     .setName("rs")
     .setDescription("Displays a user's recent score")
     .addStringOption((option) => option.setName("user").setDescription("Specify a username. (or tag someone)").setRequired(false))
-    .addStringOption((option) =>
-      option.setName("mode").setDescription("Select an osu! mode").setRequired(false).addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "fruits", value: "fruits" })
-    )
+    .addStringOption((option) => option.setName("mode").setDescription("Select an osu! mode").setRequired(false).addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "catch", value: "fruits" }))
     .addStringOption((option) => option.setName("mods").setDescription("Specify a mod combination").setRequired(false))
     .addIntegerOption((option) => option.setName("index").setDescription("The index of a recent play.").setMinValue(1).setMaxValue(50))
     .addBooleanOption((option) => option.setName("passes").setDescription("Specify whether only passes should be considered.")),

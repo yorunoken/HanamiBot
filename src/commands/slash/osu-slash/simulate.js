@@ -141,9 +141,7 @@ module.exports = {
     .setDescription("Simulate a score!")
     .addStringOption((o) => o.setName("link").setDescription("The link of a beatmap"))
     .addAttachmentOption((o) => o.setName("file").setDescription(".osu file to calculate maps that aren't submitted"))
-    .addStringOption((o) =>
-      o.setName("mode").setDescription("Select an osu mode (only for unsubmitted maps)").addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "fruits", value: "fruits" })
-    )
+    .addStringOption((o) => o.setName("mode").setDescription("Select an osu mode (only for unsubmitted maps)").addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "catch", value: "fruits" }))
     .addStringOption((o) => o.setName("mods").setDescription("Calculate the pp based on mods"))
     .addNumberOption((o) => o.setName("accuracy").setDescription("What the accuracy of the simulated play should be"))
     .addNumberOption((o) => o.setName("combo").setDescription("What the accuracy of the simulated play should be"))

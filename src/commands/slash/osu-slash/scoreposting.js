@@ -188,9 +188,7 @@ module.exports = {
         .setName("recent")
         .setDescription("Generates a scorepost for a player's most recent score")
         .addStringOption((o) => o.setName("user").setDescription("osu! username of the user.").setRequired(true))
-        .addStringOption((option) =>
-          option.setName("mode").setDescription("Select an osu! mode").setRequired(false).addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "fruits", value: "fruits" })
-        )
+        .addStringOption((option) => option.setName("mode").setDescription("Select an osu! mode").setRequired(false).addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "catch", value: "fruits" }))
         .addStringOption((o) => o.setName("description").setDescription("Adds a comment to the scorepost."))
         .addNumberOption((o) => o.setName("ur").setDescription("Adds (and converts if neccessary) UR onto the scorepost."))
         .addBooleanOption((o) => o.setName("ppfc").setDescription("Adds/removes pp for fc from the title. It is on by default for plays with 20 or less misses."))
@@ -202,9 +200,7 @@ module.exports = {
         .setDescription("Generates a scorepost for a player's score on a map (highest score if no mods are provided)")
         .addStringOption((o) => o.setName("user").setDescription("osu! username of the user.").setRequired(true))
         .addStringOption((option) => option.setName("link").setDescription("The link (or ID) of the beatmap").setRequired(true))
-        .addStringOption((option) =>
-          option.setName("mode").setDescription("Select an osu! mode").setRequired(false).addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "fruits", value: "fruits" })
-        )
+        .addStringOption((option) => option.setName("mode").setDescription("Select an osu! mode").setRequired(false).addChoices({ name: "standard", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "catch", value: "fruits" }))
         .addStringOption((o) => o.setName("description").setDescription("Adds a comment to the scorepost."))
         .addStringOption((o) => o.setName("mods").setDescription("Specifies mods."))
         .addNumberOption((o) => o.setName("ur").setDescription("Adds (and converts if neccessary) UR onto the scorepost."))
