@@ -1,9 +1,3 @@
-.env
+.env.local
 node_modules/
-test.js
-.idea
-.cache
-database.sqlite/
-database.sqlite
-innate-agency-380308-ef877e4f7034.json
-osz/
+data.db
