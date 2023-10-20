@@ -5,3 +5,5 @@ export enum PrefixMethods {
 }
 
 export type CallbackVoid = (value?: any) => void;
+
+export type osuModes = "osu" | "mania" | "fruits" | "taiko";

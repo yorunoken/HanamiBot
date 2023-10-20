@@ -21,11 +21,7 @@ const client = new MyClient({
 });
 
 fs.readdirSync("./src/Handlers").forEach(async (file: any) => {
-  const commandFilePath = `./Handlers/${file}`;
-  const commandFileName = path.parse(commandFilePath).name;
-
-  const event = await require(`./Handlers/${commandFileName}`);
-
+  const event = await require(`./Handlers/${file}`);
   client.on(event.name, (...args: any) => event.execute(...args, client));
 });
 
