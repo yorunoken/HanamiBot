@@ -1,4 +1,5 @@
 import { db } from "./Handlers/ready";
+//@ts-ignore
 import { response as User } from "osu-api-extended/dist/types/v2_user_details";
 
 export const getUser = (id: string): any => db.prepare("SELECT * FROM users WHERE id = ?").get(id);
@@ -73,4 +74,14 @@ export function userDetails(user: User) {
     rankSh,
     rankSsh,
   };
+}
+
+type DiscordUser = any
+type OsuUser = any
+export function getUsernameFromArgs(user: DiscordUser, args: string[]) {
+  const argumentString = args.join("")
+  const usernameRegex = /"(.*?)"/
+  const argument = usernameRegex.test(argumentString) ? usernameRegex.exec(argumentString)![0] : getUser(user.id)
+ 
+  return undefined;
 }
