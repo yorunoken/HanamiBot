@@ -1,7 +1,10 @@
 import { Client, Collection, GatewayIntentBits } from "discord.js";
+import { auth } from "osu-api-extended";
 import fs from "fs";
-import path from "path";
-const token = Bun.env.TOKEN;
+const { CLIENT_SECRET, CLIENT_ID, TOKEN } = Bun.env;
+if (!(CLIENT_SECRET && CLIENT_ID && TOKEN)) {
+  throw new Error("WARNING: parameters have not been set in .env.local");
+}
 
 export class MyClient extends Client {
   slashCommands: Collection<any, any>;
@@ -15,6 +18,8 @@ export class MyClient extends Client {
     this.aliases = new Collection();
   }
 }
+
+auth.login(parseInt(CLIENT_ID!), CLIENT_SECRET!, ["public"]);
 
 const client = new MyClient({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessages, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent],
@@ -35,4 +40,4 @@ process.on("uncaughtExceptionMonitor", (e) => {
   console.error(e);
 });
 
-client.login(token);
+client.login(TOKEN);

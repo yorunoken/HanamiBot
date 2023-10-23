@@ -1,7 +1,8 @@
 import { ChatInputCommandInteraction } from "discord.js";
-import { v2 } from "osu-api-extended";
+import { start } from "../../Helpers/osu";
 
 export async function run({ interaction }: { interaction: ChatInputCommandInteraction }) {
   await interaction.deferReply();
+  await start(interaction);
 }
 export { data } from "../data/profile";

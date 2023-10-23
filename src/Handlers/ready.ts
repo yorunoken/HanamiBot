@@ -5,10 +5,7 @@ import { Routes } from "discord-api-types/v10";
 import { MyClient } from "..";
 import { getServer, insertData } from "../utils";
 
-const token = Bun.env.TOKEN;
-if (!token) {
-  throw new Error("WARNING! Token not set in: .env.local");
-}
+const token = Bun.env.TOKEN as string;
 const rest = new REST({ version: "10" }).setToken(token);
 
 export const db = new Database(`./src/data.db`);
