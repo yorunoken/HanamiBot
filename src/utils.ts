@@ -46,9 +46,9 @@ function getRetryCount(retryMap: any[], mapId: number) {
   return retryCounter;
 }
 
-function formatNumber(value: number, decimalPlaces: number): string {
-  return value.toFixed(decimalPlaces).replace(/\.0+$/, "");
-}
+const formatNumber = (value: number, decimalPlaces: number) => value.toFixed(decimalPlaces).replace(/\.0+$/, "");
+const errMsg = (message: string) => ({ status: false, message });
+const getUserData = (userId: string) => getUser(userId) || errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`);
 
 const flags = ["i", "rev", "p"];
 const argParser = (str: string, flags: string[]) => [...str.matchAll(/-(\w+)|(\w+)=(\S+)/g)].filter((m) => flags.includes(m[1]) || flags.includes(m[2])).map((m) => [m[1] || m[2], m[3]]);
@@ -356,14 +356,6 @@ export class ButtonActions {
       response.edit({ embeds: [page], components: _components as any });
     }
   }
-}
-
-function errMsg(message: string) {
-  return { status: false, message };
-}
-
-function getUserData(userId: string) {
-  return getUser(userId) || errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`);
 }
 
 export function getUsernameFromArgs(user: UserDiscord, args?: string[]) {
