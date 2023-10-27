@@ -13,7 +13,12 @@ db.run(`CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
   data TEXT
 );`);
-db.run(`CREATE TABLE IF NOT EXISTS  servers (
+db.run(`CREATE TABLE IF NOT EXISTS servers (
+  id INTEGER PRIMARY KEY,
+  data TEXT
+);
+`);
+db.run(`CREATE TABLE IF NOT EXISTS maps (
   id INTEGER PRIMARY KEY,
   data TEXT
 );
@@ -84,7 +89,7 @@ async function checkForServers(client: MyClient) {
       };
 
       const data = JSON.stringify(foobar);
-      insertData({ guildId, data });
+      insertData({ table: "servers", id: guildId, data });
       emptyServers++;
     }
   }

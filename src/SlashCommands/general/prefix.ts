@@ -14,7 +14,6 @@ async function addPrefix({ interaction }: { interaction: ChatInputCommandInterac
   let data = JSON.parse(document.data);
 
   const documentPrefixes: string[] | undefined = data.prefix;
-  console.log(documentPrefixes);
 
   if (documentPrefixes && documentPrefixes.includes(prefix)) {
     return await interaction.editReply(`The prefix \`${prefix}\` is already set!`);
@@ -26,7 +25,7 @@ async function addPrefix({ interaction }: { interaction: ChatInputCommandInterac
 
   data.prefix = prefixesArray;
 
-  await insertData({ guildId, data: JSON.stringify(data) });
+  await insertData({ table: "servers", id: guildId, data: JSON.stringify(data) });
   updateCache(data.prefix, guildId);
 
   return await interaction.editReply(`The prefix \`${prefix}\` has been added to the array of prefixes!`);
@@ -51,7 +50,7 @@ async function removePrefix({ interaction }: { interaction: ChatInputCommandInte
   const prefixesArray = documentPrefixes.filter((item) => item !== prefix);
   data.prefix = prefixesArray.length > 0 ? prefixesArray : undefined;
 
-  await insertData({ guildId, data: JSON.stringify(data) });
+  await insertData({ table: "servers", id: guildId, data: JSON.stringify(data) });
   updateCache(data.prefix, guildId);
 
   return await interaction.editReply(`The prefix \`${prefix}\` has been removed from the array of prefixes!`);
