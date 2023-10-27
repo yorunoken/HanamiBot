@@ -1,4 +1,5 @@
-import { UserDetails, getUsernameFromArgs, IntearctionHandler, nextButton, previousButton, buildActionRow, ButtonActions, ScoreDetails } from "../utils";
+import { getUsernameFromArgs, IntearctionHandler, nextButton, previousButton, buildActionRow } from "../utils";
+import { UserDetails, ButtonActions, ScoreDetails } from "../classes";
 import { Message, ChatInputCommandInteraction, ButtonInteraction, EmbedBuilder } from "discord.js";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 import { v2 } from "osu-api-extended";

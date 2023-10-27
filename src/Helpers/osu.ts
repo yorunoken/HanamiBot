@@ -1,5 +1,6 @@
-import { UserDetails, getUsernameFromArgs, IntearctionHandler, showMoreButton, ButtonActions } from "../utils";
+import { getUsernameFromArgs, IntearctionHandler, showMoreButton } from "../utils";
 import { Message, ChatInputCommandInteraction, EmbedBuilder, ButtonInteraction } from "discord.js";
+import { UserDetails, ButtonActions } from "../classes";
 import { osuModes } from "../types";
 import { v2 } from "osu-api-extended";
 
