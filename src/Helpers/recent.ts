@@ -24,7 +24,7 @@ export async function start(interaction: Message | ChatInputCommandInteraction, 
   }
   const plays = await v2.scores.user.category(user.id, "recent", {
     limit: "50",
-    include_fails: !passOnly,
+    include_fails: !argOptions.passOnly,
     mode: argOptions.mode,
   });
   if (plays.length === 0) {

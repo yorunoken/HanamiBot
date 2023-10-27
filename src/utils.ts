@@ -399,7 +399,7 @@ export function IntearctionHandler(interaction: Message | ChatInputCommandIntera
   const userArgs = isSlash ? [interaction.options.getString("user") || ""] : args;
   const author = isSlash ? interaction.user : interaction.author;
   const mode = isSlash ? (interaction.options.getString("mode") as osuModes) || "osu" : "osu";
-  const passOnly = isSlash ? interaction.options.getBoolean("passonly") || false : true;
+  const passOnly = isSlash ? interaction.options.getBoolean("passonly") || false : false;
 
   return { reply, userArgs, author, mode, passOnly };
 }
