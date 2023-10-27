@@ -1,4 +1,4 @@
-import { User as UserDiscord, Message, ChatInputCommandInteraction, InteractionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, ButtonInteraction } from "discord.js";
+import { User as UserDiscord, Message, ChatInputCommandInteraction, InteractionType, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { db } from "./Handlers/ready";
 import { osuModes } from "./types";
 
