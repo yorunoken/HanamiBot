@@ -5,7 +5,7 @@ import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores
 import { v2 } from "osu-api-extended";
 import { osuModes } from "../types";
 
-export async function start(interaction: Message | ChatInputCommandInteraction, passOnly?: boolean, args?: string[], mode?: osuModes, number?: number) {
+export async function start(isRecent: boolean, interaction: Message | ChatInputCommandInteraction, passOnly?: boolean, args?: string[], mode?: osuModes, number?: number) {
   const argOptions = IntearctionHandler(interaction, args);
   argOptions.mode = mode ?? argOptions.mode;
   argOptions.passOnly = passOnly ?? argOptions.passOnly;
@@ -23,8 +23,8 @@ export async function start(interaction: Message | ChatInputCommandInteraction, 
   if (!user.id) {
     return argOptions.reply(`The user \`${userOptions.user}\` does not exist in Bancho.`);
   }
-  const plays = await v2.scores.user.category(user.id, "recent", {
-    limit: "50",
+  const plays = await v2.scores.user.category(user.id, isRecent ? "recent" : "best", {
+    limit: "100",
     include_fails: !argOptions.passOnly,
     mode: argOptions.mode,
   });
@@ -35,7 +35,7 @@ export async function start(interaction: Message | ChatInputCommandInteraction, 
   const userDetailOptions = new UserDetails(user, argOptions.mode);
 
   const functionOptions = { user: userDetailOptions, plays, mode: argOptions.mode, index };
-  const embed = await getRecentPlay(functionOptions);
+  const embed = await getRecentPlays(functionOptions);
 
   const components = [buildActionRow([previousButton, nextButton], [index === 0, index + 1 === plays.length])];
   const response = await argOptions.reply({ embeds: [embed], components });
@@ -44,7 +44,7 @@ export async function start(interaction: Message | ChatInputCommandInteraction, 
   const collector = response.createMessageComponentCollector({ time: 60000, filter });
 
   collector.on("collect", async function (i: ButtonInteraction) {
-    await ButtonActions.handleRecentButtons(getRecentPlay, functionOptions, i, response);
+    await ButtonActions.handleRecentButtons(getRecentPlays, functionOptions, i, response);
   });
 
   collector.on("end", async () => {
@@ -52,7 +52,7 @@ export async function start(interaction: Message | ChatInputCommandInteraction, 
   });
 }
 
-async function getRecentPlay({ user, plays, mode, index }: { user: UserDetails; plays: ScoreResponse[]; mode: osuModes; index: number }) {
+async function getRecentPlays({ user, plays, mode, index }: { user: UserDetails; plays: ScoreResponse[]; mode: osuModes; index: number }) {
   const options = await new ScoreDetails().initialize(plays, index, mode);
 
   return new EmbedBuilder()

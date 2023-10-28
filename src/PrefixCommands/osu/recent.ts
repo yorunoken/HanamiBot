@@ -3,6 +3,8 @@ import { start } from "../../Helpers/recent";
 import { osuModes } from "../../types";
 
 const modeAliases: { [key: string]: { mode: osuModes; passOnly: boolean } } = {
+  // recents
+  r: { mode: "osu", passOnly: false },
   rs: { mode: "osu", passOnly: false },
   rt: { mode: "taiko", passOnly: false },
   rm: { mode: "mania", passOnly: false },
@@ -12,8 +14,8 @@ const modeAliases: { [key: string]: { mode: osuModes; passOnly: boolean } } = {
   recentmania: { mode: "mania", passOnly: false },
   recentcatch: { mode: "fruits", passOnly: false },
 
-  // pass only
   rp: { mode: "osu", passOnly: true },
+  rsp: { mode: "osu", passOnly: true },
   rpt: { mode: "taiko", passOnly: true },
   rpm: { mode: "mania", passOnly: true },
   rpc: { mode: "fruits", passOnly: true },
@@ -27,12 +29,14 @@ export const name = "recent";
 export const aliases = Object.keys(modeAliases);
 export const cooldown = 3000;
 
-export async function run({ message, args, commandName, number }: { message: Message; args: string[]; commandName: string; number: number }) {
+export async function run({ message, args, commandName, index }: { message: Message; args: string[]; commandName: string; index: number }) {
   await message.channel.sendTyping();
 
   const alias = modeAliases[commandName.toLowerCase()];
   const modeOptions = alias.mode || undefined;
   const passOnly = alias.passOnly || false;
+  const isRecent = true;
+  console.log(index);
 
-  await start(message, passOnly, args, modeOptions, number);
+  await start(isRecent, message, passOnly, args, modeOptions, index - 1);
 }
