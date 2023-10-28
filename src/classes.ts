@@ -1,4 +1,4 @@
-import { rulesets, getMap, insertData, getRetryCount, grades, formatNumber, buildActionRow, showLessButton, showMoreButton, previousButton, nextButton, loadingButtons } from "./utils"
+import { rulesets, getMap, insertData, getRetryCount, grades, formatNumber, buildActionRow, showLessButton, showMoreButton, previousButton, nextButton, loadingButtons } from "./utils";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 import { response as UserOsu } from "osu-api-extended/dist/types/v2_user_details";
 //@ts-ignore
@@ -139,7 +139,7 @@ export class ScoreDetails {
     this.grade = grades[play.rank];
     this.submittedTime = new Date(play.created_at).getTime() / 1000;
     this.minutesTotal = Math.floor(totalLength / 60).toFixed();
-    this.secondsTotal = (totalLength % 60).toString().padStart(2, "0");
+    this.secondsTotal = (totalLength % 60).toFixed().toString().padStart(2, "0");
     this.bpm = performance.mapValues.bpm.toFixed();
     this.mapValues = `AR: ${formatNumber(performance.mapValues.ar, 1)} OD: ${formatNumber(performance.mapValues.od, 1)} CS: ${formatNumber(performance.mapValues.cs, 1)} HP: ${formatNumber(performance.mapValues.hp, 2)}`;
     this.stars = performance.maxPerf.difficulty.stars.toFixed(2);
@@ -297,22 +297,7 @@ export class ButtonActions {
 }
 
 export class CalculateHitResults {
-  static calcStandard({ accuracy, totalHitObjects, countMiss, count100, count50 }:{ accuracy: number; totalHitObjects: number; countMiss: number; count50?: number; count100?: number; }) {
-    let count300: number;
+  static standard({ accuracy, totalHitObjects, countMiss, count100, count50 }: { accuracy: number; totalHitObjects: number; countMiss: number; count50?: number; count100?: number }) {}
 
-    if (count50 !== null || count100 !== null) {
-      count300 = totalHitObjects - (count100 ?? 0) - (count50 ?? 0) - countMiss;
-    } else {
-      const targetTotal = Math.round(accuracy * totalHitObjects * 6);
-      const delta = targetTotal - (totalHitObjects - countMiss);
-
-      count300 = delta / 5;
-      count100 = delta % 5;
-      count50 = totalHitObjects - count300 - count100 - countMiss 
-    }
-
-    return { count300, count100: count100 ?? 0, count50: count50 ?? 0, countMiss }
-  }
-
-  constructor(){}
+  constructor() {}
 }
