@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction } from "discord.js";
-import { start } from "../../Helpers/recent";
+import { start } from "../../Helpers/plays";
 
 export async function run({ interaction }: { interaction: ChatInputCommandInteraction }) {
   await interaction.deferReply();

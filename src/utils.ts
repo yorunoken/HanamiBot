@@ -30,7 +30,7 @@ export const buildActionRow = (buttons: ButtonBuilder[], disabledStates: boolean
   return actionRow;
 };
 
-export function getRetryCount(retryMap: any[], mapId: number) {
+export function getRetryCount(retryMap: number[], mapId: number) {
   let retryCounter = 0;
   for (let i = 0; i < retryMap.length; i++) {
     if (retryMap[i] === mapId) {
@@ -44,8 +44,8 @@ export const formatNumber = (value: number, decimalPlaces: number) => value.toFi
 export const errMsg = (message: string) => ({ status: false, message });
 export const getUserData = (userId: string) => getUser(userId) || errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`);
 
-const flags = ["i", "rev", "p"];
-export const argParser = (str: string, flags: string[]) => [...str.matchAll(/-(\w+)|(\w+)=(\S+)/g)].filter((m) => flags.includes(m[1]) || flags.includes(m[2])).map((m) => [m[1] || m[2], m[3]]);
+const flags = ["i", "index", "rev", "p", "page"];
+export const argParser = (str: string, flags: string[]) => [...str.matchAll(/-(\w+)|(\w+)=(\S+)/g)].filter((m) => flags.includes(m[1]) || flags.includes(m[2])).reduce((acc, m) => ((acc[m[1] || m[2]] = m[3] !== undefined ? m[3] : true), acc), {} as Record<string, string | boolean>);
 
 export const loadingButtons = buildActionRow([new ButtonBuilder().setCustomId("wating").setLabel("Waiting..").setStyle(ButtonStyle.Secondary)], [false]);
 export const showMoreButton = buildActionRow([new ButtonBuilder().setCustomId("more").setLabel("Show More").setStyle(ButtonStyle.Success)]);
@@ -64,9 +64,10 @@ export function getUsernameFromArgs(user: UserDiscord, args?: string[]) {
 
   const flagsParsed = argParser(args.join(" "), flags);
 
-  const argumentString = args.filter((arg) => !flags.includes(arg) || !flags.includes(`-${arg}`)).join(" ");
+  const argumentString = args.length > 0 ? args[0].replace(/(?:\s|^)(-\w+|\w+=\S+)(?=\s|$)/g, "").trim() : "";
   if (!argumentString) {
-    return { user: getUserData(user.id), flags: flagsParsed };
+    const userData = getUserData(user.id).data;
+    return { user: userData ? JSON.parse(userData).banchoId : errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`), flags: flagsParsed };
   }
 
   const discordUserRegex = /\d{17,18}/;

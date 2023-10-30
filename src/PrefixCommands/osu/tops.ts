@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { start } from "../../Helpers/recent";
+import { start } from "../../Helpers/plays";
 import { osuModes } from "../../types";
 
 const modeAliases: { [key: string]: { mode: osuModes; recent: boolean } } = {
@@ -25,13 +25,13 @@ export const name = "top";
 export const aliases = Object.keys(modeAliases);
 export const cooldown = 3000;
 
-export async function run({ message, args, commandName, number }: { message: Message; args: string[]; commandName: string; number: number }) {
+export async function run({ message, args, commandName, index }: { message: Message; args: string[]; commandName: string; index: number }) {
   await message.channel.sendTyping();
 
   const alias = modeAliases[commandName.toLowerCase()];
   const modeOptions = alias.mode || undefined;
-  const recent = alias.recent || false;
-  const isRecent = false;
+  const isRecent = alias.recent || false;
+  const isTops = true;
 
-  await start(isRecent, message, recent, args, modeOptions, number);
+  await start({ isTops, interaction: message, isRecent, args, mode: modeOptions, number: index - 1 });
 }

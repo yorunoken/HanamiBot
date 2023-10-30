@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { start } from "../../Helpers/recent";
+import { start } from "../../Helpers/plays";
 import { osuModes } from "../../types";
 
 const modeAliases: { [key: string]: { mode: osuModes; passOnly: boolean } } = {
@@ -35,8 +35,7 @@ export async function run({ message, args, commandName, index }: { message: Mess
   const alias = modeAliases[commandName.toLowerCase()];
   const modeOptions = alias.mode || undefined;
   const passOnly = alias.passOnly || false;
-  const isRecent = true;
-  console.log(index);
+  const isTops = false;
 
-  await start(isRecent, message, passOnly, args, modeOptions, index - 1);
+  await start({ isTops, interaction: message, passOnly, args, mode: modeOptions, number: index - 1 });
 }

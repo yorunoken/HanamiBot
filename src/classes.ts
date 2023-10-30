@@ -40,9 +40,13 @@ export class ScoreDetails {
   bpm!: string;
   mapValues!: string;
   performance: any;
-  ppValue!: string;
+  totalResult!: string;
   ifFcValue!: string;
   stars!: string;
+  comboValue!: string;
+  pp!: string;
+  fcPp!: string;
+  ssPp!: string;
 
   static getPerformanceDetails(play: ScoreResponse, rulesetId: number, values: any, mapText: string) {
     const modsId = play.mods.length > 0 ? mods.id(play.mods.join("")) : 0;
@@ -63,7 +67,7 @@ export class ScoreDetails {
     return { mapValues, maxPerf, curPerf, fcPerf };
   }
 
-  async initialize(plays: ScoreResponse[], index: number, mode: osuModes) {
+  async initialize(plays: ScoreResponse[], index: number, mode: osuModes, isTops: boolean) {
     const play = plays[index];
     const rulesetId = rulesets[mode];
 
@@ -101,8 +105,10 @@ export class ScoreDetails {
     const percentageNum = Number((objectshit / objects) * 100);
 
     this.percentagePassed = percentageNum === 100 || play.passed == true ? "" : `@${percentageNum.toFixed(1)}% `;
-    const retryMap = plays.map((x) => x.beatmap.id).splice(0, index);
-    const retryCounter = getRetryCount(retryMap, beatmapId) + 1;
+
+    const retryMap = plays.map((x) => x.beatmap.id);
+    retryMap.splice(0, index);
+    const retryCounter = getRetryCount(retryMap, beatmapId);
 
     this.modsPlay = play.mods.length > 0 ? `**+${play.mods.join("").toUpperCase()}**` : "**+NM**";
 
@@ -143,9 +149,14 @@ export class ScoreDetails {
     this.bpm = performance.mapValues.bpm.toFixed();
     this.mapValues = `AR: ${formatNumber(performance.mapValues.ar, 1)} OD: ${formatNumber(performance.mapValues.od, 1)} CS: ${formatNumber(performance.mapValues.cs, 1)} HP: ${formatNumber(performance.mapValues.hp, 2)}`;
     this.stars = performance.maxPerf.difficulty.stars.toFixed(2);
-    this.accValues = `{**${rulesetId === 3 ? count_geki + "/" : ""}${count_300}**/${rulesetId === 3 ? count_katu + "/" : ""}${count_100}/${rulesetId === 1 ? "" : count_50 + "/"}${count_miss}}`;
 
-    this.ppValue = `**${performance.curPerf.pp.toFixed(2)}**/${performance.curPerf.pp.toFixed(2)}pp [ **${play.max_combo}**x/${performance.maxPerf.difficulty.maxCombo}x ] ${this.accValues}`;
+    this.accValues = `{ **${rulesetId === 3 ? count_geki + "/" : ""}${count_300}**/${rulesetId === 3 ? count_katu + "/" : ""}${count_100}/${rulesetId === 1 ? "" : count_50 + "/"}${count_miss} }`;
+    this.comboValue = `[ **${play.max_combo}**x/${performance.maxPerf.difficulty.maxCombo}x ]`;
+    this.pp = performance.curPerf.pp.toFixed(2);
+    this.fcPp = performance.fcPerf.pp.toFixed(2);
+    this.ssPp = performance.maxPerf.pp.toFixed(2);
+
+    this.totalResult = isTops ? performance.curPerf.pp.toFixed(2) : `**${this.pp}**/${this.ssPp}pp ${this.comboValue} ${this.accValues}`;
     this.ifFcValue = "";
     if ((performance.curPerf as any).effectiveMissCount > 0) {
       const Map300CountFc = objects - count_100 - count_50;
@@ -162,7 +173,7 @@ export class ScoreDetails {
         mode
       );
 
-      this.ifFcValue = `If FC: **${performance.fcPerf.pp.toFixed(2)}**pp for **${FcAcc.toFixed(2)}%**`;
+      this.ifFcValue = isTops ? ` ~~[**${this.fcPp}**]~~` : `If FC: **${this.fcPp}**pp for **${FcAcc.toFixed(2)}%**`;
     }
     return this;
   }
@@ -276,7 +287,7 @@ export class ButtonActions {
     }
   }
 
-  static async handleRecentButtons(pageBuilder: any, options: any, i: ButtonInteraction, response: Message) {
+  static async handleRecentButtons({ pageBuilder, options, i, response }: { pageBuilder: any; options: any; i: ButtonInteraction; response: Message }) {
     const customId = i.customId;
 
     await i.update({ components: [loadingButtons as any] });
@@ -291,6 +302,25 @@ export class ButtonActions {
       const page = await pageBuilder(options);
 
       const _components = [buildActionRow([previousButton, nextButton], [options.index === 0, options.index + 1 === options.plays.length])];
+      response.edit({ embeds: [page], components: _components as any });
+    }
+  }
+
+  static async handleTopsButtons({ pageBuilder, options, i, response }: { pageBuilder: any; options: any; i: ButtonInteraction; response: Message }) {
+    const customId = i.customId;
+
+    await i.update({ components: [loadingButtons as any] });
+    if (customId === "next") {
+      options.page++;
+      const page = await pageBuilder(options);
+
+      const _components = [buildActionRow([previousButton, nextButton], [options.page * 5 === 0, options.page * 5 + 5 === options.plays.length])];
+      response.edit({ embeds: [page], components: _components as any });
+    } else if (customId === "previous") {
+      options.page--;
+      const page = await pageBuilder(options);
+
+      const _components = [buildActionRow([previousButton, nextButton], [options.index === 0, options.index * 5 + 5 === options.plays.length])];
       response.edit({ embeds: [page], components: _components as any });
     }
   }
