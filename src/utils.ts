@@ -43,6 +43,8 @@ export function getRetryCount(retryMap: number[], mapId: number) {
 export const formatNumber = (value: number, decimalPlaces: number) => value.toFixed(decimalPlaces).replace(/\.0+$/, "");
 export const errMsg = (message: string) => ({ status: false, message });
 export const getUserData = (userId: string) => getUser(userId) || errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`);
+export const buttonBoolsTops = (type: string, options: any) => (type === "previous" ? options.page * 5 === 0 : options.page * 5 + 5 === options.plays.length);
+export const buttonBoolsIndex = (type: string, options: any) => (type === "previous" ? options.index === 0 : options.index + 1 === options.plays.length);
 
 const flags = ["i", "index", "rev", "p", "page"];
 export const argParser = (str: string, flags: string[]) => [...str.matchAll(/-(\w+)|(\w+)=(\S+)/g)].filter((m) => flags.includes(m[1]) || flags.includes(m[2])).reduce((acc, m) => ((acc[m[1] || m[2]] = m[3] !== undefined ? m[3] : true), acc), {} as Record<string, string | boolean>);
@@ -64,7 +66,13 @@ export function getUsernameFromArgs(user: UserDiscord, args?: string[]) {
 
   const flagsParsed = argParser(args.join(" "), flags);
 
-  const argumentString = args.length > 0 ? args[0].replace(/(?:\s|^)(-\w+|\w+=\S+)(?=\s|$)/g, "").trim() : "";
+  const argumentString =
+    args.length > 0
+      ? args
+          .join(" ")
+          .replace(/(?:\s|^)(-\w+|\w+=\S+)(?=\s|$)/g, "")
+          .trim()
+      : "";
   if (!argumentString) {
     const userData = getUserData(user.id).data;
     return { user: userData ? JSON.parse(userData).banchoId : errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`), flags: flagsParsed };
@@ -86,7 +94,7 @@ export function getUsernameFromArgs(user: UserDiscord, args?: string[]) {
   return osuUsername ? { user: osuUsername, flags: flagsParsed } : undefined;
 }
 
-export function IntearctionHandler(interaction: Message | ChatInputCommandInteraction, args?: string[]) {
+export function Interactionhandler(interaction: Message | ChatInputCommandInteraction, args?: string[]) {
   const isSlash = interaction.type === InteractionType.ApplicationCommand;
 
   const reply = (options: any) => (isSlash ? interaction.editReply(options) : interaction.channel.send(options));
@@ -94,6 +102,7 @@ export function IntearctionHandler(interaction: Message | ChatInputCommandIntera
   const author = isSlash ? interaction.user : interaction.author;
   const mode = isSlash ? (interaction.options.getString("mode") as osuModes) || "osu" : "osu";
   const passOnly = isSlash ? interaction.options.getBoolean("passonly") || false : false;
+  const index = isSlash ? (interaction.options.getInteger("index") ? interaction.options.getInteger("index")! - 1 : 0) : 0;
 
-  return { reply, userArgs, author, mode, passOnly };
+  return { reply, userArgs, author, mode, passOnly, index };
 }

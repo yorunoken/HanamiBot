@@ -7,6 +7,7 @@ import { Message, ButtonInteraction } from "discord.js";
 import { mods, tools } from "osu-api-extended";
 import { Beatmap, Calculator } from "rosu-pp";
 import { osuModes } from "./types";
+import { buttonBoolsIndex, buttonBoolsTops } from "./utils";
 
 export class ScoreDetails {
   beatmapId!: number;
@@ -156,7 +157,7 @@ export class ScoreDetails {
     this.fcPp = performance.fcPerf.pp.toFixed(2);
     this.ssPp = performance.maxPerf.pp.toFixed(2);
 
-    this.totalResult = isTops ? performance.curPerf.pp.toFixed(2) : `**${this.pp}**/${this.ssPp}pp ${this.comboValue} ${this.accValues}`;
+    this.totalResult = `**${this.pp}**/${this.ssPp}pp ${this.comboValue} ${this.accValues}`;
     this.ifFcValue = "";
     if ((performance.curPerf as any).effectiveMissCount > 0) {
       const Map300CountFc = objects - count_100 - count_50;
@@ -173,7 +174,7 @@ export class ScoreDetails {
         mode
       );
 
-      this.ifFcValue = isTops ? ` ~~[**${this.fcPp}**]~~` : `If FC: **${this.fcPp}**pp for **${FcAcc.toFixed(2)}%**`;
+      this.ifFcValue = `If FC: **${this.fcPp}**pp for **${FcAcc.toFixed(2)}%**`;
     }
     return this;
   }
@@ -290,38 +291,31 @@ export class ButtonActions {
   static async handleRecentButtons({ pageBuilder, options, i, response }: { pageBuilder: any; options: any; i: ButtonInteraction; response: Message }) {
     const customId = i.customId;
 
+    const getComponents = () => [buildActionRow([previousButton, nextButton], [options.index === 0, options.index + 1 === options.plays.length])] as any;
     await i.update({ components: [loadingButtons as any] });
     if (customId === "next") {
       options.index++;
-      const page = await pageBuilder(options);
-
-      const _components = [buildActionRow([previousButton, nextButton], [options.index === 0, options.index + 1 === options.plays.length])];
-      response.edit({ embeds: [page], components: _components as any });
+      response.edit({ embeds: [await pageBuilder(options)], components: getComponents() });
     } else if (customId === "previous") {
       options.index--;
-      const page = await pageBuilder(options);
-
-      const _components = [buildActionRow([previousButton, nextButton], [options.index === 0, options.index + 1 === options.plays.length])];
-      response.edit({ embeds: [page], components: _components as any });
+      response.edit({ embeds: [await pageBuilder(options)], components: getComponents() });
     }
   }
 
   static async handleTopsButtons({ pageBuilder, options, i, response }: { pageBuilder: any; options: any; i: ButtonInteraction; response: Message }) {
     const customId = i.customId;
+    const index = options.index;
 
+    const getComponents = () => [buildActionRow([previousButton, nextButton], [index! >= 0 ? buttonBoolsIndex("previous", options) : buttonBoolsTops("previous", options), index! >= 0 ? buttonBoolsIndex("next", options) : buttonBoolsTops("next", options)])] as any;
     await i.update({ components: [loadingButtons as any] });
     if (customId === "next") {
       options.page++;
-      const page = await pageBuilder(options);
-
-      const _components = [buildActionRow([previousButton, nextButton], [options.page * 5 === 0, options.page * 5 + 5 === options.plays.length])];
-      response.edit({ embeds: [page], components: _components as any });
+      options.index++;
+      response.edit({ embeds: [await pageBuilder(options)], components: getComponents() });
     } else if (customId === "previous") {
       options.page--;
-      const page = await pageBuilder(options);
-
-      const _components = [buildActionRow([previousButton, nextButton], [options.index === 0, options.index * 5 + 5 === options.plays.length])];
-      response.edit({ embeds: [page], components: _components as any });
+      options.index--;
+      response.edit({ embeds: [await pageBuilder(options)], components: getComponents() });
     }
   }
 }
