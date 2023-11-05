@@ -11,9 +11,9 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
   argOptions.passOnly = passOnlyArg ?? argOptions.passOnly;
 
   const indexThing = number ?? argOptions.index;
-  argOptions.index = isNaN(indexThing) ? 0 : indexThing;
+  const index = isNaN(indexThing) ? (isTops ? undefined : 0) : indexThing;
 
-  const { index, mode, passOnly } = argOptions;
+  const { mode, passOnly } = argOptions;
   console.log({ index, mode, passOnly });
 
   const userOptions = getUsernameFromArgs(argOptions.author, argOptions.userArgs);
@@ -31,11 +31,13 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
     return argOptions.reply(`The user \`${userOptions.user}\` does not exist in Bancho.`);
   }
 
-  const plays = await v2.scores.user.category(user.id, isTops ? "best" : "recent", {
+  let plays = await v2.scores.user.category(user.id, isTops ? "best" : "recent", {
     limit: isTops ? "100 " : "50",
     include_fails: passOnly,
     mode: mode,
   });
+
+  plays = recentTop ? plays.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) : plays;
 
   if (plays.length === 0) {
     return argOptions.reply(`The user \`${user.username}\` does not have recent plays in Bancho.`);
