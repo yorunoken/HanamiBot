@@ -6,7 +6,7 @@ export async function start(interaction: ChatInputCommandInteraction) {
   const username = interaction.options.getString("user")!;
   const author = interaction.user;
 
-  const user = await v2.user.details(username);
+  const user = await v2.user.details(username, "osu");
   if (!user.id) {
     return interaction.reply(`The user \`${username}\` does not exist in Bancho.`);
   }

@@ -3,7 +3,7 @@ import { start } from "../../Helpers/osu";
 import { osuModes } from "../../types";
 
 export const name = "osu";
-export const aliases = ["osu", "mania", "taiko", ""];
+export const aliases = ["osu", "mania", "taiko", "catch"];
 export const cooldown = 3000;
 
 export async function run({ message, args, commandName }: { message: Message; args: string[]; commandName: osuModes }) {

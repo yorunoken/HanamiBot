@@ -1,4 +1,4 @@
-import { User as UserDiscord, Message, ChatInputCommandInteraction, InteractionType, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { User as UserDiscord, Message, ChatInputCommandInteraction, InteractionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, TextBasedChannel } from "discord.js";
 import { db } from "./Handlers/ready";
 import { osuModes } from "./types";
 
@@ -73,6 +73,7 @@ export function getUsernameFromArgs(user: UserDiscord, args?: string[]) {
           .replace(/(?:\s|^)(-\w+|\w+=\S+)(?=\s|$)/g, "")
           .trim()
       : "";
+
   if (!argumentString) {
     const userData = getUserData(user.id).data;
     return { user: userData ? JSON.parse(userData).banchoId : errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`), flags: flagsParsed };
@@ -82,9 +83,9 @@ export function getUsernameFromArgs(user: UserDiscord, args?: string[]) {
   const discordUserMatch = argumentString.match(discordUserRegex);
   const userId = discordUserMatch ? discordUserMatch[0] : undefined;
 
-  const discordUser = userId ? { user: getUserData(userId), flags: flagsParsed } : undefined;
-  if (discordUser) {
-    return discordUser;
+  const userData = getUserData(userId!).data;
+  if (userId) {
+    return { user: userData ? JSON.parse(userData)?.banchoId : errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`), flags: flagsParsed };
   }
 
   const osuUsernameRegex = /"(.*?)"/;
@@ -93,6 +94,36 @@ export function getUsernameFromArgs(user: UserDiscord, args?: string[]) {
 
   return osuUsername ? { user: osuUsername, flags: flagsParsed } : undefined;
 }
+
+const findId = (embed: any) => (embed.url || embed.description || (embed.author && embed.author.url))?.match(/\d+/)?.[0] || null;
+
+const getEmbedFromReply = async (message: Message, client: Client) => {
+  const channel = client.channels.cache.get(message.channelId) as TextBasedChannel;
+  if (!channel) {
+    return null;
+  }
+  const referencedMessage = await channel.messages.fetch(message.reference?.messageId!);
+  const embed = referencedMessage?.embeds?.[0];
+  return /\/(user|u)/.test(embed.url!) || /\/(user|u)/.test(embed.author?.url!) ? null : findId(embed);
+};
+
+async function cycleThroughEmbeds(message: Message, client: Client) {
+  const channel = client.channels.cache.get(message.channelId) as TextBasedChannel;
+  const messages = await channel.messages.fetch({ limit: 100 });
+
+  let beatmapId;
+  for (const [_id, message] of messages) {
+    if (!(message.embeds.length > 0 && message.author.bot)) {
+      continue;
+    }
+    beatmapId = await findId(message.embeds[0]);
+    if (beatmapId) {
+      break;
+    }
+  }
+  return beatmapId;
+}
+export const getBeatmapId_FromContext = async (message: Message, client: Client) => (message.reference ? await getEmbedFromReply(message, client) : cycleThroughEmbeds(message, client));
 
 export function Interactionhandler(interaction: Message | ChatInputCommandInteraction, args?: string[]) {
   const isSlash = interaction.type === InteractionType.ApplicationCommand;

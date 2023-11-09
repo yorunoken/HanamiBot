@@ -157,7 +157,7 @@ export class ScoreDetails {
     this.fcPp = performance.fcPerf.pp.toFixed(2);
     this.ssPp = performance.maxPerf.pp.toFixed(2);
 
-    this.totalResult = `**${this.pp}**/${this.ssPp}pp ${this.comboValue} ${this.accValues}`;
+    this.totalResult = `**${this.pp}**/${this.ssPp}pp • ${this.comboValue} • ${this.accValues}`;
     this.ifFcValue = "";
     if ((performance.curPerf as any).effectiveMissCount > 0) {
       const Map300CountFc = objects - count_100 - count_50;
