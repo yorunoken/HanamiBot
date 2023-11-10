@@ -1,6 +1,6 @@
 import { getUsernameFromArgs, Interactionhandler, showMoreButton, getBeatmapId_FromContext } from "../utils";
 import { Message, ChatInputCommandInteraction, EmbedBuilder, ButtonInteraction, Client } from "discord.js";
-import { UserDetails, ButtonActions } from "../classes";
+import { UserDetails, BeatmapDetails } from "../classes";
 import { osuModes } from "../types";
 import { v2 } from "osu-api-extended";
 
@@ -19,7 +19,8 @@ export async function start(interaction: Message, client: Client, args?: string[
   if (!beatmapId) {
     return options.reply(`There doesn't seem to be any beatmap embeds in this conversation.`);
   }
-  console.log(beatmapId);
+  const beatmap = await v2.beatmap.id.details(beatmapId)
+  const beatmapDetailOptions = new BeatmapDetails().initialize(beatmap)
 
   const user = await v2.user.details(userOptions.user, options.mode);
   if (!user.id) {

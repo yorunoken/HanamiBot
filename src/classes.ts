@@ -1,6 +1,7 @@
 import { rulesets, getMap, insertData, getRetryCount, grades, formatNumber, buildActionRow, showLessButton, showMoreButton, previousButton, nextButton, loadingButtons } from "./utils";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 import { response as UserOsu } from "osu-api-extended/dist/types/v2_user_details";
+import { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
 //@ts-ignore
 import { Downloader, DownloadEntry } from "osu-downloader";
 import { Message, ButtonInteraction } from "discord.js";
@@ -8,6 +9,25 @@ import { mods, tools } from "osu-api-extended";
 import { Beatmap, Calculator } from "rosu-pp";
 import { osuModes } from "./types";
 import { buttonBoolsIndex, buttonBoolsTops } from "./utils";
+
+function getPerformanceDetails(play: ScoreResponse, rulesetId: number, values: any, mapText: string) {
+  const modsId = play.mods.length > 0 ? mods.id(play.mods.join("")) : 0;
+  const { count_100, count_300, count_50, count_geki, count_katu, count_miss } = values;
+
+  let scoreParam = {
+    mode: rulesetId,
+    mods: modsId,
+  };
+  const map = new Beatmap({ content: mapText });
+  const calculator = new Calculator(scoreParam);
+
+  const mapValues = calculator.mapAttributes(map);
+  const maxPerf = calculator.performance(map);
+  const curPerf = calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(count_miss).combo(play.max_combo).nGeki(count_geki).nKatu(count_katu).performance(map);
+  const fcPerf = calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(0).combo(maxPerf.difficulty.maxCombo).nGeki(count_geki).nKatu(count_katu).performance(map);
+
+  return { mapValues, maxPerf, curPerf, fcPerf };
+}
 
 export class ScoreDetails {
   beatmapId!: number;
@@ -48,25 +68,6 @@ export class ScoreDetails {
   pp!: string;
   fcPp!: string;
   ssPp!: string;
-
-  static getPerformanceDetails(play: ScoreResponse, rulesetId: number, values: any, mapText: string) {
-    const modsId = play.mods.length > 0 ? mods.id(play.mods.join("")) : 0;
-    const { count_100, count_300, count_50, count_geki, count_katu, count_miss } = values;
-
-    let scoreParam = {
-      mode: rulesetId,
-      mods: modsId,
-    };
-    const map = new Beatmap({ content: mapText });
-    const calculator = new Calculator(scoreParam);
-
-    const mapValues = calculator.mapAttributes(map);
-    const maxPerf = calculator.performance(map);
-    const curPerf = calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(count_miss).combo(play.max_combo).nGeki(count_geki).nKatu(count_katu).performance(map);
-    const fcPerf = calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(0).combo(maxPerf.difficulty.maxCombo).nGeki(count_geki).nKatu(count_katu).performance(map);
-
-    return { mapValues, maxPerf, curPerf, fcPerf };
-  }
 
   async initialize(plays: ScoreResponse[], index: number, mode: osuModes, isTops: boolean) {
     const play = plays[index];
@@ -120,7 +121,7 @@ export class ScoreDetails {
       totalLength = totalLength / 1.5;
     }
 
-    const performance = ScoreDetails.getPerformanceDetails(play, rulesetId, { count_100, count_300, count_50, count_geki, count_katu, count_miss }, file);
+    const performance = getPerformanceDetails(play, rulesetId, { count_100, count_300, count_50, count_geki, count_katu, count_miss }, file);
 
     this.beatmapId = beatmapId;
     this.countCircles = count_circles;
@@ -273,6 +274,11 @@ export class UserDetails {
     this.emoteSs = grades.X;
     this.emoteSsh = grades.XH;
   }
+}
+
+export class BeatmapDetails {
+  async initialize(beatmap: BeatmapResponse) {}
+  constructor() {}
 }
 
 export class ButtonActions {
