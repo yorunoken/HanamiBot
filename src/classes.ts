@@ -1,187 +1,10 @@
-import { rulesets, getMap, insertData, getRetryCount, grades, formatNumber, buildActionRow, showLessButton, showMoreButton, previousButton, nextButton, loadingButtons } from "./utils";
+import { rulesets, getMap, insertData, getRetryCount, grades, formatNumber, buildActionRow, showLessButton, showMoreButton, previousButton, nextButton, loadingButtons, buttonBoolsIndex, buttonBoolsTops, downloadMap, getPerformanceDetails } from "./utils";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
-import { response as UserOsu } from "osu-api-extended/dist/types/v2_user_details";
 import { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
-//@ts-ignore
-import { Downloader, DownloadEntry } from "osu-downloader";
+import { response as UserOsu } from "osu-api-extended/dist/types/v2_user_details";
 import { Message, ButtonInteraction } from "discord.js";
-import { mods, tools } from "osu-api-extended";
-import { Beatmap, Calculator } from "rosu-pp";
+import { tools } from "osu-api-extended";
 import { osuModes } from "./types";
-import { buttonBoolsIndex, buttonBoolsTops } from "./utils";
-
-function getPerformanceDetails(play: ScoreResponse, rulesetId: number, values: any, mapText: string) {
-  const modsId = play.mods.length > 0 ? mods.id(play.mods.join("")) : 0;
-  const { count_100, count_300, count_50, count_geki, count_katu, count_miss } = values;
-
-  let scoreParam = {
-    mode: rulesetId,
-    mods: modsId,
-  };
-  const map = new Beatmap({ content: mapText });
-  const calculator = new Calculator(scoreParam);
-
-  const mapValues = calculator.mapAttributes(map);
-  const maxPerf = calculator.performance(map);
-  const curPerf = calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(count_miss).combo(play.max_combo).nGeki(count_geki).nKatu(count_katu).performance(map);
-  const fcPerf = calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(0).combo(maxPerf.difficulty.maxCombo).nGeki(count_geki).nKatu(count_katu).performance(map);
-
-  return { mapValues, maxPerf, curPerf, fcPerf };
-}
-
-export class ScoreDetails {
-  beatmapId!: number;
-  countCircles!: number;
-  countSliders!: number;
-  countSpinners!: number;
-  hitLength!: number;
-  version!: string;
-  creatorId!: number;
-  creatorUsername!: string;
-  mapStatus!: string;
-  mapsetId!: number;
-  count100!: number;
-  count300!: number;
-  count50!: number;
-  countGeki!: number;
-  countKatu!: number;
-  countMiss!: number;
-  accValues!: string;
-  retries!: number;
-  totalScore!: string;
-  percentagePassed!: string;
-  accuracy!: string;
-  artist!: string;
-  title!: string;
-  grade!: string;
-  modsPlay!: string;
-  submittedTime!: number;
-  minutesTotal!: string;
-  secondsTotal!: string;
-  bpm!: string;
-  mapValues!: string;
-  performance: any;
-  totalResult!: string;
-  ifFcValue!: string;
-  stars!: string;
-  comboValue!: string;
-  pp!: string;
-  fcPp!: string;
-  ssPp!: string;
-
-  async initialize(plays: ScoreResponse[], index: number, mode: osuModes, isTops: boolean) {
-    const play = plays[index];
-    const rulesetId = rulesets[mode];
-
-    const { id: beatmapId, count_circles, count_sliders, count_spinners, hit_length, version } = play.beatmap;
-    const { user_id: creatorId, creator: creatorUsername, status: mapStatus, id: mapsetId, artist, title } = play.beatmapset;
-    const { count_100, count_300, count_50, count_geki, count_katu, count_miss } = play.statistics;
-
-    let file = await getMap(beatmapId.toString())?.data;
-    if (!file || (mapStatus !== "ranked" && mapStatus !== "loved" && mapStatus !== "approved")) {
-      const downloader = new Downloader({
-        rootPath: "./cache",
-        filesPerSecond: 0,
-        synchronous: true,
-      });
-
-      downloader.addSingleEntry(
-        new DownloadEntry({
-          id: beatmapId,
-          save: false, // Don't save file on a disk.
-        })
-      );
-
-      const downloaderResponse = await downloader.downloadSingle();
-      if (downloaderResponse.status == -3) {
-        throw new Error("ERROR CODE 409, ABORTING TASK");
-      }
-
-      file = downloaderResponse.buffer.toString();
-      insertData({ table: "maps", id: beatmapId.toString(), data: file });
-    }
-
-    const objectshit = count_300 + count_100 + count_50 + count_miss;
-    const objects = count_circles + count_sliders + count_spinners;
-
-    const percentageNum = Number((objectshit / objects) * 100);
-
-    this.percentagePassed = percentageNum === 100 || play.passed == true ? "" : `@${percentageNum.toFixed(1)}% `;
-
-    const retryMap = plays.map((x) => x.beatmap.id);
-    retryMap.splice(0, index);
-    const retryCounter = getRetryCount(retryMap, beatmapId);
-
-    this.modsPlay = play.mods.length > 0 ? `**+${play.mods.join("").toUpperCase()}**` : "**+NM**";
-
-    let hitLength = play.beatmap.hit_length;
-    let totalLength = play.beatmap.hit_length;
-    if (this.modsPlay.toLowerCase().includes("dt")) {
-      hitLength = hitLength / 1.5;
-      totalLength = totalLength / 1.5;
-    }
-
-    const performance = getPerformanceDetails(play, rulesetId, { count_100, count_300, count_50, count_geki, count_katu, count_miss }, file);
-
-    this.beatmapId = beatmapId;
-    this.countCircles = count_circles;
-    this.countSliders = count_sliders;
-    this.countSpinners = count_spinners;
-    this.hitLength = hit_length;
-    this.version = version;
-    this.creatorId = creatorId;
-    this.creatorUsername = creatorUsername;
-    this.mapStatus = mapStatus;
-    this.mapsetId = mapsetId;
-    this.count100 = count_100;
-    this.count300 = count_300;
-    this.count50 = count_50;
-    this.countGeki = count_geki;
-    this.countKatu = count_katu;
-    this.countMiss = count_miss;
-    this.retries = retryCounter;
-    this.totalScore = play.score.toLocaleString();
-    this.accuracy = `${Number(play.accuracy * 100).toFixed(2)}%`;
-    this.artist = artist;
-    this.title = title;
-    this.grade = grades[play.rank];
-    this.submittedTime = new Date(play.created_at).getTime() / 1000;
-    this.minutesTotal = Math.floor(totalLength / 60).toFixed();
-    this.secondsTotal = (totalLength % 60).toFixed().toString().padStart(2, "0");
-    this.bpm = performance.mapValues.bpm.toFixed();
-    this.mapValues = `AR: ${formatNumber(performance.mapValues.ar, 1)} OD: ${formatNumber(performance.mapValues.od, 1)} CS: ${formatNumber(performance.mapValues.cs, 1)} HP: ${formatNumber(performance.mapValues.hp, 2)}`;
-    this.stars = performance.maxPerf.difficulty.stars.toFixed(2);
-
-    this.accValues = `{ **${rulesetId === 3 ? count_geki + "/" : ""}${count_300}**/${rulesetId === 3 ? count_katu + "/" : ""}${count_100}/${rulesetId === 1 ? "" : count_50 + "/"}${count_miss} }`;
-    this.comboValue = `[ **${play.max_combo}**x/${performance.maxPerf.difficulty.maxCombo}x ]`;
-    this.pp = performance.curPerf.pp.toFixed(2);
-    this.fcPp = performance.fcPerf.pp.toFixed(2);
-    this.ssPp = performance.maxPerf.pp.toFixed(2);
-
-    this.totalResult = `**${this.pp}**/${this.ssPp}pp • ${this.comboValue} • ${this.accValues}`;
-    this.ifFcValue = "";
-    if ((performance.curPerf as any).effectiveMissCount > 0) {
-      const Map300CountFc = objects - count_100 - count_50;
-
-      const FcAcc = tools.accuracy(
-        {
-          300: Map300CountFc.toString(),
-          geki: count_geki.toString(),
-          100: count_100.toString(),
-          katu: count_katu.toString(),
-          50: count_50.toString(),
-          0: "0",
-        },
-        mode
-      );
-
-      this.ifFcValue = `If FC: **${this.fcPp}**pp for **${FcAcc.toFixed(2)}%**`;
-    }
-    return this;
-  }
-
-  constructor() {}
-}
 
 export class UserDetails {
   username: string;
@@ -276,8 +99,143 @@ export class UserDetails {
   }
 }
 
-export class BeatmapDetails {
-  async initialize(beatmap: BeatmapResponse) {}
+export class ScoreDetails {
+  beatmapId!: number;
+  countCircles!: number;
+  countSliders!: number;
+  countSpinners!: number;
+  hitLength!: number;
+  version!: string;
+  creatorId!: number;
+  creatorUsername!: string;
+  mapStatus!: string;
+  mapsetId!: number;
+  count100!: number;
+  count300!: number;
+  count50!: number;
+  countGeki!: number;
+  countKatu!: number;
+  countMiss!: number;
+  accValues!: string;
+  retries!: number | undefined;
+  totalScore!: string;
+  percentagePassed!: string;
+  accuracy!: string;
+  artist!: string;
+  title!: string;
+  grade!: string;
+  modsPlay!: string;
+  submittedTime!: number;
+  minutesTotal!: string;
+  secondsTotal!: string;
+  bpm!: string;
+  mapValues!: string;
+  performance: any;
+  totalResult!: string;
+  ifFcValue!: string;
+  stars!: string;
+  comboValue!: string;
+  pp!: string;
+  fcPp!: string;
+  ssPp!: string;
+
+  async initialize(plays: ScoreResponse[], index: number, mode: osuModes, isTops: boolean, isCompare?: boolean, perfDetails?: any, beatmap?: BeatmapResponse) {
+    const play = plays[index];
+    const rulesetId = rulesets[mode];
+
+    (play.beatmap as any) = isCompare ? beatmap : play.beatmap;
+    (play.beatmapset as any) = isCompare ? beatmap?.beatmapset : play.beatmapset;
+
+    const { id: beatmapId, count_circles, count_sliders, count_spinners, hit_length, version } = play.beatmap;
+    const { user_id: creatorId, creator: creatorUsername, status: mapStatus, id: mapsetId, artist, title } = play.beatmapset;
+    const { count_100, count_300, count_50, count_geki, count_katu, count_miss } = play.statistics;
+
+    let file;
+    if (!isCompare) {
+      if (!(await getMap(beatmapId.toString())?.data) || !["ranked", "loved", "approved"].includes(mapStatus)) {
+        file = await downloadMap(beatmapId);
+        insertData({ table: "maps", id: beatmapId.toString(), data: file });
+      }
+    }
+
+    const objectshit = count_300 + count_100 + count_50 + count_miss;
+    const objects = count_circles + count_sliders + count_spinners;
+
+    const percentageNum = Number((objectshit / objects) * 100);
+
+    this.percentagePassed = percentageNum === 100 || play.passed == true ? "" : `@${percentageNum.toFixed(1)}% `;
+
+    const retryCounter = isCompare ? undefined : getRetryCount(plays.map((x) => x.beatmap.id).splice(0, index), beatmapId);
+
+    this.modsPlay = play.mods.length > 0 ? `**+${play.mods.join("").toUpperCase()}**` : "**+NM**";
+
+    let hitLength = play.beatmap.hit_length;
+    let totalLength = play.beatmap.hit_length;
+    if (this.modsPlay.toLowerCase().includes("dt")) {
+      hitLength = hitLength! / 1.5;
+      totalLength = totalLength! / 1.5;
+    }
+
+    const performance = isCompare ? perfDetails : getPerformanceDetails(play, rulesetId, { count_100, count_300, count_50, count_geki, count_katu, count_miss }, file);
+
+    this.beatmapId = beatmapId;
+    this.countCircles = count_circles;
+    this.countSliders = count_sliders;
+    this.countSpinners = count_spinners;
+    this.hitLength = hit_length;
+    this.version = version;
+    this.creatorId = creatorId;
+    this.creatorUsername = creatorUsername;
+    this.mapStatus = mapStatus;
+    this.mapsetId = mapsetId;
+    this.count100 = count_100;
+    this.count300 = count_300;
+    this.count50 = count_50;
+    this.countGeki = count_geki;
+    this.countKatu = count_katu;
+    this.countMiss = count_miss;
+    this.retries = retryCounter;
+    this.totalScore = play.score.toLocaleString();
+    this.accuracy = `${Number(play.accuracy * 100).toFixed(2)}%`;
+    this.artist = artist;
+    this.title = title;
+    this.grade = grades[play.rank];
+    this.submittedTime = new Date(play.created_at).getTime() / 1000;
+    this.minutesTotal = Math.floor(totalLength! / 60).toFixed();
+    this.secondsTotal = (totalLength! % 60).toFixed().toString().padStart(2, "0");
+    this.bpm = performance.mapValues.bpm.toFixed();
+    this.mapValues = `AR: ${formatNumber(performance.mapValues.ar, 1)} OD: ${formatNumber(performance.mapValues.od, 1)} CS: ${formatNumber(performance.mapValues.cs, 1)} HP: ${formatNumber(performance.mapValues.hp, 2)}`;
+    this.stars = performance.maxPerf.difficulty.stars.toFixed(2);
+
+    this.accValues = `{ **${rulesetId === 3 ? count_geki + "/" : ""}${count_300}**/${rulesetId === 3 ? count_katu + "/" : ""}${count_100}/${rulesetId === 1 ? "" : count_50 + "/"}${count_miss} }`;
+    this.comboValue = `[ **${play.max_combo}**x/${performance.maxPerf.difficulty.maxCombo}x ]`;
+    this.pp = performance.curPerf.pp.toFixed(2);
+    this.fcPp = performance.fcPerf.pp.toFixed(2);
+    this.ssPp = performance.maxPerf.pp.toFixed(2);
+
+    this.totalResult = `**${this.pp}**/${this.ssPp}pp • ${this.comboValue} • ${this.accValues}`;
+    this.ifFcValue = "";
+    if ((performance.curPerf as any).effectiveMissCount > 0) {
+      const Map300CountFc = objects - count_100 - count_50;
+
+      const FcAcc = tools.accuracy(
+        {
+          300: Map300CountFc.toString(),
+          geki: count_geki.toString(),
+          100: count_100.toString(),
+          katu: count_katu.toString(),
+          50: count_50.toString(),
+          0: "0",
+        },
+        mode
+      );
+
+      this.ifFcValue = `If FC: **${this.fcPp}**pp for **${FcAcc.toFixed(2)}%**`;
+    }
+
+    return this;
+  }
+
   constructor() {}
 }
 

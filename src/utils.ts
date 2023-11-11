@@ -1,4 +1,9 @@
 import { User as UserDiscord, Message, ChatInputCommandInteraction, InteractionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, TextBasedChannel } from "discord.js";
+import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
+//@ts-ignore
+import { Downloader, DownloadEntry } from "osu-downloader";
+import { Beatmap, Calculator } from "rosu-pp";
+import { mods } from "osu-api-extended";
 import { db } from "./Handlers/ready";
 import { osuModes } from "./types";
 
@@ -95,7 +100,50 @@ export function getUsernameFromArgs(user: UserDiscord, args?: string[]) {
   return osuUsername ? { user: osuUsername, flags: flagsParsed } : undefined;
 }
 
-const findId = (embed: any) => (embed.url || embed.description || (embed.author && embed.author.url))?.match(/\d+/)?.[0] || null;
+export function getPerformanceDetails(play: ScoreResponse, rulesetId: number, values: any, mapText: string) {
+  const modsId = play.mods.length > 0 ? mods.id(play.mods.join("")) : 0;
+  const { count_100, count_300, count_50, count_geki, count_katu, count_miss } = values;
+
+  let scoreParam = {
+    mode: rulesetId,
+    mods: modsId,
+  };
+  const map = new Beatmap({ content: mapText });
+  const calculator = new Calculator(scoreParam);
+
+  const mapValues = calculator.mapAttributes(map);
+  const maxPerf = calculator.performance(map);
+  const curPerf = calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(count_miss).combo(play.max_combo).nGeki(count_geki).nKatu(count_katu).performance(map);
+  const fcPerf = calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(0).combo(maxPerf.difficulty.maxCombo).nGeki(count_geki).nKatu(count_katu).performance(map);
+
+  return { mapValues, maxPerf, curPerf, fcPerf };
+}
+
+export async function downloadMap(beatmapId: number) {
+  const downloader = new Downloader({
+    rootPath: "./cache",
+    filesPerSecond: 0,
+    synchronous: true,
+  });
+
+  downloader.addSingleEntry(
+    new DownloadEntry({
+      id: beatmapId,
+      save: false, // Don't save file on a disk.
+    })
+  );
+
+  const downloaderResponse = await downloader.downloadSingle();
+  if (downloaderResponse.status == -3) {
+    throw new Error("ERROR CODE 409, ABORTING TASK");
+  }
+  return downloaderResponse.buffer.toString();
+}
+
+const findId = (embed: any) => {
+  const urlToCheck = embed.url || (embed.author && embed.author.url);
+  return urlToCheck && !/\/(user|u)/.test(urlToCheck) ? urlToCheck.match(/\d+/)?.[0] : null;
+};
 
 const getEmbedFromReply = async (message: Message, client: Client) => {
   const channel = client.channels.cache.get(message.channelId) as TextBasedChannel;
@@ -104,7 +152,7 @@ const getEmbedFromReply = async (message: Message, client: Client) => {
   }
   const referencedMessage = await channel.messages.fetch(message.reference?.messageId!);
   const embed = referencedMessage?.embeds?.[0];
-  return /\/(user|u)/.test(embed.url!) || /\/(user|u)/.test(embed.author?.url!) ? null : findId(embed);
+  return findId(embed);
 };
 
 async function cycleThroughEmbeds(message: Message, client: Client) {

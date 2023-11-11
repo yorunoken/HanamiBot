@@ -33,7 +33,7 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
 
   let plays = await v2.scores.user.category(user.id, isTops ? "best" : "recent", {
     limit: isTops ? "100 " : "50",
-    include_fails: passOnly,
+    include_fails: !passOnly,
     mode: mode,
   });
 
