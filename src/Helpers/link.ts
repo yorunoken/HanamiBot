@@ -7,7 +7,6 @@ export async function start(interaction: ChatInputCommandInteraction) {
   const author = interaction.user;
 
   const user = await v2.user.details(username, "osu");
-  console.log(user)
   if (!user.id) {
     return interaction.editReply(`The user \`${username}\` does not exist in Bancho.`);
   }
@@ -19,10 +18,6 @@ export async function start(interaction: ChatInputCommandInteraction) {
     await insertData({ table: "users", id: author.id, data: currentDocs.data });
   }
   let data = JSON.parse(currentDocs.data);
-  if (data.banchoId === user.id) {
-    const embed = new EmbedBuilder().setColor("Red").setTitle(`Error!`).setDescription(`It seems you are already linked to this account.`).setThumbnail(user.avatar_url);
-    return await interaction.editReply({ embeds: [embed] });
-  }
   data.banchoId = user.id;
 
   await insertData({ table: "users", id: author.id, data: JSON.stringify(data) });
