@@ -152,7 +152,8 @@ export class ScoreDetails {
 
     let file;
     if (!isCompare) {
-      if (!(await getMap(beatmapId.toString())?.data) || !["ranked", "loved", "approved"].includes(mapStatus)) {
+      file = await getMap(beatmapId.toString())?.data;
+      if (!file || !["ranked", "loved", "approved"].includes(mapStatus)) {
         file = await downloadMap(beatmapId);
         insertData({ table: "maps", id: beatmapId.toString(), data: file });
       }
@@ -160,15 +161,15 @@ export class ScoreDetails {
 
     const objectshit = count_300 + count_100 + count_50 + count_miss;
     const objects = count_circles + count_sliders + count_spinners;
-
+    
     const percentageNum = Number((objectshit / objects) * 100);
 
     this.percentagePassed = percentageNum === 100 || play.passed == true ? "" : `@${percentageNum.toFixed(1)}% `;
-
+    
     const retryCounter = isCompare ? undefined : getRetryCount(plays.map((x) => x.beatmap.id).splice(0, index), beatmapId);
-
+    
     this.modsPlay = play.mods.length > 0 ? `**+${play.mods.join("").toUpperCase()}**` : "**+NM**";
-
+    
     let hitLength = play.beatmap.hit_length;
     let totalLength = play.beatmap.hit_length;
     if (this.modsPlay.toLowerCase().includes("dt")) {

@@ -39,6 +39,9 @@ export async function start({ interaction, client, args, mode }: { interaction: 
   const userDetailOptions = new UserDetails(user, options.mode);
 
   const scores = await v2.scores.user.beatmap(beatmap.id, user.id, { mode: mode as osuModes });
+  if (scores.length === 0) {
+    return options.reply(`${user.username} has no scores on this beatmap`);
+  }
 
   return options.reply({ embeds: [await buildCompareEmbed(userDetailOptions, beatmap, scores, mode)] });
 }
