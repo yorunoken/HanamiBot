@@ -62,10 +62,18 @@ async function buildCompareEmbed(user: UserDetails, map: MapResponse, scores: Sc
     const score = await new ScoreDetails().initialize(scores as any, parseInt(i), mode as osuModes, false, true, scorePerf, map);
     _scores.push(
       i === "0"
-        ? `${score.grade} ${score.modsPlay} [**${score.stars}★**] • ${score.totalScore} • ${score.accuracy}\n**${score.pp}pp**/${score.ssPp}pp ~~[${score.fcPp}pp]~~ • ${score.comboValue}\n${score.accValues} <t:${score.submittedTime}:R>\n`
-        : `${score.grade} ${score.modsPlay} [**${score.stars}★**] • **${score.pp}pp** (${score.accuracy}) • **${play.max_combo}x** • ${(scorePerf.curPerf as any).effectiveMissCount > 0 ? `${score.countMiss} <:hit00:1061254490075955231>` : ""} <t:${score.submittedTime}:R>`
+        ? `${score.grade} ${score.modsPlay} **[${score.stars}★]** • ${score.totalScore} • ${score.accuracy}\n**${score.pp}pp**/${score.ssPp}pp ~~[${score.fcPp}pp]~~ • ${score.comboValue}\n${score.accValues} <t:${score.submittedTime}:R>\n`
+        : `${score.grade} ${score.modsPlay} **[${score.stars}★]** • **${score.pp}pp** (${score.accuracy}) • **${play.max_combo}x** • ${(scorePerf.curPerf as any).effectiveMissCount > 0 ? `${score.countMiss} <:hit00:1061254490075955231>` : ""} <t:${score.submittedTime}:R>`
     );
   }
 
-  return new EmbedBuilder().setTitle(`${map.beatmapset.artist} - ${map.beatmapset.title} [${map.version}]`).setURL(`https://osu.ppy.sh/b/${map.id}`).setDescription(_scores.join("\n")).setThumbnail(`https://assets.ppy.sh/beatmaps/${map.beatmapset_id}/covers/list.jpg`);
+  return new EmbedBuilder()
+    .setAuthor({
+      name: `${user.username} ${user.pp}pp (#${user.globalRank} ${user.countryCode}#${user.countryRank})`,
+      // iconURL: `https://osu.ppy.sh/images/flags/${countryCode}.png`,
+      iconURL: user.userAvatar,
+      url: user.userUrl,
+    })
+    .setTitle(`${map.beatmapset.artist} - ${map.beatmapset.title} [${map.version}]`)
+    .setURL(`https://osu.ppy.sh/b/${map.id}`).setDescription(_scores.join("\n")).setThumbnail(`https://assets.ppy.sh/beatmaps/${map.beatmapset_id}/covers/list.jpg`);
 }
