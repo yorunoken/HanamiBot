@@ -4,9 +4,9 @@ import { UserDetails, ButtonActions } from "../classes";
 import { osuModes } from "../types";
 import { v2 } from "osu-api-extended";
 
-export async function start(interaction: Message | ChatInputCommandInteraction, args?: string[], mode?: osuModes) {
+export async function start(interaction: Message | ChatInputCommandInteraction, args?: string[], mode?: any) {
   const options = Interactionhandler(interaction, args);
-  options.mode = mode ?? options.mode;
+  options.mode = mode === "catch" ? "fruits" : mode ?? options.mode;
 
   const userOptions = getUsernameFromArgs(options.author, options.userArgs);
   if (!userOptions) {
