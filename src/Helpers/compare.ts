@@ -20,7 +20,7 @@ export async function start({ interaction, client, args, mode }: { interaction: 
     return options.reply(userOptions.user.message);
   }
 
-  const beatmapId = await getBeatmapId_FromContext(interaction, client);
+  const beatmapId = userOptions.beatmapId || (await getBeatmapId_FromContext(interaction, client));
   if (!beatmapId) {
     return options.reply(`There doesn't seem to be any beatmap embeds in this conversation.`);
   }
@@ -31,14 +31,13 @@ export async function start({ interaction, client, args, mode }: { interaction: 
 
   mode = mode.length > 0 ? mode : beatmap.mode;
 
-  console.log(options.mode);
   const user = await v2.user.details(userOptions.user, options.mode);
   if (!user.id) {
     return options.reply(`The user \`${userOptions.user}\` does not exist in Bancho.`);
   }
   const userDetailOptions = new UserDetails(user, options.mode);
 
-  const scores = await v2.scores.user.beatmap(beatmap.id, user.id, { mode: mode as osuModes });
+  let scores = await v2.scores.user.beatmap(beatmap.id, user.id, { mode: mode as osuModes });
   if (scores.length === 0) {
     return options.reply(`${user.username} has no scores on this beatmap`);
   }
@@ -55,15 +54,14 @@ async function buildCompareEmbed(user: UserDetails, map: MapResponse, scores: Sc
 
   const _scores = [];
   for (let i in scores) {
-    const play = scores[i];
-    const hitValues = play.statistics;
+    const { mods, max_combo, statistics } = scores[i];
 
-    const scorePerf = getPerformanceDetails(play as any, rulesets[mode], hitValues, file);
+    const scorePerf = getPerformanceDetails({ modsArg: mods, maxCombo: max_combo, rulesetId: rulesets[mode], hitValues: statistics, mapText: file });
     const score = await new ScoreDetails().initialize(scores as any, parseInt(i), mode as osuModes, false, true, scorePerf, map);
     _scores.push(
       i === "0"
         ? `${score.grade} ${score.modsPlay} **[${score.stars}★]** • ${score.totalScore} • ${score.accuracy}\n**${score.pp}pp**/${score.ssPp}pp ~~[${score.fcPp}pp]~~ • ${score.comboValue}\n${score.accValues} <t:${score.submittedTime}:R>\n`
-        : `${score.grade} ${score.modsPlay} **[${score.stars}★]** • **${score.pp}pp** (${score.accuracy}) • **${play.max_combo}x** • ${(scorePerf.curPerf as any).effectiveMissCount > 0 ? `${score.countMiss} <:hit00:1061254490075955231>` : ""} <t:${score.submittedTime}:R>`
+        : `${score.grade} ${score.modsPlay} **[${score.stars}★]** • **${score.pp}pp** (${score.accuracy}) • **${max_combo}x** • ${(scorePerf.curPerf as any).effectiveMissCount > 0 ? `${score.countMiss} <:hit00:1061254490075955231>` : ""} <t:${score.submittedTime}:R>`
     );
   }
 
@@ -75,5 +73,7 @@ async function buildCompareEmbed(user: UserDetails, map: MapResponse, scores: Sc
       url: user.userUrl,
     })
     .setTitle(`${map.beatmapset.artist} - ${map.beatmapset.title} [${map.version}]`)
-    .setURL(`https://osu.ppy.sh/b/${map.id}`).setDescription(_scores.join("\n")).setThumbnail(`https://assets.ppy.sh/beatmaps/${map.beatmapset_id}/covers/list.jpg`);
+    .setURL(`https://osu.ppy.sh/b/${map.id}`)
+    .setDescription(_scores.join("\n"))
+    .setThumbnail(`https://assets.ppy.sh/beatmaps/${map.beatmapset_id}/covers/list.jpg`);
 }

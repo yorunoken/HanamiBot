@@ -19,6 +19,13 @@ export const grades: { [key: string]: string } = {
   XH: "<:XH_:1057763296717045891>",
 };
 
+export const osuEmojis: { [key: string]: string } = {
+  osu: "<:osu:1075928459014066286>",
+  mania: "<:mania:1075928451602718771>",
+  taiko: "<:taiko:1075928454651969606>",
+  fruits: "<:ctb:1075928456367444018>",
+};
+
 export const rulesets: { [key: string]: number } = {
   osu: 0,
   taiko: 1,
@@ -53,6 +60,13 @@ export const buttonBoolsIndex = (type: string, options: any) => (type === "previ
 
 const flags = ["i", "index", "rev", "p", "page"];
 export const argParser = (str: string, flags: string[]) => [...str.matchAll(/-(\w+)|(\w+)=(\S+)/g)].filter((m) => flags.includes(m[1]) || flags.includes(m[2])).reduce((acc, m) => ((acc[m[1] || m[2]] = m[3] !== undefined ? m[3] : true), acc), {} as Record<string, string | boolean>);
+export const modsParser = (str: string) =>
+  (str.match(/\+([A-Za-z]+)/g) || [])
+    .filter((_, i) => i % 2 === 0)
+    .map((code) => code.substring(1))
+    .join("")
+    .toUpperCase()
+    .match(/.{1,2}/g);
 
 export const loadingButtons = buildActionRow([new ButtonBuilder().setCustomId("wating").setLabel("Waiting..").setStyle(ButtonStyle.Secondary)], [false]);
 export const showMoreButton = buildActionRow([new ButtonBuilder().setCustomId("more").setLabel("Show More").setStyle(ButtonStyle.Success)]);
@@ -68,20 +82,19 @@ export const insertData = ({ table, id, data }: { table: string; id: string; dat
 
 export function getUsernameFromArgs(user: UserDiscord, args?: string[]) {
   args = args || [];
+  const argsJoined = args.join(" ");
 
-  const flagsParsed = argParser(args.join(" "), flags);
+  const flagsParsed = argParser(argsJoined, flags);
 
-  const argumentString =
-    args.length > 0
-      ? args
-          .join(" ")
-          .replace(/(?:\s|^)(-\w+|\w+=\S+)(?=\s|$)/g, "")
-          .trim()
-      : "";
+  const mapRegexResult = argsJoined.match(/https:\/\/osu\.ppy\.sh\/(b|beatmaps|beatmapsets)\/\d+(#(osu|mania|fruits|taiko)\/\d+)?/);
+  const beatmapId = mapRegexResult ? mapRegexResult[0].match(/\d+$/)![0] : null;
+  const mods = modsParser(argsJoined);
+
+  let argumentString = args.length > 0 ? argsJoined.replace(/(?:\s|^)\+(\w+)(?=\s|$)|(-\w+|\w+=\S+|https:\/\/osu\.ppy\.sh\/(b|beatmaps|beatmapsets)\/\d+(#(osu|mania|fruits|taiko)\/\d+)?)?(?=\s|$)/g, "").trim() : "";
 
   if (!argumentString) {
     const userData = getUserData(user.id).data;
-    return { user: userData ? JSON.parse(userData).banchoId : errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`), flags: flagsParsed };
+    return { user: userData ? JSON.parse(userData).banchoId : errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods };
   }
 
   const discordUserRegex = /\d{17,18}/;
@@ -90,19 +103,19 @@ export function getUsernameFromArgs(user: UserDiscord, args?: string[]) {
 
   const userData = getUserData(userId!).data;
   if (userId) {
-    return { user: userData ? JSON.parse(userData)?.banchoId : errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`), flags: flagsParsed };
+    return { user: userData ? JSON.parse(userData)?.banchoId : errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods };
   }
 
   const osuUsernameRegex = /"(.*?)"/;
   const osuUsernameMatch = argumentString.match(osuUsernameRegex);
-  const osuUsername = osuUsernameMatch ? osuUsernameMatch[1] : args[0] || undefined;
+  const osuUsername = osuUsernameMatch ? osuUsernameMatch[1] : argumentString || undefined;
 
-  return osuUsername ? { user: osuUsername, flags: flagsParsed } : undefined;
+  return osuUsername ? { user: osuUsername, flags: flagsParsed, beatmapId, mods } : undefined;
 }
 
-export function getPerformanceDetails(play: ScoreResponse, rulesetId: number, values: any, mapText: string) {
-  const modsId = play.mods.length > 0 ? mods.id(play.mods.join("")) : 0;
-  const { count_100, count_300, count_50, count_geki, count_katu, count_miss } = values;
+export function getPerformanceDetails({ accuracy, mapText, maxCombo, modsArg, rulesetId, hitValues }: { modsArg: string[]; maxCombo: number; rulesetId: number; hitValues?: any; mapText: string; accuracy?: number }) {
+  const modsId = modsArg.length > 0 ? mods.id(modsArg.join("")) : 0;
+  const { count_100, count_300, count_50, count_geki, count_katu, count_miss } = hitValues;
 
   let scoreParam = {
     mode: rulesetId,
@@ -113,8 +126,8 @@ export function getPerformanceDetails(play: ScoreResponse, rulesetId: number, va
 
   const mapValues = calculator.mapAttributes(map);
   const maxPerf = calculator.performance(map);
-  const curPerf = calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(count_miss).combo(play.max_combo).nGeki(count_geki).nKatu(count_katu).performance(map);
-  const fcPerf = calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(0).combo(maxPerf.difficulty.maxCombo).nGeki(count_geki).nKatu(count_katu).performance(map);
+  const curPerf = accuracy ? undefined : calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(count_miss).combo(maxCombo).nGeki(count_geki).nKatu(count_katu).performance(map);
+  const fcPerf = accuracy ? calculator.acc(accuracy).performance(map) : calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(0).combo(maxPerf.difficulty.maxCombo).nGeki(count_geki).nKatu(count_katu).performance(map);
 
   return { mapValues, maxPerf, curPerf, fcPerf };
 }

@@ -14,7 +14,6 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
   const index = isNaN(indexThing) ? (isTops ? undefined : 0) : indexThing;
 
   const { mode, passOnly } = argOptions;
-  console.log({ index, mode, passOnly });
 
   const userOptions = getUsernameFromArgs(argOptions.author, argOptions.userArgs);
   if (!userOptions) {
@@ -49,7 +48,6 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
   const topsOptions = { user: userDetailOptions, plays, mode: mode, page, index: index!, isTops };
   const embed = isTops ? await getSubsequentPlays(topsOptions) : await getRecentPlays(recentOptions);
 
-  console.log([index, page, buttonBoolsIndex("previous", isTops ? topsOptions : recentOptions)]);
   const components = [buildActionRow([previousButton, nextButton], [index! >= 0 ? buttonBoolsIndex("previous", isTops ? topsOptions : recentOptions) : buttonBoolsTops("previous", isTops ? topsOptions : recentOptions), index! >= 0 ? buttonBoolsIndex("next", isTops ? topsOptions : recentOptions) : buttonBoolsTops("next", isTops ? topsOptions : recentOptions)])];
   const response = await argOptions.reply({ embeds: [embed], components });
 
@@ -89,7 +87,6 @@ async function getRecentPlays({ user, plays, mode, index, isTops }: { user: User
 async function getSubsequentPlays({ user, plays, mode, page, index, isTops }: { user: UserDetails; plays: ScoreResponse[]; mode: osuModes; page: number | undefined; index: number; isTops: boolean }) {
   if (index! >= 0) {
     const options = await new ScoreDetails().initialize(plays, index, mode, isTops);
-    console.log(options);
 
     return new EmbedBuilder()
       .setColor("Purple")

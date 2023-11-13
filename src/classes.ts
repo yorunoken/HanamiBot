@@ -1,4 +1,4 @@
-import { rulesets, getMap, insertData, getRetryCount, grades, formatNumber, buildActionRow, showLessButton, showMoreButton, previousButton, nextButton, loadingButtons, buttonBoolsIndex, buttonBoolsTops, downloadMap, getPerformanceDetails } from "./utils";
+import { rulesets, getMap, insertData, getRetryCount, grades, formatNumber, buildActionRow, showLessButton, showMoreButton, previousButton, nextButton, loadingButtons, buttonBoolsIndex, buttonBoolsTops, downloadMap, getPerformanceDetails, osuEmojis } from "./utils";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 import { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
 import { response as UserOsu } from "osu-api-extended/dist/types/v2_user_details";
@@ -161,15 +161,15 @@ export class ScoreDetails {
 
     const objectshit = count_300 + count_100 + count_50 + count_miss;
     const objects = count_circles + count_sliders + count_spinners;
-    
+
     const percentageNum = Number((objectshit / objects) * 100);
 
     this.percentagePassed = percentageNum === 100 || play.passed == true ? "" : `@${percentageNum.toFixed(1)}% `;
-    
+
     const retryCounter = isCompare ? undefined : getRetryCount(plays.map((x) => x.beatmap.id).splice(0, index), beatmapId);
-    
+
     this.modsPlay = play.mods.length > 0 ? `**+${play.mods.join("").toUpperCase()}**` : "**+NM**";
-    
+
     let hitLength = play.beatmap.hit_length;
     let totalLength = play.beatmap.hit_length;
     if (this.modsPlay.toLowerCase().includes("dt")) {
@@ -177,7 +177,7 @@ export class ScoreDetails {
       totalLength = totalLength! / 1.5;
     }
 
-    const performance = isCompare ? perfDetails : getPerformanceDetails(play, rulesetId, { count_100, count_300, count_50, count_geki, count_katu, count_miss }, file);
+    const performance = isCompare ? perfDetails : getPerformanceDetails({ modsArg: play.mods, maxCombo: play.max_combo, rulesetId, hitValues: { count_100, count_300, count_50, count_geki, count_katu, count_miss }, mapText: file });
 
     this.beatmapId = beatmapId;
     this.countCircles = count_circles;
@@ -233,6 +233,85 @@ export class ScoreDetails {
 
       this.ifFcValue = `If FC: **${this.fcPp}**pp for **${FcAcc.toFixed(2)}%**`;
     }
+
+    return this;
+  }
+
+  constructor() {}
+}
+
+export class BeatmapDetails {
+  title!: string;
+  artist!: string;
+  version!: string;
+  mode!: string;
+  id!: number;
+  setId!: number;
+  creator!: string;
+  totalObjects: any;
+  stars!: string;
+  mods!: string;
+  bpm!: string;
+  totalLength!: number;
+  mapLength!: string;
+  maxCombo!: number;
+  ar!: string;
+  od!: string;
+  hp!: string;
+  cs!: string;
+  favorited!: string;
+  playCount!: string;
+  ppValues!: string;
+  links!: string;
+  background!: string;
+  updatedAt!: string;
+  modeEmoji!: string;
+
+  async initialize(map: BeatmapResponse, valueOptions: { mods: string[]; accuracy?: number; ar?: number; od?: number; cs?: number }, file?: string) {
+    const set = map.beatmapset;
+    file = file || (await getMap(map.id.toString())?.data);
+
+    this.title = set.title;
+    this.artist = set.artist;
+    this.version = map.version;
+    this.mode = map.mode;
+    this.id = map.id;
+    this.setId = map.beatmapset_id;
+    this.creator = map.beatmapset.creator;
+    this.totalObjects = map.count_circles + map.count_sliders + map.count_spinners;
+
+    const performance: Record<number, ReturnType<typeof getPerformanceDetails>> = {};
+    [100, 99, 98, 95].forEach((accuracy) => {
+      performance[accuracy] = getPerformanceDetails({
+        modsArg: valueOptions.mods,
+        maxCombo: map.max_combo,
+        rulesetId: rulesets[this.mode],
+        hitValues: {},
+        accuracy: accuracy,
+        mapText: file!,
+      });
+    });
+
+    this.stars = performance[100].maxPerf.difficulty.stars.toFixed(2);
+    this.mods = "+" + valueOptions.mods.join("");
+    this.bpm = performance[100].mapValues.bpm.toFixed();
+    this.totalLength = ["DT", "NC"].includes(this.mods.toUpperCase()) ? map.hit_length / 1.5 : map.hit_length;
+    this.mapLength = `${Math.floor(this.totalLength / 60).toFixed()}:${(this.totalLength % 60).toFixed().toString().padStart(2, "0")}`;
+    this.maxCombo = map.max_combo;
+
+    this.ar = ["taiko", "mania"].includes(this.mode) ? "-" : performance[100].mapValues.ar.toFixed(1);
+    this.od = performance[100].mapValues.od.toFixed(1);
+    this.hp = performance[100].mapValues.hp.toFixed(1);
+    this.cs = ["taiko", "mania"].includes(this.mode) ? "-" : performance[100].mapValues.ar.toFixed(2);
+
+    this.favorited = map.beatmapset.favourite_count.toLocaleString();
+    this.playCount = map.beatmapset.play_count.toLocaleString();
+
+    this.ppValues = `\`\`\`Acc | PP\n100%: ${performance[100].fcPerf.pp.toFixed()}pp\n99%:  ${performance[99].fcPerf.pp.toFixed()}pp\n98%:  ${performance[98].fcPerf.pp.toFixed()}pp\n95%:  ${performance[95].fcPerf.pp.toFixed()}pp\`\`\``;
+    this.links = `<:chimu:1117792339549761576>[Chimu](https://chimu.moe/d/${this.setId})\n<:beatconnect:1075915329512931469>[Beatconnect](https://beatconnect.io/b/${this.setId})\n:notes:[Song Preview](https://b.ppy.sh/preview/${this.setId}.mp3)\n🎬[Map Preview](https://osu.pages.dev/preview#${this.id})\n🖼️[Full Background](https://assets.ppy.sh/beatmaps/${this.setId}/covers/raw.jpg)`;
+    this.background = `https://assets.ppy.sh/beatmaps/${map.beatmapset_id}/covers/cover.jpg`;
+    this.updatedAt = `${map.status === "ranked" ? "Ranked at" : map.status === "loved" ? "Loved at" : map.status === "qualified" ? "Qualified at" : "Last updated at"} ${new Date(map.last_updated).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`;
+    this.modeEmoji = osuEmojis[map.mode];
 
     return this;
   }
