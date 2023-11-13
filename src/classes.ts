@@ -248,6 +248,7 @@ export class BeatmapDetails {
   id!: number;
   setId!: number;
   creator!: string;
+  rulesetId!: number;
   totalObjects: any;
   stars!: string;
   mods!: string;
@@ -278,6 +279,7 @@ export class BeatmapDetails {
     this.id = map.id;
     this.setId = map.beatmapset_id;
     this.creator = map.beatmapset.creator;
+    this.rulesetId = rulesets[this.mode];
     this.totalObjects = map.count_circles + map.count_sliders + map.count_spinners;
 
     const performance: Record<number, ReturnType<typeof getPerformanceDetails>> = {};
