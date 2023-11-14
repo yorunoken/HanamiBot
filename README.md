@@ -1,15 +1,19 @@
-# miabun
+# Hanami 🌸
 
-To install dependencies:
+Hanami is a simple osu! bot  written in discordjs-v14!
 
-```bash
-bun install
-```
+Invite the bot to your server using [this link](https://discord.com/api/oauth2/authorize?client_id=995999045157916763&permissions=330752&scope=bot)
 
-To run:
- 
-```bash
-bun start
-```
+## Commands ⭐
 
-This project was created using `bun init` in bun v1.0.6. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+`/osu` get a user's osu! profile
+
+`/recent` get a user's most recent osu! score
+
+`/top` get a user's osu! top plays
+
+use `/help` in your server for more information.
+
+## Contact me 🤙
+
+if you have any questions or just want to have someone to talk to, add me on discord (@yorunoken), or message me on twitter (@ken_yoru)
