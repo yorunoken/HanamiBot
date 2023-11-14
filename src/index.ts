@@ -2,7 +2,7 @@ import { Client, Collection, GatewayIntentBits } from "discord.js";
 import { auth } from "osu-api-extended";
 import fs from "fs";
 const { CLIENT_SECRET, CLIENT_ID, TOKEN } = Bun.env;
-if (!(CLIENT_SECRET && CLIENT_ID && TOKEN)) {
+if (!(CLIENT_SECRET || CLIENT_ID || TOKEN)) {
   throw new Error("WARNING: parameters have not been set in .env.local");
 }
 
@@ -19,16 +19,18 @@ export class MyClient extends Client {
   }
 }
 
-auth.login(parseInt(CLIENT_ID!), CLIENT_SECRET!, ["public"]);
-
 const client = new MyClient({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessages, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent],
 });
 
-fs.readdirSync("./src/Handlers").forEach(async (file: any) => {
-  const event = await require(`./Handlers/${file}`);
-  client.on(event.name, (...args: any) => event.execute(...args, client));
-});
+export function main() {
+  auth.login(parseInt(CLIENT_ID!), CLIENT_SECRET!, ["public"]);
+  fs.readdirSync("./src/Handlers").forEach(async (file: any) => {
+    const event = await require(`./Handlers/${file}`);
+    client.on(event.name, (...args: any) => event.execute(...args, client));
+  });
+}
+main();
 
 process.on("unhandledRejection", (e) => {
   console.error(e);

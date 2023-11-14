@@ -1,6 +1,7 @@
-import { Message } from "discord.js";
 import { start } from "../../Helpers/plays";
+import { returnFlags } from "../../utils";
 import { osuModes } from "../../types";
+import { Message } from "discord.js";
 
 const modeAliases: { [key: string]: { mode: osuModes; recent: boolean } } = {
   top: { mode: "osu", recent: false },
@@ -24,6 +25,8 @@ const modeAliases: { [key: string]: { mode: osuModes; recent: boolean } } = {
 export const name = "top";
 export const aliases = Object.keys(modeAliases);
 export const cooldown = 3000;
+export const description = `Get the top plays of an osu! player.`;
+export const flags = returnFlags({ index: true, page: true });
 
 export async function run({ message, args, commandName, index }: { message: Message; args: string[]; commandName: string; index: number }) {
   await message.channel.sendTyping();

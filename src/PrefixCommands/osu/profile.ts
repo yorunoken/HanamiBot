@@ -5,6 +5,7 @@ import { osuModes } from "../../types";
 export const name = "osu";
 export const aliases = ["osu", "mania", "taiko", "catch"];
 export const cooldown = 3000;
+export const description = `Get information of an osu! player.`;
 
 export async function run({ message, args, commandName }: { message: Message; args: string[]; commandName: osuModes }) {
   await message.channel.sendTyping();

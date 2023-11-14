@@ -1,5 +1,4 @@
 import { User as UserDiscord, Message, ChatInputCommandInteraction, InteractionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, TextBasedChannel } from "discord.js";
-import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 //@ts-ignore
 import { Downloader, DownloadEntry } from "osu-downloader";
 import { Beatmap, Calculator } from "rosu-pp";
@@ -52,6 +51,7 @@ export function getRetryCount(retryMap: number[], mapId: number) {
   return retryCounter;
 }
 
+export const returnFlags = ({ page, index, mods }: { page?: boolean; index?: boolean; mods?: boolean }) => `${page ? "- page(p)=number (returns the page corresponding to `number`)\n" : ""}${index ? "- index(i)=number (returns the index corresponding to `number`)" : ""}${mods ? "- +MODS (returns play(s) with provided mod combination)\n" : ""}`;
 export const formatNumber = (value: number, decimalPlaces: number) => value.toFixed(decimalPlaces).replace(/\.0+$/, "");
 export const errMsg = (message: string) => ({ status: false, message });
 export const getUserData = (userId: string) => getUser(userId) || errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`);
@@ -191,10 +191,11 @@ export function Interactionhandler(interaction: Message | ChatInputCommandIntera
 
   const reply = (options: any) => (isSlash ? interaction.editReply(options) : interaction.channel.send(options));
   const userArgs = isSlash ? [interaction.options.getString("user") || ""] : args;
+  const commandName = isSlash ? [interaction.options.getString("command") || ""] : args;
   const author = isSlash ? interaction.user : interaction.author;
   const mode = isSlash ? (interaction.options.getString("mode") as osuModes) || "osu" : "osu";
   const passOnly = isSlash ? interaction.options.getBoolean("passonly") || false : false;
   const index = isSlash ? (interaction.options.getInteger("index") ? interaction.options.getInteger("index")! - 1 : 0) : 0;
 
-  return { reply, userArgs, author, mode, passOnly, index };
+  return { reply, userArgs, author, mode, passOnly, index, commandName };
 }

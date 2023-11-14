@@ -1,6 +1,7 @@
 import { Message } from "discord.js";
 import { start } from "../../Helpers/plays";
 import { osuModes } from "../../types";
+import { returnFlags } from "../../utils";
 
 const modeAliases: { [key: string]: { mode: osuModes; passOnly: boolean } } = {
   // recents
@@ -28,6 +29,8 @@ const modeAliases: { [key: string]: { mode: osuModes; passOnly: boolean } } = {
 export const name = "recent";
 export const aliases = Object.keys(modeAliases);
 export const cooldown = 3000;
+export const description = `Get the recent play of an osu! player.`;
+export const flags = returnFlags({ index: true });
 
 export async function run({ message, args, commandName, index }: { message: Message; args: string[]; commandName: string; index: number }) {
   await message.channel.sendTyping();
