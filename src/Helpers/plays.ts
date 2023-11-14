@@ -99,7 +99,7 @@ async function getSubsequentPlays({ user, plays, mode, page, index, isTops }: { 
       .setTitle(`${options.artist} - ${options.title} [${options.version}] [${options.stars}★]`)
       .setURL(`https://osu.ppy.sh/b/${options.beatmapId}`)
       .setFields({
-        name: `#${index + 1}- ${options.grade} ${options.modsPlay}  **${options.totalScore}  ${options.accuracy}** <t:${options.submittedTime}:R>`,
+        name: `#${options.placement}- ${options.grade} ${options.modsPlay}  **${options.totalScore}  ${options.accuracy}** <t:${options.submittedTime}:R>`,
         value: `${options.totalResult}${options.ifFcValue.length > 0 ? "\n" + options.ifFcValue : ""}\n\nBPM: \`${options.bpm}\` Length: \`${options.minutesTotal}:${options.secondsTotal}\`\n\`${options.mapValues}\``,
       })
       .setThumbnail(`https://assets.ppy.sh/beatmaps/${options.mapsetId}/covers/list.jpg`)
@@ -113,7 +113,7 @@ async function getSubsequentPlays({ user, plays, mode, page, index, isTops }: { 
 
   for (let i = startPage; i < endPage && i < plays.length; i++) {
     const options = await new ScoreDetails().initialize(plays, i, mode, isTops);
-    const textRow1 = `\n**#${i + 1} [${options.title} [${options.version}]](https://osu.ppy.sh/b/${options.beatmapId})** ${options.modsPlay} [${options.stars}★]\n`;
+    const textRow1 = `\n**#${options.placement} [${options.title} [${options.version}]](https://osu.ppy.sh/b/${options.beatmapId})** ${options.modsPlay} [${options.stars}★]\n`;
     const textRow2 = `${options.grade} **${options.pp}pp** ~~[**${options.fcPp}pp**]~~ (${options.accuracy}) ${options.comboValue} <t:${options.submittedTime}:R>\n`;
     const textRow3 = `>> ${options.totalScore} ${options.accValues}`;
     description.push(textRow1 + textRow2 + textRow3);

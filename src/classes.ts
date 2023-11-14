@@ -105,6 +105,7 @@ export class ScoreDetails {
   countSliders!: number;
   countSpinners!: number;
   hitLength!: number;
+  placement!: number;
   version!: string;
   creatorId!: number;
   creatorUsername!: string;
@@ -184,6 +185,7 @@ export class ScoreDetails {
     this.countSliders = count_sliders;
     this.countSpinners = count_spinners;
     this.hitLength = hit_length;
+    this.placement = play.position;
     this.version = version;
     this.creatorId = creatorId;
     this.creatorUsername = creatorUsername;
