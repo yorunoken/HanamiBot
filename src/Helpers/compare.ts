@@ -37,7 +37,9 @@ export async function start({ interaction, client, args, mode }: { interaction: 
   }
   const userDetailOptions = new UserDetails(user, options.mode);
 
-  let scores = await v2.scores.user.beatmap(beatmap.id, user.id, { mode: mode as osuModes });
+  let scores = (await v2.scores.user.beatmap(beatmap.id, user.id, { mode: mode as osuModes })).sort((a, b) => b.pp - a.pp);
+  const mods = userOptions.mods;
+  scores = mods ? scores.filter(score => score.mods.join("").toUpperCase() === (mods?.join("").toUpperCase() === "NM" ? "" : mods?.join("").toUpperCase())) : scores;
   if (scores.length === 0) {
     return options.reply(`${user.username} has no scores on this beatmap`);
   }
