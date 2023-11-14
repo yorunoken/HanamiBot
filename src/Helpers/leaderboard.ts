@@ -5,7 +5,6 @@ import { v2 } from "osu-api-extended";
 
 export async function start({ interaction, client, args, type }: { interaction: Message<boolean>; client: Client<boolean>; args: string[]; type: "global" | "country" }) {
   const options = Interactionhandler(interaction, args);
-  console.log(type);
 
   const userOptions = getUsernameFromArgs(options.author, options.userArgs);
   if (!userOptions) {
@@ -27,7 +26,15 @@ export async function start({ interaction, client, args, type }: { interaction: 
 
   const beatmapDetails = await new BeatmapDetails().initialize(beatmap, { mods: userOptions.mods || [""] }, file);
 
-  const scores = await fetch(`https://osu.ppy.sh/beatmaps/${beatmap.id}/scores?mode=${beatmap.mode}&type=${type}`, { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } }).then((res) => res.json());
+  const modifiedMods = userOptions.mods
+    ? userOptions.mods
+        .join("")
+        .match(/.{1,2}/g)
+        ?.map((mod: any) => `&mods[]=${mod}`)
+        .join("")
+    : "";
+
+  const scores = await fetch(`https://osu.ppy.sh/beatmaps/${beatmap.id}/scores?mode=${beatmap.mode}&type=${type}${modifiedMods}`, { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } }).then((res) => res.json());
   if (scores.scores.length === 0) {
     return options.reply("This map doesn't has no score in its leaderboard.");
   }
