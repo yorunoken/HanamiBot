@@ -23,14 +23,12 @@ const client = new MyClient({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessages, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent],
 });
 
-export function main() {
-  auth.login(parseInt(CLIENT_ID!), CLIENT_SECRET!, ["public"]);
-  fs.readdirSync("./src/Handlers").forEach(async (file: any) => {
-    const event = await require(`./Handlers/${file}`);
-    client.on(event.name, (...args: any) => event.execute(...args, client));
-  });
-}
-main();
+auth.login(parseInt(CLIENT_ID!), CLIENT_SECRET!, ["public"]);
+fs.readdirSync("./src/Handlers").forEach(async (file: any) => {
+  const event = await require(`./Handlers/${file}`);
+  client.on(event.name, (...args: any) => event.execute(...args, client));
+});
+
 
 process.on("unhandledRejection", (e) => {
   console.error(e);
