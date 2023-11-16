@@ -36,7 +36,7 @@ export async function start({ interaction, client, args, type }: { interaction: 
 
   const scores = await fetch(`https://osu.ppy.sh/beatmaps/${beatmap.id}/scores?mode=${beatmap.mode}&type=${type}${modifiedMods}`, { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } }).then((res) => res.json());
   if (scores.scores.length === 0) {
-    return options.reply("This map doesn't has no score in its leaderboard.");
+    return options.reply("This map has no scores in its leaderboard.");
   }
 
   if (page < 0 || page >= Math.ceil(scores.scores.length / 5)) {
