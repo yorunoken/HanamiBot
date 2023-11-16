@@ -24,7 +24,6 @@ export const aliases = Object.keys(modeAliases);
 export const cooldown = 3000;
 export const description = `Get the plays of an osu! player on a specific map.`;
 export const flags = returnFlags({ mods: true });
-export const category = "osu"
 
 export async function run({ message, args, commandName, client }: { message: Message; args: string[]; commandName: osuModes; client: Client }) {
   await message.channel.sendTyping();

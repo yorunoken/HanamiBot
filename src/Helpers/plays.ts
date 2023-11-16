@@ -23,7 +23,7 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
     return argOptions.reply(userOptions.user.message);
   }
   const flags = userOptions.flags;
-  const page = isTops ? parseInt((flags.p as string) || (flags.page as string)) || 0 : undefined;
+  const page = isTops ? parseInt((flags.p as string) || (flags.page as string)) - 1 || 0 : undefined;
 
   const user = await v2.user.details(userOptions.user, mode);
   if (!user.id) {
@@ -31,15 +31,18 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
   }
 
   let plays = await v2.scores.user.category(user.id, isTops ? "best" : "recent", {
-    limit: isTops ? "100 " : "50",
+    limit: isTops ? "100" : "50",
     include_fails: !passOnly,
     mode: mode,
   });
-
   plays = recentTop ? plays.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) : plays;
 
   if (plays.length === 0) {
-    return argOptions.reply(`The user \`${user.username}\` does not have recent plays in Bancho.`);
+    return argOptions.reply(`The user \`${user.username}\` does not have any ${isTops ? "top" : "recent"} plays in Bancho.`);
+  }
+
+  if (page && (page < 0 || page >= Math.ceil(plays.length / 5))) {
+    return argOptions.reply(`Please provide a valid page (between 1 and ${Math.ceil(plays.length / 5)})`);
   }
 
   const userDetailOptions = new UserDetails(user, mode);

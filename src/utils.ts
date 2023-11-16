@@ -55,7 +55,7 @@ export const returnFlags = ({ page, index, mods }: { page?: boolean; index?: boo
 export const formatNumber = (value: number, decimalPlaces: number) => value.toFixed(decimalPlaces).replace(/\.0+$/, "");
 export const errMsg = (message: string) => ({ status: false, message });
 export const getUserData = (userId: string) => getUser(userId) || errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`);
-export const buttonBoolsTops = (type: string, options: any) => (type === "previous" ? options.page * 5 === 0 : options.page * 5 + 5 === options.plays.length);
+export const buttonBoolsTops = (type: string, options: any) => (type === "previous" ? options.page * 5 === 0 : options.page * 5 + 5 === (options.plays?.length || options.length));
 export const buttonBoolsIndex = (type: string, options: any) => (type === "previous" ? options.index === 0 : options.index + 1 === options.plays.length);
 
 const flags = ["i", "index", "rev", "p", "page"];

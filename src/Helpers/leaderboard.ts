@@ -1,6 +1,6 @@
-import { getUsernameFromArgs, Interactionhandler, showMoreButton, getBeatmapId_FromContext, getMap, downloadMap, insertData, getPerformanceDetails, rulesets, grades } from "../utils";
+import { getUsernameFromArgs, Interactionhandler, showMoreButton, getBeatmapId_FromContext, getMap, downloadMap, insertData, getPerformanceDetails, grades, buttonBoolsIndex, buttonBoolsTops, buildActionRow, nextButton, previousButton } from "../utils";
 import { Message, ChatInputCommandInteraction, EmbedBuilder, ButtonInteraction, Client } from "discord.js";
-import { BeatmapDetails } from "../classes";
+import { BeatmapDetails, ButtonActions } from "../classes";
 import { v2 } from "osu-api-extended";
 
 export async function start({ interaction, client, args, type }: { interaction: Message<boolean>; client: Client<boolean>; args: string[]; type: "global" | "country" }) {
@@ -42,10 +42,26 @@ export async function start({ interaction, client, args, type }: { interaction: 
   if (page < 0 || page >= Math.ceil(scores.scores.length / 5)) {
     return options.reply(`Please provide a valid page (between 1 and ${Math.ceil(scores.scores.length / 5)})`);
   }
-  return options.reply({ content: `Showing ${type} tops`, embeds: [await buildMapEmbed(beatmapDetails, scores, page, file)] });
+
+  const embedOptions = { map: beatmapDetails, fetched: scores, page, file, length: scores.scores.length };
+  console.log(embedOptions.page, embedOptions.length)
+  const components = [buildActionRow([previousButton, nextButton], [buttonBoolsTops("previous", embedOptions), buttonBoolsTops("next", embedOptions)])];
+  const response = await options.reply({ content: `Showing ${type} tops`, embeds: [await buildMapEmbed(embedOptions)], components });
+
+
+  const filter = (i: any) => i.user.id === options.author.id;
+  const collector = response.createMessageComponentCollector({ time: 60000, filter });
+
+  collector.on("collect", async function (i: ButtonInteraction) {
+    await ButtonActions.handleTopsButtons({ pageBuilder: buildMapEmbed, options: embedOptions, i, response });
+  });
+
+  collector.on("end", async () => {
+    await response.edit({ components: [] });
+  });
 }
 
-async function buildMapEmbed(map: BeatmapDetails, fetched: any, page: number, file: string) {
+async function buildMapEmbed({ map, fetched, page, file }:{ map: BeatmapDetails, fetched: any, page: number, file: string }) {
   const scores = fetched.scores;
 
   let description = [];
