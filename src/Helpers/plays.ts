@@ -125,5 +125,6 @@ async function getSubsequentPlays({ user, plays, mode, page, index, isTops }: { 
   return new EmbedBuilder()
     .setAuthor({ url: user.userUrl, name: `${user.username}: ${user.pp} (#${user.globalRank} ${user.countryCode.toUpperCase()}#${user.countryRank})`, iconURL: `https://osu.ppy.sh/images/flags/${user.countryCode.toUpperCase()}.png` })
     .setThumbnail(user.userAvatar)
-    .setDescription(description.join(""));
+    .setDescription(description.join(""))
+    .setFooter({ text: `Page ${page! + 1}/${Math.ceil(plays.length / 5)}` });
 }
