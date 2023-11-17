@@ -80,7 +80,7 @@ export const getServer = (id: string): any => db.prepare("SELECT * FROM servers 
 export const getMap = (id: string): any => db.prepare(`SELECT * FROM maps WHERE id = ?`).get(id);
 export const insertData = ({ table, id, data }: { table: string; id: string; data: string }): any => db.prepare(`INSERT OR REPLACE INTO ${table} values (?, ?)`).run(id, data);
 
-export function getUsernameFromArgs(user: UserDiscord, args?: string[]) {
+export function getUsernameFromArgs(user: UserDiscord, args?: string[], userNotNeeded?: boolean) {
   args = args || [];
   const argsJoined = args.join(" ");
 
@@ -92,9 +92,11 @@ export function getUsernameFromArgs(user: UserDiscord, args?: string[]) {
 
   let argumentString = args.length > 0 ? argsJoined.replace(/(?:\s|^)\+(\w+)(?=\s|$)|(-\w+|\w+=\S+|https:\/\/osu\.ppy\.sh\/(b|beatmaps|beatmapsets)\/\d+(#(osu|mania|fruits|taiko)\/\d+)?)?(?=\s|$)/g, "").trim() : "";
 
+  console.log("wah");
   if (!argumentString) {
     const userData = getUserData(user.id).data;
-    return { user: userData ? JSON.parse(userData).banchoId : errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods };
+
+    return { user: userData || userNotNeeded ? (userNotNeeded ? undefined : JSON.parse(userData).banchoId) : errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods };
   }
 
   const discordUserRegex = /\d{17,18}/;
@@ -103,7 +105,7 @@ export function getUsernameFromArgs(user: UserDiscord, args?: string[]) {
 
   const userData = getUserData(userId!).data;
   if (userId) {
-    return { user: userData ? JSON.parse(userData)?.banchoId : errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods };
+    return { user: userData || userNotNeeded ? (userNotNeeded ? undefined : JSON.parse(userData)?.banchoId) : errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods };
   }
 
   const osuUsernameRegex = /"(.*?)"/;

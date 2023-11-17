@@ -6,7 +6,7 @@ import { v2 } from "osu-api-extended";
 export async function start({ interaction, client, args, type }: { interaction: Message<boolean>; client: Client<boolean>; args: string[]; type: "global" | "country" }) {
   const options = Interactionhandler(interaction, args);
 
-  const userOptions = getUsernameFromArgs(options.author, options.userArgs);
+  const userOptions = getUsernameFromArgs(options.author, options.userArgs, true);
   if (!userOptions) {
     return options.reply("Something went wrong.");
   }
@@ -44,10 +44,8 @@ export async function start({ interaction, client, args, type }: { interaction: 
   }
 
   const embedOptions = { map: beatmapDetails, fetched: scores, page, file, length: scores.scores.length };
-  console.log(embedOptions.page, embedOptions.length)
   const components = [buildActionRow([previousButton, nextButton], [buttonBoolsTops("previous", embedOptions), buttonBoolsTops("next", embedOptions)])];
   const response = await options.reply({ content: `Showing ${type} tops`, embeds: [await buildMapEmbed(embedOptions)], components });
-
 
   const filter = (i: any) => i.user.id === options.author.id;
   const collector = response.createMessageComponentCollector({ time: 60000, filter });
@@ -61,7 +59,7 @@ export async function start({ interaction, client, args, type }: { interaction: 
   });
 }
 
-async function buildMapEmbed({ map, fetched, page, file }:{ map: BeatmapDetails, fetched: any, page: number, file: string }) {
+async function buildMapEmbed({ map, fetched, page, file }: { map: BeatmapDetails; fetched: any; page: number; file: string }) {
   const scores = fetched.scores;
 
   let description = [];
@@ -86,5 +84,5 @@ async function buildMapEmbed({ map, fetched, page, file }:{ map: BeatmapDetails,
     .setURL(`https://osu.ppy.sh/b/${map.id}`)
     .setImage(map.background)
     .setDescription(description.join("\n"))
-    .setFooter({ text: `Page ${page + 1}/${Math.ceil(scores.length / 5)}` });
+    .setFooter({ text: `Page ${page + 1}/${Math.ceil(scores.length / 5)} - Powered by YoruNoKen's osu! supporter` });
 }
