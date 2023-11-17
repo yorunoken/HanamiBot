@@ -196,6 +196,9 @@ export function Interactionhandler(interaction: Message | ChatInputCommandIntera
   const mode = isSlash ? (interaction.options.getString("mode") as osuModes) || "osu" : "osu";
   const passOnly = isSlash ? interaction.options.getBoolean("passonly") || false : false;
   const index = isSlash ? (interaction.options.getInteger("index") ? interaction.options.getInteger("index")! - 1 : 0) : 0;
+  const subcommand = isSlash ? interaction.options.getSubcommand() : undefined;
+  const prefix = isSlash ? interaction.options.getString("prefix") : undefined;
+  const { guildId } = interaction;
 
-  return { reply, userArgs, author, mode, passOnly, index, commandName };
+  return { reply, userArgs, author, mode, passOnly, index, commandName, subcommand, guildId, prefix };
 }

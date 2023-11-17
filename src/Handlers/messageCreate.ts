@@ -9,7 +9,7 @@ const cooldown = new Map();
 
 const prefixCache: any = {};
 
-export function updateCache(object: string[], guildId: string) {
+export function updatePrefixCache(object: string[], guildId: string) {
   if (!prefixCache[guildId]) return false;
   prefixCache[guildId] = object;
   return true;
