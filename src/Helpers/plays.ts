@@ -117,7 +117,7 @@ async function getSubsequentPlays({ user, plays, mode, page, index, isTops }: { 
   for (let i = startPage; i < endPage && i < plays.length; i++) {
     const options = await new ScoreDetails().initialize(plays, i, mode, isTops);
     const textRow1 = `\n**#${options.placement} [${options.title} [${options.version}]](https://osu.ppy.sh/b/${options.beatmapId})** ${options.modsPlay} [${options.stars}★]\n`;
-    const textRow2 = `${options.grade} **${options.pp}pp** ~~[**${options.fcPp}pp**]~~ (${options.accuracy}) ${options.comboValue} <t:${options.submittedTime}:R>\n`;
+    const textRow2 = `${options.grade} **${options.pp}pp** ${options.ifFcValue.length > 0 ? `~~[**${options.fcPp}pp**]~~ ` : ""}(${options.accuracy}) ${options.comboValue} <t:${options.submittedTime}:R>\n`;
     const textRow3 = `>> ${options.totalScore} ${options.accValues}`;
     description.push(textRow1 + textRow2 + textRow3);
   }
