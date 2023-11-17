@@ -1,4 +1,4 @@
-import { MyClient } from ".";
+import { MyClient } from "./index";
 
 export const defaultPrefix = "!";
 export const serverJoinMessage = (client: MyClient) =>
