@@ -3,10 +3,10 @@ import { Message, ChatInputCommandInteraction, EmbedBuilder, ButtonInteraction, 
 import { BeatmapDetails } from "../classes";
 import { v2 } from "osu-api-extended";
 
-export async function start({ interaction, client, args }: { interaction: Message<boolean>; client: Client<boolean>; args: string[] }) {
+export async function start({ interaction, client, args, mapId }: { interaction: Message; client?: Client<boolean>; args: string[]; mapId?: string }) {
   const options = Interactionhandler(interaction, args);
 
-  const userOptions = getUsernameFromArgs(options.author, options.userArgs);
+  const userOptions = getUsernameFromArgs(options.author, options.userArgs, true);
   if (!userOptions) {
     return options.reply("Something went wrong.");
   }
@@ -14,7 +14,7 @@ export async function start({ interaction, client, args }: { interaction: Messag
     return options.reply(userOptions.user.message);
   }
 
-  const beatmapId = userOptions.beatmapId || (await getBeatmapId_FromContext(interaction, client));
+  const beatmapId = mapId || userOptions.beatmapId || (await getBeatmapId_FromContext(interaction, client!));
   if (!beatmapId) {
     return options.reply(`There doesn't seem to be any beatmap embeds in this conversation.`);
   }

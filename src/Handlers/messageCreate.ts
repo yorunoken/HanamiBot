@@ -1,4 +1,5 @@
 import { Message, PermissionFlagsBits, ChannelType, TextChannel } from "discord.js";
+import { getLoneCommand } from "../Helpers/loneCommands";
 import { defaultPrefix } from "../constants";
 import { getServer } from "../utils";
 import { MyClient } from "..";
@@ -32,6 +33,10 @@ export const execute = async (message: Message, client: MyClient) => {
   if (randomNumber > 70) {
     if (message.content === ":3") return message.channel.send("3:");
     if (message.content === "3:") return message.channel.send(":3");
+  }
+
+  if (message.content.startsWith("https://")) {
+    getLoneCommand(message);
   }
 
   let prefixOptions = prefixCache[guildId] || (prefixCache[guildId] = JSON.parse((await getServer(guildId)).data)?.prefix) || (prefixCache[guildId] = [defaultPrefix]);
