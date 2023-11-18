@@ -1,5 +1,5 @@
 import { getUsernameFromArgs, Interactionhandler, getBeatmapId_FromContext, getMap, downloadMap, insertData, getPerformanceDetails, rulesets } from "../utils";
-import { Message, EmbedBuilder,  Client } from "discord.js";
+import { Message, EmbedBuilder, Client } from "discord.js";
 import { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_beatmap";
 import { response as MapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
@@ -38,8 +38,44 @@ export async function start({ interaction, client, args, mode }: { interaction: 
   const userDetailOptions = new UserDetails(user, options.mode);
 
   let scores = (await v2.scores.user.beatmap(beatmap.id, user.id, { mode: mode as osuModes })).sort((a, b) => b.pp - a.pp);
-  const mods = userOptions.mods;
-  scores = mods ? scores.filter(score => score.mods.join("").toUpperCase() === (mods?.join("").toUpperCase() === "NM" ? "" : mods?.join("").toUpperCase())) : scores;
+  const mods = userOptions?.mods?.codes;
+  scores = mods
+    ? scores.filter((score) => {
+        let userMods = mods.join("").toUpperCase();
+        const scoreMods = score.mods.join("").toUpperCase();
+        const force = userOptions!.mods!.force;
+
+        if (userMods === "NM") {
+          return userOptions!.mods!.include ? scoreMods === "" : userOptions!.mods!.remove ? scoreMods !== "" : undefined;
+        }
+
+        const includedBool = (str: string) =>
+          scoreMods
+            .match(/.{1,2}/g)
+            ?.sort()
+            .join("")
+            .includes((str.match(/.{1,2}/g) || [""]).sort().join(""));
+
+        const exactBool = (str: string) =>
+          scoreMods
+            .match(/.{1,2}/g)
+            ?.sort()
+            .join("") ===
+          str
+            .match(/.{1,2}/g)
+            ?.sort()
+            .join("");
+
+        if (userOptions!.mods!.include) {
+          return (force ? exactBool : includedBool)(userMods);
+        } else if (userOptions!.mods!.remove) {
+          return !(force ? exactBool : includedBool)(userMods);
+        }
+
+        return scoreMods === (userMods === "NM" ? "" : userMods);
+      })
+    : scores;
+
   if (scores.length === 0) {
     return options.reply(`${user.username} has no scores on this beatmap`);
   }

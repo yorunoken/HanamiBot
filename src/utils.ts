@@ -60,13 +60,23 @@ export const buttonBoolsIndex = (type: string, options: any) => (type === "previ
 
 const flags = ["i", "index", "rev", "p", "page"];
 export const argParser = (str: string, flags: string[]) => [...str.matchAll(/-(\w+)|(\w+)=(\S+)/g)].filter((m) => flags.includes(m[1]) || flags.includes(m[2])).reduce((acc, m) => ((acc[m[1] || m[2]] = m[3] !== undefined ? m[3] : true), acc), {} as Record<string, string | boolean>);
-export const modsParser = (str: string) =>
-  (str.match(/\+([A-Za-z]+)/g) || [])
-    .filter((_, i) => i % 2 === 0)
-    .map((code) => code.substring(1))
-    .join("")
-    .toUpperCase()
-    .match(/.{1,2}/g);
+function modsParser(str: string) {
+  const modCodes = (str.match(/[\-+!][\-+!]?[A-Za-z]+/g) || []).map((code) => code.toUpperCase());
+
+  const force = modCodes.some((code) => code.includes("!"));
+  return modCodes.some((code) => code.includes("-")) && !force
+    ? undefined
+    : {
+        force: force,
+        include: modCodes.some((code) => code.includes("+")) ? true : false,
+        remove: modCodes.some((code) => code.includes("-")) && force ? true : false,
+        codes: modCodes
+          .map((code) => code.replace(/[+\-!]/g, ""))
+          .join("")
+          .match(/.{1,2}/g),
+        whole: modCodes.join(""),
+      };
+}
 
 export const loadingButtons = buildActionRow([new ButtonBuilder().setCustomId("wating").setLabel("Waiting..").setStyle(ButtonStyle.Secondary)], [false]);
 export const showMoreButton = buildActionRow([new ButtonBuilder().setCustomId("more").setLabel("Show More").setStyle(ButtonStyle.Success)]);
@@ -82,15 +92,20 @@ export const insertData = ({ table, id, data }: { table: string; id: string; dat
 
 export function getUsernameFromArgs(user: UserDiscord, args?: string[], userNotNeeded?: boolean) {
   args = args || [];
-  const argsJoined = args.join(" ");
+  let argsJoined = args.join(" ");
 
   const flagsParsed = argParser(argsJoined, flags);
 
-  const mapRegexResult = argsJoined.match(/https:\/\/osu\.ppy\.sh\/(b|beatmaps|beatmapsets)\/\d+(#(osu|mania|fruits|taiko)\/\d+)?/);
+  const mapRegex = /https:\/\/osu\.ppy\.sh\/(b|beatmaps|beatmapsets)\/\d+(#(osu|mania|fruits|taiko)\/\d+)?/;
+  const mapRegexResult = argsJoined.match(mapRegex);
   const beatmapId = mapRegexResult ? mapRegexResult[0].match(/\d+$/)![0] : null;
+  argsJoined = argsJoined.replace(new RegExp(mapRegex, "i"), "");
   const mods = modsParser(argsJoined);
+  console.log(mods);
 
-  let argumentString = args.length > 0 ? argsJoined.replace(/(?:\s|^)\+(\w+)(?=\s|$)|(-\w+|\w+=\S+|https:\/\/osu\.ppy\.sh\/(b|beatmaps|beatmapsets)\/\d+(#(osu|mania|fruits|taiko)\/\d+)?)?(?=\s|$)/g, "").trim() : "";
+  argsJoined = mods ? argsJoined.toLowerCase().replace(mods.whole.toLowerCase(), "") : argsJoined;
+
+  let argumentString = args.length > 0 ? argsJoined.replace(/(?:\s|^)(?=\s|$)|(-\w+|\w+=\S+|https:\/\/osu\.ppy\.sh\/(b|beatmaps|beatmapsets)\/\d+(#(osu|mania|fruits|taiko)\/\d+)?)?(?=\s|$)/g, "").trim() : "";
 
   if (!argumentString) {
     const userData = getUserData(user.id).data;
@@ -197,7 +212,7 @@ export function Interactionhandler(interaction: Message | ChatInputCommandIntera
   const mode = isSlash ? (interaction.options.getString("mode") as osuModes) || "osu" : "osu";
   const passOnly = isSlash ? interaction.options.getBoolean("passonly") || false : false;
   const index = isSlash ? (interaction.options.getInteger("index") ? interaction.options.getInteger("index")! - 1 : 0) : 0;
-  const subcommand = isSlash ? interaction.options.getSubcommand() : undefined;
+  const subcommand = isSlash ? interaction.options?.getSubcommand() || undefined : undefined;
   const prefix = isSlash ? interaction.options.getString("prefix") : undefined;
   const { guildId } = interaction;
 

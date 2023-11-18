@@ -29,7 +29,7 @@ const modeAliases: { [key: string]: { mode: osuModes; passOnly: boolean } } = {
 export const name = "recent";
 export const aliases = Object.keys(modeAliases);
 export const cooldown = 3000;
-export const description = `Get the recent play of an osu! player.`;
+export const description = `Get the recent play of an osu! player.\nMods can be specified through +_, +!_, -!_ syntax`;
 export const flags = returnFlags({ index: true });
 
 export async function run({ message, args, commandName, index }: { message: Message; args: string[]; commandName: string; index: number }) {

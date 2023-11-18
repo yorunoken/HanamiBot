@@ -25,10 +25,9 @@ const client = new MyClient({
 
 auth.login(parseInt(CLIENT_ID), CLIENT_SECRET, ["public"]);
 fs.readdirSync("./src/Handlers").forEach(async (file: any) => {
-  const event = await require(`./Handlers/${file}`);
+  const event = await import(`./Handlers/${file}`);
   client.on(event.name, (...args: any) => event.execute(...args, client));
 });
-
 
 process.on("unhandledRejection", (e) => {
   console.error(e);

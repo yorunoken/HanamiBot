@@ -24,10 +24,10 @@ export async function start({ interaction, client, args, type }: { interaction: 
     insertData({ table: "maps", id: beatmapId.toString(), data: file });
   }
 
-  const beatmapDetails = await new BeatmapDetails().initialize(beatmap, { mods: userOptions.mods || [""] }, file);
+  const beatmapDetails = await new BeatmapDetails().initialize(beatmap, { mods: userOptions?.mods?.codes || [""] }, file);
 
-  const modifiedMods = userOptions.mods
-    ? userOptions.mods
+  const modifiedMods = userOptions?.mods?.codes
+    ? userOptions.mods.codes
         .join("")
         .match(/.{1,2}/g)
         ?.map((mod: any) => `&mods[]=${mod}`)
