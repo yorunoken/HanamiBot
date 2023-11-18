@@ -37,6 +37,45 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
   });
   plays = recentTop ? plays.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) : plays;
 
+  const mods = userOptions?.mods?.codes;
+
+  plays = mods
+    ? plays.filter((score) => {
+        let userMods = mods.join("").toUpperCase();
+        const scoreMods = score.mods.join("").toUpperCase();
+        const force = userOptions!.mods!.force;
+
+        if (userMods === "NM") {
+          return userOptions!.mods!.include ? scoreMods === "" : userOptions!.mods!.remove ? scoreMods !== "" : undefined;
+        }
+
+        const includedBool = (str: string) =>
+          scoreMods
+            .match(/.{1,2}/g)
+            ?.sort()
+            .join("")
+            .includes((str.match(/.{1,2}/g) || [""]).sort().join(""));
+
+        const exactBool = (str: string) =>
+          scoreMods
+            .match(/.{1,2}/g)
+            ?.sort()
+            .join("") ===
+          str
+            .match(/.{1,2}/g)
+            ?.sort()
+            .join("");
+
+        if (userOptions!.mods!.include) {
+          return (force ? exactBool : includedBool)(userMods);
+        } else if (userOptions!.mods!.remove) {
+          return !(force ? exactBool : includedBool)(userMods);
+        }
+
+        return scoreMods === (userMods === "NM" ? "" : userMods);
+      })
+    : plays;
+
   if (plays.length === 0) {
     return argOptions.reply(`The user \`${user.username}\` does not have any ${isTops ? "top" : "recent"} plays in Bancho.`);
   }
@@ -52,7 +91,7 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
   const embed = isTops ? await getSubsequentPlays(topsOptions) : await getRecentPlays(recentOptions);
 
   const components = [buildActionRow([previousButton, nextButton], [index! >= 0 ? buttonBoolsIndex("previous", isTops ? topsOptions : recentOptions) : buttonBoolsTops("previous", isTops ? topsOptions : recentOptions), index! >= 0 ? buttonBoolsIndex("next", isTops ? topsOptions : recentOptions) : buttonBoolsTops("next", isTops ? topsOptions : recentOptions)])];
-  const response = await argOptions.reply({ embeds: [embed], components });
+  const response = await argOptions.reply({ content: `Found \`${plays.length}\` plays`, embeds: [embed], components });
 
   const filter = (i: any) => i.user.id === argOptions.author.id;
   const collector = response.createMessageComponentCollector({ time: 60000, filter });

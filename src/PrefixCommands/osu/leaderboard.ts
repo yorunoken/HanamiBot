@@ -15,8 +15,8 @@ const typeAlises: { [key: string]: { type: "global" | "country" } } = {
 export const name = "leaderboard";
 export const aliases = Object.keys(typeAlises);
 export const cooldown = 3000;
-export const description = `Get the leaderboard of a map.`;
-export const flags = returnFlags({ page: true, mods: true });
+export const description = `Get the leaderboard of a map.\nMods can be specified through +_, +!_, -!_ syntax`;
+export const flags = returnFlags({ page: true });
 
 export async function run({ message, args, commandName, client }: { message: Message; args: string[]; commandName: "global" | "country"; client: Client }) {
   await message.channel.sendTyping();
