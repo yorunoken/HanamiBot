@@ -92,7 +92,6 @@ export function getUsernameFromArgs(user: UserDiscord, args?: string[], userNotN
 
   let argumentString = args.length > 0 ? argsJoined.replace(/(?:\s|^)\+(\w+)(?=\s|$)|(-\w+|\w+=\S+|https:\/\/osu\.ppy\.sh\/(b|beatmaps|beatmapsets)\/\d+(#(osu|mania|fruits|taiko)\/\d+)?)?(?=\s|$)/g, "").trim() : "";
 
-  console.log("wah");
   if (!argumentString) {
     const userData = getUserData(user.id).data;
 

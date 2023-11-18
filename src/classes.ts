@@ -167,7 +167,7 @@ export class ScoreDetails {
 
     this.percentagePassed = percentageNum === 100 || play.passed == true ? "" : `@${percentageNum.toFixed(1)}% `;
 
-    const retryCounter = isCompare ? undefined : getRetryCount(plays.map((x) => x.beatmap.id).splice(0, index), beatmapId);
+    const retryCounter = isCompare ? undefined : getRetryCount(plays.map((x) => x.beatmap.id).splice(index, plays.length), beatmapId);
 
     this.modsPlay = play.mods.length > 0 ? `**+${play.mods.join("").toUpperCase()}**` : "**+NM**";
 
