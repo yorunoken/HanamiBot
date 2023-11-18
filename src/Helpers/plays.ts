@@ -81,7 +81,7 @@ async function getRecentPlays({ user, plays, mode, index, isTops }: { user: User
     .setURL(`https://osu.ppy.sh/b/${options.beatmapId}`)
     .setFields({
       name: `${options.grade} ${options.percentagePassed}${options.modsPlay} • **${options.totalScore} • ${options.accuracy}** <t:${options.submittedTime}:R>`,
-      value: `${options.totalResult}\n${options.ifFcValue} Try #${options.retries}\n\nBPM: \`${options.bpm}\` Length: \`${options.minutesTotal}:${options.secondsTotal}\`\n\`${options.mapValues}\``,
+      value: `${options.totalResult}\n${options.ifFcValue} • \`Try #${options.retries}\`\n\nBPM: \`${options.bpm}\` Length: \`${options.minutesTotal}:${options.secondsTotal}\`\n\`${options.mapValues}\``,
     })
     .setThumbnail(`https://assets.ppy.sh/beatmaps/${options.mapsetId}/covers/list.jpg`)
     .setFooter({ text: `by ${options.creatorUsername}, ${options.mapStatus}`, iconURL: `https://a.ppy.sh/${options.creatorId}?1668890819.jpeg` });
