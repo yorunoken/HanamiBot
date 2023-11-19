@@ -3,7 +3,7 @@ import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores
 import { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
 import { response as UserOsu } from "osu-api-extended/dist/types/v2_user_details";
 import { Message, ButtonInteraction } from "discord.js";
-import { tools } from "osu-api-extended";
+import { tools, v2 } from "osu-api-extended";
 import { osuModes } from "./types";
 
 export class UserDetails {
@@ -139,6 +139,7 @@ export class ScoreDetails {
   pp!: string;
   fcPp!: string;
   ssPp!: string;
+  globalPlacement!: string;
 
   async initialize(plays: ScoreResponse[], index: number, mode: osuModes, isTops: boolean, isCompare?: boolean, perfDetails?: any, beatmap?: BeatmapResponse) {
     const play = plays[index];
@@ -179,6 +180,14 @@ export class ScoreDetails {
     }
 
     const performance = isCompare ? perfDetails : getPerformanceDetails({ modsArg: play.mods, maxCombo: play.max_combo, rulesetId, hitValues: { count_100, count_300, count_50, count_geki, count_katu, count_miss }, mapText: file });
+
+    this.globalPlacement = "";
+    if (play.passed && play.best_id) {
+      const scoreGlobal = await v2.scores.details(play.best_id, mode);
+      if (scoreGlobal && scoreGlobal.rank_global < 10000) {
+        this.globalPlacement = `**__Global Rank #${scoreGlobal.rank_global}:__**`;
+      }
+    }
 
     this.beatmapId = beatmapId;
     this.countCircles = count_circles;
