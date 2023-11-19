@@ -150,7 +150,7 @@ export function getPerformanceDetails({ accuracy, mapText, maxCombo, modsArg, ru
 
 export async function downloadMap(beatmapId: number) {
   const responseDirect = await fetch(`https://api.osu.direct/osu/${beatmapId}`);
-  if(responseDirect.status !== 404) {
+  if (responseDirect.status !== 404) {
     return new TextDecoder().decode(await responseDirect.arrayBuffer());
   }
 
