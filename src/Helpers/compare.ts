@@ -99,7 +99,7 @@ async function buildCompareEmbed(user: UserDetails, map: MapResponse, scores: Sc
     _scores.push(
       i === "0"
         ? `${score.globalPlacement.length > 0 ? score.globalPlacement + "\n" : ""}${score.grade} ${score.modsPlay} **[${score.stars}★]** • ${score.totalScore} • ${score.accuracy}\n**${score.pp}pp**/${score.ssPp}pp ~~[${score.fcPp}pp]~~ • ${score.comboValue}\n${score.accValues} <t:${score.submittedTime}:R>\n`
-        : `${i === "1" ? "Other plays on the map:\n" : ""}${score.grade} ${score.modsPlay} **[${score.stars}★]** • **${score.pp}pp** (${score.accuracy}) • **${max_combo}x** • ${(scorePerf.curPerf as any).effectiveMissCount > 0 ? `${score.countMiss} <:hit00:1061254490075955231>` : ""} <t:${score.submittedTime}:R>`
+        : `${i === "1" ? "**__Other plays on the map:__**\n" : ""}${score.grade} ${score.modsPlay} **[${score.stars}★]** • **${score.pp}pp** (${score.accuracy}) • **${max_combo}x** • ${(scorePerf.curPerf as any).effectiveMissCount > 0 ? `${score.countMiss} <:hit00:1061254490075955231>` : ""} <t:${score.submittedTime}:R>`
     );
   }
 
