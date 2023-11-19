@@ -101,7 +101,6 @@ export function getUsernameFromArgs(user: UserDiscord, args?: string[], userNotN
   const beatmapId = mapRegexResult ? mapRegexResult[0].match(/\d+$/)![0] : null;
   argsJoined = argsJoined.replace(new RegExp(mapRegex, "i"), "");
   const mods = modsParser(argsJoined);
-  console.log(mods);
 
   argsJoined = mods ? argsJoined.toLowerCase().replace(mods.whole.toLowerCase(), "") : argsJoined;
 
@@ -110,7 +109,16 @@ export function getUsernameFromArgs(user: UserDiscord, args?: string[], userNotN
   if (!argumentString) {
     const userData = getUserData(user.id).data;
 
-    return { user: userData || userNotNeeded ? (userNotNeeded ? undefined : JSON.parse(userData).banchoId) : errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods };
+    if (userNotNeeded) {
+      let _user = undefined;
+      try {
+        const parsedData = JSON.parse(userData);
+        _user = parsedData.banchoId || errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`);
+      } catch (_) {}
+
+      return { user: _user, flags: flagsParsed, beatmapId, mods };
+    }
+    return { user: userData ? JSON.parse(userData).banchoId : errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods };
   }
 
   const discordUserRegex = /\d{17,18}/;
@@ -119,7 +127,16 @@ export function getUsernameFromArgs(user: UserDiscord, args?: string[], userNotN
 
   const userData = getUserData(userId!).data;
   if (userId) {
-    return { user: userData || userNotNeeded ? (userNotNeeded ? undefined : JSON.parse(userData)?.banchoId) : errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods };
+    if (userNotNeeded) {
+      let _user = undefined;
+      try {
+        const parsedData = JSON.parse(userData);
+        _user = parsedData.banchoId || errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`);
+      } catch (_) {}
+
+      return { user: _user, flags: flagsParsed, beatmapId, mods };
+    }
+    return { user: userData ? JSON.parse(userData)?.banchoId : errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods };
   }
 
   const osuUsernameRegex = /"(.*?)"/;
