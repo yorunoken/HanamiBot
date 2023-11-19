@@ -141,7 +141,7 @@ export class ScoreDetails {
   ssPp!: string;
   globalPlacement!: string;
 
-  async initialize(plays: ScoreResponse[], index: number, mode: osuModes, isTops: boolean, isCompare?: boolean, perfDetails?: any, beatmap?: BeatmapResponse) {
+  async initialize(plays: ScoreResponse[], index: number, mode: osuModes, _isTops: boolean, isCompare?: boolean, perfDetails?: any, beatmap?: BeatmapResponse) {
     const play = plays[index];
     const rulesetId = rulesets[mode];
 
@@ -330,6 +330,24 @@ export class BeatmapDetails {
   }
 
   constructor() {}
+}
+
+export class StatsDetails {
+  [x: string]: any; // temporary measure to ts bullshit
+
+  constructor(_user: UserOsu, scores: ScoreResponse[]) {
+    const lastArray = scores.length - 1;
+
+    const ppSorted = scores.sort((a, b) => Number(a.pp) - Number(b.pp)).map((score) => score.pp);
+    this.pp = { min: ppSorted[0], avg: ppSorted.reduce((acc, pp) => acc + Number(pp), 0) / scores.length, max: ppSorted[lastArray] };
+
+    const accuracySorted = scores.sort((a, b) => Number(a.accuracy) - Number(b.accuracy)).map((score) => score.accuracy * 100);
+    this.accuracy = { min: accuracySorted[0], avg: accuracySorted.reduce((acc, pp) => acc + Number(pp), 0) / scores.length, max: accuracySorted[lastArray] };
+
+    // let's leave star for another time when I actually have a database of maps
+    // const starsSorted = "";
+    // this.stars = ""
+  }
 }
 
 export class ButtonActions {
