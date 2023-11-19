@@ -17,6 +17,9 @@ export async function start({ interaction, client, args, type }: { interaction: 
     return options.reply(`There doesn't seem to be any beatmap embeds in this conversation.`);
   }
   const beatmap = await v2.beatmap.id.details(beatmapId);
+  if (!beatmap.id) {
+    return options.reply("Hmmm.. It seems the beatmap's id is wrong, maybe double check?");
+  }
 
   let file = await getMap(beatmapId.toString())?.data;
   if (!file || !["ranked", "loved", "approved"].includes(beatmap.status)) {
@@ -39,11 +42,13 @@ export async function start({ interaction, client, args, type }: { interaction: 
     return options.reply("This map has no scores in its leaderboard.");
   }
 
+  const initializerScore = userOptions.user ? { user: interaction.author, score: scores.scores.find((score: any) => score.user.id === userOptions.user), index: scores.scores.findIndex((score: any) => score.user.id === userOptions.user) } : undefined;
+
   if (page < 0 || page >= Math.ceil(scores.scores.length / 5)) {
     return options.reply(`Please provide a valid page (between 1 and ${Math.ceil(scores.scores.length / 5)})`);
   }
 
-  const embedOptions = { map: beatmapDetails, fetched: scores, page, file, length: scores.scores.length };
+  const embedOptions = { map: beatmapDetails, fetched: scores, page, file, length: scores.scores.length, initializer: initializerScore };
   const components = [buildActionRow([previousButton, nextButton], [buttonBoolsTops("previous", embedOptions), buttonBoolsTops("next", embedOptions)])];
   const response = await options.reply({ content: `Showing ${type} tops`, embeds: [await buildMapEmbed(embedOptions)], components });
 
@@ -59,7 +64,7 @@ export async function start({ interaction, client, args, type }: { interaction: 
   });
 }
 
-async function buildMapEmbed({ map, fetched, page, file }: { map: BeatmapDetails; fetched: any; page: number; file: string }) {
+async function buildMapEmbed({ map, fetched, page, file, initializer }: { map: BeatmapDetails; fetched: any; page: number; file: string; initializer: any | undefined }) {
   const scores = fetched.scores;
 
   let description = [];
@@ -79,10 +84,21 @@ async function buildMapEmbed({ map, fetched, page, file }: { map: BeatmapDetails
     description.push(textRow1 + textRow2 + textRow3);
   }
 
+  let _userScore = "";
+  if (initializer.score) {
+    const score = initializer.score;
+    const mods = score.mods.length > 0 ? score.mods.map((mod: any) => mod.acronym) : [""];
+    const stats = score.statistics;
+    const hitValues = { count_300: stats.great || 0, count_100: stats.ok || 0, count_50: stats.meh || 0, count_miss: stats.miss || 0, count_geki: stats.perfect || 0, count_katu: stats.good || 0 };
+    const performance = getPerformanceDetails({ mapText: file, maxCombo: score.max_combo, modsArg: mods, rulesetId: map.rulesetId, hitValues });
+
+    _userScore = `\n\n**__<@${initializer.user.id}>'s score:__**\n**#${initializer.index + 1} [${score.user.username}](https://osu.ppy.sh/users/${score.user.id})**: ${score.total_score.toLocaleString()} [**${score.max_combo}x**/${map.maxCombo}x] **+${mods.join("")}**\n${grades[score.rank]} **${performance.curPerf?.pp.toFixed(2)}**/${performance.maxPerf.pp.toFixed(2)}pp (${(score.accuracy * 100).toFixed(2)}%) <t:${new Date(score.ended_at).getTime() / 1000}:R>`;
+  }
+
   return new EmbedBuilder()
     .setTitle(`${map.artist} - ${map.title}`)
     .setURL(`https://osu.ppy.sh/b/${map.id}`)
     .setImage(map.background)
-    .setDescription(description.join("\n"))
+    .setDescription(description.join("\n") + _userScore)
     .setFooter({ text: `Page ${page + 1}/${Math.ceil(scores.length / 5)} - Powered by YoruNoKen's osu! supporter` });
 }
