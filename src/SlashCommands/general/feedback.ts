@@ -12,7 +12,7 @@ export async function run({ interaction, client }: { interaction: ChatInputComma
   const input = interaction.options.getString("feedback")!;
   const type = interaction.options.getString("type")!;
 
-  channel.send({ embeds: [new EmbedBuilder().setAuthor({ name: `Feedback from ${sender.username}`, iconURL: `${sender.avatarURL}` }).addFields({ name: `Type: ${type}`, value: input })] });
+  channel.send({ embeds: [new EmbedBuilder().setAuthor({ name: `Feedback from ${sender.username}`, iconURL: `${sender.avatarURL()}` }).addFields({ name: `Type: ${type}`, value: input })] });
   interaction.editReply("Feedback sent, thank you!");
 }
 export { data } from "../data/feedback";
