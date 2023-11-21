@@ -16,6 +16,40 @@ export function updatePrefixCache(object: string[], guildId: string) {
   return true;
 }
 
+async function checkForMention(message: Message, client: MyClient) {
+  const messagesArray = [
+    "freedom for Palpatine!! :flag_sd: :flag_sd: :flag_sd:",
+    "did someone say anime girls?",
+    "haiiii ^_^ :3 heyyy haiiii X3 hiiiiiii!!!!!!!",
+    "hiii :3333",
+    "did you know humans have two hearts? I have mine, and yours (in my basement)",
+    "cannot read properties of undefined",
+    "[object Object]",
+    "undefined",
+    "strings are not numbers!",
+    "critical error: yoru has no bitches",
+    "I stole chips when I was a 6",
+    "nom my map",
+    "I like staplers,,,,",
+    "need me an autist gf, are you autist gf?",
+    "yknow I've always wanted? you :3",
+    "hm?",
+    'HELP     "',
+    "one drink coming up for table 727! HAHA see what I did there?",
+    "sometimes I wish I was a woman",
+    "I love my owner! im gonna cry myself to sleep tonight",
+    "i love beeing a silly little goober",
+    "hey, dont stop pinging me. I like it when u do that..",
+    "i miss her",
+  ];
+
+  const reply = () => message.reply(messagesArray[Math.floor(messagesArray.length * Math.random())]);
+
+  if (["hanami", "mia"].some((char) => message.content.toLowerCase().includes(char)) || message.content.includes(`<@${client.user?.id}>`) || (message.reference && (await message.fetchReference()).author.id === client.user?.id)) {
+    reply();
+  }
+}
+
 export const name = "messageCreate";
 export const execute = async (message: Message, client: MyClient) => {
   const guildId = message.guildId;
@@ -41,9 +75,15 @@ export const execute = async (message: Message, client: MyClient) => {
 
   let prefixOptions = prefixCache[guildId] || (prefixCache[guildId] = JSON.parse((await getServer(guildId)).data)?.prefix) || (prefixCache[guildId] = [defaultPrefix]);
   let prefix = prefixOptions.find((p: string) => message.content.startsWith(p));
-  if (!prefix) return;
+  if (!prefix) {
+    await checkForMention(message, client);
+    return;
+  }
 
-  if (!message.content.startsWith(prefix)) return;
+  if (!message.content.startsWith(prefix)) {
+    await checkForMention(message, client);
+    return;
+  }
 
   const args = message.content.slice(prefix.length).trim().split(/ +/g);
   const cmd = args.length > 0 ? args.shift()!.toLowerCase() : "";
