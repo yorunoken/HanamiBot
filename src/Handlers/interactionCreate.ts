@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Interaction, InteractionType } from "discord.js";
+import { Interaction, InteractionType } from "discord.js";
 import { MyClient, ButtonActions } from "../classes";
 import { db } from "./ready";
 
@@ -8,10 +8,7 @@ export const execute = async (interaction: Interaction, client: MyClient) => {
     return;
   }
 
-  if (interaction.type === InteractionType.MessageComponent) {
-    if (!interaction.isButton()) {
-      return;
-    }
+  if (interaction.type === InteractionType.MessageComponent && interaction.isButton()) {
     const message = interaction.message;
     const sillyOptions = client.sillyOptions[message.id];
     if (sillyOptions.buttonHandler) {
