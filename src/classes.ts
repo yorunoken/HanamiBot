@@ -351,14 +351,14 @@ export class StatsDetails {
 }
 
 export class ButtonActions {
-  static async handleProfileButtons(pageBuilders: any[], i: ButtonInteraction, userDetailOptions: UserDetails, response: Message) {
+  static async handleProfileButtons({ pageBuilder, i, options, response }: { pageBuilder: any; i: ButtonInteraction; options: any; response: Message }) {
     const customId = i.customId;
     await i.update({ components: [loadingButtons as any] });
     if (customId === "more") {
-      const page = pageBuilders[1](userDetailOptions);
+      const page = pageBuilder[1](options);
       response.edit({ embeds: [page], components: [showLessButton as any] });
     } else if (customId === "less") {
-      const page = pageBuilders[0](userDetailOptions);
+      const page = pageBuilder[0](options);
       response.edit({ embeds: [page], components: [showMoreButton as any] });
     }
   }

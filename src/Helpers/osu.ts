@@ -30,7 +30,7 @@ export async function start(interaction: Message | ChatInputCommandInteraction, 
   const collector = response.createMessageComponentCollector({ time: 60000, filter });
 
   collector.on("collect", async function (i: ButtonInteraction) {
-    await ButtonActions.handleProfileButtons([buildPage1, buildPage2], i, userDetailOptions, response);
+    await ButtonActions.handleProfileButtons({ pageBuilder: [buildPage1, buildPage2], i, options: userDetailOptions, response });
   });
 
   collector.on("end", async () => {

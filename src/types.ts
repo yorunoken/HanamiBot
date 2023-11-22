@@ -14,7 +14,7 @@ export enum commands {
 
 export interface commandInterface {
   initializer: User;
-  buttonHandler?: string;
+  buttonHandler?: "handleProfileButtons" | "handleRecentButtons" | "handleTopsButtons";
   type: commands;
   embedOptions: object;
   response: Message;

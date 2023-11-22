@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Interaction, InteractionType } from "discord.js";
-import { MyClient } from "../classes";
+import { MyClient, ButtonActions } from "../classes";
 import { db } from "./ready";
 
 export const name = "interactionCreate";
@@ -9,13 +9,14 @@ export const execute = async (interaction: Interaction, client: MyClient) => {
   }
 
   if (interaction.type === InteractionType.MessageComponent) {
-    const sillyOptions = client.sillyOptions[interaction.id];
-    if (!interaction.isButton() || interaction.user.id !== sillyOptions.initializer.id) {
+    console.log(client.sillyOptions);
+    if (!interaction.isButton()) {
       return;
     }
-
-    console.log(sillyOptions);
-    const { customId, id, user } = interaction;
+    const sillyOptions = client.sillyOptions[interaction.id];
+    if (sillyOptions.buttonHandler) {
+      await ButtonActions[sillyOptions.buttonHandler]({ i: interaction, options: sillyOptions.embedOptions, pageBuilder: sillyOptions.pageBuilder, response: sillyOptions.response });
+    }
   }
 
   if (interaction.type === InteractionType.ApplicationCommand) {
