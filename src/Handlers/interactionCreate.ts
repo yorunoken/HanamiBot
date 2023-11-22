@@ -9,11 +9,11 @@ export const execute = async (interaction: Interaction, client: MyClient) => {
   }
 
   if (interaction.type === InteractionType.MessageComponent) {
-    console.log(client.sillyOptions);
     if (!interaction.isButton()) {
       return;
     }
-    const sillyOptions = client.sillyOptions[interaction.id];
+    const message = interaction.message;
+    const sillyOptions = client.sillyOptions[message.id];
     if (sillyOptions.buttonHandler) {
       await ButtonActions[sillyOptions.buttonHandler]({ i: interaction, options: sillyOptions.embedOptions, pageBuilder: sillyOptions.pageBuilder, response: sillyOptions.response });
     }

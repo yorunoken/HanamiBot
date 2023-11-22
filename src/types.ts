@@ -9,7 +9,7 @@ export enum PrefixMethods {
 export enum commands {
   Recent = 0,
   Top = 1,
-  Leaderboard = 2,
+  Profile = 2,
 }
 
 export interface commandInterface {
@@ -18,7 +18,7 @@ export interface commandInterface {
   type: commands;
   embedOptions: object;
   response: Message;
-  pageBuilder: Function;
+  pageBuilder?: Function;
 }
 
 export type CallbackVoid = (value?: any) => void;

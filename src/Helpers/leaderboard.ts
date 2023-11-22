@@ -1,9 +1,10 @@
 import { getUsernameFromArgs, Interactionhandler, showMoreButton, getBeatmapId_FromContext, getMap, downloadMap, insertData, getPerformanceDetails, grades, buttonBoolsIndex, buttonBoolsTops, buildActionRow, nextButton, previousButton } from "../utils";
 import { Message, ChatInputCommandInteraction, EmbedBuilder, ButtonInteraction, Client } from "discord.js";
-import { BeatmapDetails, ButtonActions } from "../classes";
+import { BeatmapDetails, ButtonActions, MyClient } from "../classes";
 import { v2 } from "osu-api-extended";
+import { commands } from "../types";
 
-export async function start({ interaction, client, args, type }: { interaction: Message<boolean>; client: Client<boolean>; args: string[]; type: "global" | "country" }) {
+export async function start({ interaction, client, args, type }: { interaction: Message<boolean>; client: MyClient; args: string[]; type: "global" | "country" }) {
   const options = Interactionhandler(interaction, args);
 
   const userOptions = getUsernameFromArgs(options.author, options.userArgs, true);
@@ -51,17 +52,7 @@ export async function start({ interaction, client, args, type }: { interaction: 
   const embedOptions = { map: beatmapDetails, fetched: scores, page, file, length: scores.scores.length, initializer: initializerScore };
   const components = [buildActionRow([previousButton, nextButton], [buttonBoolsTops("previous", embedOptions), buttonBoolsTops("next", embedOptions)])];
   const response = await options.reply({ content: `Showing ${type} tops`, embeds: [await buildMapEmbed(embedOptions)], components });
-
-  const filter = (i: any) => i.user.id === options.author.id;
-  const collector = response.createMessageComponentCollector({ time: 60000, filter });
-
-  collector.on("collect", async function (i: ButtonInteraction) {
-    await ButtonActions.handleTopsButtons({ pageBuilder: buildMapEmbed, options: embedOptions, i, response });
-  });
-
-  collector.on("end", async () => {
-    await response.edit({ components: [] });
-  });
+  client.sillyOptions[response.id] = { buttonHandler: "handleTopsButtons", type: commands.Top, embedOptions, response, pageBuilder: buildMapEmbed, initializer: options.author };
 }
 
 async function buildMapEmbed({ map, fetched, page, file, initializer }: { map: BeatmapDetails; fetched: any; page: number; file: string; initializer: any | undefined }) {

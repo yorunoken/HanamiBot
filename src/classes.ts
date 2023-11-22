@@ -351,14 +351,14 @@ export class StatsDetails {
 }
 
 export class ButtonActions {
-  static async handleProfileButtons({ pageBuilder, i, options, response }: { pageBuilder: any; i: ButtonInteraction; options: any; response: Message }) {
+  static async handleProfileButtons({ i, options, response }: { i: ButtonInteraction; options: any; response: Message }) {
     const customId = i.customId;
     await i.update({ components: [loadingButtons as any] });
     if (customId === "more") {
-      const page = pageBuilder[1](options);
+      const page = options.pageBuilder[1](options.options);
       response.edit({ embeds: [page], components: [showLessButton as any] });
     } else if (customId === "less") {
-      const page = pageBuilder[0](options);
+      const page = options.pageBuilder[0](options.options);
       response.edit({ embeds: [page], components: [showMoreButton as any] });
     }
   }
@@ -402,10 +402,12 @@ export class CalculateHitResults {
 }
 
 export class MyClient extends Client {
+  [x: string]: any;
   slashCommands: Collection<any, any>;
   prefixCommands: Collection<any, any>;
   aliases: Collection<any, any>;
   sillyOptions: Record<string, commandInterface>;
+  client: any;
 
   constructor(options: any) {
     super(options);

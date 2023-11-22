@@ -94,18 +94,7 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
   const embedOptions = isTops ? topsOptions : recentOptions;
   const components = [buildActionRow([previousButton, nextButton], [index! >= 0 ? buttonBoolsIndex("previous", embedOptions) : buttonBoolsTops("previous", embedOptions), index! >= 0 ? buttonBoolsIndex("next", embedOptions) : buttonBoolsTops("next", embedOptions)])];
   const response = await reply({ content: `Found \`${plays.length}\` plays`, embeds: [embed], components });
-  client.sillyOptions[interaction.id] = { buttonHandler: isTops ? "handleTopsButtons" : "handleRecentButtons", type: commands[isTops ? "Top" : "Recent"], embedOptions, response, pageBuilder: isTops ? getSubsequentPlays : getRecentPlays, initializer: argOptions.author };
-
-  // const filter = (i: any) => i.user.id === argOptions.author.id;
-  // const collector = response.createMessageComponentCollector({ time: 60000, filter });
-
-  // collector.on("collect", async function (i: ButtonInteraction) {
-  //   await ButtonActions[isTops ? "handleTopsButtons" : "handleRecentButtons"]({ pageBuilder: isTops ? getSubsequentPlays : getRecentPlays, options: embedOptions, i, response });
-  // });
-
-  // collector.on("end", async () => {
-  //   await response.edit({ components: [] });
-  // });
+  client.sillyOptions[response.id] = { buttonHandler: isTops ? "handleTopsButtons" : "handleRecentButtons", type: commands[isTops ? "Top" : "Recent"], embedOptions, response, pageBuilder: isTops ? getSubsequentPlays : getRecentPlays, initializer: argOptions.author };
 }
 
 async function getRecentPlays({ user, plays, mode, index, isTops }: { user: UserDetails; plays: ScoreResponse[]; mode: osuModes; index: number | undefined; isTops: boolean }) {

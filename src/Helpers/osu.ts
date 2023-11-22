@@ -1,10 +1,10 @@
 import { getUsernameFromArgs, Interactionhandler, showMoreButton } from "../utils";
 import { Message, ChatInputCommandInteraction, EmbedBuilder, ButtonInteraction } from "discord.js";
-import { UserDetails, ButtonActions } from "../classes";
-import { osuModes } from "../types";
+import { UserDetails, ButtonActions, MyClient } from "../classes";
+import { commands, osuModes } from "../types";
 import { v2 } from "osu-api-extended";
 
-export async function start(interaction: Message | ChatInputCommandInteraction, args?: string[], mode?: any) {
+export async function start(interaction: Message | ChatInputCommandInteraction, client: MyClient, args?: string[], mode?: any) {
   const options = Interactionhandler(interaction, args);
   options.mode = mode === "catch" ? "fruits" : mode ?? options.mode;
 
@@ -25,17 +25,7 @@ export async function start(interaction: Message | ChatInputCommandInteraction, 
 
   let page = buildPage1(userDetailOptions);
   const response = await options.reply({ embeds: [page], components: [showMoreButton] });
-
-  const filter = (i: any) => i.user.id === options.author.id;
-  const collector = response.createMessageComponentCollector({ time: 60000, filter });
-
-  collector.on("collect", async function (i: ButtonInteraction) {
-    await ButtonActions.handleProfileButtons({ pageBuilder: [buildPage1, buildPage2], i, options: userDetailOptions, response });
-  });
-
-  collector.on("end", async () => {
-    await response.edit({ components: [] });
-  });
+  client.sillyOptions[response.id] = { buttonHandler: "handleProfileButtons", type: commands.Profile, embedOptions: { pageBuilder: [buildPage1, buildPage2], options: userDetailOptions, response }, response, initializer: options.author };
 }
 
 function buildPage1(options: UserDetails) {
