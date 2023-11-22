@@ -78,12 +78,13 @@ function modsParser(str: string) {
       };
 }
 
-export const loadingButtons = buildActionRow([new ButtonBuilder().setCustomId("wating").setLabel("Waiting..").setStyle(ButtonStyle.Secondary)], [false]);
+export const loadingButtons = buildActionRow([new ButtonBuilder().setCustomId("wating").setLabel("Waiting..").setStyle(ButtonStyle.Secondary)], [true]);
 export const showMoreButton = buildActionRow([new ButtonBuilder().setCustomId("more").setLabel("Show More").setStyle(ButtonStyle.Success)]);
 export const showLessButton = buildActionRow([new ButtonBuilder().setCustomId("less").setLabel("Show Less").setStyle(ButtonStyle.Success)]);
 
 export const previousButton = new ButtonBuilder().setCustomId("previous").setLabel("⬅️").setStyle(ButtonStyle.Secondary);
 export const nextButton = new ButtonBuilder().setCustomId("next").setLabel("➡️").setStyle(ButtonStyle.Secondary);
+export const specifyButton = new ButtonBuilder().setCustomId("indexbtn").setLabel("*").setStyle(ButtonStyle.Secondary);
 
 export const getUser = (id: string): any => db.prepare("SELECT * FROM users WHERE id = ?").get(id);
 export const getServer = (id: string): any => db.prepare("SELECT * FROM servers WHERE id = ?").get(id);

@@ -16,7 +16,7 @@ export interface commandInterface {
   initializer: User;
   buttonHandler?: "handleProfileButtons" | "handleRecentButtons" | "handleTopsButtons";
   type: commands;
-  embedOptions: object;
+  embedOptions: any;
   response: Message;
   pageBuilder?: Function;
 }

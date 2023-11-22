@@ -1,8 +1,8 @@
-import { rulesets, getMap, insertData, getRetryCount, grades, formatNumber, buildActionRow, showLessButton, showMoreButton, previousButton, nextButton, loadingButtons, buttonBoolsIndex, buttonBoolsTops, downloadMap, getPerformanceDetails, osuEmojis } from "./utils";
+import { rulesets, getMap, insertData, getRetryCount, grades, formatNumber, buildActionRow, showLessButton, showMoreButton, previousButton, nextButton, loadingButtons, buttonBoolsIndex, buttonBoolsTops, downloadMap, getPerformanceDetails, osuEmojis, specifyButton } from "./utils";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 import { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
 import { response as UserOsu } from "osu-api-extended/dist/types/v2_user_details";
-import { Message, ButtonInteraction, Client, Collection } from "discord.js";
+import { Message, ButtonInteraction, Client, Collection, ModalSubmitInteraction } from "discord.js";
 import { tools, v2 } from "osu-api-extended";
 import { osuModes, commandInterface } from "./types";
 
@@ -351,7 +351,11 @@ export class StatsDetails {
 }
 
 export class ButtonActions {
-  static async handleProfileButtons({ i, options, response }: { i: ButtonInteraction; options: any; response: Message }) {
+  static async handleProfileButtons({ i, options, response }: { i: ButtonInteraction | ModalSubmitInteraction; options: any; response: Message }) {
+    if (i instanceof ModalSubmitInteraction) {
+      return;
+    }
+
     const customId = i.customId;
     await i.update({ components: [loadingButtons as any] });
     if (customId === "more") {
@@ -363,35 +367,37 @@ export class ButtonActions {
     }
   }
 
-  static async handleRecentButtons({ pageBuilder, options, i, response }: { pageBuilder: any; options: any; i: ButtonInteraction; response: Message }) {
-    const customId = i.customId;
+  static async handleRecentButtons({ pageBuilder, options, i, response }: { pageBuilder: any; options: any; i: ButtonInteraction | ModalSubmitInteraction; response: Message }) {
+    const getComponents = () => [buildActionRow([previousButton, specifyButton, nextButton], [options.index === 0, false, options.index + 1 === options.plays.length])] as any;
+    const editEmbed = async (options: any) => response.edit({ embeds: [await pageBuilder(options)], components: getComponents() });
 
-    const getComponents = () => [buildActionRow([previousButton, nextButton], [options.index === 0, options.index + 1 === options.plays.length])] as any;
-    await i.update({ components: [loadingButtons as any] });
-    if (customId === "next") {
-      options.index++;
-      response.edit({ embeds: [await pageBuilder(options)], components: getComponents() });
-    } else if (customId === "previous") {
-      options.index--;
-      response.edit({ embeds: [await pageBuilder(options)], components: getComponents() });
+    if (i instanceof ModalSubmitInteraction) {
+      await response.edit({ components: [loadingButtons as any] });
+      await editEmbed(options);
+      return;
     }
+
+    const customId = i.customId;
+    await i.update({ components: [loadingButtons as any] });
+    customId === "next" ? options.index++ : customId === "previous" ? options.index-- : null;
+    editEmbed(options);
   }
 
-  static async handleTopsButtons({ pageBuilder, options, i, response }: { pageBuilder: any; options: any; i: ButtonInteraction; response: Message }) {
-    const customId = i.customId;
+  static async handleTopsButtons({ pageBuilder, options, i, response }: { pageBuilder: any; options: any; i: ButtonInteraction | ModalSubmitInteraction; response: Message }) {
+    const getComponents = () => [buildActionRow([previousButton, specifyButton, nextButton], [index! >= 0 ? buttonBoolsIndex("previous", options) : buttonBoolsTops("previous", options), false, index! >= 0 ? buttonBoolsIndex("next", options) : buttonBoolsTops("next", options)])] as any;
+    const editEmbed = async (options: any) => response.edit({ embeds: [await pageBuilder(options)], components: getComponents() });
     const index = options.index;
 
-    const getComponents = () => [buildActionRow([previousButton, nextButton], [index! >= 0 ? buttonBoolsIndex("previous", options) : buttonBoolsTops("previous", options), index! >= 0 ? buttonBoolsIndex("next", options) : buttonBoolsTops("next", options)])] as any;
-    await i.update({ components: [loadingButtons as any] });
-    if (customId === "next") {
-      options.page++;
-      options.index++;
-      response.edit({ embeds: [await pageBuilder(options)], components: getComponents() });
-    } else if (customId === "previous") {
-      options.page--;
-      options.index--;
-      response.edit({ embeds: [await pageBuilder(options)], components: getComponents() });
+    if (i instanceof ModalSubmitInteraction) {
+      await response.edit({ components: [loadingButtons as any] });
+      await editEmbed(options);
+      return;
     }
+
+    const customId = i.customId;
+    await i.update({ components: [loadingButtons as any] });
+    customId === "next" ? (options.page++, options.index++) : customId === "previous" ? (options.page--, options.index--) : null;
+    await editEmbed(options);
   }
 }
 
