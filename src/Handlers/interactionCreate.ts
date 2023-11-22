@@ -16,10 +16,10 @@ export const execute = async (interaction: Interaction, client: MyClient) => {
     const sillyOptions = client.sillyOptions[message.id];
 
     const index = sillyOptions.embedOptions.index ? Number(interaction.fields.getTextInputValue("index")) : null;
-    const page = !sillyOptions.embedOptions.index ? Number(interaction.fields.getTextInputValue("page")) : null;
+    const page = sillyOptions.buttonHandler === "handleTopsButtons" && !sillyOptions.embedOptions.index ? Number(interaction.fields.getTextInputValue("page")) : null;
     const playsLength = sillyOptions.embedOptions.plays.length;
 
-    if ((index || page)! > (sillyOptions.buttonHandler === "handleRecentButtons" ? playsLength : sillyOptions.embedOptions.index ? playsLength : playsLength / 5) || (index || page)! < 0) {
+    if ((index || page)! > (sillyOptions.buttonHandler === "handleRecentButtons" ? playsLength : sillyOptions.embedOptions.index ? playsLength : Math.ceil(playsLength / 5)) || (index || page)! < 0) {
       return;
     }
 
@@ -36,12 +36,16 @@ export const execute = async (interaction: Interaction, client: MyClient) => {
     const message = interaction.message;
     const sillyOptions = client.sillyOptions[message.id];
 
+    if (interaction.user.id !== sillyOptions.initializer.id) {
+      return interaction.reply({ ephemeral: true, content: "You need to be the one who initialized the command to be able to click the buttons." });
+    }
+
     if (interaction.customId === "indexbtn") {
       const playsLength = sillyOptions.embedOptions.plays.length;
       const modal = new ModalBuilder().setCustomId("myModal").setTitle("Enter a value");
       const favoriteColorInput = new TextInputBuilder()
         .setCustomId(sillyOptions.buttonHandler === "handleRecentButtons" ? "index" : sillyOptions.embedOptions.index ? "index" : "page")
-        .setLabel(`Your value here. (1-${sillyOptions.buttonHandler === "handleRecentButtons" ? playsLength : sillyOptions.embedOptions.index ? playsLength : playsLength / 5})`)
+        .setLabel(`Your value here. (1-${sillyOptions.buttonHandler === "handleRecentButtons" ? playsLength : sillyOptions.embedOptions.index ? playsLength : Math.ceil(playsLength / 5)})`)
         .setStyle(TextInputStyle.Short);
 
       const firstActionRow = new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(favoriteColorInput);
