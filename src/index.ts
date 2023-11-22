@@ -17,7 +17,7 @@ fs.readdirSync("./src/Handlers").forEach(async (file: any) => {
   client.on(event.name, (...args: any) => event.execute(...args, client));
 });
 
-setInterval(() => (client.sillyOptions = {}), 2 * 60 * 1000);
+// setInterval(() => (client.sillyOptions = {}), 2 * 60 * 1000);
 
 process.on("unhandledRejection", (e) => {
   console.error(e);
