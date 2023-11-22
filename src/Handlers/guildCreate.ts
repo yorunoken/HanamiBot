@@ -1,6 +1,6 @@
 import { Guild, ChannelType, PermissionFlagsBits, TextChannel } from "discord.js";
 import { serverJoinMessage } from "../constants";
-import { MyClient } from "..";
+import { MyClient } from "../classes";
 
 export const name = "guildCreate";
 export const execute = async (guild: Guild, client: MyClient) => {

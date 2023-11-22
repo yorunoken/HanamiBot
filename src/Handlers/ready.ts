@@ -2,7 +2,7 @@ import { Database } from "bun:sqlite";
 import fs from "fs";
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
-import { MyClient } from "..";
+import { MyClient } from "../classes";
 import { getServer, insertData } from "../utils";
 
 const token = Bun.env.TOKEN as string;

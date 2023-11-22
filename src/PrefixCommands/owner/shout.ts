@@ -1,5 +1,5 @@
 import { ChannelType, Message, PermissionFlagsBits, TextChannel } from "discord.js";
-import { MyClient } from "../..";
+import { MyClient } from "../../classes";
 import { serverJoinMessage } from "../../constants";
 
 export const name = "shout";

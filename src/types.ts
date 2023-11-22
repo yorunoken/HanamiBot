@@ -1,7 +1,24 @@
+import { User, Message } from "discord.js";
+
 export enum PrefixMethods {
   ADD = "add",
   REMOVE = "remove",
   LIST = "list",
+}
+
+export enum commands {
+  Recent = 0,
+  Top = 1,
+  Leaderboard = 2,
+}
+
+export interface commandInterface {
+  initializer: User;
+  buttonHandler?: string;
+  type: commands;
+  embedOptions: object;
+  response: Message;
+  pageBuilder: Function;
 }
 
 export type CallbackVoid = (value?: any) => void;

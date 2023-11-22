@@ -2,7 +2,7 @@ import { Message, PermissionFlagsBits, ChannelType, TextChannel } from "discord.
 import { getLoneCommand } from "../Helpers/loneCommands";
 import { defaultPrefix } from "../constants";
 import { getServer } from "../utils";
-import { MyClient } from "..";
+import { MyClient } from "../classes";
 import { db } from "./ready";
 import ms from "ms";
 

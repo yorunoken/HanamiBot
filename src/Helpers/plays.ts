@@ -1,12 +1,13 @@
 import { getUsernameFromArgs, Interactionhandler, nextButton, previousButton, buildActionRow, buttonBoolsIndex, buttonBoolsTops } from "../utils";
 import { Message, ChatInputCommandInteraction, ButtonInteraction, EmbedBuilder } from "discord.js";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
-import { UserDetails, ButtonActions, ScoreDetails } from "../classes";
+import { UserDetails, ButtonActions, ScoreDetails, MyClient } from "../classes";
+import { osuModes, commands } from "../types";
 import { v2 } from "osu-api-extended";
-import { osuModes } from "../types";
 
-export async function start({ isTops, interaction, passOnly: passOnlyArg, args, mode: modeArg, number, recentTop }: { isTops: boolean; interaction: Message | ChatInputCommandInteraction; passOnly?: boolean; args?: string[]; mode?: osuModes; number?: number; recentTop?: boolean }) {
+export async function start({ isTops, interaction, passOnly: passOnlyArg, args, mode: modeArg, number, recentTop, client }: { isTops: boolean; interaction: Message | ChatInputCommandInteraction; passOnly?: boolean; args?: string[]; mode?: osuModes; number?: number; recentTop?: boolean; client: MyClient }) {
   const argOptions = Interactionhandler(interaction, args);
+  const reply = argOptions.reply;
   argOptions.mode = modeArg ?? argOptions.mode;
   argOptions.passOnly = passOnlyArg ?? argOptions.passOnly;
 
@@ -17,17 +18,17 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
 
   const userOptions = getUsernameFromArgs(argOptions.author, argOptions.userArgs);
   if (!userOptions) {
-    return argOptions.reply("Something went wrong.");
+    return reply("Something went wrong.");
   }
   if (userOptions.user?.status === false) {
-    return argOptions.reply(userOptions.user.message);
+    return reply(userOptions.user.message);
   }
   const flags = userOptions.flags;
   const page = isTops ? parseInt((flags.p as string) || (flags.page as string)) - 1 || 0 : undefined;
 
   const user = await v2.user.details(userOptions.user, mode);
   if (!user.id) {
-    return argOptions.reply(`The user \`${userOptions.user}\` does not exist in Bancho.`);
+    return reply(`The user \`${userOptions.user}\` does not exist in Bancho.`);
   }
 
   let plays = await v2.scores.user.category(user.id, isTops ? "best" : "recent", {
@@ -77,11 +78,11 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
     : plays;
 
   if (plays.length === 0) {
-    return argOptions.reply(`The user \`${user.username}\` does not have any ${isTops ? "top" : "recent"} plays in Bancho.`);
+    return reply(`The user \`${user.username}\` does not have any ${isTops ? "top" : "recent"} plays in Bancho.`);
   }
 
   if (page && (page < 0 || page >= Math.ceil(plays.length / 5))) {
-    return argOptions.reply(`Please provide a valid page (between 1 and ${Math.ceil(plays.length / 5)})`);
+    return reply(`Please provide a valid page (between 1 and ${Math.ceil(plays.length / 5)})`);
   }
 
   const userDetailOptions = new UserDetails(user, mode);
@@ -90,14 +91,16 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
   const topsOptions = { user: userDetailOptions, plays, mode: mode, page, index: index!, isTops };
   const embed = isTops ? await getSubsequentPlays(topsOptions) : await getRecentPlays(recentOptions);
 
-  const components = [buildActionRow([previousButton, nextButton], [index! >= 0 ? buttonBoolsIndex("previous", isTops ? topsOptions : recentOptions) : buttonBoolsTops("previous", isTops ? topsOptions : recentOptions), index! >= 0 ? buttonBoolsIndex("next", isTops ? topsOptions : recentOptions) : buttonBoolsTops("next", isTops ? topsOptions : recentOptions)])];
-  const response = await argOptions.reply({ content: `Found \`${plays.length}\` plays`, embeds: [embed], components });
+  const embedOptions = isTops ? topsOptions : recentOptions;
+  const components = [buildActionRow([previousButton, nextButton], [index! >= 0 ? buttonBoolsIndex("previous", embedOptions) : buttonBoolsTops("previous", embedOptions), index! >= 0 ? buttonBoolsIndex("next", embedOptions) : buttonBoolsTops("next", embedOptions)])];
+  const response = await reply({ content: `Found \`${plays.length}\` plays`, embeds: [embed], components });
+  client.sillyOptions[interaction.id] = { buttonHandler: isTops ? "handleTopsButtons" : "handleRecentButtons", type: commands[isTops ? "Top" : "Recent"], embedOptions, response, pageBuilder: isTops ? getSubsequentPlays : getRecentPlays, initializer: argOptions.author };
 
   const filter = (i: any) => i.user.id === argOptions.author.id;
   const collector = response.createMessageComponentCollector({ time: 60000, filter });
 
   collector.on("collect", async function (i: ButtonInteraction) {
-    await ButtonActions[isTops ? "handleTopsButtons" : "handleRecentButtons"]({ pageBuilder: isTops ? getSubsequentPlays : getRecentPlays, options: isTops ? topsOptions : recentOptions, i, response });
+    await ButtonActions[isTops ? "handleTopsButtons" : "handleRecentButtons"]({ pageBuilder: isTops ? getSubsequentPlays : getRecentPlays, options: embedOptions, i, response });
   });
 
   collector.on("end", async () => {

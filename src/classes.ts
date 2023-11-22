@@ -2,9 +2,9 @@ import { rulesets, getMap, insertData, getRetryCount, grades, formatNumber, buil
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 import { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
 import { response as UserOsu } from "osu-api-extended/dist/types/v2_user_details";
-import { Message, ButtonInteraction } from "discord.js";
+import { Message, ButtonInteraction, Client, Collection } from "discord.js";
 import { tools, v2 } from "osu-api-extended";
-import { osuModes } from "./types";
+import { osuModes, commandInterface } from "./types";
 
 export class UserDetails {
   username: string;
@@ -399,4 +399,19 @@ export class CalculateHitResults {
   static standard({ accuracy, totalHitObjects, countMiss, count100, count50 }: { accuracy: number; totalHitObjects: number; countMiss: number; count50?: number; count100?: number }) {}
 
   constructor() {}
+}
+
+export class MyClient extends Client {
+  slashCommands: Collection<any, any>;
+  prefixCommands: Collection<any, any>;
+  aliases: Collection<any, any>;
+  sillyOptions: Record<string, commandInterface>;
+
+  constructor(options: any) {
+    super(options);
+    this.slashCommands = new Collection();
+    this.prefixCommands = new Collection();
+    this.aliases = new Collection();
+    this.sillyOptions = {};
+  }
 }
