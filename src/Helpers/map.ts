@@ -1,5 +1,5 @@
-import { getUsernameFromArgs, Interactionhandler, showMoreButton, getBeatmapId_FromContext, getMap, downloadMap, insertData, getPerformanceDetails, rulesets } from "../utils";
-import { Message, ChatInputCommandInteraction, EmbedBuilder, ButtonInteraction, Client } from "discord.js";
+import { getUsernameFromArgs, Interactionhandler, getBeatmapId_FromContext, getMap, downloadMap, insertData } from "../utils";
+import { Message, EmbedBuilder, Client } from "discord.js";
 import { BeatmapDetails } from "../classes";
 import { v2 } from "osu-api-extended";
 
