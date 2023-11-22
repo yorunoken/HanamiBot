@@ -1,5 +1,5 @@
 import { getUsernameFromArgs, Interactionhandler, nextButton, previousButton, buildActionRow, buttonBoolsIndex, buttonBoolsTops } from "../utils";
-import { Message, ChatInputCommandInteraction, ButtonInteraction, EmbedBuilder } from "discord.js";
+import { Message, ChatInputCommandInteraction, ButtonInteraction, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 import { UserDetails, ButtonActions, ScoreDetails, MyClient } from "../classes";
 import { osuModes, commands } from "../types";
@@ -92,7 +92,11 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
   const embed = isTops ? await getSubsequentPlays(topsOptions) : await getRecentPlays(recentOptions);
 
   const embedOptions = isTops ? topsOptions : recentOptions;
-  const components = [buildActionRow([previousButton, nextButton], [index! >= 0 ? buttonBoolsIndex("previous", embedOptions) : buttonBoolsTops("previous", embedOptions), index! >= 0 ? buttonBoolsIndex("next", embedOptions) : buttonBoolsTops("next", embedOptions)])];
+  const button = new ButtonBuilder().setCustomId("myButton").setLabel("Click me!").setStyle(ButtonStyle.Primary);
+
+  const row = new ActionRowBuilder().addComponents(button);
+
+  const components = [buildActionRow([previousButton, nextButton], [index! >= 0 ? buttonBoolsIndex("previous", embedOptions) : buttonBoolsTops("previous", embedOptions), index! >= 0 ? buttonBoolsIndex("next", embedOptions) : buttonBoolsTops("next", embedOptions)]), row];
   const response = await reply({ content: `Found \`${plays.length}\` plays`, embeds: [embed], components });
   client.sillyOptions[response.id] = { buttonHandler: isTops ? "handleTopsButtons" : "handleRecentButtons", type: commands[isTops ? "Top" : "Recent"], embedOptions, response, pageBuilder: isTops ? getSubsequentPlays : getRecentPlays, initializer: argOptions.author };
 }
