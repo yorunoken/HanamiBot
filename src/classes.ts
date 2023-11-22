@@ -2,9 +2,9 @@ import { rulesets, getMap, insertData, getRetryCount, grades, formatNumber, buil
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 import { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
 import { response as UserOsu } from "osu-api-extended/dist/types/v2_user_details";
-import { Message, ButtonInteraction } from "discord.js";
+import { Message, ButtonInteraction, Client, Collection } from "discord.js";
 import { tools, v2 } from "osu-api-extended";
-import { osuModes } from "./types";
+import { osuModes, commandInterface } from "./types";
 
 export class UserDetails {
   username: string;
@@ -141,7 +141,7 @@ export class ScoreDetails {
   ssPp!: string;
   globalPlacement!: string;
 
-  async initialize(plays: ScoreResponse[], index: number, mode: osuModes, isTops: boolean, isCompare?: boolean, perfDetails?: any, beatmap?: BeatmapResponse) {
+  async initialize(plays: ScoreResponse[], index: number, mode: osuModes, _isTops: boolean, isCompare?: boolean, perfDetails?: any, beatmap?: BeatmapResponse) {
     const play = plays[index];
     const rulesetId = rulesets[mode];
 
@@ -332,15 +332,33 @@ export class BeatmapDetails {
   constructor() {}
 }
 
+export class StatsDetails {
+  [x: string]: any; // temporary measure to ts bullshit
+
+  constructor(_user: UserOsu, scores: ScoreResponse[]) {
+    const lastArray = scores.length - 1;
+
+    const ppSorted = scores.sort((a, b) => Number(a.pp) - Number(b.pp)).map((score) => score.pp);
+    this.pp = { min: ppSorted[0], avg: ppSorted.reduce((acc, pp) => acc + Number(pp), 0) / scores.length, max: ppSorted[lastArray] };
+
+    const accuracySorted = scores.sort((a, b) => Number(a.accuracy) - Number(b.accuracy)).map((score) => score.accuracy * 100);
+    this.accuracy = { min: accuracySorted[0], avg: accuracySorted.reduce((acc, pp) => acc + Number(pp), 0) / scores.length, max: accuracySorted[lastArray] };
+
+    // let's leave star for another time when I actually have a database of maps
+    // const starsSorted = "";
+    // this.stars = ""
+  }
+}
+
 export class ButtonActions {
-  static async handleProfileButtons(pageBuilders: any[], i: ButtonInteraction, userDetailOptions: UserDetails, response: Message) {
+  static async handleProfileButtons({ i, options, response }: { i: ButtonInteraction; options: any; response: Message }) {
     const customId = i.customId;
     await i.update({ components: [loadingButtons as any] });
     if (customId === "more") {
-      const page = pageBuilders[1](userDetailOptions);
+      const page = options.pageBuilder[1](options.options);
       response.edit({ embeds: [page], components: [showLessButton as any] });
     } else if (customId === "less") {
-      const page = pageBuilders[0](userDetailOptions);
+      const page = options.pageBuilder[0](options.options);
       response.edit({ embeds: [page], components: [showMoreButton as any] });
     }
   }
@@ -381,4 +399,21 @@ export class CalculateHitResults {
   static standard({ accuracy, totalHitObjects, countMiss, count100, count50 }: { accuracy: number; totalHitObjects: number; countMiss: number; count50?: number; count100?: number }) {}
 
   constructor() {}
+}
+
+export class MyClient extends Client {
+  [x: string]: any;
+  slashCommands: Collection<any, any>;
+  prefixCommands: Collection<any, any>;
+  aliases: Collection<any, any>;
+  sillyOptions: Record<string, commandInterface>;
+  client: any;
+
+  constructor(options: any) {
+    super(options);
+    this.slashCommands = new Collection();
+    this.prefixCommands = new Collection();
+    this.aliases = new Collection();
+    this.sillyOptions = {};
+  }
 }
