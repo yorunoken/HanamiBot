@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Interaction, InteractionResponse, InteractionType, ModalActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ActionRowBuilder, Interaction, InteractionType, ModalActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import { MyClient, ButtonActions } from "../classes";
 import { db } from "./ready";
 
@@ -14,6 +14,9 @@ export const execute = async (interaction: Interaction, client: MyClient) => {
       return;
     }
     const sillyOptions = client.sillyOptions[message.id];
+    if (!sillyOptions.buttonHandler) {
+      return;
+    }
 
     const index = sillyOptions.embedOptions.index ? Number(interaction.fields.getTextInputValue("index")) : null;
     const page = sillyOptions.buttonHandler === "handleTopsButtons" && !sillyOptions.embedOptions.index ? Number(interaction.fields.getTextInputValue("page")) : null;
@@ -27,9 +30,7 @@ export const execute = async (interaction: Interaction, client: MyClient) => {
     page ? (sillyOptions.embedOptions.page = Number(page) - 1) : null;
 
     await interaction.deferUpdate();
-    if (sillyOptions.buttonHandler) {
-      await ButtonActions[sillyOptions.buttonHandler]({ i: interaction, options: sillyOptions.embedOptions, pageBuilder: sillyOptions.pageBuilder, response: sillyOptions.response });
-    }
+    await ButtonActions[sillyOptions.buttonHandler]({ i: interaction, options: sillyOptions.embedOptions, pageBuilder: sillyOptions.pageBuilder, response: sillyOptions.response });
   }
 
   if (interaction.type === InteractionType.MessageComponent && interaction.isButton()) {
