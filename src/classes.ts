@@ -1,4 +1,4 @@
-import { rulesets, getMap, insertData, getRetryCount, grades, formatNumber, buildActionRow, showLessButton, showMoreButton, previousButton, nextButton, loadingButtons, buttonBoolsIndex, buttonBoolsTops, downloadMap, getPerformanceDetails, osuEmojis } from "./utils";
+import { rulesets, getMap, insertData, getRetryCount, grades, formatNumber, buildActionRow, showLessButton, showMoreButton, previousButton, nextButton, loadingButtons, buttonBoolsIndex, buttonBoolsTops, downloadMap, getPerformanceDetails, osuEmojis, specifyButton } from "./utils";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 import { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
 import { response as UserOsu } from "osu-api-extended/dist/types/v2_user_details";
@@ -368,7 +368,7 @@ export class ButtonActions {
   }
 
   static async handleRecentButtons({ pageBuilder, options, i, response }: { pageBuilder: any; options: any; i: ButtonInteraction | ModalSubmitInteraction; response: Message }) {
-    const getComponents = () => [buildActionRow([previousButton, nextButton], [options.index === 0, options.index + 1 === options.plays.length])] as any;
+    const getComponents = () => [buildActionRow([previousButton, specifyButton, nextButton], [options.index === 0, false, options.index + 1 === options.plays.length])] as any;
     const editEmbed = async (options: any) => response.edit({ embeds: [await pageBuilder(options)], components: getComponents() });
 
     if (i instanceof ModalSubmitInteraction) {
@@ -384,7 +384,7 @@ export class ButtonActions {
   }
 
   static async handleTopsButtons({ pageBuilder, options, i, response }: { pageBuilder: any; options: any; i: ButtonInteraction | ModalSubmitInteraction; response: Message }) {
-    const getComponents = () => [buildActionRow([previousButton, nextButton], [index! >= 0 ? buttonBoolsIndex("previous", options) : buttonBoolsTops("previous", options), index! >= 0 ? buttonBoolsIndex("next", options) : buttonBoolsTops("next", options)])] as any;
+    const getComponents = () => [buildActionRow([previousButton, specifyButton, nextButton], [index! >= 0 ? buttonBoolsIndex("previous", options) : buttonBoolsTops("previous", options), false, index! >= 0 ? buttonBoolsIndex("next", options) : buttonBoolsTops("next", options)])] as any;
     const editEmbed = async (options: any) => response.edit({ embeds: [await pageBuilder(options)], components: getComponents() });
     const index = options.index;
 
