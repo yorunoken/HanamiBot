@@ -51,7 +51,7 @@ export async function start({ interaction, client, args, type }: { interaction: 
     return options.reply(`Please provide a valid page (between 1 and ${lengthCeil})`);
   }
 
-  const embedOptions = { map: await new BeatmapDetails().initialize(beatmap, { mods: userOptions?.mods?.codes || [""] }, file), fetched: scores, page, file, length: scoresLength, initializer: userOptions.user ? { user: interaction.author, score: scores.scores.find((score: any) => score.user.id === userOptions.user), index: scores.scores.findIndex((score: any) => score.user.id === userOptions.user) } : undefined };
+  const embedOptions = { map: await new BeatmapDetails().initialize(beatmap, { mods: userOptions?.mods?.codes || [""] }, file), plays: scores.scores, fetched: scores, page, file, length: scoresLength, initializer: userOptions.user ? { user: interaction.author, score: scores.scores.find((score: any) => score.user.id === userOptions.user), index: scores.scores.findIndex((score: any) => score.user.id === userOptions.user) } : undefined };
   const response = await options.reply({ content: `Showing ${type} tops`, embeds: [await buildMapEmbed(embedOptions)], components: [buildActionRow([firstButton, previousButton, specifyButton, nextButton, lastButton], [page === 0, buttonBoolsTops("previous", embedOptions), false, buttonBoolsTops("next", embedOptions), page === lengthCeil - 1])] });
   client.sillyOptions[response.id] = { buttonHandler: "handleTopsButtons", type: commands.Top, embedOptions, response, pageBuilder: buildMapEmbed, initializer: options.author };
 }
