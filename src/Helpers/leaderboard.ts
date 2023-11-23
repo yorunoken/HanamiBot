@@ -22,7 +22,7 @@ export async function start({ interaction, client, args, type }: { interaction: 
     return options.reply("Hmmm.. It seems the beatmap's id is wrong, maybe double check?");
   }
 
-  let file = await getMap(beatmapId.toString())?.data;
+  let file = getMap(beatmapId.toString())?.data;
   if (!file || !["ranked", "loved", "approved"].includes(beatmap.status)) {
     file = await downloadMap(beatmapId);
     insertData({ table: "maps", id: beatmapId.toString(), data: file });

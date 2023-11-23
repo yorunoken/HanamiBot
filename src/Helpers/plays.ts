@@ -101,7 +101,7 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
 
 async function getRecentPlays({ user, plays, mode, index, isTops }: { user: UserDetails; plays: ScoreResponse[]; mode: osuModes; index: number; isTops: boolean }) {
   const beatmapId = plays[index].beatmap.id;
-  let file = await getMap(beatmapId.toString())?.data;
+  let file = getMap(beatmapId.toString())?.data;
   if (!file || !["ranked", "loved", "approved"].includes(plays[index].beatmap.status)) {
     file = await downloadMap(beatmapId);
     insertData({ table: "maps", id: beatmapId.toString(), data: file });
@@ -130,7 +130,7 @@ async function getRecentPlays({ user, plays, mode, index, isTops }: { user: User
 async function getSubsequentPlays({ user, plays, mode, page, index, isTops }: { user: UserDetails; plays: ScoreResponse[]; mode: osuModes; page: number | undefined; index: number; isTops: boolean }) {
   if (index! >= 0) {
     const beatmapId = plays[index].beatmap.id;
-    let file = await getMap(beatmapId.toString())?.data;
+    let file = getMap(beatmapId.toString())?.data;
     if (!file || !["ranked", "loved", "approved"].includes(plays[index].beatmap.status)) {
       file = await downloadMap(beatmapId);
       insertData({ table: "maps", id: beatmapId.toString(), data: file });
@@ -163,7 +163,7 @@ async function getSubsequentPlays({ user, plays, mode, page, index, isTops }: { 
 
   for (let i = startPage; i < endPage && i < plays.length; i++) {
     const beatmapId = plays[i].beatmap.id;
-    let file = await getMap(beatmapId.toString())?.data;
+    let file = getMap(beatmapId.toString())?.data;
     if (!file || !["ranked", "loved", "approved"].includes(plays[i].beatmap.status)) {
       file = await downloadMap(beatmapId);
       insertData({ table: "maps", id: beatmapId.toString(), data: file });

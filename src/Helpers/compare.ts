@@ -84,7 +84,7 @@ export async function start({ interaction, client, args, mode }: { interaction: 
 }
 
 async function buildCompareEmbed(user: UserDetails, map: MapResponse, scores: ScoreResponse[], mode: string) {
-  let file = await getMap(map.id.toString())?.data;
+  let file = getMap(map.id.toString())?.data;
   if (!file || !["ranked", "loved", "approved"].includes(map.status)) {
     file = await downloadMap(map.id);
     insertData({ table: "maps", id: map.id.toString(), data: file });

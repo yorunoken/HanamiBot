@@ -20,7 +20,7 @@ export async function start({ interaction, client, args, mapId }: { interaction:
   }
   const beatmap = await v2.beatmap.id.details(beatmapId);
 
-  let file = await getMap(beatmapId.toString())?.data;
+  let file = getMap(beatmapId.toString())?.data;
   if (!file || !["ranked", "loved", "approved"].includes(beatmap.status)) {
     file = await downloadMap(beatmapId);
     insertData({ table: "maps", id: beatmapId.toString(), data: file });
