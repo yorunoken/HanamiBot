@@ -26,9 +26,7 @@ export async function start({ interaction, client, args, mapId }: { interaction:
     insertData({ table: "maps", id: beatmapId.toString(), data: file });
   }
 
-  const beatmapDetails = await new BeatmapDetails().initialize(beatmap, { mods: userOptions?.mods?.codes || [""] }, file);
-
-  return options.reply({ embeds: [await buildMapEmbed(beatmapDetails)] });
+  return options.reply({ embeds: [await buildMapEmbed(new BeatmapDetails(beatmap, { mods: userOptions?.mods?.codes || [""] }, file))] });
 }
 
 async function buildMapEmbed(map: BeatmapDetails) {

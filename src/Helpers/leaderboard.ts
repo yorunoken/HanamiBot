@@ -51,7 +51,15 @@ export async function start({ interaction, client, args, type }: { interaction: 
     return options.reply(`Please provide a valid page (between 1 and ${lengthCeil})`);
   }
 
-  const embedOptions = { map: await new BeatmapDetails().initialize(beatmap, { mods: userOptions?.mods?.codes || [""] }, file), plays: scores.scores, fetched: scores, page, file, length: scoresLength, initializer: userOptions.user ? { user: interaction.author, score: scores.scores.find((score: any) => score.user.id === userOptions.user), index: scores.scores.findIndex((score: any) => score.user.id === userOptions.user) } : undefined };
+  const embedOptions = {
+    map: new BeatmapDetails(beatmap, { mods: userOptions?.mods?.codes || [""] }, file),
+    plays: scores.scores,
+    fetched: scores,
+    page,
+    file,
+    length: scoresLength,
+    initializer: userOptions.user ? { user: interaction.author, score: scores.scores.find((score: any) => score.user.id === userOptions.user), index: scores.scores.findIndex((score: any) => score.user.id === userOptions.user) } : undefined,
+  };
   const response = await options.reply({ content: `Showing ${type} tops`, embeds: [await buildMapEmbed(embedOptions)], components: [buildActionRow([firstButton, previousButton, specifyButton, nextButton, lastButton], [page === 0, buttonBoolsTops("previous", embedOptions), false, buttonBoolsTops("next", embedOptions), page === lengthCeil - 1])] });
   client.sillyOptions[response.id] = { buttonHandler: "handleTopsButtons", type: commands.Top, embedOptions, response, pageBuilder: buildMapEmbed, initializer: options.author };
 }
@@ -84,7 +92,9 @@ async function buildMapEmbed({ map, fetched, page, file, initializer }: { map: B
     const hitValues = { count_300: stats.great || 0, count_100: stats.ok || 0, count_50: stats.meh || 0, count_miss: stats.miss || 0, count_geki: stats.perfect || 0, count_katu: stats.good || 0 };
     const performance = getPerformanceDetails({ mapText: file, maxCombo: score.max_combo, modsArg: mods, rulesetId: map.rulesetId, hitValues });
 
-    _userScore = `\n\n**__<@${initializer.user.id}>'s score:__**\n**#${initializer.index + 1} [${score.user.username}](https://osu.ppy.sh/users/${score.user.id})**: ${score.total_score.toLocaleString()} [**${score.max_combo}x**/${map.maxCombo}x] **+${mods.join("")}**\n${grades[score.rank]} **${performance.curPerf?.pp.toFixed(2)}**/${performance.maxPerf.pp.toFixed(2)}pp (${(score.accuracy * 100).toFixed(2)}%) <t:${new Date(score.ended_at).getTime() / 1000}:R>`;
+    _userScore = `\n\n**__<@${initializer.user.id}>'s score:__**\n**#${initializer.index + 1} [${score.user.username}](https://osu.ppy.sh/users/${score.user.id})**: ${score.total_score.toLocaleString()} [**${score.max_combo}x**/${map.maxCombo}x] **+${mods.join("")}**\n${grades[score.rank]} **${performance.curPerf?.pp.toFixed(2)}**/${performance.maxPerf.pp.toFixed(2)}pp (${(
+      score.accuracy * 100
+    ).toFixed(2)}%) <t:${new Date(score.ended_at).getTime() / 1000}:R>`;
   }
 
   return new EmbedBuilder()

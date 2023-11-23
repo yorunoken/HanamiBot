@@ -100,66 +100,65 @@ export class UserDetails {
 }
 
 export class ScoreDetails {
-  beatmapId!: number;
-  countCircles!: number;
-  countSliders!: number;
-  countSpinners!: number;
-  hitLength!: number;
-  placement!: number;
-  version!: string;
-  creatorId!: number;
-  creatorUsername!: string;
-  mapStatus!: string;
-  mapsetId!: number;
-  count100!: number;
-  count300!: number;
-  count50!: number;
-  countGeki!: number;
-  countKatu!: number;
-  countMiss!: number;
-  accValues!: string;
-  retries!: number | undefined;
-  totalScore!: string;
-  percentagePassed!: string;
-  accuracy!: string;
-  artist!: string;
-  title!: string;
-  grade!: string;
-  modsPlay!: string;
-  submittedTime!: number;
-  minutesTotal!: string;
-  secondsTotal!: string;
-  bpm!: string;
-  mapValues!: string;
-  performance: any;
-  totalResult!: string;
-  ifFcValue!: string;
-  stars!: string;
-  comboValue!: string;
-  pp!: string;
-  fcPp!: string;
-  ssPp!: string;
-  globalPlacement!: string;
+  plays: ScoreResponse[];
+  index: number;
+  mode: osuModes;
+  _isTops?: boolean;
+  isCompare?: boolean;
+  perfDetails?: any;
+  beatmap?: BeatmapResponse;
+  file: string;
 
-  async initialize(plays: ScoreResponse[], index: number, mode: osuModes, _isTops: boolean, isCompare?: boolean, perfDetails?: any, beatmap?: BeatmapResponse) {
-    const play = plays[index];
-    const rulesetId = rulesets[mode];
+  percentagePassed: string | undefined;
+  modsPlay: string | undefined;
+  globalPlacement: string | undefined;
+  beatmapId: number | undefined;
+  countCircles: number | undefined;
+  countSliders: number | undefined;
+  countSpinners: number | undefined;
+  hitLength: number | undefined;
+  placement: number | undefined;
+  version: string | undefined;
+  creatorId: number | undefined;
+  creatorUsername: string | undefined;
+  mapStatus: string | undefined;
+  mapsetId: number | undefined;
+  count100: number | undefined;
+  count300: number | undefined;
+  count50: number | undefined;
+  countGeki: number | undefined;
+  countKatu: number | undefined;
+  countMiss: number | undefined;
+  retries: number | undefined;
+  totalScore: string | undefined;
+  accuracy: string | undefined;
+  artist: string | undefined;
+  title: string | undefined;
+  grade: string | undefined;
+  submittedTime: number | undefined;
+  minutesTotal: string | undefined;
+  secondsTotal: string | undefined;
+  bpm: any;
+  mapValues: string | undefined;
+  stars: any;
+  accValues: string | undefined;
+  comboValue: string | undefined;
+  pp: any;
+  fcPp: any;
+  ssPp: any;
+  totalResult: string | undefined;
+  ifFcValue: string | undefined;
 
-    (play.beatmap as any) = isCompare ? beatmap : play.beatmap;
-    (play.beatmapset as any) = isCompare ? beatmap?.beatmapset : play.beatmapset;
+  async initialize() {
+    const play = this.plays[this.index];
+    const rulesetId = rulesets[this.mode];
+
+    (play.beatmap as any) = this.isCompare ? this.beatmap : play.beatmap;
+    (play.beatmapset as any) = this.isCompare ? this.beatmap?.beatmapset : play.beatmapset;
 
     const { id: beatmapId, count_circles, count_sliders, count_spinners, hit_length, version } = play.beatmap;
     const { user_id: creatorId, creator: creatorUsername, status: mapStatus, id: mapsetId, artist, title } = play.beatmapset;
     const { count_100, count_300, count_50, count_geki, count_katu, count_miss } = play.statistics;
-
-    let file;
-    if (!isCompare) {
-      file = await getMap(beatmapId.toString())?.data;
-      if (!file || !["ranked", "loved", "approved"].includes(mapStatus)) {
-        file = await downloadMap(beatmapId);
-        insertData({ table: "maps", id: beatmapId.toString(), data: file });
-      }
-    }
 
     const objectshit = count_300 + count_100 + count_50 + count_miss;
     const objects = count_circles + count_sliders + count_spinners;
@@ -168,7 +167,7 @@ export class ScoreDetails {
 
     this.percentagePassed = percentageNum === 100 || play.passed == true ? "" : `@${percentageNum.toFixed(1)}% `;
 
-    const retryCounter = isCompare ? undefined : getRetryCount(plays.map((x) => x.beatmap.id).splice(index, plays.length), beatmapId);
+    const retryCounter = this.isCompare ? undefined : getRetryCount(this.plays.map((x) => x.beatmap.id).splice(this.index, this.plays.length), beatmapId);
 
     this.modsPlay = play.mods.length > 0 ? `**+${play.mods.join("").toUpperCase()}**` : "**+NM**";
 
@@ -179,16 +178,15 @@ export class ScoreDetails {
       totalLength = totalLength! / 1.5;
     }
 
-    const performance = isCompare ? perfDetails : getPerformanceDetails({ modsArg: play.mods, maxCombo: play.max_combo, rulesetId, hitValues: { count_100, count_300, count_50, count_geki, count_katu, count_miss }, mapText: file });
+    const performance = this.isCompare ? this.perfDetails : getPerformanceDetails({ modsArg: play.mods, maxCombo: play.max_combo, rulesetId, hitValues: { count_100, count_300, count_50, count_geki, count_katu, count_miss }, mapText: this.file });
 
     this.globalPlacement = "";
     if (play.passed && play.best_id) {
-      const scoreGlobal = await v2.scores.details(play.best_id, mode);
+      const scoreGlobal = await v2.scores.details(play.best_id, this.mode);
       if (scoreGlobal && scoreGlobal.rank_global < 10000) {
         this.globalPlacement = `**__Global Rank #${scoreGlobal.rank_global}:__**`;
       }
     }
-
     this.beatmapId = beatmapId;
     this.countCircles = count_circles;
     this.countSliders = count_sliders;
@@ -239,50 +237,56 @@ export class ScoreDetails {
           50: count_50.toString(),
           0: "0",
         },
-        mode
+        this.mode
       );
 
       this.ifFcValue = `If FC: **${this.fcPp}**pp for **${FcAcc.toFixed(2)}%**`;
     }
-
     return this;
   }
 
-  constructor() {}
+  constructor({ plays, index, mode, _isTops, isCompare, perfDetails, beatmap, file }: { plays: ScoreResponse[]; index: number; mode: osuModes; _isTops?: boolean; isCompare?: boolean; perfDetails?: any; beatmap?: BeatmapResponse; file: string }) {
+    this.plays = plays;
+    this.index = index;
+    this.mode = mode;
+    this._isTops = _isTops;
+    this.isCompare = isCompare;
+    this.perfDetails = perfDetails;
+    this.beatmap = beatmap;
+    this.file = file;
+  }
 }
 
 export class BeatmapDetails {
-  title!: string;
-  artist!: string;
-  version!: string;
-  mode!: string;
-  id!: number;
-  setId!: number;
-  creator!: string;
-  rulesetId!: number;
+  title: string;
+  artist: string;
+  version: string;
+  mode: string;
+  id: number;
+  setId: number;
+  creator: string;
+  rulesetId: number;
   totalObjects: any;
-  stars!: string;
-  mods!: string;
-  bpm!: string;
-  totalLength!: number;
-  mapLength!: string;
-  maxCombo!: number;
-  ar!: string;
-  od!: string;
-  hp!: string;
-  cs!: string;
-  favorited!: string;
-  playCount!: string;
-  ppValues!: string;
-  links!: string;
-  background!: string;
-  updatedAt!: string;
-  modeEmoji!: string;
+  stars: string;
+  mods: string;
+  bpm: string;
+  totalLength: number;
+  mapLength: string;
+  maxCombo: number;
+  ar: string;
+  od: string;
+  hp: string;
+  cs: string;
+  favorited: string;
+  playCount: string;
+  ppValues: string;
+  links: string;
+  background: string;
+  updatedAt: string;
+  modeEmoji: string;
 
-  async initialize(map: BeatmapResponse, valueOptions: { mods: string[]; accuracy?: number; ar?: number; od?: number; cs?: number }, file?: string) {
+  constructor(map: BeatmapResponse, valueOptions: { mods: string[]; accuracy?: number; ar?: number; od?: number; cs?: number }, file?: string) {
     const set = map.beatmapset;
-    file = file || (await getMap(map.id.toString())?.data);
-
     this.title = set.title;
     this.artist = set.artist;
     this.version = map.version;
@@ -298,7 +302,7 @@ export class BeatmapDetails {
       performance[accuracy] = getPerformanceDetails({
         modsArg: valueOptions.mods,
         maxCombo: map.max_combo,
-        rulesetId: rulesets[this.mode],
+        rulesetId: this.rulesetId,
         hitValues: {},
         accuracy: accuracy,
         mapText: file!,
@@ -325,11 +329,7 @@ export class BeatmapDetails {
     this.background = `https://assets.ppy.sh/beatmaps/${map.beatmapset_id}/covers/cover.jpg`;
     this.updatedAt = `${map.status === "ranked" ? "Ranked at" : map.status === "loved" ? "Loved at" : map.status === "qualified" ? "Qualified at" : "Last updated at"} ${new Date(map.last_updated).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`;
     this.modeEmoji = osuEmojis[map.mode];
-
-    return this;
   }
-
-  constructor() {}
 }
 
 export class StatsDetails {
