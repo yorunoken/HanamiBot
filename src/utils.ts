@@ -82,9 +82,11 @@ export const loadingButtons = buildActionRow([new ButtonBuilder().setCustomId("w
 export const showMoreButton = buildActionRow([new ButtonBuilder().setCustomId("more").setLabel("Show More").setStyle(ButtonStyle.Success)]);
 export const showLessButton = buildActionRow([new ButtonBuilder().setCustomId("less").setLabel("Show Less").setStyle(ButtonStyle.Success)]);
 
-export const previousButton = new ButtonBuilder().setCustomId("previous").setLabel("⬅️").setStyle(ButtonStyle.Secondary);
-export const nextButton = new ButtonBuilder().setCustomId("next").setLabel("➡️").setStyle(ButtonStyle.Secondary);
-export const specifyButton = new ButtonBuilder().setCustomId("indexbtn").setLabel("*").setStyle(ButtonStyle.Secondary);
+export const firstButton = new ButtonBuilder().setCustomId("first").setEmoji("1177027029154156615").setStyle(ButtonStyle.Secondary);
+export const lastButton = new ButtonBuilder().setCustomId("last").setEmoji("1177027026947948584").setStyle(ButtonStyle.Secondary);
+export const previousButton = new ButtonBuilder().setCustomId("previous").setEmoji("1177027021646331995").setStyle(ButtonStyle.Secondary);
+export const nextButton = new ButtonBuilder().setCustomId("next").setEmoji("1177027023030456420").setStyle(ButtonStyle.Secondary);
+export const specifyButton = new ButtonBuilder().setCustomId("indexbtn").setEmoji("1177027025672871936").setStyle(ButtonStyle.Secondary);
 
 export const getUser = (id: string): any => db.prepare("SELECT * FROM users WHERE id = ?").get(id);
 export const getServer = (id: string): any => db.prepare("SELECT * FROM servers WHERE id = ?").get(id);
