@@ -1,7 +1,8 @@
 import { getUsernameFromArgs, Interactionhandler, showMoreButton } from "../utils";
 import { Message, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
-import { UserDetails, MyClient } from "../classes";
-import { commands } from "../types";
+import { MyClient } from "../classes";
+import { getUser } from "../functions";
+import { commands, UserInfo } from "../types";
 import { v2 } from "osu-api-extended";
 
 export async function start(interaction: Message | ChatInputCommandInteraction, client: MyClient, args?: string[], mode?: any) {
@@ -21,14 +22,14 @@ export async function start(interaction: Message | ChatInputCommandInteraction, 
     return options.reply(`The user \`${userOptions.user}\` does not exist in Bancho.`);
   }
 
-  const userDetailOptions = new UserDetails(user, options.mode);
+  const userDetailOptions = getUser({ user, mode: options.mode });
 
   let page = buildPage1(userDetailOptions);
   const response = await options.reply({ embeds: [page], components: [showMoreButton] });
   client.sillyOptions[response.id] = { buttonHandler: "handleProfileButtons", type: commands.Profile, embedOptions: { pageBuilder: [buildPage1, buildPage2], options: userDetailOptions, response }, response, initializer: options.author };
 }
 
-function buildPage1(options: UserDetails) {
+function buildPage1(options: UserInfo) {
   const highRank = options.highestRank ? `\n**Peak Rank:** \`#${options.highestRank}\` **Achieved:** <t:${options.highestRankTime}:R>` : "";
 
   return new EmbedBuilder()
@@ -55,7 +56,7 @@ function buildPage1(options: UserDetails) {
     });
 }
 
-function buildPage2(options: UserDetails) {
+function buildPage2(options: UserInfo) {
   return new EmbedBuilder()
     .setColor("Purple")
     .setAuthor({

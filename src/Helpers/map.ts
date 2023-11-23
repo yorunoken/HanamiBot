@@ -1,6 +1,7 @@
 import { getUsernameFromArgs, Interactionhandler, getBeatmapId_FromContext, getMap, downloadMap, insertData } from "../utils";
 import { Message, EmbedBuilder, Client } from "discord.js";
-import { BeatmapDetails } from "../classes";
+import { getBeatmap } from "../functions";
+import { BeatmapInfo } from "../types";
 import { v2 } from "osu-api-extended";
 
 export async function start({ interaction, client, args, mapId }: { interaction: Message; client?: Client<boolean>; args: string[]; mapId?: string }) {
@@ -26,10 +27,10 @@ export async function start({ interaction, client, args, mapId }: { interaction:
     insertData({ table: "maps", id: beatmapId.toString(), data: file });
   }
 
-  return options.reply({ embeds: [await buildMapEmbed(new BeatmapDetails(beatmap, { mods: userOptions?.mods?.codes || [""] }, file))] });
+  return options.reply({ embeds: [await buildMapEmbed(await getBeatmap(beatmap, { mods: userOptions?.mods?.codes || [""] }, file))] });
 }
 
-async function buildMapEmbed(map: BeatmapDetails) {
+async function buildMapEmbed(map: BeatmapInfo) {
   const mapAuthor = await v2.user.details(map.creator, "osu");
 
   return new EmbedBuilder()

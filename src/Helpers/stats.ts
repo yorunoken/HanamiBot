@@ -1,6 +1,5 @@
 import { getUsernameFromArgs, Interactionhandler, showMoreButton } from "../utils";
 import { Message, ChatInputCommandInteraction, EmbedBuilder, ButtonInteraction } from "discord.js";
-import { UserDetails, StatsDetails } from "../classes";
 import { osuModes } from "../types";
 import { v2 } from "osu-api-extended";
 
@@ -28,6 +27,6 @@ export async function start({ interaction, mode, args }: { interaction: Message 
     return options.reply(`The user \`${user.username}\` does not have any top plays in Bancho.`);
   }
 
-  const uDetail = new UserDetails(user, options.mode);
-  const sDetail = new StatsDetails(user, tops);
+  // const uDetail = new UserDetails(user, options.mode);
+  // const sDetail = new StatsDetails(user, tops);
 }

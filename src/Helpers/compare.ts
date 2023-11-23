@@ -3,8 +3,8 @@ import { Message, EmbedBuilder, Client } from "discord.js";
 import { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_beatmap";
 import { response as MapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
-import { UserDetails, ScoreDetails } from "../classes";
-import { osuModes } from "../types";
+import { getUser, getScore } from "../functions";
+import { UserInfo, osuModes } from "../types";
 import { v2 } from "osu-api-extended";
 
 const leaderboardExists = (beatmap: BeatmapResponse) => typeof beatmap.id === "number" || ["qualified", "ranked", "loved"].includes(beatmap.status?.toLowerCase());
@@ -35,7 +35,7 @@ export async function start({ interaction, client, args, mode }: { interaction: 
   if (!user.id) {
     return options.reply(`The user \`${userOptions.user}\` does not exist in Bancho.`);
   }
-  const userDetailOptions = new UserDetails(user, options.mode);
+  const userDetailOptions = getUser({ user, mode: options.mode });
 
   let scores = (await v2.scores.user.beatmap(beatmap.id, user.id, { mode: mode as osuModes })).sort((a, b) => b.pp - a.pp);
   const mods = userOptions?.mods?.codes;
@@ -83,23 +83,16 @@ export async function start({ interaction, client, args, mode }: { interaction: 
   return options.reply({ embeds: [await buildCompareEmbed(userDetailOptions, beatmap, scores, mode)] });
 }
 
-async function buildCompareEmbed(user: UserDetails, map: MapResponse, scores: ScoreResponse[], mode: string) {
-  let file = getMap(map.id.toString())?.data;
-  if (!file || !["ranked", "loved", "approved"].includes(map.status)) {
-    file = await downloadMap(map.id);
-    insertData({ table: "maps", id: map.id.toString(), data: file });
-  }
-
+async function buildCompareEmbed(user: UserInfo, map: MapResponse, scores: ScoreResponse[], mode: string) {
   const _scores = [];
   for (let i in scores) {
-    const { mods, max_combo, statistics } = scores[i];
+    const { max_combo } = scores[i];
 
-    const scorePerf = getPerformanceDetails({ modsArg: mods, maxCombo: max_combo, rulesetId: rulesets[mode], hitValues: statistics, mapText: file });
-    const score = await new ScoreDetails({ plays: scores as any, index: parseInt(i), mode: mode as osuModes, _isTops: false, isCompare: true, perfDetails: scorePerf, beatmap: map, file: file }).initialize();
+    const score = await getScore({ plays: scores as any, index: parseInt(i), mode: mode as osuModes, _isTops: false, isCompare: true, beatmap: map });
     _scores.push(
       i === "0"
         ? `${score.globalPlacement?.length && score.globalPlacement.length > 0 ? score.globalPlacement + "\n" : ""}${score.grade} ${score.modsPlay} **[${score.stars}★]** • ${score.totalScore} • ${score.accuracy}\n**${score.pp}pp**/${score.ssPp}pp ~~[${score.fcPp}pp]~~ • ${score.comboValue}\n${score.accValues} <t:${score.submittedTime}:R>\n`
-        : `${i === "1" ? "**__Other plays on the map:__**\n" : ""}${score.grade} ${score.modsPlay} **[${score.stars}★]** • **${score.pp}pp** (${score.accuracy}) • **${max_combo}x** • ${(scorePerf.curPerf as any).effectiveMissCount > 0 ? `${score.countMiss} <:hit00:1061254490075955231>` : ""} <t:${score.submittedTime}:R>`
+        : `${i === "1" ? "**__Other plays on the map:__**\n" : ""}${score.grade} ${score.modsPlay} **[${score.stars}★]** • **${score.pp}pp** (${score.accuracy}) • **${max_combo}x** • ${(score.performance.curPerf as any).effectiveMissCount > 0 ? `${score.countMiss} <:hit00:1061254490075955231>` : ""} <t:${score.submittedTime}:R>`
     );
   }
 

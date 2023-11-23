@@ -1,8 +1,9 @@
 import { getUsernameFromArgs, Interactionhandler, getBeatmapId_FromContext, getMap, downloadMap, insertData, getPerformanceDetails, grades, buttonBoolsTops, buildActionRow, nextButton, previousButton, specifyButton, firstButton, lastButton } from "../utils";
 import { Message, EmbedBuilder } from "discord.js";
-import { BeatmapDetails, MyClient } from "../classes";
+import { MyClient } from "../classes";
+import { getBeatmap } from "../functions";
 import { v2 } from "osu-api-extended";
-import { commands } from "../types";
+import { BeatmapInfo, commands } from "../types";
 
 export async function start({ interaction, client, args, type }: { interaction: Message<boolean>; client: MyClient; args: string[]; type: "global" | "country" }) {
   const options = Interactionhandler(interaction, args);
@@ -52,7 +53,7 @@ export async function start({ interaction, client, args, type }: { interaction: 
   }
 
   const embedOptions = {
-    map: new BeatmapDetails(beatmap, { mods: userOptions?.mods?.codes || [""] }, file),
+    map: await getBeatmap(beatmap, { mods: userOptions?.mods?.codes || [""] }, file),
     plays: scores.scores,
     fetched: scores,
     page,
@@ -64,7 +65,7 @@ export async function start({ interaction, client, args, type }: { interaction: 
   client.sillyOptions[response.id] = { buttonHandler: "handleTopsButtons", type: commands.Top, embedOptions, response, pageBuilder: buildMapEmbed, initializer: options.author };
 }
 
-async function buildMapEmbed({ map, fetched, page, file, initializer }: { map: BeatmapDetails; fetched: any; page: number; file: string; initializer: any | undefined }) {
+async function buildMapEmbed({ map, fetched, page, file, initializer }: { map: BeatmapInfo; fetched: any; page: number; file: string; initializer: any | undefined }) {
   const scores = fetched.scores;
 
   let description = [];
@@ -92,9 +93,7 @@ async function buildMapEmbed({ map, fetched, page, file, initializer }: { map: B
     const hitValues = { count_300: stats.great || 0, count_100: stats.ok || 0, count_50: stats.meh || 0, count_miss: stats.miss || 0, count_geki: stats.perfect || 0, count_katu: stats.good || 0 };
     const performance = getPerformanceDetails({ mapText: file, maxCombo: score.max_combo, modsArg: mods, rulesetId: map.rulesetId, hitValues });
 
-    _userScore = `\n\n**__<@${initializer.user.id}>'s score:__**\n**#${initializer.index + 1} [${score.user.username}](https://osu.ppy.sh/users/${score.user.id})**: ${score.total_score.toLocaleString()} [**${score.max_combo}x**/${map.maxCombo}x] **+${mods.join("")}**\n${grades[score.rank]} **${performance.curPerf?.pp.toFixed(2)}**/${performance.maxPerf.pp.toFixed(2)}pp (${(
-      score.accuracy * 100
-    ).toFixed(2)}%) <t:${new Date(score.ended_at).getTime() / 1000}:R>`;
+    _userScore = `\n\n**__<@${initializer.user.id}>'s score:__**\n**#${initializer.index + 1} [${score.user.username}](https://osu.ppy.sh/users/${score.user.id})**: ${score.total_score.toLocaleString()} [**${score.max_combo}x**/${map.maxCombo}x] **+${mods.join("")}**\n${grades[score.rank]} **${performance.curPerf?.pp.toFixed(2)}**/${performance.maxPerf.pp.toFixed(2)}pp (${(score.accuracy * 100).toFixed(2)}%) <t:${new Date(score.ended_at).getTime() / 1000}:R>`;
   }
 
   return new EmbedBuilder()

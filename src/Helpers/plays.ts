@@ -1,10 +1,10 @@
 import { getUsernameFromArgs, Interactionhandler, nextButton, previousButton, buildActionRow, buttonBoolsIndex, buttonBoolsTops, specifyButton, lastButton, firstButton, downloadMap, getMap, insertData } from "../utils";
-import { Message, ChatInputCommandInteraction, ButtonInteraction, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { Message, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
-import { UserDetails, ButtonActions, ScoreDetails, MyClient } from "../classes";
-import { osuModes, commands } from "../types";
+import { MyClient } from "../classes";
+import { getScore, getUser } from "../functions";
+import { osuModes, commands, UserInfo } from "../types";
 import { v2 } from "osu-api-extended";
-import { beatmap } from "osu-api-extended/dist/api/v1";
 
 export async function start({ isTops, interaction, passOnly: passOnlyArg, args, mode: modeArg, number, recentTop, client }: { isTops: boolean; interaction: Message | ChatInputCommandInteraction; passOnly?: boolean; args?: string[]; mode?: osuModes; number?: number; recentTop?: boolean; client: MyClient }) {
   const argOptions = Interactionhandler(interaction, args);
@@ -86,7 +86,7 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
     return reply(`Please provide a valid page (between 1 and ${Math.ceil(plays.length / 5)})`);
   }
 
-  const userDetailOptions = new UserDetails(user, mode);
+  const userDetailOptions = getUser({ user, mode });
 
   const recentOptions = { user: userDetailOptions, plays, mode: mode, index: index!, isTops };
   const topsOptions = { user: userDetailOptions, plays, mode: mode, page, index: index!, isTops };
@@ -99,15 +99,8 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
   client.sillyOptions[response.id] = { buttonHandler: isTops ? "handleTopsButtons" : "handleRecentButtons", type: commands[isTops ? "Top" : "Recent"], embedOptions, response, pageBuilder: isTops ? getSubsequentPlays : getRecentPlays, initializer: argOptions.author };
 }
 
-async function getRecentPlays({ user, plays, mode, index, isTops }: { user: UserDetails; plays: ScoreResponse[]; mode: osuModes; index: number; isTops: boolean }) {
-  const beatmapId = plays[index].beatmap.id;
-  let file = getMap(beatmapId.toString())?.data;
-  if (!file || !["ranked", "loved", "approved"].includes(plays[index].beatmap.status)) {
-    file = await downloadMap(beatmapId);
-    insertData({ table: "maps", id: beatmapId.toString(), data: file });
-  }
-
-  const options = await new ScoreDetails({ plays, index, mode, file }).initialize();
+async function getRecentPlays({ user, plays, mode, index, isTops }: { user: UserInfo; plays: ScoreResponse[]; mode: osuModes; index: number; isTops: boolean }) {
+  const options = await getScore({ plays, index, mode });
 
   return new EmbedBuilder()
     .setColor("Purple")
@@ -127,7 +120,7 @@ async function getRecentPlays({ user, plays, mode, index, isTops }: { user: User
     .setFooter({ text: `by ${options.creatorUsername}, ${options.mapStatus}`, iconURL: `https://a.ppy.sh/${options.creatorId}?1668890819.jpeg` });
 }
 
-async function getSubsequentPlays({ user, plays, mode, page, index, isTops }: { user: UserDetails; plays: ScoreResponse[]; mode: osuModes; page: number | undefined; index: number; isTops: boolean }) {
+async function getSubsequentPlays({ user, plays, mode, page, index, isTops }: { user: UserInfo; plays: ScoreResponse[]; mode: osuModes; page: number | undefined; index: number; isTops: boolean }) {
   if (index! >= 0) {
     const beatmapId = plays[index].beatmap.id;
     let file = getMap(beatmapId.toString())?.data;
@@ -136,7 +129,7 @@ async function getSubsequentPlays({ user, plays, mode, page, index, isTops }: { 
       insertData({ table: "maps", id: beatmapId.toString(), data: file });
     }
 
-    const options = await new ScoreDetails({ plays, index, mode, file }).initialize();
+    const options = await getScore({ plays, index, mode, file });
 
     return new EmbedBuilder()
       .setColor("Purple")
@@ -169,7 +162,7 @@ async function getSubsequentPlays({ user, plays, mode, page, index, isTops }: { 
       insertData({ table: "maps", id: beatmapId.toString(), data: file });
     }
 
-    const options = await new ScoreDetails({ plays, index: i, mode, file }).initialize();
+    const options = await getScore({ plays, index: i, mode, file });
     const textRow1 = `\n**#${options.placement} [${options.title} [${options.version}]](https://osu.ppy.sh/b/${options.beatmapId})** ${options.modsPlay} [${options.stars}★]\n`;
     const textRow2 = `${options.grade} **${options.pp}pp** ${options.ifFcValue?.length && options.ifFcValue.length > 0 ? `~~[**${options.fcPp}pp**]~~ ` : ""}(${options.accuracy}) ${options.comboValue} <t:${options.submittedTime}:R>\n`;
     const textRow3 = `>> ${options.totalScore} ${options.accValues}`;
