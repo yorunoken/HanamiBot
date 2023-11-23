@@ -1,4 +1,4 @@
-import { rulesets, getMap, insertData, getRetryCount, grades, formatNumber, buildActionRow, showLessButton, showMoreButton, previousButton, nextButton, loadingButtons, buttonBoolsIndex, buttonBoolsTops, downloadMap, getPerformanceDetails, osuEmojis, specifyButton } from "./utils";
+import { rulesets, getMap, insertData, getRetryCount, grades, formatNumber, buildActionRow, showLessButton, showMoreButton, previousButton, nextButton, loadingButtons, buttonBoolsIndex, buttonBoolsTops, downloadMap, getPerformanceDetails, osuEmojis, specifyButton, firstButton, lastButton } from "./utils";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 import { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
 import { response as UserOsu } from "osu-api-extended/dist/types/v2_user_details";
@@ -351,25 +351,23 @@ export class StatsDetails {
 }
 
 export class ButtonActions {
+  private static getRow(parameters: boolean[]) {
+    const buttons = [firstButton, previousButton, specifyButton, nextButton, lastButton];
+    return [buildActionRow(buttons, parameters)] as any;
+  }
+
   static async handleProfileButtons({ i, options, response }: { i: ButtonInteraction | ModalSubmitInteraction; options: any; response: Message }) {
     if (i instanceof ModalSubmitInteraction) {
       return;
     }
 
-    const customId = i.customId;
     await i.update({ components: [loadingButtons as any] });
-    if (customId === "more") {
-      const page = options.pageBuilder[1](options.options);
-      response.edit({ embeds: [page], components: [showLessButton as any] });
-    } else if (customId === "less") {
-      const page = options.pageBuilder[0](options.options);
-      response.edit({ embeds: [page], components: [showMoreButton as any] });
-    }
+    const page = options.pageBuilder[i.customId === "more" ? 1 : 0](options.options);
+    response.edit({ embeds: [page], components: [showLessButton as any] });
   }
 
   static async handleRecentButtons({ pageBuilder, options, i, response }: { pageBuilder: any; options: any; i: ButtonInteraction | ModalSubmitInteraction; response: Message }) {
-    const getComponents = () => [buildActionRow([previousButton, specifyButton, nextButton], [options.index === 0, false, options.index + 1 === options.plays.length])] as any;
-    const editEmbed = async (options: any) => response.edit({ embeds: [await pageBuilder(options)], components: getComponents() });
+    const editEmbed = async (options: any) => response.edit({ embeds: [await pageBuilder(options)], components: this.getRow([options.index === 0, buttonBoolsIndex("previous", options), false, buttonBoolsIndex("next", options), options.plays.length - 1 === options.index]) });
 
     if (i instanceof ModalSubmitInteraction) {
       await response.edit({ components: [loadingButtons as any] });
@@ -377,16 +375,27 @@ export class ButtonActions {
       return;
     }
 
-    const customId = i.customId;
     await i.update({ components: [loadingButtons as any] });
-    customId === "next" ? options.index++ : customId === "previous" ? options.index-- : null;
+    switch (i.customId) {
+      case "next":
+        options.index++;
+        break;
+      case "previous":
+        options.index--;
+        break;
+      case "last":
+        options.index = options.plays.length - 1;
+        break;
+      case "first":
+        options.index = 0;
+        break;
+    }
+
     editEmbed(options);
   }
 
   static async handleTopsButtons({ pageBuilder, options, i, response }: { pageBuilder: any; options: any; i: ButtonInteraction | ModalSubmitInteraction; response: Message }) {
-    const getComponents = () => [buildActionRow([previousButton, specifyButton, nextButton], [index! >= 0 ? buttonBoolsIndex("previous", options) : buttonBoolsTops("previous", options), false, index! >= 0 ? buttonBoolsIndex("next", options) : buttonBoolsTops("next", options)])] as any;
-    const editEmbed = async (options: any) => response.edit({ embeds: [await pageBuilder(options)], components: getComponents() });
-    const index = options.index;
+    const editEmbed = async (options: any) => response.edit({ embeds: [await pageBuilder(options)], components: this.getRow([options.page === 0, buttonBoolsTops("previous", options), false, buttonBoolsTops("next", options), (options.index ? options.plays.length - 1 : Math.ceil(options.plays.length / 5) - 1) === options.page]) });
 
     if (i instanceof ModalSubmitInteraction) {
       await response.edit({ components: [loadingButtons as any] });
@@ -394,9 +403,27 @@ export class ButtonActions {
       return;
     }
 
-    const customId = i.customId;
     await i.update({ components: [loadingButtons as any] });
-    customId === "next" ? (options.page++, options.index++) : customId === "previous" ? (options.page--, options.index--) : null;
+    console.log(!0);
+    switch (i.customId) {
+      case "next":
+        options.index++;
+        options.page++;
+        break;
+      case "previous":
+        options.index--;
+        options.page--;
+        break;
+      case "last":
+        options.index = options.index + 1 ? options.plays.length - 1 : undefined;
+        options.page = options.page + 1 ? Math.ceil(options.plays.length / 5) - 1 : undefined;
+        break;
+      case "first":
+        options.index = options.index + 1 ? 0 : undefined;
+        options.page = options.page + 1 ? 0 : undefined;
+        break;
+    }
+    console.log({ index: options.index, page: options.page });
     await editEmbed(options);
   }
 }

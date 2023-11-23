@@ -1,4 +1,4 @@
-import { getUsernameFromArgs, Interactionhandler, getBeatmapId_FromContext, getMap, downloadMap, insertData, getPerformanceDetails, grades, buttonBoolsTops, buildActionRow, nextButton, previousButton } from "../utils";
+import { getUsernameFromArgs, Interactionhandler, getBeatmapId_FromContext, getMap, downloadMap, insertData, getPerformanceDetails, grades, buttonBoolsTops, buildActionRow, nextButton, previousButton, specifyButton, firstButton, lastButton } from "../utils";
 import { Message, EmbedBuilder } from "discord.js";
 import { BeatmapDetails, MyClient } from "../classes";
 import { v2 } from "osu-api-extended";
@@ -28,30 +28,31 @@ export async function start({ interaction, client, args, type }: { interaction: 
     insertData({ table: "maps", id: beatmapId.toString(), data: file });
   }
 
-  const beatmapDetails = await new BeatmapDetails().initialize(beatmap, { mods: userOptions?.mods?.codes || [""] }, file);
+  const scores = (await fetch(
+    `https://osu.ppy.sh/beatmaps/${beatmap.id}/scores?mode=${beatmap.mode}&type=${type}${
+      userOptions?.mods?.codes
+        ? userOptions.mods.codes
+            .join("")
+            .match(/.{1,2}/g)
+            ?.map((mod: any) => `&mods[]=${mod}`)
+            .join("")
+        : ""
+    }`,
+    { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } }
+  ).then((res) => res.json())) as any;
 
-  const modifiedMods = userOptions?.mods?.codes
-    ? userOptions.mods.codes
-        .join("")
-        .match(/.{1,2}/g)
-        ?.map((mod: any) => `&mods[]=${mod}`)
-        .join("")
-    : "";
-
-  const scores = (await fetch(`https://osu.ppy.sh/beatmaps/${beatmap.id}/scores?mode=${beatmap.mode}&type=${type}${modifiedMods}`, { headers: { Cookie: `osu_session=${process.env.OSU_SESSION}` } }).then((res) => res.json())) as any;
-  if (scores.scores.length === 0) {
+  const scoresLength = scores.scores.length;
+  const lengthCeil = Math.ceil(scoresLength / 5);
+  if (scoresLength === 0) {
     return options.reply("This map has no scores in its leaderboard.");
   }
 
-  const initializerScore = userOptions.user ? { user: interaction.author, score: scores.scores.find((score: any) => score.user.id === userOptions.user), index: scores.scores.findIndex((score: any) => score.user.id === userOptions.user) } : undefined;
-
-  if (page < 0 || page >= Math.ceil(scores.scores.length / 5)) {
-    return options.reply(`Please provide a valid page (between 1 and ${Math.ceil(scores.scores.length / 5)})`);
+  if (page < 0 || page >= lengthCeil) {
+    return options.reply(`Please provide a valid page (between 1 and ${lengthCeil})`);
   }
 
-  const embedOptions = { map: beatmapDetails, fetched: scores, page, file, length: scores.scores.length, initializer: initializerScore };
-  const components = [buildActionRow([previousButton, nextButton], [buttonBoolsTops("previous", embedOptions), buttonBoolsTops("next", embedOptions)])];
-  const response = await options.reply({ content: `Showing ${type} tops`, embeds: [await buildMapEmbed(embedOptions)], components });
+  const embedOptions = { map: await new BeatmapDetails().initialize(beatmap, { mods: userOptions?.mods?.codes || [""] }, file), plays: scores.scores, fetched: scores, page, file, length: scoresLength, initializer: userOptions.user ? { user: interaction.author, score: scores.scores.find((score: any) => score.user.id === userOptions.user), index: scores.scores.findIndex((score: any) => score.user.id === userOptions.user) } : undefined };
+  const response = await options.reply({ content: `Showing ${type} tops`, embeds: [await buildMapEmbed(embedOptions)], components: [buildActionRow([firstButton, previousButton, specifyButton, nextButton, lastButton], [page === 0, buttonBoolsTops("previous", embedOptions), false, buttonBoolsTops("next", embedOptions), page === lengthCeil - 1])] });
   client.sillyOptions[response.id] = { buttonHandler: "handleTopsButtons", type: commands.Top, embedOptions, response, pageBuilder: buildMapEmbed, initializer: options.author };
 }
 
