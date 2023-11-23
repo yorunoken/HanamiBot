@@ -362,8 +362,7 @@ export class ButtonActions {
     }
 
     await i.update({ components: [loadingButtons as any] });
-    const page = options.pageBuilder[i.customId === "more" ? 1 : 0](options.options);
-    response.edit({ embeds: [page], components: [showLessButton as any] });
+    response.edit({ embeds: [options.pageBuilder[i.customId === "more" ? 1 : 0](options.options)], components: [showLessButton as any] });
   }
 
   static async handleRecentButtons({ pageBuilder, options, i, response }: { pageBuilder: any; options: any; i: ButtonInteraction | ModalSubmitInteraction; response: Message }) {
@@ -404,7 +403,6 @@ export class ButtonActions {
     }
 
     await i.update({ components: [loadingButtons as any] });
-    console.log(!0);
     switch (i.customId) {
       case "next":
         options.index++;
@@ -423,7 +421,6 @@ export class ButtonActions {
         options.page = options.page + 1 ? 0 : undefined;
         break;
     }
-    console.log({ index: options.index, page: options.page });
     await editEmbed(options);
   }
 }
