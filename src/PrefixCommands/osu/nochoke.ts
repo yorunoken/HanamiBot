@@ -28,5 +28,5 @@ export async function run({ message, args, commandName, index, client }: { messa
   const alias = modeAliases[commandName.toLowerCase()];
   const mode = alias.mode || undefined;
 
-  await start({ interaction: message, args, mode, number: index, client });
+  await start({ interaction: message, args, mode, client });
 }
