@@ -91,7 +91,19 @@ export const specifyButton = new ButtonBuilder().setCustomId("indexbtn").setEmoj
 export const getUser = (id: string): any => db.prepare("SELECT * FROM users WHERE id = ?").get(id);
 export const getServer = (id: string): any => db.prepare("SELECT * FROM servers WHERE id = ?").get(id);
 export const getMap = (id: string): any => db.prepare(`SELECT * FROM maps WHERE id = ?`).get(id);
-export const insertData = ({ table, id, data }: { table: string; id: string; data: string }): any => db.prepare(`INSERT OR REPLACE INTO ${table} values (?, ?)`).run(id, data);
+export const insertData = ({ table, id, data }: { table: string; id: string; data: string }): void => db.prepare(`INSERT OR REPLACE INTO ${table} values (?, ?)`).run(id, data);
+
+export const insertDataBulk = ({ table, data }: { table: string; data: { id: string; contents: string }[] }): void => {
+  const insertStatement = db.prepare(`INSERT OR REPLACE INTO ${table} values (?, ?)`);
+
+  const transaction = db.transaction(() => {
+    for (const { id, contents } of data) {
+      insertStatement.run(id, contents);
+    }
+  });
+
+  transaction();
+};
 
 export function getUsernameFromArgs(user: UserDiscord, args?: string[], userNotNeeded?: boolean) {
   args = args || [];
