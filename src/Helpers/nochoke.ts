@@ -5,7 +5,7 @@ import { getUser } from "../functions";
 import { response as UserResponse } from "osu-api-extended/dist/types/v2_user_details";
 
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
-import { Interactionhandler, downloadMap, getMapsInBulk, getUsernameFromArgs, insertDataBulk } from "../utils";
+import { Interactionhandler, downloadMap, getMapsInBulk, getPerformanceDetails, getUsernameFromArgs, insertDataBulk, rulesets } from "../utils";
 import { v2 } from "osu-api-extended";
 
 export async function start({ interaction, args, mode, client }: { interaction: Message | ChatInputCommandInteraction; args?: string[]; mode?: osuModes; client: MyClient }) {
@@ -32,7 +32,18 @@ export async function start({ interaction, args, mode, client }: { interaction: 
 }
 
 async function getNoChoke(plays: ScoreResponse[], user: UserResponse, reply: (options: any) => Promise<Message<boolean>>) {
-  const files = getFiles(plays, user, reply);
+  const files = await getFiles(plays, user, reply);
+
+  for (const play of plays) {
+    let { beatmap: map, statistics } = play;
+    const rulesetId = rulesets[map.id];
+
+    statistics.count_300 += statistics.count_miss;
+    statistics.count_miss = 0;
+
+    let performance = getPerformanceDetails({ mapText: files[map.id], rulesetId, modsArg: play.mods, hitValues: statistics });
+    performance.mapId = map.id;
+  }
 }
 
 async function getFiles(plays: ScoreResponse[], user: UserResponse, reply: (options: any) => Promise<Message<boolean>>) {

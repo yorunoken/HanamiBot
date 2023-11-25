@@ -1,5 +1,5 @@
 import { User as UserDiscord, Message, ChatInputCommandInteraction, InteractionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, TextBasedChannel } from "discord.js";
-//@ts-ignore
+//@ts-expect-error
 import { Downloader, DownloadEntry } from "osu-downloader";
 import { Beatmap, Calculator } from "rosu-pp";
 import { mods } from "osu-api-extended";
@@ -166,23 +166,34 @@ export function getUsernameFromArgs(user: UserDiscord, args?: string[], userNotN
   return osuUsername ? { user: osuUsername, flags: flagsParsed, beatmapId, mods } : undefined;
 }
 
-export function getPerformanceDetails({ accuracy, mapText, maxCombo, modsArg, rulesetId, hitValues }: { modsArg: string[]; maxCombo: number; rulesetId: number; hitValues?: any; mapText: string; accuracy?: number }) {
-  const modsId = modsArg.length > 0 ? mods.id(modsArg.join("")) : 0;
-  const { count_100, count_300, count_50, count_geki, count_katu, count_miss } = hitValues;
+export function getPerformanceDetails({ modsArg, maxCombo, rulesetId, hitValues, mapText, accuracy }: { modsArg: string[]; maxCombo?: number; rulesetId: number; hitValues?: any; mapText: string; accuracy?: number }) {
+  let { count_100 = 0, count_300 = 0, count_50 = 0, count_geki = 0, count_katu = 0, count_miss = 0 } = hitValues;
+  count_geki = [2, 3].includes(rulesetId) ? undefined : count_geki;
+  count_katu = [2, 3].includes(rulesetId) ? undefined : count_katu;
 
   let scoreParam = {
     mode: rulesetId,
-    mods: modsId,
+    mods: modsArg.length > 0 ? mods.id(modsArg.join("")) : 0,
   };
   const map = new Beatmap({ content: mapText });
   const calculator = new Calculator(scoreParam);
 
   const mapValues = calculator.mapAttributes(map);
   const maxPerf = calculator.performance(map);
-  const curPerf = accuracy ? undefined : calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(count_miss).combo(maxCombo).nGeki(count_geki).nKatu(count_katu).performance(map);
+  const curPerf = accuracy
+    ? undefined
+    : calculator
+        .n300(count_300)
+        .n100(count_100)
+        .n50(count_50)
+        .nMisses(count_miss)
+        .combo(maxCombo ?? maxPerf.difficulty.maxCombo)
+        .nGeki(count_geki)
+        .nKatu(count_katu)
+        .performance(map);
   const fcPerf = accuracy ? calculator.acc(accuracy).performance(map) : calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(0).combo(maxPerf.difficulty.maxCombo).nGeki(count_geki).nKatu(count_katu).performance(map);
 
-  return { mapValues, maxPerf, curPerf, fcPerf };
+  return { mapValues, maxPerf, curPerf, fcPerf, mapId: 0 };
 }
 
 export async function downloadMap(beatmapId: number | number[]) {
