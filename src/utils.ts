@@ -91,14 +91,19 @@ export const specifyButton = new ButtonBuilder().setCustomId("indexbtn").setEmoj
 export const getUser = (id: string): any => db.prepare("SELECT * FROM users WHERE id = ?").get(id);
 export const getServer = (id: string): any => db.prepare("SELECT * FROM servers WHERE id = ?").get(id);
 export const getMap = (id: string): any => db.prepare(`SELECT * FROM maps WHERE id = ?`).get(id);
-export const insertData = ({ table, id, data }: { table: string; id: string; data: string }): void => db.prepare(`INSERT OR REPLACE INTO ${table} values (?, ?)`).run(id, data);
+export const getMapsInBulk = (ids: string[] | number[]): any => {
+  const placeholders = ids.map(() => "?").join(", ");
+  const query = `SELECT * FROM maps WHERE id IN (${placeholders})`;
+  return db.prepare(query).all(...ids);
+};
 
-export const insertDataBulk = ({ table, data }: { table: string; data: { id: string; contents: string }[] }): void => {
+export const insertData = ({ table, id, data }: { table: string; id: string; data: string }): void => db.prepare(`INSERT OR REPLACE INTO ${table} values (?, ?)`).run(id, data);
+export const insertDataBulk = ({ table, object }: { table: string; object: { id: number; data: string }[] }): void => {
   const insertStatement = db.prepare(`INSERT OR REPLACE INTO ${table} values (?, ?)`);
 
   const transaction = db.transaction(() => {
-    for (const { id, contents } of data) {
-      insertStatement.run(id, contents);
+    for (const { id, data } of object) {
+      insertStatement.run(id, data);
     }
   });
 
@@ -180,11 +185,11 @@ export function getPerformanceDetails({ accuracy, mapText, maxCombo, modsArg, ru
   return { mapValues, maxPerf, curPerf, fcPerf };
 }
 
-export async function downloadMap(beatmapId: number) {
-  const responseDirect = await fetch(`https://api.osu.direct/osu/${beatmapId}`);
-  if (responseDirect.status !== 404) {
-    return new TextDecoder().decode(await responseDirect.arrayBuffer());
-  }
+export async function downloadMap(beatmapId: number | number[]) {
+  // const responseDirect = await fetch(`https://api.osu.direct/osu/${beatmapId}`);
+  // if (responseDirect.status !== 404) {
+  //   return new TextDecoder().decode(await responseDirect.arrayBuffer());
+  // }
 
   const downloader = new Downloader({
     rootPath: "./cache",
@@ -192,18 +197,23 @@ export async function downloadMap(beatmapId: number) {
     synchronous: true,
   });
 
-  downloader.addSingleEntry(
-    new DownloadEntry({
-      id: beatmapId,
-      save: false, // Don't save file on a disk.
-    })
-  );
+  const isIdArray = Array.isArray(beatmapId);
+  if (isIdArray) {
+    downloader.addMultipleEntries(beatmapId.map((id) => new DownloadEntry({ id, save: false })));
+  } else {
+    downloader.addSingleEntry(
+      new DownloadEntry({
+        id: beatmapId,
+        save: false,
+      })
+    );
+  }
 
-  const downloaderResponse = await downloader.downloadSingle();
+  const downloaderResponse = await downloader.downloadAll();
   if (downloaderResponse.status == -3) {
     throw new Error("ERROR CODE 409, ABORTING TASK");
   }
-  return downloaderResponse.buffer.toString();
+  return isIdArray ? downloaderResponse.map((response: any) => ({ id: response.id, contents: response.buffer.toString() })) : downloaderResponse.buffer.toString();
 }
 
 const findId = (embed: any) => {
