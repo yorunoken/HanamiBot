@@ -16,7 +16,7 @@ const modeAliases: { [key: string]: { mode: osuModes } } = {
   ncn: { mode: "fruits" },
 };
 
-export const name = "top";
+export const name = "nochoke";
 export const aliases = Object.keys(modeAliases);
 export const cooldown = 3000;
 export const description = `Get the top plays of an osu! player.\nMods can be specified through \`+_, +!_, -!_\` syntax`;
