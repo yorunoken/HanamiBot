@@ -1,4 +1,6 @@
 import { User, Message } from "discord.js";
+import { MapAttributes, PerformanceAttributes } from "rosu-pp";
+import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 
 export enum PrefixMethods {
   ADD = "add",
@@ -145,4 +147,17 @@ export interface UserInfo {
   emoteSh: string;
   emoteSs: string;
   emoteSsh: string;
+}
+
+export interface noChokePlayDetails {
+  mapValues: MapAttributes;
+  maxPerf: PerformanceAttributes;
+  curPerf: PerformanceAttributes | undefined;
+  fcPerf: PerformanceAttributes;
+  mapId: number;
+  playInfo: {
+    play: ScoreResponse;
+    misses: number;
+    grade: string;
+  };
 }
