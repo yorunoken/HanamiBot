@@ -1,5 +1,5 @@
 import { User as UserDiscord, Message, ChatInputCommandInteraction, InteractionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, TextBasedChannel } from "discord.js";
-//@ts-ignore
+//@ts-expect-error
 import { Downloader, DownloadEntry } from "osu-downloader";
 import { Beatmap, Calculator } from "rosu-pp";
 import { mods } from "osu-api-extended";
@@ -91,14 +91,19 @@ export const specifyButton = new ButtonBuilder().setCustomId("indexbtn").setEmoj
 export const getUser = (id: string): any => db.prepare("SELECT * FROM users WHERE id = ?").get(id);
 export const getServer = (id: string): any => db.prepare("SELECT * FROM servers WHERE id = ?").get(id);
 export const getMap = (id: string): any => db.prepare(`SELECT * FROM maps WHERE id = ?`).get(id);
-export const insertData = ({ table, id, data }: { table: string; id: string; data: string }): void => db.prepare(`INSERT OR REPLACE INTO ${table} values (?, ?)`).run(id, data);
+export const getMapsInBulk = (ids: string[] | number[]): any => {
+  const placeholders = ids.map(() => "?").join(", ");
+  const query = `SELECT * FROM maps WHERE id IN (${placeholders})`;
+  return db.prepare(query).all(...ids);
+};
 
-export const insertDataBulk = ({ table, data }: { table: string; data: { id: string; contents: string }[] }): void => {
+export const insertData = ({ table, id, data }: { table: string; id: string; data: string }): void => db.prepare(`INSERT OR REPLACE INTO ${table} values (?, ?)`).run(id, data);
+export const insertDataBulk = ({ table, object }: { table: string; object: { id: number; data: string }[] }): void => {
   const insertStatement = db.prepare(`INSERT OR REPLACE INTO ${table} values (?, ?)`);
 
   const transaction = db.transaction(() => {
-    for (const { id, contents } of data) {
-      insertStatement.run(id, contents);
+    for (const { id, data } of object) {
+      insertStatement.run(id, data);
     }
   });
 
@@ -161,30 +166,41 @@ export function getUsernameFromArgs(user: UserDiscord, args?: string[], userNotN
   return osuUsername ? { user: osuUsername, flags: flagsParsed, beatmapId, mods } : undefined;
 }
 
-export function getPerformanceDetails({ accuracy, mapText, maxCombo, modsArg, rulesetId, hitValues }: { modsArg: string[]; maxCombo: number; rulesetId: number; hitValues?: any; mapText: string; accuracy?: number }) {
-  const modsId = modsArg.length > 0 ? mods.id(modsArg.join("")) : 0;
-  const { count_100, count_300, count_50, count_geki, count_katu, count_miss } = hitValues;
+export function getPerformanceDetails({ modsArg, maxCombo, rulesetId, hitValues, mapText, accuracy }: { modsArg: string[]; maxCombo?: number; rulesetId: number; hitValues?: any; mapText: string; accuracy?: number }) {
+  let { count_100 = 0, count_300 = 0, count_50 = 0, count_geki = 0, count_katu = 0, count_miss = 0 } = hitValues;
+  count_geki = [2, 3].includes(rulesetId) ? undefined : count_geki;
+  count_katu = [2, 3].includes(rulesetId) ? undefined : count_katu;
 
   let scoreParam = {
     mode: rulesetId,
-    mods: modsId,
+    mods: modsArg.length > 0 ? mods.id(modsArg.join("")) : 0,
   };
   const map = new Beatmap({ content: mapText });
   const calculator = new Calculator(scoreParam);
 
   const mapValues = calculator.mapAttributes(map);
   const maxPerf = calculator.performance(map);
-  const curPerf = accuracy ? undefined : calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(count_miss).combo(maxCombo).nGeki(count_geki).nKatu(count_katu).performance(map);
+  const curPerf = accuracy
+    ? undefined
+    : calculator
+        .n300(count_300)
+        .n100(count_100)
+        .n50(count_50)
+        .nMisses(count_miss)
+        .combo(maxCombo ?? maxPerf.difficulty.maxCombo)
+        .nGeki(count_geki)
+        .nKatu(count_katu)
+        .performance(map);
   const fcPerf = accuracy ? calculator.acc(accuracy).performance(map) : calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(0).combo(maxPerf.difficulty.maxCombo).nGeki(count_geki).nKatu(count_katu).performance(map);
 
-  return { mapValues, maxPerf, curPerf, fcPerf };
+  return { mapValues, maxPerf, curPerf, fcPerf, mapId: 0, playInfo: {} as any };
 }
 
-export async function downloadMap(beatmapId: number) {
-  const responseDirect = await fetch(`https://api.osu.direct/osu/${beatmapId}`);
-  if (responseDirect.status !== 404) {
-    return new TextDecoder().decode(await responseDirect.arrayBuffer());
-  }
+export async function downloadMap(beatmapId: number | number[]) {
+  // const responseDirect = await fetch(`https://api.osu.direct/osu/${beatmapId}`);
+  // if (responseDirect.status !== 404) {
+  //   return new TextDecoder().decode(await responseDirect.arrayBuffer());
+  // }
 
   const downloader = new Downloader({
     rootPath: "./cache",
@@ -192,18 +208,23 @@ export async function downloadMap(beatmapId: number) {
     synchronous: true,
   });
 
-  downloader.addSingleEntry(
-    new DownloadEntry({
-      id: beatmapId,
-      save: false, // Don't save file on a disk.
-    })
-  );
+  const isIdArray = Array.isArray(beatmapId);
+  if (isIdArray) {
+    downloader.addMultipleEntries(beatmapId.map((id) => new DownloadEntry({ id, save: false })));
+  } else {
+    downloader.addSingleEntry(
+      new DownloadEntry({
+        id: beatmapId,
+        save: false,
+      })
+    );
+  }
 
-  const downloaderResponse = await downloader.downloadSingle();
+  const downloaderResponse = isIdArray ? await downloader.downloadAll() : await downloader.downloadSingle();
   if (downloaderResponse.status == -3) {
     throw new Error("ERROR CODE 409, ABORTING TASK");
   }
-  return downloaderResponse.buffer.toString();
+  return isIdArray ? downloaderResponse.map((response: any) => ({ id: response.id, contents: response.buffer.toString() })) : downloaderResponse.buffer.toString();
 }
 
 const findId = (embed: any) => {
