@@ -193,7 +193,7 @@ export function getPerformanceDetails({ modsArg, maxCombo, rulesetId, hitValues,
         .performance(map);
   const fcPerf = accuracy ? calculator.acc(accuracy).performance(map) : calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(0).combo(maxPerf.difficulty.maxCombo).nGeki(count_geki).nKatu(count_katu).performance(map);
 
-  return { mapValues, maxPerf, curPerf, fcPerf, mapId: 0 };
+  return { mapValues, maxPerf, curPerf, fcPerf, mapId: 0, playInfo: {} as any };
 }
 
 export async function downloadMap(beatmapId: number | number[]) {
@@ -220,7 +220,7 @@ export async function downloadMap(beatmapId: number | number[]) {
     );
   }
 
-  const downloaderResponse = await downloader.downloadAll();
+  const downloaderResponse = isIdArray ? await downloader.downloadAll() : await downloader.downloadSingle();
   if (downloaderResponse.status == -3) {
     throw new Error("ERROR CODE 409, ABORTING TASK");
   }
