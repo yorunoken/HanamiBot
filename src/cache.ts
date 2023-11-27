@@ -5,7 +5,7 @@ export function updatePrefixCache(object: string[], guildId: string) {
   return true;
 }
 
-export let downloadingMapUserCache: { [username: string]: boolean } = {};
-export function updateDownloadingCache(username: string, downloading: boolean) {
-  downloadingMapUserCache[username] = downloading;
+export let downloadingMapUserCache: { [userId: number]: boolean } = {};
+export function updateDownloadingCache(userId: number, downloading: boolean) {
+  downloadingMapUserCache[userId] = downloading;
 }
