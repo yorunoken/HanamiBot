@@ -5,16 +5,9 @@ import { getServer } from "../utils";
 import { MyClient } from "../classes";
 import { db } from "./ready";
 import ms from "ms";
+import { prefixCache } from "../cache";
 
 const cooldown = new Map();
-
-const prefixCache: any = {};
-
-export function updatePrefixCache(object: string[], guildId: string) {
-  if (!prefixCache[guildId]) return false;
-  prefixCache[guildId] = object;
-  return true;
-}
 
 async function checkForMention(message: Message, client: MyClient) {
   const messagesArray = [

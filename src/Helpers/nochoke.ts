@@ -1,10 +1,10 @@
-import { Interactionhandler, buildActionRow, buttonBoolsIndex, buttonBoolsTops, downloadMap, firstButton, getMap, getMapsInBulk, getPerformanceDetails, getUsernameFromArgs, grades, insertData, insertDataBulk, lastButton, nextButton, previousButton, rulesets, specifyButton } from "../utils";
+import { Interactionhandler, buildActionRow, buttonBoolsTops, downloadMap, firstButton, getMapsInBulk, getPerformanceDetails, getUsernameFromArgs, grades, insertDataBulk, lastButton, nextButton, previousButton, rulesets, specifyButton } from "../utils";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 import { response as UserResponse } from "osu-api-extended/dist/types/v2_user_details";
 import { Message, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
-import { MapAttributes, PerformanceAttributes } from "rosu-pp";
+import { updateDownloadingCache, downloadingMapUserCache } from "../cache";
 import { getUser } from "../functions";
-import { UserInfo, commands, noChokePlayDetails, osuModes } from "../types";
+import { commands, noChokePlayDetails, osuModes } from "../types";
 import { MyClient } from "../classes";
 import { v2, tools } from "osu-api-extended";
 
@@ -33,6 +33,9 @@ export async function start({ interaction, args, mode, client }: { interaction: 
 
 async function getNoChoke(interactionOptions: any, client: MyClient, plays: ScoreResponse[], page: number, user: UserResponse, reply: (options: any) => Promise<Message<boolean>>, mode: osuModes) {
   const files = await getFiles(plays, user, reply);
+  if (files === false) {
+    return;
+  }
 
   const newPlays: noChokePlayDetails[] = plays
     .map((play) => {
@@ -63,6 +66,12 @@ async function getFiles(plays: ScoreResponse[], user: UserResponse, reply: (opti
   let mapsInBulk = getMapsInBulk(mapIds);
   const missingMapIds = mapIds.filter((id) => !mapsInBulk.some((map: any) => map.id === id));
   if (missingMapIds.length > 0) {
+    if (downloadingMapUserCache[user.id] === true) {
+      reply({ embeds: [new EmbedBuilder().setTitle("Warning!").setDescription(`The bot is already in the proccess of downloading ${user.username}'s plays. Please be patient.`).setColor("Red")] });
+      return false;
+    }
+
+    updateDownloadingCache(user.id, true);
     const message = await reply({ embeds: [new EmbedBuilder().setTitle("Warning!").setDescription(`\`${missingMapIds.length}\`of ${user.username}'s plays are not in the bot's database. Please wait while the bot is downloading your maps.`).setColor("Red")] });
     const data = (await downloadMap(mapIds)).map((map: any) => ({ id: map.id, data: map.contents }));
     insertDataBulk({
@@ -72,6 +81,7 @@ async function getFiles(plays: ScoreResponse[], user: UserResponse, reply: (opti
     data.forEach((map: any) => {
       mapsInBulk = [...mapsInBulk, map];
     });
+    updateDownloadingCache(user.id, false);
     message.edit({ embeds: [new EmbedBuilder().setTitle("Success").setDescription("Maps have been downloaded, setting up embed.").setColor("Green")] });
   }
 
