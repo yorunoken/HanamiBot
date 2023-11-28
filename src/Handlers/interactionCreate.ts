@@ -1,5 +1,5 @@
 import { ActionRowBuilder, Interaction, InteractionType, ModalActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
-import { MyClient, ButtonActions } from "../classes";
+import { ButtonActions, MyClient } from "../classes";
 import { db } from "./ready";
 
 export const name = "interactionCreate";

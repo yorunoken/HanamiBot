@@ -1,4 +1,4 @@
-import { Message, ModalBuilder, TextInputStyle, TextInputBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Message, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 
 export const name = "modal";
 export const aliases = ["modal"];

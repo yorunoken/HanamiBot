@@ -1,5 +1,5 @@
-import { insertDataBulk } from "./src/utils";
 import fs from "fs";
+import { insertDataBulk } from "./src/utils";
 
 async function main() {
   const files = fs.readdirSync("../2023_11_01_osu_files");

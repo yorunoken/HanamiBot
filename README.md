@@ -1,6 +1,6 @@
 # Hanami 🌸
 
-Hanami is a simple osu! bot  written in discordjs-v14!
+Hanami is a simple osu! bot written in discordjs-v14!
 
 Invite the bot to your server using [this link](https://discord.com/api/oauth2/authorize?client_id=995999045157916763&permissions=330752&scope=bot)
 

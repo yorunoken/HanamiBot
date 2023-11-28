@@ -1,7 +1,7 @@
-import { Message, ChatInputCommandInteraction } from "discord.js";
-import { Interactionhandler, getServer, insertData } from "../utils";
+import { ChatInputCommandInteraction, Message } from "discord.js";
 import { updatePrefixCache } from "../cache";
 import { defaultPrefix } from "../constants";
+import { getServer, insertData, Interactionhandler } from "../utils";
 
 const commands: { [key: string]: Function } = {
   add: addPrefix,

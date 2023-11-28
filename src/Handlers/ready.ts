@@ -1,7 +1,7 @@
-import { Database } from "bun:sqlite";
-import fs from "fs";
 import { REST } from "@discordjs/rest";
+import { Database } from "bun:sqlite";
 import { Routes } from "discord-api-types/v10";
+import fs from "fs";
 import { MyClient } from "../classes";
 import { getServer, insertData } from "../utils";
 

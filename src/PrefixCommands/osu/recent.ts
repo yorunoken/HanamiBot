@@ -1,8 +1,8 @@
 import { Message } from "discord.js";
+import { MyClient } from "../../classes";
 import { start } from "../../Helpers/plays";
 import { osuModes } from "../../types";
 import { returnFlags } from "../../utils";
-import { MyClient } from "../../classes";
 
 const modeAliases: { [key: string]: { mode: osuModes; passOnly: boolean } } = {
   // recents

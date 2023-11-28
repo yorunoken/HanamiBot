@@ -1,6 +1,6 @@
-import { start as user } from "./osu";
-import { start as map } from "./map";
 import { Message } from "discord.js";
+import { start as map } from "./map";
+import { start as user } from "./osu";
 
 const functions: { [key: string]: Function } = {
   map,

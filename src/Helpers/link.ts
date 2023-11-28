@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, EmbedBuilder, Message, User } from "discord.js";
-import { insertData, getUser, Interactionhandler, getUsernameFromArgs } from "../utils";
 import { v2 } from "osu-api-extended";
+import { getUser, getUsernameFromArgs, insertData, Interactionhandler } from "../utils";
 
 export async function start(interaction: ChatInputCommandInteraction | Message, args?: string[]) {
   const options = Interactionhandler(interaction, args);
@@ -13,7 +13,7 @@ export async function start(interaction: ChatInputCommandInteraction | Message, 
 
   const userOptions = getUsernameFromArgs({} as User, username);
   if (userOptions?.user.status === false) {
-    return reply('Something went wrong, try wrapping the username in quotes (")');
+    return reply("Something went wrong, try wrapping the username in quotes (\")");
   }
 
   const author = options.author;

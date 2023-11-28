@@ -1,5 +1,5 @@
-import { start } from "../../Helpers/help";
 import { Message } from "discord.js";
+import { start } from "../../Helpers/help";
 
 export const name = "help";
 export const aliases = ["help"];

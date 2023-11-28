@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
+import { MyClient } from "../../classes";
 import { start } from "../../Helpers/leaderboard";
 import { returnFlags } from "../../utils";
-import { MyClient } from "../../classes";
 
 const typeAlises: { [key: string]: { type: "global" | "country" } } = {
   leaderboard: { type: "global" },
