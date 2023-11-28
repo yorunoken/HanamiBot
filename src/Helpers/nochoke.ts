@@ -6,7 +6,7 @@ import { downloadingMapUserCache, updateDownloadingCache } from "../cache";
 import { MyClient } from "../classes";
 import { getUser } from "../functions";
 import { commands, noChokePlayDetails, osuModes } from "../types";
-import { buildActionRow, buttonBoolsTops, downloadMap, firstButton, getMapsInBulk, getPerformanceDetails, getUsernameFromArgs, grades, insertDataBulk, Interactionhandler, lastButton, nextButton, previousButton, rulesets, specifyButton } from "../utils";
+import { buildActionRow, buttonBoolsTops, calculateWeightedScores, downloadMap, firstButton, getMapsInBulk, getPerformanceDetails, getUsernameFromArgs, grades, insertDataBulk, Interactionhandler, lastButton, nextButton, previousButton, rulesets, specifyButton } from "../utils";
 
 export async function start({ interaction, args, mode, client }: { interaction: Message | ChatInputCommandInteraction; args?: string[]; mode?: osuModes; client: MyClient }) {
   const interactionOptions = Interactionhandler(interaction, args);
@@ -91,12 +91,6 @@ async function getFiles(plays: ScoreResponse[], user: UserResponse, reply: (opti
   }, {});
 }
 
-function getWeightedScores({ user, plays }: { user: UserResponse; plays: noChokePlayDetails[] }) {
-  const oldPlaysPp = plays.map((play, index) => Number(play.playInfo.play.pp) * Math.pow(0.95, index)).reduce((a, b) => a + b);
-  const newPlaysPp = plays.map((play, index) => play.fcPerf.pp * Math.pow(0.95, index)).reduce((a, b) => a + b);
-  return newPlaysPp + (user.statistics.pp - oldPlaysPp);
-}
-
 async function getSubsequentPlays({ user, plays, page, mode }: { user: UserResponse; plays: noChokePlayDetails[]; page: number; mode: osuModes }) {
   const userDetails = getUser({ user, mode });
   let description = [];
@@ -120,7 +114,7 @@ async function getSubsequentPlays({ user, plays, page, mode }: { user: UserRespo
     description.push(textRow1 + textRow2 + textRow3);
   }
 
-  const newTotalPp = getWeightedScores({ user, plays });
+  const newTotalPp = calculateWeightedScores({ user, plays });
   return new EmbedBuilder()
     .setAuthor({ url: userDetails.userUrl, name: `${userDetails.username}: ${userDetails.pp} (#${userDetails.globalRank} ${userDetails.countryCode.toUpperCase()}#${userDetails.countryRank})`, iconURL: `https://osu.ppy.sh/images/flags/${userDetails.countryCode.toUpperCase()}.png` })
     .setTitle(`Total PP: ${user.statistics.pp.toFixed(2)}pp ➜ ${newTotalPp.toFixed(2)}pp (+${(newTotalPp - user.statistics.pp).toFixed(2)})`)
@@ -129,6 +123,6 @@ async function getSubsequentPlays({ user, plays, page, mode }: { user: UserRespo
     .setFooter({
       text: `Page ${page + 1}/${Math.ceil(plays.length / 5)} • Approx. rank for ${newTotalPp.toFixed(2)}pp: #${await fetch(`https://osudaily.net/api/pp.php?k=${Bun.env.OSU_DAILY_API}&m=${rulesetId}&t=pp&v=${newTotalPp}`)
         .then((res) => res.json())
-        .then((res) => res.rank.toLocaleString())}`,
+        .then((res: any) => res?.rank?.toLocaleString())}`,
     });
 }

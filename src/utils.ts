@@ -1,10 +1,11 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, InteractionType, Message, TextBasedChannel, User as UserDiscord } from "discord.js";
 import { mods } from "osu-api-extended";
+import { response as UserResponse } from "osu-api-extended/dist/types/v2_user_details";
 // @ts-expect-error
 import { DownloadEntry, Downloader } from "osu-downloader";
 import { Beatmap, Calculator } from "rosu-pp";
 import { db } from "./Handlers/ready";
-import { osuModes } from "./types";
+import { noChokePlayDetails, osuModes } from "./types";
 
 export const grades: { [key: string]: string } = {
   A: "<:A_:1057763284327080036>",
@@ -109,6 +110,12 @@ export const insertDataBulk = ({ table, object }: { table: string; object: { id:
 
   transaction();
 };
+
+export function calculateWeightedScores({ user, plays }: { user: UserResponse; plays: noChokePlayDetails[] }) {
+  const oldPlaysPp = plays.map((play, index) => Number(play.playInfo.play.pp) * Math.pow(0.95, index)).reduce((a, b) => a + b);
+  const newPlaysPp = plays.map((play, index) => play.fcPerf.pp * Math.pow(0.95, index)).reduce((a, b) => a + b);
+  return newPlaysPp + (user.statistics.pp - oldPlaysPp);
+}
 
 export function getUsernameFromArgs(user: UserDiscord, args?: string[], userNotNeeded?: boolean) {
   args = args || [];
@@ -264,7 +271,9 @@ export function Interactionhandler(interaction: Message | ChatInputCommandIntera
   const isSlash = interaction.type === InteractionType.ApplicationCommand;
 
   const reply = (options: any) => (isSlash ? interaction.editReply(options) : interaction.channel.send(options));
-  const userArgs = isSlash ? [interaction.options.getString("user")! || ""] : args || [""];
+  const userArgs = isSlash ? [interaction.options.getString("user") || ""] : args || [""];
+  const ppCount = isSlash ? interaction.options.getNumber("count") || 1 : 1;
+  const ppValue = isSlash ? interaction.options.getNumber("pp", true) : 1;
   const commandName = isSlash ? [interaction.options.getString("command") || ""] : args || [""];
   const author = isSlash ? interaction.user : interaction.author;
   const mode = isSlash ? (interaction.options.getString("mode") as osuModes) || "osu" : "osu";
@@ -274,5 +283,5 @@ export function Interactionhandler(interaction: Message | ChatInputCommandIntera
   const prefix = isSlash ? interaction.options.getString("prefix") : undefined;
   const { guildId } = interaction;
 
-  return { reply, userArgs, author, mode, passOnly, index, commandName, subcommand, guildId, prefix };
+  return { reply, userArgs, author, mode, passOnly, index, commandName, subcommand, guildId, prefix, ppValue, ppCount };
 }
