@@ -1,12 +1,12 @@
-import { Interactionhandler, buildActionRow, buttonBoolsTops, downloadMap, firstButton, getMapsInBulk, getPerformanceDetails, getUsernameFromArgs, grades, insertDataBulk, lastButton, nextButton, previousButton, rulesets, specifyButton } from "../utils";
+import { ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
+import { tools, v2 } from "osu-api-extended";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 import { response as UserResponse } from "osu-api-extended/dist/types/v2_user_details";
-import { Message, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
-import { updateDownloadingCache, downloadingMapUserCache } from "../cache";
+import { downloadingMapUserCache, updateDownloadingCache } from "../cache";
+import { MyClient } from "../classes";
 import { getUser } from "../functions";
 import { commands, noChokePlayDetails, osuModes } from "../types";
-import { MyClient } from "../classes";
-import { v2, tools } from "osu-api-extended";
+import { buildActionRow, buttonBoolsTops, downloadMap, firstButton, getMapsInBulk, getPerformanceDetails, getUsernameFromArgs, grades, insertDataBulk, Interactionhandler, lastButton, nextButton, previousButton, rulesets, specifyButton } from "../utils";
 
 export async function start({ interaction, args, mode, client }: { interaction: Message | ChatInputCommandInteraction; args?: string[]; mode?: osuModes; client: MyClient }) {
   const interactionOptions = Interactionhandler(interaction, args);

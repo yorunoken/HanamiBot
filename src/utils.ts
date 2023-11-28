@@ -1,8 +1,8 @@
-import { User as UserDiscord, Message, ChatInputCommandInteraction, InteractionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, TextBasedChannel } from "discord.js";
-//@ts-expect-error
-import { Downloader, DownloadEntry } from "osu-downloader";
-import { Beatmap, Calculator } from "rosu-pp";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, InteractionType, Message, TextBasedChannel, User as UserDiscord } from "discord.js";
 import { mods } from "osu-api-extended";
+// @ts-expect-error
+import { DownloadEntry, Downloader } from "osu-downloader";
+import { Beatmap, Calculator } from "rosu-pp";
 import { db } from "./Handlers/ready";
 import { osuModes } from "./types";
 
@@ -67,15 +67,15 @@ function modsParser(str: string) {
   return modCodes.some((code) => code.includes("-")) && !force
     ? undefined
     : {
-        force: force,
-        include: modCodes.some((code) => code.includes("+")) ? true : false,
-        remove: modCodes.some((code) => code.includes("-")) && force ? true : false,
-        codes: modCodes
-          .map((code) => code.replace(/[+\-!]/g, ""))
-          .join("")
-          .match(/.{1,2}/g),
-        whole: modCodes.join(""),
-      };
+      force: force,
+      include: modCodes.some((code) => code.includes("+")) ? true : false,
+      remove: modCodes.some((code) => code.includes("-")) && force ? true : false,
+      codes: modCodes
+        .map((code) => code.replace(/[+\-!]/g, ""))
+        .join("")
+        .match(/.{1,2}/g),
+      whole: modCodes.join(""),
+    };
 }
 
 export const loadingButtons = buildActionRow([new ButtonBuilder().setCustomId("wating").setLabel("Waiting..").setStyle(ButtonStyle.Secondary)], [true]);
@@ -183,14 +183,14 @@ export function getPerformanceDetails({ modsArg, maxCombo, rulesetId, hitValues,
   const curPerf = accuracy
     ? undefined
     : calculator
-        .n300(count_300)
-        .n100(count_100)
-        .n50(count_50)
-        .nMisses(count_miss)
-        .combo(maxCombo ?? maxPerf.difficulty.maxCombo)
-        .nGeki(count_geki)
-        .nKatu(count_katu)
-        .performance(map);
+      .n300(count_300)
+      .n100(count_100)
+      .n50(count_50)
+      .nMisses(count_miss)
+      .combo(maxCombo ?? maxPerf.difficulty.maxCombo)
+      .nGeki(count_geki)
+      .nKatu(count_katu)
+      .performance(map);
   const fcPerf = accuracy ? calculator.acc(accuracy).performance(map) : calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(0).combo(maxPerf.difficulty.maxCombo).nGeki(count_geki).nKatu(count_katu).performance(map);
 
   return { mapValues, maxPerf, curPerf, fcPerf, mapId: 0, playInfo: {} as any };
@@ -216,7 +216,7 @@ export async function downloadMap(beatmapId: number | number[]) {
       new DownloadEntry({
         id: beatmapId,
         save: false,
-      })
+      }),
     );
   }
 

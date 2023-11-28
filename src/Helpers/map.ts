@@ -1,8 +1,8 @@
-import { getUsernameFromArgs, Interactionhandler, getBeatmapId_FromContext, getMap, downloadMap, insertData } from "../utils";
-import { Message, EmbedBuilder, Client } from "discord.js";
+import { Client, EmbedBuilder, Message } from "discord.js";
+import { v2 } from "osu-api-extended";
 import { getBeatmap } from "../functions";
 import { BeatmapInfo } from "../types";
-import { v2 } from "osu-api-extended";
+import { downloadMap, getBeatmapId_FromContext, getMap, getUsernameFromArgs, insertData, Interactionhandler } from "../utils";
 
 export async function start({ interaction, client, args, mapId }: { interaction: Message; client?: Client<boolean>; args: string[]; mapId?: string }) {
   const options = Interactionhandler(interaction, args);

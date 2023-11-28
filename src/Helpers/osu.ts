@@ -1,9 +1,9 @@
-import { getUsernameFromArgs, Interactionhandler, showMoreButton } from "../utils";
-import { Message, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
+import { v2 } from "osu-api-extended";
 import { MyClient } from "../classes";
 import { getUser } from "../functions";
 import { commands, UserInfo } from "../types";
-import { v2 } from "osu-api-extended";
+import { getUsernameFromArgs, Interactionhandler, showMoreButton } from "../utils";
 
 export async function start(interaction: Message | ChatInputCommandInteraction, client: MyClient, args?: string[], mode?: any) {
   const options = Interactionhandler(interaction, args);
@@ -48,7 +48,7 @@ function buildPage1(options: UserInfo) {
       {
         name: "Grades",
         value: `${options.emoteSsh}\`${options.rankSsh}\` ${options.emoteSs}\`${options.rankSs}\` ${options.emoteSh}\`${options.rankSh}\` ${options.emoteS}\`${options.rankS}\` ${options.emoteA}\`${options.rankA}\``,
-      }
+      },
     )
     .setImage(options.coverUrl)
     .setFooter({
@@ -71,7 +71,7 @@ function buildPage2(options: UserInfo) {
         value: `**Ranked Score:** \`${options.rankedScore}\`\n**Total Score:** \`${options.totalScore}\`\n**Objects Hit:** \`${options.objectsHit}\``,
         inline: true,
       },
-      { name: "Profile", value: `${options.occupation}${options.interest}${options.location}`, inline: true }
+      { name: "Profile", value: `${options.occupation}${options.interest}${options.location}`, inline: true },
     )
     .setImage(options.coverUrl)
     .setFooter({

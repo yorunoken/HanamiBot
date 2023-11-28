@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
+import { MyClient } from "../../classes";
 import { start } from "../../Helpers/osu";
 import { osuModes } from "../../types";
-import { MyClient } from "../../classes";
 
 export const name = "osu";
 export const aliases = ["osu", "mania", "taiko", "catch"];

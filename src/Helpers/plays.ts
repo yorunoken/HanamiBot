@@ -1,10 +1,10 @@
-import { getUsernameFromArgs, Interactionhandler, nextButton, previousButton, buildActionRow, buttonBoolsIndex, buttonBoolsTops, specifyButton, lastButton, firstButton, downloadMap, getMap, insertData } from "../utils";
-import { Message, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
+import { v2 } from "osu-api-extended";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 import { MyClient } from "../classes";
 import { getScore, getUser } from "../functions";
-import { osuModes, commands, UserInfo } from "../types";
-import { v2 } from "osu-api-extended";
+import { commands, osuModes, UserInfo } from "../types";
+import { buildActionRow, buttonBoolsIndex, buttonBoolsTops, downloadMap, firstButton, getMap, getUsernameFromArgs, insertData, Interactionhandler, lastButton, nextButton, previousButton, specifyButton } from "../utils";
 
 export async function start({ isTops, interaction, passOnly: passOnlyArg, args, mode: modeArg, number, recentTop, client }: { isTops: boolean; interaction: Message | ChatInputCommandInteraction; passOnly?: boolean; args?: string[]; mode?: osuModes; number?: number; recentTop?: boolean; client: MyClient }) {
   const argOptions = Interactionhandler(interaction, args);
@@ -43,39 +43,39 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
 
   plays = mods
     ? plays.filter((score) => {
-        let userMods = mods.join("").toUpperCase();
-        const scoreMods = score.mods.join("").toUpperCase();
-        const force = userOptions!.mods!.force;
+      let userMods = mods.join("").toUpperCase();
+      const scoreMods = score.mods.join("").toUpperCase();
+      const force = userOptions!.mods!.force;
 
-        if (userMods === "NM") {
-          return userOptions!.mods!.include ? scoreMods === "" : userOptions!.mods!.remove ? scoreMods !== "" : undefined;
-        }
+      if (userMods === "NM") {
+        return userOptions!.mods!.include ? scoreMods === "" : userOptions!.mods!.remove ? scoreMods !== "" : undefined;
+      }
 
-        const includedBool = (str: string) =>
-          scoreMods
-            .match(/.{1,2}/g)
-            ?.sort()
-            .join("")
-            .includes((str.match(/.{1,2}/g) || [""]).sort().join(""));
+      const includedBool = (str: string) =>
+        scoreMods
+          .match(/.{1,2}/g)
+          ?.sort()
+          .join("")
+          .includes((str.match(/.{1,2}/g) || [""]).sort().join(""));
 
-        const exactBool = (str: string) =>
-          scoreMods
-            .match(/.{1,2}/g)
-            ?.sort()
-            .join("") ===
-          str
+      const exactBool = (str: string) =>
+        scoreMods
+          .match(/.{1,2}/g)
+          ?.sort()
+          .join("")
+          === str
             .match(/.{1,2}/g)
             ?.sort()
             .join("");
 
-        if (userOptions!.mods!.include) {
-          return (force ? exactBool : includedBool)(userMods);
-        } else if (userOptions!.mods!.remove) {
-          return !(force ? exactBool : includedBool)(userMods);
-        }
+      if (userOptions!.mods!.include) {
+        return (force ? exactBool : includedBool)(userMods);
+      } else if (userOptions!.mods!.remove) {
+        return !(force ? exactBool : includedBool)(userMods);
+      }
 
-        return scoreMods === (userMods === "NM" ? "" : userMods);
-      })
+      return scoreMods === (userMods === "NM" ? "" : userMods);
+    })
     : plays;
 
   if (plays.length === 0) {

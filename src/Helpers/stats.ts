@@ -1,7 +1,7 @@
-import { getUsernameFromArgs, Interactionhandler, showMoreButton } from "../utils";
-import { Message, ChatInputCommandInteraction, EmbedBuilder, ButtonInteraction } from "discord.js";
-import { osuModes } from "../types";
+import { ButtonInteraction, ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
 import { v2 } from "osu-api-extended";
+import { osuModes } from "../types";
+import { getUsernameFromArgs, Interactionhandler, showMoreButton } from "../utils";
 
 export async function start({ interaction, mode, args }: { interaction: Message | ChatInputCommandInteraction; mode: osuModes; args?: string[] }) {
   const options = Interactionhandler(interaction, args);

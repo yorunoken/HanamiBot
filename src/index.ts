@@ -1,6 +1,6 @@
 import { GatewayIntentBits } from "discord.js";
-import { auth } from "osu-api-extended";
 import fs from "fs";
+import { auth } from "osu-api-extended";
 import { MyClient } from "./classes";
 const { CLIENT_SECRET, CLIENT_ID, TOKEN } = Bun.env;
 if (!CLIENT_SECRET || !CLIENT_ID || !TOKEN) {

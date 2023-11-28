@@ -1,8 +1,8 @@
-import { start } from "../../Helpers/nochoke";
-import { returnFlags } from "../../utils";
-import { osuModes } from "../../types";
 import { Message } from "discord.js";
 import { MyClient } from "../../classes";
+import { start } from "../../Helpers/nochoke";
+import { osuModes } from "../../types";
+import { returnFlags } from "../../utils";
 
 const modeAliases: { [key: string]: { mode: osuModes } } = {
   nochoke: { mode: "osu" },

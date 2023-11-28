@@ -1,5 +1,5 @@
-import { start } from "../../Helpers/prefix";
 import { Message } from "discord.js";
+import { start } from "../../Helpers/prefix";
 
 export const name = "prefix";
 export const aliases = ["prefix"];

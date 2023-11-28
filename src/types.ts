@@ -1,6 +1,6 @@
-import { User, Message } from "discord.js";
-import { MapAttributes, PerformanceAttributes } from "rosu-pp";
+import { Message, User } from "discord.js";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
+import { MapAttributes, PerformanceAttributes } from "rosu-pp";
 
 export enum PrefixMethods {
   ADD = "add",
