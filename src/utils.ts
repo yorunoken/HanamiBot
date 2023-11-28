@@ -168,8 +168,8 @@ export function getUsernameFromArgs(user: UserDiscord, args?: string[], userNotN
 
 export function getPerformanceDetails({ modsArg, maxCombo, rulesetId, hitValues, mapText, accuracy }: { modsArg: string[]; maxCombo?: number; rulesetId: number; hitValues?: any; mapText: string; accuracy?: number }) {
   let { count_100 = 0, count_300 = 0, count_50 = 0, count_geki = 0, count_katu = 0, count_miss = 0 } = hitValues;
-  count_geki = [2, 3].includes(rulesetId) ? count_geki : undefined;
-  count_katu = [2, 3].includes(rulesetId) ? count_katu : undefined;
+  count_geki = [2, 3].includes(rulesetId) ? count_geki : 0;
+  count_katu = [2, 3].includes(rulesetId) ? count_katu : 0;
 
   let scoreParam = {
     mode: rulesetId,
