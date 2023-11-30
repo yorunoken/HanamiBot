@@ -1,13 +1,13 @@
 import { ChannelType, Message, PermissionFlagsBits, TextChannel } from "discord.js";
-import { MyClient } from "../../classes";
 import { serverJoinMessage } from "../../constants";
+import { ExtendedClient } from "../../Structure/index";
 
 export const name = "shout";
 export const aliases = ["shout"];
 export const cooldown = 0;
 export const description = `Shouts at all the servers`;
 
-export async function run({ message, client, args }: { message: Message; client: MyClient; args: string[] }) {
+export async function run({ message, client, args }: { message: Message; client: ExtendedClient; args: string[] }) {
   if (message.author.id !== "372343076578131968") {
     return;
   }

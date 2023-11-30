@@ -1,11 +1,11 @@
 import { ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
 import { v2 } from "osu-api-extended";
-import { MyClient } from "../classes";
 import { getUser } from "../functions";
 import { osuModes, UserInfo } from "../Structure";
+import { ExtendedClient } from "../Structure/index";
 import { getUsernameFromArgs, Interactionhandler, rulesets } from "../utils";
 
-export async function start({ interaction, client }: { interaction: Message | ChatInputCommandInteraction; client: MyClient }) {
+export async function start({ interaction, client }: { interaction: Message | ChatInputCommandInteraction; client: ExtendedClient }) {
   const options = Interactionhandler(interaction);
   const { reply, mode, ppValue, ppCount } = options;
 

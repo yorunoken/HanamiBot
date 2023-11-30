@@ -3,19 +3,14 @@ import { serverJoinMessage } from "../constants";
 import { ExtendedClient } from "../Structure";
 import BaseEvent from "../Structure/BaseEvent";
 
-// @ts-expect-error
 export default class GuildCreateEvent extends BaseEvent {
-  guild: Guild;
-  constructor(client: ExtendedClient, guild: Guild) {
+  constructor(client: ExtendedClient) {
     super(client);
-    this.guild = guild;
-    this.fetchGuild();
   }
 
-  private fetchGuild(): void {
+  public execute(guild: Guild) {
     for (
-      let [_, channel] of this
-        .guild.channels.cache
+      let [_, channel] of guild.channels.cache
     ) {
       channel = channel as TextChannel;
       const botPermissions = channel.permissionsFor(this.client.user!.id);

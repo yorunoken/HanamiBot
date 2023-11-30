@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction } from "discord.js";
-import { MyClient } from "../../classes";
 import { start } from "../../Helpers/plays";
+import { ExtendedClient } from "../../Structure/index";
 
-export async function run({ interaction, client }: { interaction: ChatInputCommandInteraction; client: MyClient }) {
+export async function run({ interaction, client }: { interaction: ChatInputCommandInteraction; client: ExtendedClient }) {
   await interaction.deferReply();
   await start({ isTops: false, interaction, client });
 }

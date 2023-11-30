@@ -37,11 +37,11 @@ export default class InteractionCreateEvent extends BaseEvent {
 
       await interaction.deferUpdate();
       await ButtonActions[sillyOptions.buttonHandler]({ i: interaction, options: sillyOptions.embedOptions, pageBuilder: sillyOptions.pageBuilder, response: sillyOptions.response });
+      return;
     }
 
     if (interaction.type === InteractionType.MessageComponent && interaction.isButton()) {
-      const message = interaction.message;
-      const sillyOptions = this.client.sillyOptions[message.id];
+      const sillyOptions = this.client.sillyOptions[interaction.message.id];
 
       if (interaction.user.id !== sillyOptions.initializer.id) {
         interaction.reply({ ephemeral: true, content: "You need to be the one who initialized the command to be able to click the buttons." });
@@ -66,16 +66,19 @@ export default class InteractionCreateEvent extends BaseEvent {
       if (sillyOptions.buttonHandler) {
         await ButtonActions[sillyOptions.buttonHandler]({ i: interaction, options: sillyOptions.embedOptions, pageBuilder: sillyOptions.pageBuilder, response: sillyOptions.response });
       }
+      return;
     }
 
     if (interaction.type === InteractionType.ApplicationCommand) {
       try {
         const command = this.client.slashCommands.get(interaction.commandName);
+        if (!command) return;
         command.run({ client: this.client, interaction, db });
       } catch (e) {
         console.error(e);
         interaction.reply({ content: "There was an error with this interaction. Please try again.", ephemeral: true });
       }
+      return;
     }
   }
 }

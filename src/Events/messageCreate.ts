@@ -90,7 +90,8 @@ export default class MessageCreateEvent extends BaseEvent {
       number = Number(match[2]);
     }
 
-    const command = this.client.prefixCommands.get(commandName) || this.client.prefixCommands.get(this.client.aliases.get(commandName));
+    const alias = this.client.aliases.get(commandName);
+    const command = alias ? this.client.prefixCommands.get(alias) : this.client.prefixCommands.get(commandName);
     if (!command) return;
 
     if (!command.cooldown) {
