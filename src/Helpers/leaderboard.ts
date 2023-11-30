@@ -2,7 +2,7 @@ import { EmbedBuilder, Message } from "discord.js";
 import { v2 } from "osu-api-extended";
 import { MyClient } from "../classes";
 import { getBeatmap } from "../functions";
-import { BeatmapInfo, commands } from "../types";
+import { BeatmapInfo, commands } from "../Structure";
 import { buildActionRow, buttonBoolsTops, downloadMap, firstButton, getBeatmapId_FromContext, getMap, getPerformanceDetails, getUsernameFromArgs, grades, insertData, Interactionhandler, lastButton, nextButton, previousButton, specifyButton } from "../utils";
 
 export async function start({ interaction, client, args, type }: { interaction: Message<boolean>; client: MyClient; args: string[]; type: "global" | "country" }) {

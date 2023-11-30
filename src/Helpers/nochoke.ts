@@ -5,7 +5,7 @@ import { response as UserResponse } from "osu-api-extended/dist/types/v2_user_de
 import { downloadingMapUserCache, updateDownloadingCache } from "../cache";
 import { MyClient } from "../classes";
 import { getUser } from "../functions";
-import { commands, noChokePlayDetails, osuModes } from "../types";
+import { commands, noChokePlayDetails, osuModes } from "../Structure";
 import { buildActionRow, buttonBoolsTops, calculateWeightedScores, downloadMap, firstButton, getMapsInBulk, getPerformanceDetails, getUsernameFromArgs, grades, insertDataBulk, Interactionhandler, lastButton, nextButton, previousButton, rulesets, specifyButton } from "../utils";
 
 export async function start({ interaction, args, mode, client }: { interaction: Message | ChatInputCommandInteraction; args?: string[]; mode?: osuModes; client: MyClient }) {

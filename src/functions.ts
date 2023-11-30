@@ -2,7 +2,7 @@ import { tools, v2 } from "osu-api-extended";
 import { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 import { response as UserOsu } from "osu-api-extended/dist/types/v2_user_details";
-import { BeatmapInfo, osuModes, ScoreInfo, UserInfo } from "./types";
+import { BeatmapInfo, osuModes, ScoreInfo, UserInfo } from "./Structure";
 import { downloadMap, formatNumber, getPerformanceDetails, getRetryCount, grades, insertData, osuEmojis, rulesets } from "./utils";
 
 export function getUser({ user, mode }: { user: UserOsu; mode: osuModes }): UserInfo {

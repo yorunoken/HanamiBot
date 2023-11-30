@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
 import { v2 } from "osu-api-extended";
 import { MyClient } from "../classes";
 import { getUser } from "../functions";
-import { osuModes, UserInfo } from "../types";
+import { osuModes, UserInfo } from "../Structure";
 import { getUsernameFromArgs, Interactionhandler, rulesets } from "../utils";
 
 export async function start({ interaction, client }: { interaction: Message | ChatInputCommandInteraction; client: MyClient }) {

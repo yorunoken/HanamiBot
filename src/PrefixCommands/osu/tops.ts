@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { MyClient } from "../../classes";
 import { start } from "../../Helpers/plays";
-import { osuModes } from "../../types";
+import { osuModes } from "../../Structure";
 import { returnFlags } from "../../utils";
 
 const modeAliases: { [key: string]: { mode: osuModes; recent: boolean } } = {

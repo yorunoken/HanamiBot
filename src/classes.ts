@@ -1,5 +1,4 @@
-import { ButtonInteraction, Client, Collection, Message, ModalSubmitInteraction } from "discord.js";
-import { commandInterface } from "./types";
+import { ButtonInteraction, Message, ModalSubmitInteraction } from "discord.js";
 import { buildActionRow, buttonBoolsIndex, buttonBoolsTops, firstButton, lastButton, loadingButtons, nextButton, previousButton, showLessButton, specifyButton } from "./utils";
 
 export class ButtonActions {
@@ -74,22 +73,5 @@ export class ButtonActions {
         break;
     }
     await editEmbed(options);
-  }
-}
-
-export class MyClient extends Client {
-  [x: string]: any;
-  slashCommands: Collection<any, any>;
-  prefixCommands: Collection<any, any>;
-  aliases: Collection<any, any>;
-  sillyOptions: Record<string, commandInterface>;
-  client: any;
-
-  constructor(options: any) {
-    super(options);
-    this.slashCommands = new Collection();
-    this.prefixCommands = new Collection();
-    this.aliases = new Collection();
-    this.sillyOptions = {};
   }
 }
