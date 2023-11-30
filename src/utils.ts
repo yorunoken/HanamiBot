@@ -2,10 +2,10 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteracti
 import { mods } from "osu-api-extended";
 import { response as UserResponse } from "osu-api-extended/dist/types/v2_user_details";
 // @ts-expect-error
-import { DownloadEntry, Downloader } from "osu-downloader";
+import { DownloadEntry, Downloader, DownloadResult } from "osu-downloader";
 import { Beatmap, Calculator } from "rosu-pp";
-import { db } from "./Handlers/ready";
-import { noChokePlayDetails, osuModes } from "./types";
+import { db } from "./Events/ready";
+import { noChokePlayDetails, osuModes } from "./Structure";
 
 export const grades: { [key: string]: string } = {
   A: "<:A_:1057763284327080036>",
@@ -209,7 +209,7 @@ export async function downloadMap(beatmapId: number | number[]) {
   //   return new TextDecoder().decode(await responseDirect.arrayBuffer());
   // }
 
-  const downloader = new Downloader({
+  let downloader = new Downloader({
     rootPath: "./cache",
     filesPerSecond: 0,
     synchronous: true,
@@ -228,10 +228,10 @@ export async function downloadMap(beatmapId: number | number[]) {
   }
 
   const downloaderResponse = isIdArray ? await downloader.downloadAll() : await downloader.downloadSingle();
-  if (downloaderResponse.status == -3) {
+  if (!isIdArray ? downloaderResponse.status == -3 : downloaderResponse.some((item: any) => item.status == -3)) {
     throw new Error("ERROR CODE 409, ABORTING TASK");
   }
-  return isIdArray ? downloaderResponse.map((response: any) => ({ id: response.id, contents: response.buffer.toString() })) : downloaderResponse.buffer.toString();
+  return !isIdArray ? downloaderResponse.buffer.toString() : downloaderResponse.map((response: any) => ({ id: response.id, contents: response.buffer.toString() }));
 }
 
 const findId = (embed: any) => {
@@ -273,7 +273,7 @@ export function Interactionhandler(interaction: Message | ChatInputCommandIntera
   const reply = (options: any) => (isSlash ? interaction.editReply(options) : interaction.channel.send(options));
   const userArgs = isSlash ? [interaction.options.getString("user") || ""] : args || [""];
   const ppCount = isSlash ? interaction.options.getNumber("count") || 1 : 1;
-  const ppValue = isSlash ? interaction.options.getNumber("pp", true) : 1;
+  const ppValue = isSlash ? interaction.options.getNumber("pp") : 1;
   const commandName = isSlash ? [interaction.options.getString("command") || ""] : args || [""];
   const author = isSlash ? interaction.user : interaction.author;
   const mode = isSlash ? (interaction.options.getString("mode") as osuModes) || "osu" : "osu";

@@ -1,11 +1,11 @@
 import { ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
 import { v2 } from "osu-api-extended";
-import { MyClient } from "../classes";
 import { getUser } from "../functions";
-import { commands, UserInfo } from "../types";
+import { commands, UserInfo } from "../Structure";
+import { ExtendedClient } from "../Structure/index";
 import { getUsernameFromArgs, Interactionhandler, showMoreButton } from "../utils";
 
-export async function start(interaction: Message | ChatInputCommandInteraction, client: MyClient, args?: string[], mode?: any) {
+export async function start(interaction: Message | ChatInputCommandInteraction, client: ExtendedClient, args?: string[], mode?: any) {
   const options = Interactionhandler(interaction, args);
   options.mode = mode === "catch" ? "fruits" : mode ?? options.mode;
 

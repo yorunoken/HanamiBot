@@ -3,12 +3,12 @@ import { tools, v2 } from "osu-api-extended";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 import { response as UserResponse } from "osu-api-extended/dist/types/v2_user_details";
 import { downloadingMapUserCache, updateDownloadingCache } from "../cache";
-import { MyClient } from "../classes";
 import { getUser } from "../functions";
-import { commands, noChokePlayDetails, osuModes } from "../types";
+import { commands, noChokePlayDetails, osuModes } from "../Structure";
+import { ExtendedClient } from "../Structure/index";
 import { buildActionRow, buttonBoolsTops, calculateWeightedScores, downloadMap, firstButton, getMapsInBulk, getPerformanceDetails, getUsernameFromArgs, grades, insertDataBulk, Interactionhandler, lastButton, nextButton, previousButton, rulesets, specifyButton } from "../utils";
 
-export async function start({ interaction, args, mode, client }: { interaction: Message | ChatInputCommandInteraction; args?: string[]; mode?: osuModes; client: MyClient }) {
+export async function start({ interaction, args, mode, client }: { interaction: Message | ChatInputCommandInteraction; args?: string[]; mode?: osuModes; client: ExtendedClient }) {
   const interactionOptions = Interactionhandler(interaction, args);
   const { reply, author, userArgs } = interactionOptions;
   mode = (mode ?? interactionOptions.mode) as osuModes;
@@ -31,7 +31,7 @@ export async function start({ interaction, args, mode, client }: { interaction: 
   getNoChoke(interactionOptions, client, plays, parseInt((options.flags.p as string) || (options.flags.page as string)) - 1 || 0, user, reply, mode);
 }
 
-async function getNoChoke(interactionOptions: any, client: MyClient, plays: ScoreResponse[], page: number, user: UserResponse, reply: (options: any) => Promise<Message<boolean>>, mode: osuModes) {
+async function getNoChoke(interactionOptions: any, client: ExtendedClient, plays: ScoreResponse[], page: number, user: UserResponse, reply: (options: any) => Promise<Message<boolean>>, mode: osuModes) {
   const files = await getFiles(plays, user, reply);
   if (files === false) {
     return;

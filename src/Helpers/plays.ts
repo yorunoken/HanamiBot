@@ -1,12 +1,12 @@
 import { ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
 import { v2 } from "osu-api-extended";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
-import { MyClient } from "../classes";
 import { getScore, getUser } from "../functions";
-import { commands, osuModes, UserInfo } from "../types";
+import { commands, osuModes, UserInfo } from "../Structure";
+import { ExtendedClient } from "../Structure/index";
 import { buildActionRow, buttonBoolsIndex, buttonBoolsTops, downloadMap, firstButton, getMap, getUsernameFromArgs, insertData, Interactionhandler, lastButton, nextButton, previousButton, specifyButton } from "../utils";
 
-export async function start({ isTops, interaction, passOnly: passOnlyArg, args, mode: modeArg, number, recentTop, client }: { isTops: boolean; interaction: Message | ChatInputCommandInteraction; passOnly?: boolean; args?: string[]; mode?: osuModes; number?: number; recentTop?: boolean; client: MyClient }) {
+export async function start({ isTops, interaction, passOnly: passOnlyArg, args, mode: modeArg, number, recentTop, client }: { isTops: boolean; interaction: Message | ChatInputCommandInteraction; passOnly?: boolean; args?: string[]; mode?: osuModes; number?: number; recentTop?: boolean; client: ExtendedClient }) {
   const argOptions = Interactionhandler(interaction, args);
   const reply = argOptions.reply;
   argOptions.mode = modeArg ?? argOptions.mode;

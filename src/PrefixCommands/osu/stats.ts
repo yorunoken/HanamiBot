@@ -1,6 +1,6 @@
 import { Client, Message } from "discord.js";
 import { start } from "../../Helpers/stats";
-import { osuModes } from "../../types";
+import { osuModes } from "../../Structure";
 
 const modeAliases: { [key: string]: { mode: osuModes } } = {
   stats: { mode: "osu" },

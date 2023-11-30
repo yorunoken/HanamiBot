@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
 import fs from "fs";
-import { ModuleReturn } from "../types";
+import { ModuleReturn } from "../Structure";
 import { Interactionhandler } from "../utils";
 
 export async function start({ interaction, args }: { interaction: Message | ChatInputCommandInteraction; args?: string[] }) {

@@ -1,6 +1,19 @@
-import { Message, User } from "discord.js";
+import { Message, SlashCommandBuilder, User } from "discord.js";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 import { MapAttributes, PerformanceAttributes } from "rosu-pp";
+
+export interface PrefixCommands {
+  name: string;
+  aliases: string;
+  cooldown: number;
+  description: string;
+  run: (options: { [key: string]: any }) => Promise<void>;
+}
+
+export interface SlashCommands {
+  run: (options: { [key: string]: any }) => Promise<void>;
+  data: SlashCommandBuilder;
+}
 
 export enum PrefixMethods {
   ADD = "add",

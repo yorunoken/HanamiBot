@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
-import { MyClient } from "../../classes";
 import { start } from "../../Helpers/leaderboard";
+import { ExtendedClient } from "../../Structure/index";
 import { returnFlags } from "../../utils";
 
 const typeAlises: { [key: string]: { type: "global" | "country" } } = {
@@ -19,7 +19,7 @@ export const cooldown = 3000;
 export const description = `Get the leaderboard of a map.\nMods can be specified through +_, +!_, -!_ syntax`;
 export const flags = returnFlags({ page: true });
 
-export async function run({ message, args, commandName, client }: { message: Message; args: string[]; commandName: "global" | "country"; client: MyClient }) {
+export async function run({ message, args, commandName, client }: { message: Message; args: string[]; commandName: "global" | "country"; client: ExtendedClient }) {
   await message.channel.sendTyping();
   await start({ interaction: message, client, args, type: typeAlises[commandName].type });
 }

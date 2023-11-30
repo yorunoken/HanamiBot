@@ -4,7 +4,7 @@ import { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beat
 import { response as MapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_beatmap";
 import { getScore, getUser } from "../functions";
-import { osuModes, UserInfo } from "../types";
+import { osuModes, UserInfo } from "../Structure";
 import { downloadMap, getBeatmapId_FromContext, getMap, getPerformanceDetails, getUsernameFromArgs, insertData, Interactionhandler, rulesets } from "../utils";
 
 const leaderboardExists = (beatmap: BeatmapResponse) => typeof beatmap.id === "number" || ["qualified", "ranked", "loved"].includes(beatmap.status?.toLowerCase());
