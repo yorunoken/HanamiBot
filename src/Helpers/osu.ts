@@ -23,13 +23,15 @@ export async function start(interaction: Message | ChatInputCommandInteraction, 
   }
 
   const userDetailOptions = getUser({ user, mode: options.mode, locale });
+  userDetailOptions.locale = locale;
 
-  let page = buildPage1(userDetailOptions, locale);
+  let page = buildPage1(userDetailOptions);
   const response = await options.reply({ embeds: [page], components: [showMoreButton] });
   client.sillyOptions[response.id] = { buttonHandler: "handleProfileButtons", type: commands.Profile, embedOptions: { pageBuilder: [buildPage1, buildPage2], options: userDetailOptions, locale, response }, response, initializer: options.author };
 }
 
-function buildPage1(options: UserInfo, locale: Locales) {
+function buildPage1(options: UserInfo) {
+  const locale = options.locale;
   const highRank = options.highestRank ? `\n**${locale.embeds.profile.peakRank}:** \`#${options.highestRank}\` **${locale.embeds.profile.achieved}:** <t:${options.highestRankTime}:R>` : "";
 
   return new EmbedBuilder()
@@ -57,7 +59,8 @@ function buildPage1(options: UserInfo, locale: Locales) {
     });
 }
 
-function buildPage2(options: UserInfo, locale: Locales) {
+function buildPage2(options: UserInfo) {
+  const locale = options.locale;
   return new EmbedBuilder()
     .setColor("Purple")
     .setAuthor({

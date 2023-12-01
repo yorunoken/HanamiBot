@@ -123,6 +123,7 @@ export interface ScoreInfo {
 }
 
 export interface UserInfo {
+  locale: Locales;
   username: string;
   userCover: string;
   userAvatar: string;
