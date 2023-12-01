@@ -17,5 +17,7 @@ export async function run({ interaction, client }: { interaction: ChatInputComma
   const guild = getServer(guildId);
   insertData({ table: "servers", data: JSON.stringify({ ...JSON.parse(guild.data), language }), id: guildId });
   client.localeLanguage.set(guildId, language);
+
+  interaction.editReply(`Successfully set language to: \`${language}\``);
 }
 export { data } from "../data/language";
