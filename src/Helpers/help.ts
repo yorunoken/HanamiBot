@@ -3,7 +3,7 @@ import fs from "fs";
 import { ModuleReturn } from "../Structure";
 import { Interactionhandler } from "../utils";
 
-export async function start({ interaction, args }: { interaction: Message | ChatInputCommandInteraction; args?: string[] }) {
+export async function start({ interaction, args, locale }: { interaction: Message | ChatInputCommandInteraction; args?: string[]; locale: any }) {
   const options = Interactionhandler(interaction, args);
   const commandName = options.commandName?.length! > 0 ? options.commandName?.join("") : undefined;
 
@@ -16,11 +16,11 @@ export async function start({ interaction, args }: { interaction: Message | Chat
     }
   }
 
-  commandName ? commandHelp(options, commandName, commands) : helpMenu(options, commands);
+  commandName ? commandHelp(options, commandName, commands, locale) : helpMenu(options, commands, locale);
 }
 
-function helpMenu(options: any, commands: any) {
-  const embed = new EmbedBuilder().setTitle(`Use \`/help <command>\` for details of a command`);
+function helpMenu(options: any, commands: any, locale: any) {
+  const embed = new EmbedBuilder().setTitle(locale.embeds.help.title);
   const categories: any = {};
   Object.values(commands).forEach((array: any) => categories[array.category] = (categories[array.category] || []).concat(array));
 
@@ -30,13 +30,13 @@ function helpMenu(options: any, commands: any) {
   options.reply({ embeds: [embed] });
 }
 
-function commandHelp(options: any, name: string, commands: any) {
+function commandHelp(options: any, name: string, commands: any, locale: any) {
   const command = Object.values(commands).find((cmd: any) => cmd.aliases.some((alias: string) => alias.toLowerCase() === name.toLowerCase()) || cmd.name.toLowerCase() === name.toLowerCase()) as ModuleReturn | undefined;
   if (!command) {
-    options.reply(`The command with the name (or alias) \`${name}\` was not found.`);
+    options.reply(locale.embeds.help.commandNotFound.replace("{NAME}", name));
     return;
   }
 
-  const embed = new EmbedBuilder().setTitle(`Information of command: ${command.name}`).setDescription(`\`\`\`/${command.name}\`\`\`\n${command.description}\n\nflags:\n${command.flags || "none"}\n\naliases: \`${command.aliases.join(", ")}\``);
+  const embed = new EmbedBuilder().setTitle(locale.embeds.help.commandInfoTitleEmbed.replace("{NAME}", command.name)).setDescription(`\`\`\`/${command.name}\`\`\`\n${command.description}\n\nflags:\n${command.flags || "none"}\n\naliases: \`${command.aliases.join(", ")}\``);
   options.reply({ embeds: [embed] });
 }

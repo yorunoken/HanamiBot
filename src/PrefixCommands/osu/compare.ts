@@ -1,6 +1,6 @@
 import { Client, Message } from "discord.js";
 import { start } from "../../Helpers/compare";
-import { osuModes } from "../../Structure";
+import { Locales, osuModes } from "../../Structure";
 
 const modeAliases: { [key: string]: { mode: osuModes | string } } = {
   compare: { mode: "" },
@@ -23,9 +23,9 @@ export const aliases = Object.keys(modeAliases);
 export const cooldown = 3000;
 export const description = `Get the plays of an osu! player on a specific map.\nMods can be specified through +_, +!_, -!_ syntax`;
 
-export async function run({ message, args, commandName, client }: { message: Message; args: string[]; commandName: osuModes; client: Client }) {
+export async function run({ message, args, commandName, client, locale }: { message: Message; args: string[]; commandName: osuModes; client: Client; locale: Locales }) {
   await message.channel.sendTyping();
   const modeOptions = modeAliases[commandName].mode;
 
-  await start({ interaction: message, client, args, mode: modeOptions });
+  await start({ interaction: message, client, args, mode: modeOptions, locale });
 }

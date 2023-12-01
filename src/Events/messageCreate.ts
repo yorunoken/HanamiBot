@@ -58,7 +58,7 @@ export default class MessageCreateEvent extends BaseEvent {
     const permissionsHas = botPermissions.has(PermissionFlagsBits.SendMessages) && botPermissions.has(PermissionFlagsBits.ViewChannel);
     if (!permissionsHas) return;
 
-    if (Math.floor(Math.random() * 100) > 70) {
+    if (Math.floor(Math.random() * 100) > 70 && [":3", "3:"].some(item => message.content === item)) {
       message.channel.send(message.content === ":3" ? "3:" : ":3");
       return;
     }
@@ -67,7 +67,7 @@ export default class MessageCreateEvent extends BaseEvent {
       getLoneCommand(message);
     }
 
-    let prefixOptions = prefixCache[guildId] || (prefixCache[guildId] = JSON.parse((await getServer(guildId)).data)?.prefix) || (prefixCache[guildId] = [defaultPrefix]);
+    const prefixOptions = prefixCache[guildId] ?? (prefixCache[guildId] = JSON.parse((getServer(guildId)).data)?.prefix) ?? (prefixCache[guildId] = [defaultPrefix]);
     let prefix = prefixOptions.find((p: string) => message.content.startsWith(p));
     if (!prefix) {
       await this.checkForMention(message);
@@ -94,20 +94,21 @@ export default class MessageCreateEvent extends BaseEvent {
     const command = alias ? this.client.prefixCommands.get(alias) : this.client.prefixCommands.get(commandName);
     if (!command) return;
 
+    const locale = await import(`../locales/${this.client.localeLanguage.get(guildId) ?? "en"}.json`);
     if (!command.cooldown) {
-      command.run({ client: this.client, message, args, prefix, index: number, commandName, db });
+      command.run({ client: this.client, message, args, prefix, index: number, commandName, db, locale });
       return;
     }
     if (cooldown.has(`${command.name}${message.author.id}`)) {
       message
         .reply({
-          content: `Try again in \`${ms(cooldown.get(`${command.name}${message.author.id}`) - Date.now(), { long: true })}\``,
+          content: locale.fails.cooldowntime.replace("{COOLDOWN}", ms(cooldown.get(`${command.name}${message.author.id}`) - Date.now(), { long: true })),
         })
         .then((msg) => setTimeout(() => msg.delete(), cooldown.get(`${command.name}${message.author.id}`) - Date.now()));
       return;
     }
 
-    command.run({ client: this.client, message, args, prefix, index: number, commandName, db });
+    command.run({ client: this.client, message, args, prefix, index: number, commandName, db, locale });
     cooldown.set(`${command.name}${message.author.id}`, Date.now() + command.cooldown);
     setTimeout(() => {
       cooldown.delete(`${command.name}${message.author.id}`);

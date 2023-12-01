@@ -6,7 +6,7 @@ import { commands, osuModes, UserInfo } from "../Structure";
 import { ExtendedClient } from "../Structure/index";
 import { buildActionRow, buttonBoolsIndex, buttonBoolsTops, downloadMap, firstButton, getMap, getUsernameFromArgs, insertData, Interactionhandler, lastButton, nextButton, previousButton, specifyButton } from "../utils";
 
-export async function start({ isTops, interaction, passOnly: passOnlyArg, args, mode: modeArg, number, recentTop, client }: { isTops: boolean; interaction: Message | ChatInputCommandInteraction; passOnly?: boolean; args?: string[]; mode?: osuModes; number?: number; recentTop?: boolean; client: ExtendedClient }) {
+export async function start({ isTops, interaction, passOnly: passOnlyArg, args, mode: modeArg, number, recentTop, client, locale }: { isTops: boolean; interaction: Message | ChatInputCommandInteraction; passOnly?: boolean; args?: string[]; mode?: osuModes; number?: number; recentTop?: boolean; client: ExtendedClient; locale: any }) {
   const argOptions = Interactionhandler(interaction, args);
   const reply = argOptions.reply;
   argOptions.mode = modeArg ?? argOptions.mode;
@@ -19,7 +19,7 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
 
   const userOptions = getUsernameFromArgs(argOptions.author, argOptions.userArgs);
   if (!userOptions) {
-    return reply("Something went wrong.");
+    return reply(locale.fails.error);
   }
   if (userOptions.user?.status === false) {
     return reply(userOptions.user.message);
@@ -29,7 +29,7 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
 
   const user = await v2.user.details(userOptions.user, mode);
   if (!user.id) {
-    return reply(`The user \`${userOptions.user}\` does not exist in Bancho.`);
+    return reply(locale.fails.userDoesntExist.replace("{USER}", userOptions.user));
   }
 
   let plays = await v2.scores.user.category(user.id, isTops ? "best" : "recent", {
@@ -79,11 +79,11 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
     : plays;
 
   if (plays.length === 0) {
-    return reply(`The user \`${user.username}\` does not have any ${isTops ? "top" : "recent"} plays in Bancho.`);
+    return reply(locale.embeds.plays.noScores.replace("{USERNAME}", user.username).replace("{TYPE}", isTops ? locale.embeds.plays.top : locale.embeds.plays.recent));
   }
 
   if (page && (page < 0 || page >= Math.ceil(plays.length / 5))) {
-    return reply(`Please provide a valid page (between 1 and ${Math.ceil(plays.length / 5)})`);
+    return reply(locale.fails.provideValidPage.replace("{MAXVALUE}", Math.ceil(plays.length / 5)));
   }
 
   const userDetailOptions = getUser({ user, mode });
@@ -95,7 +95,7 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
   const embedOptions = isTops ? topsOptions : recentOptions;
 
   const components = [buildActionRow([firstButton, previousButton, specifyButton, nextButton, lastButton], [page === 0 || index === 0, index! >= 0 ? buttonBoolsIndex("previous", embedOptions) : buttonBoolsTops("previous", embedOptions), false, index! >= 0 ? buttonBoolsIndex("next", embedOptions) : buttonBoolsTops("next", embedOptions), plays.length - 1 === page || plays.length - 1 === index])];
-  const response = await reply({ content: `Found \`${plays.length}\` plays`, embeds: [embed], components });
+  const response = await reply({ content: locale.embeds.plays.playsFound.replace("{LENGTH}", plays.length), embeds: [embed], components });
   client.sillyOptions[response.id] = { buttonHandler: isTops ? "handleTopsButtons" : "handleRecentButtons", type: commands[isTops ? "Top" : "Recent"], embedOptions, response, pageBuilder: isTops ? getSubsequentPlays : getRecentPlays, initializer: argOptions.author };
 }
 

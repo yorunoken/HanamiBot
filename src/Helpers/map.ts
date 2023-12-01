@@ -4,12 +4,12 @@ import { getBeatmap } from "../functions";
 import { BeatmapInfo } from "../Structure";
 import { downloadMap, getBeatmapId_FromContext, getMap, getUsernameFromArgs, insertData, Interactionhandler } from "../utils";
 
-export async function start({ interaction, client, args, mapId }: { interaction: Message; client?: Client<boolean>; args: string[]; mapId?: string }) {
+export async function start({ interaction, client, args, mapId, locale }: { interaction: Message; client?: Client<boolean>; args: string[]; mapId?: string; locale: any }) {
   const options = Interactionhandler(interaction, args);
 
   const userOptions = getUsernameFromArgs(options.author, options.userArgs, true);
   if (!userOptions) {
-    return options.reply("Something went wrong.");
+    return options.reply(locale.fails.error);
   }
   if (userOptions.user?.status === false) {
     return options.reply(userOptions.user.message);
@@ -17,7 +17,7 @@ export async function start({ interaction, client, args, mapId }: { interaction:
 
   const beatmapId = mapId || userOptions.beatmapId || (await getBeatmapId_FromContext(interaction, client!));
   if (!beatmapId) {
-    return options.reply(`There doesn't seem to be any beatmap embeds in this conversation.`);
+    return options.reply(locale.fails.noBeatmapIdInCtx);
   }
   const beatmap = await v2.beatmap.id.details(beatmapId);
 

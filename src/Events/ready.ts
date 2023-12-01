@@ -27,6 +27,6 @@ export default class ReadyEvent extends BaseEvent {
   public async execute() {
     if (!this.client.user) return;
     console.log(`Logged in as ${this.client.user.tag}`);
-    this.client.deployCommands();
+    this.client.deploy();
   }
 }

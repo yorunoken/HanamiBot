@@ -9,12 +9,12 @@ import { downloadMap, getBeatmapId_FromContext, getMap, getPerformanceDetails, g
 
 const leaderboardExists = (beatmap: BeatmapResponse) => typeof beatmap.id === "number" || ["qualified", "ranked", "loved"].includes(beatmap.status?.toLowerCase());
 
-export async function start({ interaction, client, args, mode }: { interaction: Message<boolean>; client: Client<boolean>; args: string[]; mode: osuModes | string }) {
+export async function start({ interaction, client, args, mode, locale }: { interaction: Message<boolean>; client: Client<boolean>; args: string[]; mode: osuModes | string; locale: any }) {
   const options = Interactionhandler(interaction, args);
 
   const userOptions = getUsernameFromArgs(options.author, options.userArgs);
   if (!userOptions) {
-    return options.reply("Something went wrong.");
+    return options.reply(locale.fails.error);
   }
   if (userOptions.user?.status === false) {
     return options.reply(userOptions.user.message);
@@ -22,18 +22,18 @@ export async function start({ interaction, client, args, mode }: { interaction: 
 
   const beatmapId = userOptions.beatmapId || (await getBeatmapId_FromContext(interaction, client));
   if (!beatmapId) {
-    return options.reply(`There doesn't seem to be any beatmap embeds in this conversation.`);
+    return options.reply(locale.fails.noLeaderboard);
   }
   const beatmap = await v2.beatmap.id.details(beatmapId);
   if (!leaderboardExists(beatmap)) {
-    return options.reply("Either this map doesn't exist, or it doesn't have a leaderboard.");
+    return options.reply(locale.fails.noBeatmapIdInCtx);
   }
 
   mode = mode.length > 0 ? mode : beatmap.mode;
 
   const user = await v2.user.details(userOptions.user, options.mode);
   if (!user.id) {
-    return options.reply(`The user \`${userOptions.user}\` does not exist in Bancho.`);
+    return options.reply(locale.fails.userDoesntExist.replace("{USER}", userOptions.user));
   }
   const userDetailOptions = getUser({ user, mode: options.mode });
 
@@ -77,13 +77,13 @@ export async function start({ interaction, client, args, mode }: { interaction: 
     : scores;
 
   if (scores.length === 0) {
-    return options.reply(`${user.username} has no scores on this beatmap`);
+    return options.reply(locale.fails.userHasNoScores.replace("{USER}", user.username));
   }
 
-  return options.reply({ embeds: [await buildCompareEmbed(userDetailOptions, beatmap, scores, mode)] });
+  return options.reply({ embeds: [await buildCompareEmbed(userDetailOptions, beatmap, scores, mode, locale)] });
 }
 
-async function buildCompareEmbed(user: UserInfo, map: MapResponse, scores: ScoreResponse[], mode: string) {
+async function buildCompareEmbed(user: UserInfo, map: MapResponse, scores: ScoreResponse[], mode: string, locale: any) {
   const _scores = [];
   for (let i in scores) {
     const { max_combo } = scores[i];
@@ -92,7 +92,7 @@ async function buildCompareEmbed(user: UserInfo, map: MapResponse, scores: Score
     _scores.push(
       i === "0"
         ? `${score.globalPlacement?.length && score.globalPlacement.length > 0 ? score.globalPlacement + "\n" : ""}${score.grade} ${score.modsPlay} **[${score.stars}★]** • ${score.totalScore} • ${score.accuracy}\n**${score.pp}pp**/${score.ssPp}pp ~~[${score.fcPp}pp]~~ • ${score.comboValue}\n${score.accValues} <t:${score.submittedTime}:R>\n`
-        : `${i === "1" ? "**__Other plays on the map:__**\n" : ""}${score.grade} ${score.modsPlay} **[${score.stars}★]** • **${score.pp}pp** (${score.accuracy}) • **${max_combo}x** • ${(score.performance.curPerf as any).effectiveMissCount > 0 ? `${score.countMiss} <:hit00:1061254490075955231>` : ""} <t:${score.submittedTime}:R>`,
+        : `${i === "1" ? locale.embeds.otherPlays + "\n" : ""}${score.grade} ${score.modsPlay} **[${score.stars}★]** • **${score.pp}pp** (${score.accuracy}) • **${max_combo}x** • ${(score.performance.curPerf as any).effectiveMissCount > 0 ? `${score.countMiss} <:hit00:1061254490075955231>` : ""} <t:${score.submittedTime}:R>`,
     );
   }
 

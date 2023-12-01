@@ -91,6 +91,11 @@ export const specifyButton = new ButtonBuilder().setCustomId("indexbtn").setEmoj
 
 export const getUser = (id: string): any => db.prepare("SELECT * FROM users WHERE id = ?").get(id);
 export const getServer = (id: string): any => db.prepare("SELECT * FROM servers WHERE id = ?").get(id);
+export const getServersInBulk = (ids: string[] | number[]): any => {
+  const placeholders = ids.map(() => "?").join(", ");
+  const query = `SELECT * FROM servers WHERE id IN (${placeholders})`;
+  return db.prepare(query).all(...ids);
+};
 export const getMap = (id: string): any => db.prepare(`SELECT * FROM maps WHERE id = ?`).get(id);
 export const getMapsInBulk = (ids: string[] | number[]): any => {
   const placeholders = ids.map(() => "?").join(", ");
@@ -273,7 +278,7 @@ export function Interactionhandler(interaction: Message | ChatInputCommandIntera
   const reply = (options: any) => (isSlash ? interaction.editReply(options) : interaction.channel.send(options));
   const userArgs = isSlash ? [interaction.options.getString("user") || ""] : args || [""];
   const ppCount = isSlash ? interaction.options.getNumber("count") || 1 : 1;
-  const ppValue = isSlash ? interaction.options.getNumber("pp") : 1;
+  const ppValue = isSlash ? interaction.options.getNumber("pp") || 1 : 1;
   const commandName = isSlash ? [interaction.options.getString("command") || ""] : args || [""];
   const author = isSlash ? interaction.user : interaction.author;
   const mode = isSlash ? (interaction.options.getString("mode") as osuModes) || "osu" : "osu";

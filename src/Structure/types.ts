@@ -174,3 +174,87 @@ export interface noChokePlayDetails {
     grade: string;
   };
 }
+
+interface Embeds {
+  page: string;
+  otherPlays: string;
+  provideUsername: string;
+  help: {
+    title: string;
+    commandNotFound: string;
+    commandInfoTitleEmbed: string;
+  };
+  leaderboard: {
+    noScores: string;
+  };
+  link: {
+    success: string;
+  };
+  plays: {
+    top: string;
+    recent: string;
+    noScores: string;
+    playsFound: string;
+  };
+  whatif: {
+    count: string;
+    plural: string;
+    title: string;
+    description: string;
+  };
+  profile: {
+    peakRank: string;
+    achieved: string;
+    statistics: string;
+    accuracy: string;
+    level: string;
+    playcount: string;
+    followers: string;
+    maxCombo: string;
+    recommendedStars: string;
+    grades: string;
+    joinDate: string;
+    score: string;
+    rankedScore: string;
+    totalScore: string;
+    objectsHit: string;
+    profile: string;
+  };
+  nochoke: {
+    alreadyDownloading: string;
+    mapsArentInDb: string;
+    mapsDownloaded: string;
+    approximateRank: string;
+  };
+}
+
+interface Fails {
+  linkFail: string;
+  userDoesntExist: string;
+  userHasNoScores: string;
+  provideValidPage: string;
+  noLeaderboard: string;
+  noBeatmapIdInCtx: string;
+  error: string;
+  interactionError: string;
+  cooldownTime: string;
+  userButtonNotAllowed: string;
+}
+
+interface Modals {
+  enterValue: string;
+  valueInsert: string;
+}
+
+interface Misc {
+  success: string;
+  warning: string;
+  poweredBy: string;
+}
+
+export interface Locales {
+  embeds: Embeds;
+  fails: Fails;
+  modals: Modals;
+  misc: Misc;
+}

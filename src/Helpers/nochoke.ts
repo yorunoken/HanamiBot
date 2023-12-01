@@ -8,19 +8,19 @@ import { commands, noChokePlayDetails, osuModes } from "../Structure";
 import { ExtendedClient } from "../Structure/index";
 import { buildActionRow, buttonBoolsTops, calculateWeightedScores, downloadMap, firstButton, getMapsInBulk, getPerformanceDetails, getUsernameFromArgs, grades, insertDataBulk, Interactionhandler, lastButton, nextButton, previousButton, rulesets, specifyButton } from "../utils";
 
-export async function start({ interaction, args, mode, client }: { interaction: Message | ChatInputCommandInteraction; args?: string[]; mode?: osuModes; client: ExtendedClient }) {
+export async function start({ interaction, args, mode, client, locale }: { interaction: Message | ChatInputCommandInteraction; args?: string[]; mode?: osuModes; client: ExtendedClient; locale: any }) {
   const interactionOptions = Interactionhandler(interaction, args);
   const { reply, author, userArgs } = interactionOptions;
   mode = (mode ?? interactionOptions.mode) as osuModes;
 
   const options = getUsernameFromArgs(author, userArgs);
   if (!options || options.user?.status === false) {
-    return reply(options?.user.message ?? "Something went wrong.");
+    return reply(options?.user.message ?? locale.fails.error);
   }
 
   const user = await v2.user.details(options.user, interactionOptions.mode);
   if (!user.id) {
-    return reply(`The user \`${options.user}\` does not exist in Bancho.`);
+    return reply(locale.fails.userDoesntExist.replace("{USER}", options.user));
   }
 
   let plays = await v2.scores.user.category(user.id, "best", {
@@ -28,11 +28,11 @@ export async function start({ interaction, args, mode, client }: { interaction: 
     mode,
   });
   plays = options.flags.rev ? plays.sort((a, b) => Number(a.pp) - Number(b.pp)) : plays;
-  getNoChoke(interactionOptions, client, plays, parseInt((options.flags.p as string) || (options.flags.page as string)) - 1 || 0, user, reply, mode);
+  getNoChoke(interactionOptions, client, plays, parseInt((options.flags.p as string) || (options.flags.page as string)) - 1 || 0, user, reply, mode, locale);
 }
 
-async function getNoChoke(interactionOptions: any, client: ExtendedClient, plays: ScoreResponse[], page: number, user: UserResponse, reply: (options: any) => Promise<Message<boolean>>, mode: osuModes) {
-  const files = await getFiles(plays, user, reply);
+async function getNoChoke(interactionOptions: any, client: ExtendedClient, plays: ScoreResponse[], page: number, user: UserResponse, reply: (options: any) => Promise<Message<boolean>>, mode: osuModes, locale: any) {
+  const files = await getFiles(plays, user, reply, locale);
   if (files === false) {
     return;
   }
@@ -55,24 +55,24 @@ async function getNoChoke(interactionOptions: any, client: ExtendedClient, plays
     })
     .sort((a, b) => b.fcPerf.pp - a.fcPerf.pp);
 
-  const embedOptions = { user, plays: newPlays, page, mode };
+  const embedOptions = { user, plays: newPlays, page, mode, locale };
   const components = [buildActionRow([firstButton, previousButton, specifyButton, nextButton, lastButton], [page === 0, buttonBoolsTops("previous", embedOptions), false, buttonBoolsTops("next", embedOptions), plays.length - 1 === page])];
   const response = await reply({ embeds: [await getSubsequentPlays(embedOptions)], components });
   client.sillyOptions[response.id] = { buttonHandler: "handleTopsButtons", type: commands["Top"], embedOptions, response, pageBuilder: getSubsequentPlays, initializer: interactionOptions.author };
 }
 
-async function getFiles(plays: ScoreResponse[], user: UserResponse, reply: (options: any) => Promise<Message<boolean>>) {
+async function getFiles(plays: ScoreResponse[], user: UserResponse, reply: (options: any) => Promise<Message<boolean>>, locale: any) {
   const mapIds = plays.map((play) => play.beatmap.id);
   let mapsInBulk = getMapsInBulk(mapIds);
   const missingMapIds = mapIds.filter((id) => !mapsInBulk.some((map: any) => map.id === id));
   if (missingMapIds.length > 0) {
     if (downloadingMapUserCache[user.id] === true) {
-      reply({ embeds: [new EmbedBuilder().setTitle("Warning!").setDescription(`The bot is already in the proccess of downloading ${user.username}'s plays. Please be patient.`).setColor("Red")] });
+      reply({ embeds: [new EmbedBuilder().setTitle(locale.misc.warning).setDescription(locale.embeds.nochoke.alreadyDownloading.replace("{USERNAME}", user.username)).setColor("Red")] });
       return false;
     }
 
     updateDownloadingCache(user.id, true);
-    const message = await reply({ embeds: [new EmbedBuilder().setTitle("Warning!").setDescription(`\`${missingMapIds.length}\`of ${user.username}'s plays are not in the bot's database. Please wait while the bot is downloading your maps.`).setColor("Red")] });
+    const message = await reply({ embeds: [new EmbedBuilder().setTitle(locale.misc.warning).setDescription(locale.embeds.nochoke.mapsArentInDb.replace("{MISSINGMAPS}", missingMapIds.length).replace("{USERNAME}", user.username)).setColor("Red")] });
     const data = (await downloadMap(mapIds)).map((map: any) => ({ id: map.id, data: map.contents }));
     insertDataBulk({
       table: "maps",
@@ -82,7 +82,7 @@ async function getFiles(plays: ScoreResponse[], user: UserResponse, reply: (opti
       mapsInBulk = [...mapsInBulk, map];
     });
     updateDownloadingCache(user.id, false);
-    message.edit({ embeds: [new EmbedBuilder().setTitle("Success").setDescription("Maps have been downloaded, setting up embed.").setColor("Green")] });
+    message.edit({ embeds: [new EmbedBuilder().setTitle(locale.misc.success).setDescription(locale.embeds.nochoke.mapsDownloaded).setColor("Green")] });
   }
 
   return mapsInBulk.reduce((acc: any, { id, data }: { id: number; data: string }) => {
@@ -91,7 +91,7 @@ async function getFiles(plays: ScoreResponse[], user: UserResponse, reply: (opti
   }, {});
 }
 
-async function getSubsequentPlays({ user, plays, page, mode }: { user: UserResponse; plays: noChokePlayDetails[]; page: number; mode: osuModes }) {
+async function getSubsequentPlays({ user, plays, page, mode, locale }: { user: UserResponse; plays: noChokePlayDetails[]; page: number; mode: osuModes; locale: any }) {
   const userDetails = getUser({ user, mode });
   let description = [];
 
@@ -121,8 +121,13 @@ async function getSubsequentPlays({ user, plays, page, mode }: { user: UserRespo
     .setThumbnail(userDetails.userAvatar)
     .setDescription(description.join(""))
     .setFooter({
-      text: `Page ${page + 1}/${Math.ceil(plays.length / 5)} • Approx. rank for ${newTotalPp.toFixed(2)}pp: #${await fetch(`https://osudaily.net/api/pp.php?k=${Bun.env.OSU_DAILY_API}&m=${rulesetId}&t=pp&v=${newTotalPp}`)
-        .then((res) => res.json())
-        .then((res: any) => res?.rank?.toLocaleString())}`,
+      text: `${locale.embeds.page.replace("{PAGE}", `${page + 1}/${Math.ceil(plays.length / 5)}`)} • ${
+        locale.embeds.nochoke.approximateRank.replace("{PP}", newTotalPp.toFixed(2)).replace(
+          "{RANK}",
+          await fetch(`https://osudaily.net/api/pp.php?k=${Bun.env.OSU_DAILY_API}&m=${rulesetId}&t=pp&v=${newTotalPp}`)
+            .then((res) => res.json())
+            .then((res: any) => res?.rank?.toLocaleString()),
+        )
+      } `,
     });
 }

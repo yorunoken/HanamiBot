@@ -1,0 +1,75 @@
+{
+  "embeds": {
+    "page": "Sayfa {PAGE}",
+    "otherPlays": "**__Harita üzerindeki diğer oyunlar:__**",
+    "provideUsername": "Lütfen bir kullanıcı adı girin",
+    "help": {
+      "title": "`help <komut>` komutunun detayları için kullanın",
+      "commandNotFound": "{NAME} adlı (veya takma adı) komut bulunamadı.",
+      "commandInfoTitleEmbed": "Komut bilgisi: {NAME}"
+    },
+    "leaderboard": {
+      "noScores": "Bu haritanın lider tablosunda skor yok."
+    },
+    "link": {
+      "success": "Discord hesabınızı (<@{ID}>) osu! kullanıcı {USERNAME} ile başarıyla bağladınız"
+    },
+    "plays": {
+      "top": "en iyi",
+      "recent": "son",
+      "noScores": "`{USERNAME}` kullanıcısının Bancho'da {TYPE} oyunu yok.",
+      "playsFound": "`{LENGTH}` oyun bulundu"
+    },
+    "whatif": {
+      "count": "Bir",
+      "plural": "ler",
+      "title": "{PP}pp bir oyun, {USERNAME}'in en iyi 100 oyunu arasında olmaz, bu nedenle sıralaması ve pp'si değişmez.",
+      "description": "{COUNT} yeni {PP}pp oyun{PLURAL} {USERNAME}'in #{POSITION} en iyi oyunu olacaktır.\nToplam pp'sini {NEWPP}'e çıkaracak ve {DIFFPP} artıracak, sıralamasını #{RANK} (+{RANKDIFF}) yapacaktır."
+    },
+    "profile": {
+      "peakRank": "Zirve Sırası",
+      "achieved": "Başarıldı",
+      "statistics": "İstatistikler",
+      "accuracy": "Doğruluk",
+      "level": "Seviye",
+      "playcount": "Oyun Sayısı",
+      "followers": "Takipçiler",
+      "maxCombo": "Maksimum Kombo",
+      "recommendedStars": "Tavsiye Edilen Yıldız Değeri",
+      "grades": "Dereceler",
+      "joinDate": "osu! katılım tarihi {DATE} ({AGO} yıl önce)",
+      "score": "Skor",
+      "rankedScore": "Sıralı Skor",
+      "totalScore": "Toplam Skor",
+      "objectsHit": "Vurulan Nesneler",
+      "profile": "Profil"
+    },
+    "nochoke": {
+      "alreadyDownloading": "Bot zaten {USERNAME}'in oyunlarını indirme sürecindedir. Lütfen sabırlı olun.",
+      "mapsArentInDb": "{USERNAME}'in oyunlarının `{MISSINGMAPS}` tanesi botun veritabanında yok. Lütfen bot oyunlarınızı indirirken bekleyin.",
+      "mapsDownloaded": "Haritalar indirildi, gömülü nesne ayarlanıyor.",
+      "approximateRank": "{PP}pp için Yaklaşık sıra: #{RANK}"
+    }
+  },
+  "fails": {
+    "linkFail": "Bir şeyler ters gitti, kullanıcı adını tırnak içine almayı deneyin (\")",
+    "userDoesntExist": "{USER} kullanıcısı Bancho'da mevcut değil.",
+    "userHasNoScores": "{USER} bu beatmap'te hiç skoru yok.",
+    "provideValidPage": "Lütfen geçerli bir sayfa numarası girin (1 ile {MAXVALUE} arasında)",
+    "noLeaderboard": "Ya bu harita yoktur ya da bir lider tablosu yoktur.",
+    "noBeatmapIdInCtx": "Bu sohbette herhangi bir beatmap gömülü nesnesi bulunmamaktadır.",
+    "error": "Bir şeyler ters gitti.",
+    "interactionError": "Bu etkileşimle ilgili bir hata oluştu. Lütfen tekrar deneyin.",
+    "cooldownTime": "{COOLDOWN} içinde tekrar deneyin",
+    "userButtonNotAllowed": "Bu düğmelere tıklama iznine sahip olmak için komutu başlatan kişi olmanız gerekir."
+  },
+  "modals": {
+    "enterValue": "Bir değer girin",
+    "valueInsert": "Değerinizi buraya girin. (1-{MAXVALUE})"
+  },
+  "misc": {
+    "success": "Başarılı!",
+    "warning": "Uyarı!",
+    "poweredBy": "YoruNoKen'in osu! destekçisi tarafından desteklenmektedir"
+  }
+}
