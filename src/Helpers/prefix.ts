@@ -30,7 +30,7 @@ const getsubCommand = (content: string) =>
 async function addPrefix({ options, prefix }: { options: any; prefix: string }) {
   const guildId = options.guildId;
 
-  const data = JSON.parse((await getServer(guildId)).data);
+  const data = JSON.parse((getServer(guildId)).data);
 
   const documentPrefixes: string[] | undefined = data.prefix;
 
@@ -44,7 +44,7 @@ async function addPrefix({ options, prefix }: { options: any; prefix: string }) 
 
   data.prefix = prefixesArray;
 
-  await insertData({ table: "servers", id: guildId, data: JSON.stringify(data) });
+  insertData({ table: "servers", id: guildId, data: JSON.stringify(data) });
   updatePrefixCache(data.prefix, guildId);
 
   return await options.reply(`The prefix \`${prefix}\` has been added to the array of prefixes!`);
@@ -53,7 +53,7 @@ async function addPrefix({ options, prefix }: { options: any; prefix: string }) 
 async function removePrefix({ options, prefix }: { options: any; prefix: string }) {
   const guildId = options.guildId!;
 
-  const data = JSON.parse((await getServer(guildId)).data);
+  const data = JSON.parse((getServer(guildId)).data);
 
   const documentPrefixes: string[] | undefined = data.prefix;
 
@@ -67,7 +67,7 @@ async function removePrefix({ options, prefix }: { options: any; prefix: string 
   const prefixesArray = documentPrefixes.filter((item) => !item.includes(prefix));
   data.prefix = prefixesArray.length > 0 ? prefixesArray : undefined;
 
-  await insertData({ table: "servers", id: guildId, data: JSON.stringify(data) });
+  insertData({ table: "servers", id: guildId, data: JSON.stringify(data) });
   updatePrefixCache(data.prefix, guildId);
 
   return await options.reply(`The prefix \`${prefix}\` has been removed from the array of prefixes!`);
@@ -76,8 +76,7 @@ async function removePrefix({ options, prefix }: { options: any; prefix: string 
 async function list({ options, prefix }: { options: any; prefix: string }) {
   const guildId = options.guildId!;
 
-  const document = await getServer(guildId);
-  let data = JSON.parse(document.data);
+  let data = JSON.parse(getServer(guildId).data);
   const prefixes: string[] = data.prefix || [defaultPrefix];
 
   return await options.reply(`This server's current prefixes are: \`${prefixes.join(", ")}\``);

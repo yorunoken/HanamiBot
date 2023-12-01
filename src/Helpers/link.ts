@@ -2,24 +2,24 @@ import { ChatInputCommandInteraction, EmbedBuilder, Message, User } from "discor
 import { v2 } from "osu-api-extended";
 import { getUser, getUsernameFromArgs, insertData, Interactionhandler } from "../utils";
 
-export async function start(interaction: ChatInputCommandInteraction | Message, args?: string[]) {
+export async function start(interaction: ChatInputCommandInteraction | Message, locale: any, args?: string[]) {
   const options = Interactionhandler(interaction, args);
   const { reply } = options;
 
   const username = options.userArgs;
   if (username.length === 0) {
-    return reply("Please provide a username");
+    return reply(locale.embeds.provideUsername);
   }
 
   const userOptions = getUsernameFromArgs({} as User, username);
   if (userOptions?.user.status === false) {
-    return reply("Something went wrong, try wrapping the username in quotes (\")");
+    return reply(locale.fails.linkFail);
   }
 
   const author = options.author;
   const user = await v2.user.details(userOptions?.user, "osu");
   if (!user.id) {
-    return options.reply(`The user \`${userOptions?.user}\` does not exist in Bancho.`);
+    return options.reply(locale.fails.userDoesntExist.replace("{USER}", userOptions?.user));
   }
 
   let currentDocs = await getUser(author.id);
@@ -33,6 +33,6 @@ export async function start(interaction: ChatInputCommandInteraction | Message, 
 
   insertData({ table: "users", id: author.id, data: JSON.stringify(data) });
 
-  const embed = new EmbedBuilder().setColor("Green").setTitle(`Success!`).setDescription(`Successfully linked your Discord account (<@${author.id}>) to osu! user ${user.username}`).setThumbnail(user.avatar_url);
+  const embed = new EmbedBuilder().setColor("Green").setTitle(locale.misc.success).setDescription(locale.embeds.link.success.replace("{ID}", author.id).replace("{USERNAME}", user.username)).setThumbnail(user.avatar_url);
   await reply({ embeds: [embed] });
 }

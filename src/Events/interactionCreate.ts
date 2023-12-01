@@ -14,6 +14,8 @@ export default class InteractionCreateEvent extends BaseEvent {
       return;
     }
 
+    const locale = await import(`../locales/${this.client.localeLanguage.get(interaction.guildId) ?? "en"}.json`);
+
     if (interaction.isModalSubmit()) {
       const message = interaction.message;
       if (!message) {
@@ -44,7 +46,7 @@ export default class InteractionCreateEvent extends BaseEvent {
       const sillyOptions = this.client.sillyOptions[interaction.message.id];
 
       if (interaction.user.id !== sillyOptions.initializer.id) {
-        interaction.reply({ ephemeral: true, content: "You need to be the one who initialized the command to be able to click the buttons." });
+        interaction.reply({ ephemeral: true, content: locale.fails.userButtonNotAllowed });
         return;
       }
 
@@ -53,7 +55,7 @@ export default class InteractionCreateEvent extends BaseEvent {
         const modal = new ModalBuilder().setCustomId("myModal").setTitle("Enter a value");
         const favoriteColorInput = new TextInputBuilder()
           .setCustomId(sillyOptions.buttonHandler === "handleRecentButtons" ? "index" : sillyOptions.embedOptions.index ? "index" : "page")
-          .setLabel(`Your value here. (1-${sillyOptions.buttonHandler === "handleRecentButtons" ? playsLength : sillyOptions.embedOptions.index ? playsLength : Math.ceil(playsLength / 5)})`)
+          .setLabel(locale.modals.valueInsert.replace("{MAXVALUE}", sillyOptions.buttonHandler === "handleRecentButtons" ? playsLength : sillyOptions.embedOptions.index ? playsLength : Math.ceil(playsLength / 5)))
           .setStyle(TextInputStyle.Short);
 
         const firstActionRow = new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(favoriteColorInput);
@@ -73,10 +75,10 @@ export default class InteractionCreateEvent extends BaseEvent {
       try {
         const command = this.client.slashCommands.get(interaction.commandName);
         if (!command) return;
-        command.run({ client: this.client, interaction, db });
+        command.run({ client: this.client, interaction, db, locale });
       } catch (e) {
         console.error(e);
-        interaction.reply({ content: "There was an error with this interaction. Please try again.", ephemeral: true });
+        interaction.reply({ content: locale.fails.interactionError, ephemeral: true });
       }
       return;
     }

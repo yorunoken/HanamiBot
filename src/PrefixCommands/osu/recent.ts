@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import { start } from "../../Helpers/plays";
-import { osuModes } from "../../Structure";
+import { Locales, osuModes } from "../../Structure";
 import { ExtendedClient } from "../../Structure/index";
 import { returnFlags } from "../../utils";
 
@@ -33,7 +33,7 @@ export const cooldown = 3000;
 export const description = `Get the recent play of an osu! player.\nMods can be specified through +_, +!_, -!_ syntax`;
 export const flags = returnFlags({ index: true });
 
-export async function run({ message, args, commandName, index, client }: { message: Message; args: string[]; commandName: string; index: number; client: ExtendedClient }) {
+export async function run({ message, args, commandName, index, client, locale }: { message: Message; args: string[]; commandName: string; index: number; client: ExtendedClient; locale: Locales }) {
   await message.channel.sendTyping();
 
   const alias = modeAliases[commandName.toLowerCase()];
@@ -41,5 +41,5 @@ export async function run({ message, args, commandName, index, client }: { messa
   const passOnly = alias.passOnly || false;
   const isTops = false;
 
-  await start({ isTops, interaction: message, passOnly, args, mode: modeOptions, number: index - 1, client });
+  await start({ isTops, interaction: message, passOnly, args, mode: modeOptions, number: index - 1, client, locale });
 }

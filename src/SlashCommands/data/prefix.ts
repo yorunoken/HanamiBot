@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "discord.js";
+import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 export const data = new SlashCommandBuilder()
   .setName("prefix")
   .setDescription("Set the prefix of the bot.")
@@ -15,4 +15,5 @@ export const data = new SlashCommandBuilder()
       .addStringOption((o) => o.setName("prefix").setDescription("The prefix").setRequired(true))
   )
   .addSubcommand((o) => o.setName("reset").setDescription("Remove all of the prefixes"))
-  .addSubcommand((o) => o.setName("list").setDescription("Get a list of prefixes"));
+  .addSubcommand((o) => o.setName("list").setDescription("Get a list of prefixes"))
+  .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild);

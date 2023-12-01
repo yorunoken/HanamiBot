@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import { start } from "../../Helpers/nochoke";
-import { osuModes } from "../../Structure";
+import { Locales, osuModes } from "../../Structure";
 import { ExtendedClient } from "../../Structure/index";
 import { returnFlags } from "../../utils";
 
@@ -22,11 +22,11 @@ export const cooldown = 3000;
 export const description = `Get the top plays of an osu! player.\nMods can be specified through \`+_, +!_, -!_\` syntax`;
 export const flags = returnFlags({ index: true, page: true });
 
-export async function run({ message, args, commandName, index, client }: { message: Message; args: string[]; commandName: string; index: number; client: ExtendedClient }) {
+export async function run({ message, args, commandName, index, client, locale }: { message: Message; args: string[]; commandName: string; index: number; client: ExtendedClient; locale: Locales }) {
   await message.channel.sendTyping();
 
   const alias = modeAliases[commandName.toLowerCase()];
   const mode = alias.mode || undefined;
 
-  await start({ interaction: message, args, mode, client });
+  await start({ interaction: message, args, mode, client, locale });
 }

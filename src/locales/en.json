@@ -1,0 +1,75 @@
+{
+  "embeds": {
+    "page": "Page {PAGE}",
+    "otherPlays": "**__Other plays on the map:__**",
+    "provideUsername": "Please provide a username",
+    "help": {
+      "title": "Use `help <command>` for details of a command",
+      "commandNotFound": "The command with the name (or alias) {NAME} was not found.",
+      "commandInfoTitleEmbed": "Information of command: {NAME}"
+    },
+    "leaderboard": {
+      "noScores": "This map has no scores in its leaderboard."
+    },
+    "link": {
+      "success": "Successfully linked your Discord account (<@{ID}>) to osu! user {USERNAME}"
+    },
+    "plays": {
+      "top": "top",
+      "recent": "recent",
+      "noScores": "The user `{USERNAME}` does not have any {TYPE} plays in Bancho.",
+      "playsFound": "Found `{LENGTH}` plays"
+    },
+    "whatif": {
+      "count": "A",
+      "plural": "s",
+      "title": "A {PP}pp play would not be in {USERNAME}'s top 100 plays, so their rank and pp remains unchanged.",
+      "description": "{COUNT} new {PP}pp play{PLURAL} would be {USERNAME}'s #{POSITION} top play.\nIt would increase their total pp to {NEWPP}, and by {DIFFPP} and increase their rank to #{RANK} (+{RANKDIFF})."
+    },
+    "profile": {
+      "peakRank": "Peak Rank",
+      "achieved": "Achieved",
+      "statistics": "Statistics",
+      "accuracy": "Accuracy",
+      "level": "Level",
+      "playcount": "Playcount",
+      "followers": "Followers",
+      "maxCombo": "Max Combo",
+      "recommendedStars": "Recommended Star Rating",
+      "grades": "Grades",
+      "joinDate": "Joined osu! {DATE} ({AGO} years ago)",
+      "score": "Score",
+      "rankedScore": "Ranked Score",
+      "totalScore": "Total Score",
+      "objectsHit": "Objects Hit",
+      "profile": "Profile"
+    },
+    "nochoke": {
+      "alreadyDownloading": "The bot is already in the proccess of downloading {USERNAME}'s plays. Please be patient.",
+      "mapsArentInDb": "`{MISSINGMAPS}` of {USERNAME}'s plays are not in the bot's database. Please wait while the bot is downloading your maps.",
+      "mapsDownloaded": "Maps have been downloaded, setting up embed.",
+      "approximateRank": "Approx. rank for {PP}pp: #{RANK}"
+    }
+  },
+  "fails": {
+    "linkFail": "Something went wrong, try wrapping the username in quotes (\")",
+    "userDoesntExist": "The user {USER} does not exist in Bancho.",
+    "userHasNoScores": "{USER} has no scores on this beatmap.",
+    "provideValidPage": "Please provide a valid page (between 1 and {MAXVALUE})",
+    "noLeaderboard": "Either this map doesn't exist, or it doesn't have a leaderboard.",
+    "noBeatmapIdInCtx": "There doesn't seem to be any beatmap embeds in this conversation.",
+    "error": "Something went wrong.",
+    "interactionError": "There was an error with this interaction. Please try again.",
+    "cooldownTime": "Try again in {COOLDOWN}",
+    "userButtonNotAllowed": "You need to be the one who initialized the command to be able to click the buttons."
+  },
+  "modals": {
+    "enterValue": "Enter a value",
+    "valueInsert": "Your value here. (1-{MAXVALUE})"
+  },
+  "misc": {
+    "success": "Success!",
+    "warning": "Warning!",
+    "poweredBy": "Powered by YoruNoKen's osu! supporter"
+  }
+}

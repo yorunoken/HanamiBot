@@ -1,15 +1,16 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
-import { Client, ClientOptions, Collection } from "discord.js";
+import { Client, ClientOptions } from "discord.js";
 import fs from "fs";
 import { GuildCreateEvent, InteractionCreateEvent, MessageCreateEvent, ReadyEvent } from "../Events";
-import { getServer, insertData } from "../utils";
+import { getServer, getServersInBulk, insertData } from "../utils";
 import { commandInterface, PrefixCommands, SlashCommands } from "./types";
 
 export default class extends Client {
   slashCommands: Map<string, SlashCommands>;
   prefixCommands: Map<string, PrefixCommands>;
   aliases: Map<string, string>;
+  localeLanguage: Map<string, string>;
   sillyOptions: Record<string, commandInterface>;
 
   constructor(options: ClientOptions) {
@@ -17,6 +18,7 @@ export default class extends Client {
     this.slashCommands = new Map();
     this.prefixCommands = new Map();
     this.aliases = new Map();
+    this.localeLanguage = new Map();
     this.sillyOptions = {};
 
     this.loadEvents();
@@ -29,11 +31,24 @@ export default class extends Client {
     this.on("ready", () => new ReadyEvent(this).execute());
   }
 
-  public async deployCommands() {
+  public async putLanguages() {
+    const serversId = Array.from(this.guilds.cache.keys());
+    const guilds = getServersInBulk(serversId);
+    for (const guildId of serversId) {
+      const guild = guilds.find((item: any) => item.id === Number(guildId));
+      if (!guild.language) {
+        insertData({ table: "servers", data: JSON.stringify({ ...JSON.parse(guild.data), language: "en" }), id: guildId });
+      }
+      this.localeLanguage.set(guildId, guild.length > 0 ? guild.language : "en");
+    }
+  }
+
+  public async deploy() {
     await this.loadSlashCmd();
     this.loadPrefixCmd();
     console.log("Loaded commands");
     await this.checkServers();
+    await this.putLanguages();
   }
 
   private loadPrefixCmd() {
@@ -57,7 +72,6 @@ export default class extends Client {
         }
       }
     }
-    console.log(this.aliases);
   }
 
   private async loadSlashCmd() {

@@ -1,6 +1,6 @@
 import { Client, Message } from "discord.js";
 import { start } from "../../Helpers/stats";
-import { osuModes } from "../../Structure";
+import { Locales, osuModes } from "../../Structure";
 
 const modeAliases: { [key: string]: { mode: osuModes } } = {
   stats: { mode: "osu" },
@@ -18,7 +18,7 @@ export const aliases = Object.keys(modeAliases);
 export const cooldown = 3000;
 export const description = `Get information of a map.\nMods can be specified through +_, +!_, -!_ syntax`;
 
-export async function run({ message, args, commandName }: { message: Message; args: string[]; commandName: string }) {
+export async function run({ message, args, commandName, locale }: { message: Message; args: string[]; commandName: string; locale: Locales }) {
   await message.channel.sendTyping();
   await start({ interaction: message, mode: modeAliases[commandName].mode, args });
 }

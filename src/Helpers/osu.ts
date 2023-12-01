@@ -5,13 +5,13 @@ import { commands, UserInfo } from "../Structure";
 import { ExtendedClient } from "../Structure/index";
 import { getUsernameFromArgs, Interactionhandler, showMoreButton } from "../utils";
 
-export async function start(interaction: Message | ChatInputCommandInteraction, client: ExtendedClient, args?: string[], mode?: any) {
+export async function start(interaction: Message | ChatInputCommandInteraction, client: ExtendedClient, locale: any, args?: string[], mode?: any) {
   const options = Interactionhandler(interaction, args);
   options.mode = mode === "catch" ? "fruits" : mode ?? options.mode;
 
   const userOptions = getUsernameFromArgs(options.author, options.userArgs);
   if (!userOptions) {
-    return options.reply("Something went wrong.");
+    return options.reply(locale.fails.error);
   }
   if (userOptions.user?.status === false) {
     return options.reply(userOptions.user.message);
@@ -19,18 +19,18 @@ export async function start(interaction: Message | ChatInputCommandInteraction, 
 
   const user = await v2.user.details(userOptions.user, options.mode);
   if (!user.id) {
-    return options.reply(`The user \`${userOptions.user}\` does not exist in Bancho.`);
+    return options.reply(locale.fails.userDoesntExist.replace("{USER}", userOptions?.user));
   }
 
   const userDetailOptions = getUser({ user, mode: options.mode });
 
-  let page = buildPage1(userDetailOptions);
+  let page = buildPage1(userDetailOptions, locale);
   const response = await options.reply({ embeds: [page], components: [showMoreButton] });
-  client.sillyOptions[response.id] = { buttonHandler: "handleProfileButtons", type: commands.Profile, embedOptions: { pageBuilder: [buildPage1, buildPage2], options: userDetailOptions, response }, response, initializer: options.author };
+  client.sillyOptions[response.id] = { buttonHandler: "handleProfileButtons", type: commands.Profile, embedOptions: { pageBuilder: [buildPage1, buildPage2], options: userDetailOptions, locale, response }, response, initializer: options.author };
 }
 
-function buildPage1(options: UserInfo) {
-  const highRank = options.highestRank ? `\n**Peak Rank:** \`#${options.highestRank}\` **Achieved:** <t:${options.highestRankTime}:R>` : "";
+function buildPage1(options: UserInfo, locale: any) {
+  const highRank = options.highestRank ? `\n**${locale.embeds.profile.peakRank}:** \`#${options.highestRank}\` **${locale.embeds.profile.achieved}:** <t:${options.highestRankTime}:R>` : "";
 
   return new EmbedBuilder()
     .setColor("Purple")
@@ -42,21 +42,22 @@ function buildPage1(options: UserInfo) {
     .setThumbnail(options.userAvatar)
     .setFields(
       {
-        name: "Statistics",
-        value: `**Accuracy:** \`${options.accuracy}%\` •  **Level:** \`${options.level}\`\n**Playcount:** \`${options.playCount}\` (\`${options.playHours} hrs\`)${highRank}\n**Followers:** \`${options.followers}\` • **Max Combo:** \`${options.maxCombo}\`\n**Recommended Star Rating:** \`${options.recommendedStarRating}★\``,
+        name: locale.embeds.profile.statistics,
+        value:
+          `**${locale.embeds.profile.accuracy}:** \`${options.accuracy}%\` •  **${locale.embeds.profile.level}:** \`${options.level}\`\n**${locale.embeds.profile.playcount}:** \`${options.playCount}\` (\`${options.playHours} hrs\`)${highRank}\n**${locale.embeds.profile.followers}:** \`${options.followers}\` • **${locale.embeds.profile.maxCombo}:** \`${options.maxCombo}\`\n**${locale.embeds.profile.recommendedStars}:** \`${options.recommendedStarRating}★\``,
       },
       {
-        name: "Grades",
+        name: locale.embeds.profile.grades,
         value: `${options.emoteSsh}\`${options.rankSsh}\` ${options.emoteSs}\`${options.rankSs}\` ${options.emoteSh}\`${options.rankSh}\` ${options.emoteS}\`${options.rankS}\` ${options.emoteA}\`${options.rankA}\``,
       },
     )
     .setImage(options.coverUrl)
     .setFooter({
-      text: `Joined osu! ${options.formattedDate} (${options.userJoinedAgo} years ago)`,
+      text: locale.embeds.profile.joinDate.replace("{DATE}", options.formattedDate).replace("{AGO}", options.userJoinedAgo),
     });
 }
 
-function buildPage2(options: UserInfo) {
+function buildPage2(options: UserInfo, locale: any) {
   return new EmbedBuilder()
     .setColor("Purple")
     .setAuthor({
@@ -67,14 +68,14 @@ function buildPage2(options: UserInfo) {
     .setThumbnail(options.userAvatar)
     .setFields(
       {
-        name: "Score",
-        value: `**Ranked Score:** \`${options.rankedScore}\`\n**Total Score:** \`${options.totalScore}\`\n**Objects Hit:** \`${options.objectsHit}\``,
+        name: locale.embeds.profile.score,
+        value: `**${locale.embeds.profile.rankedScore}:** \`${options.rankedScore}\`\n**${locale.embeds.profile.totalScore}:** \`${options.totalScore}\`\n**${locale.embeds.profile.objectsHit}:** \`${options.objectsHit}\``,
         inline: true,
       },
-      { name: "Profile", value: `${options.occupation}${options.interest}${options.location}`, inline: true },
+      { name: locale.embeds.profile.profile, value: `${options.occupation}${options.interest}${options.location}`, inline: true },
     )
     .setImage(options.coverUrl)
     .setFooter({
-      text: `Joined osu! ${options.formattedDate} (${options.userJoinedAgo} years ago)`,
+      text: locale.embeds.profile.joinDate.replace("{DATE}", options.formattedDate).replace("{AGO}", options.userJoinedAgo),
     });
 }
