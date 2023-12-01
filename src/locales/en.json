@@ -1,4 +1,5 @@
 {
+  "code": "en-US",
   "embeds": {
     "page": "Page {PAGE}",
     "otherPlays": "**__Other plays on the map:__**",
@@ -9,7 +10,25 @@
       "commandInfoTitleEmbed": "Information of command: {NAME}"
     },
     "leaderboard": {
-      "noScores": "This map has no scores in its leaderboard."
+      "noScores": "This map has no scores in its leaderboard.",
+      "global": "global",
+      "country": "Turkish",
+      "type": "Showing {TYPE} leaderboard.",
+      "playScore": "<@{USERID}>'s score:"
+    },
+    "map": {
+      "beatmapBy": "Beatmap by {USERNAME}",
+      "stars": "Stars",
+      "mods": "Mods",
+      "length": "Length",
+      "maxCombo": "Max Combo",
+      "objects": "Objects",
+      "links": "Links",
+      "ranked": "ranked",
+      "loved": "loved",
+      "qualified": "qualified",
+      "pending": "pending",
+      "graveyard": "graveyard"
     },
     "link": {
       "success": "Successfully linked your Discord account (<@{ID}>) to osu! user {USERNAME}"
@@ -18,12 +37,16 @@
       "top": "top",
       "recent": "recent",
       "noScores": "The user `{USERNAME}` does not have any {TYPE} plays in Bancho.",
-      "playsFound": "Found `{LENGTH}` plays"
+      "playsFound": "Found `{LENGTH}` plays",
+      "try": "Try",
+      "length": "Length",
+      "mapper": "by {USERNAME}"
     },
     "whatif": {
-      "count": "A",
+      "count": "a",
       "plural": "s",
-      "title": "A {PP}pp play would not be in {USERNAME}'s top 100 plays, so their rank and pp remains unchanged.",
+      "title": "{USERNAME} gets {COUNT} new {PP}pp play{PLURAL}",
+      "samePp": "A {PP}pp play would not be in {USERNAME}'s top 100 plays, so their rank and pp remains unchanged.",
       "description": "{COUNT} new {PP}pp play{PLURAL} would be {USERNAME}'s #{POSITION} top play.\nIt would increase their total pp to {NEWPP}, and by {DIFFPP} and increase their rank to #{RANK} (+{RANKDIFF})."
     },
     "profile": {
@@ -51,7 +74,23 @@
       "approximateRank": "Approx. rank for {PP}pp: #{RANK}"
     }
   },
+  "classes": {
+    "occupation": "Occupation",
+    "interests": "Interests",
+    "location": "Location",
+    "globalRank": "Global Rank",
+    "ifFc": "If FC: {PP}pp for {ACCURACY}",
+    "songPreview": "Song Preview",
+    "mapPreview": "Map Preview",
+    "fullBackground": "Full Background",
+    "ranked": "Ranked At",
+    "loved": "Loved At",
+    "qualified": "Qualified At",
+    "updatedAt": "Last Updated At"
+  },
   "fails": {
+    "languageDoesntExist": "That language doesn't exist in /locales. Consider [opening a pull request on github](https://github.com/YoruNoKen/HanamiBot) :)",
+    "channelDoesntExist": "This channeld doesn't exist.",
     "linkFail": "Something went wrong, try wrapping the username in quotes (\")",
     "userDoesntExist": "The user {USER} does not exist in Bancho.",
     "userHasNoScores": "{USER} has no scores on this beatmap.",
@@ -70,6 +109,8 @@
   "misc": {
     "success": "Success!",
     "warning": "Warning!",
-    "poweredBy": "Powered by YoruNoKen's osu! supporter"
+    "poweredBy": "Powered by YoruNoKen's osu! supporter",
+    "languageSet": "Successfully set language to: `{LANGUAGE}`",
+    "feedbackSent": "Feedback sent, thank you!"
   }
 }

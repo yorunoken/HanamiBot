@@ -186,6 +186,24 @@ interface Embeds {
   };
   leaderboard: {
     noScores: string;
+    global: string;
+    country: string;
+    type: string;
+    userScore: string;
+  };
+  map: {
+    beatmapBy: string;
+    stars: string;
+    mods: string;
+    length: string;
+    maxCombo: string;
+    objects: string;
+    links: string;
+    ranked: string;
+    loved: string;
+    qualified: string;
+    pending: string;
+    graveyard: string;
   };
   link: {
     success: string;
@@ -195,10 +213,14 @@ interface Embeds {
     recent: string;
     noScores: string;
     playsFound: string;
+    try: string;
+    length: string;
+    mapper: string;
   };
   whatif: {
     count: string;
     plural: string;
+    samePp: string;
     title: string;
     description: string;
   };
@@ -228,7 +250,24 @@ interface Embeds {
   };
 }
 
+interface Classes {
+  occupation: string;
+  interests: string;
+  location: string;
+  globalRank: string;
+  ifFc: string;
+  songPreview: string;
+  mapPreview: string;
+  fullBackground: string;
+  ranked: string;
+  loved: string;
+  qualified: string;
+  updatedAt: string;
+}
+
 interface Fails {
+  languageDoesntExist: string;
+  channelDoesntExist: string;
   linkFail: string;
   userDoesntExist: string;
   userHasNoScores: string;
@@ -250,10 +289,14 @@ interface Misc {
   success: string;
   warning: string;
   poweredBy: string;
+  feedbackSent: string;
+  languageSet: string;
 }
 
 export interface Locales {
+  code: string;
   embeds: Embeds;
+  classes: Classes;
   fails: Fails;
   modals: Modals;
   misc: Misc;

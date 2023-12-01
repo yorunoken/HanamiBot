@@ -1,9 +1,9 @@
 import { ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
 import fs from "fs";
-import { ModuleReturn } from "../Structure";
+import { Locales, ModuleReturn } from "../Structure/index";
 import { Interactionhandler } from "../utils";
 
-export async function start({ interaction, args, locale }: { interaction: Message | ChatInputCommandInteraction; args?: string[]; locale: any }) {
+export async function start({ interaction, args, locale }: { interaction: Message | ChatInputCommandInteraction; args?: string[]; locale: Locales }) {
   const options = Interactionhandler(interaction, args);
   const commandName = options.commandName?.length! > 0 ? options.commandName?.join("") : undefined;
 
@@ -19,7 +19,7 @@ export async function start({ interaction, args, locale }: { interaction: Messag
   commandName ? commandHelp(options, commandName, commands, locale) : helpMenu(options, commands, locale);
 }
 
-function helpMenu(options: any, commands: any, locale: any) {
+function helpMenu(options: any, commands: any, locale: Locales) {
   const embed = new EmbedBuilder().setTitle(locale.embeds.help.title);
   const categories: any = {};
   Object.values(commands).forEach((array: any) => categories[array.category] = (categories[array.category] || []).concat(array));
@@ -30,7 +30,7 @@ function helpMenu(options: any, commands: any, locale: any) {
   options.reply({ embeds: [embed] });
 }
 
-function commandHelp(options: any, name: string, commands: any, locale: any) {
+function commandHelp(options: any, name: string, commands: any, locale: Locales) {
   const command = Object.values(commands).find((cmd: any) => cmd.aliases.some((alias: string) => alias.toLowerCase() === name.toLowerCase()) || cmd.name.toLowerCase() === name.toLowerCase()) as ModuleReturn | undefined;
   if (!command) {
     options.reply(locale.embeds.help.commandNotFound.replace("{NAME}", name));

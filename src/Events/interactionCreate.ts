@@ -1,6 +1,6 @@
 import { ActionRowBuilder, Interaction, InteractionType, ModalActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import { ButtonActions } from "../classes";
-import { ExtendedClient } from "../Structure";
+import { ExtendedClient, Locales } from "../Structure";
 import BaseEvent from "../Structure/BaseEvent";
 import { db } from "./ready";
 
@@ -14,7 +14,7 @@ export default class InteractionCreateEvent extends BaseEvent {
       return;
     }
 
-    const locale = await import(`../locales/${this.client.localeLanguage.get(interaction.guildId) ?? "en"}.json`);
+    const locale: Locales = await import(`../locales/${this.client.localeLanguage.get(interaction.guildId) ?? "en"}.json`);
 
     if (interaction.isModalSubmit()) {
       const message = interaction.message;
@@ -52,7 +52,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 
       if (interaction.customId === "indexbtn") {
         const playsLength = sillyOptions.embedOptions.plays.length;
-        const modal = new ModalBuilder().setCustomId("myModal").setTitle("Enter a value");
+        const modal = new ModalBuilder().setCustomId("myModal").setTitle(locale.modals.enterValue);
         const favoriteColorInput = new TextInputBuilder()
           .setCustomId(sillyOptions.buttonHandler === "handleRecentButtons" ? "index" : sillyOptions.embedOptions.index ? "index" : "page")
           .setLabel(locale.modals.valueInsert.replace("{MAXVALUE}", sillyOptions.buttonHandler === "handleRecentButtons" ? playsLength : sillyOptions.embedOptions.index ? playsLength : Math.ceil(playsLength / 5)))

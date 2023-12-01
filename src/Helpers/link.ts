@@ -1,8 +1,9 @@
 import { ChatInputCommandInteraction, EmbedBuilder, Message, User } from "discord.js";
 import { v2 } from "osu-api-extended";
+import { Locales } from "../Structure/index";
 import { getUser, getUsernameFromArgs, insertData, Interactionhandler } from "../utils";
 
-export async function start(interaction: ChatInputCommandInteraction | Message, locale: any, args?: string[]) {
+export async function start(interaction: ChatInputCommandInteraction | Message, locale: Locales, args?: string[]) {
   const options = Interactionhandler(interaction, args);
   const { reply } = options;
 

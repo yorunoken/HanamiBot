@@ -3,7 +3,7 @@ import ms from "ms";
 import { prefixCache } from "../cache";
 import { defaultPrefix } from "../constants";
 import { getLoneCommand } from "../Helpers/loneCommands";
-import { ExtendedClient } from "../Structure";
+import { ExtendedClient, Locales } from "../Structure";
 import BaseEvent from "../Structure/BaseEvent";
 import { getServer } from "../utils";
 import { db } from "./ready";
@@ -94,7 +94,7 @@ export default class MessageCreateEvent extends BaseEvent {
     const command = alias ? this.client.prefixCommands.get(alias) : this.client.prefixCommands.get(commandName);
     if (!command) return;
 
-    const locale = await import(`../locales/${this.client.localeLanguage.get(guildId) ?? "en"}.json`);
+    const locale: Locales = await import(`../locales/${this.client.localeLanguage.get(guildId) ?? "en"}.json`);
     if (!command.cooldown) {
       command.run({ client: this.client, message, args, prefix, index: number, commandName, db, locale });
       return;
@@ -102,7 +102,7 @@ export default class MessageCreateEvent extends BaseEvent {
     if (cooldown.has(`${command.name}${message.author.id}`)) {
       message
         .reply({
-          content: locale.fails.cooldowntime.replace("{COOLDOWN}", ms(cooldown.get(`${command.name}${message.author.id}`) - Date.now(), { long: true })),
+          content: locale.fails.cooldownTime.replace("{COOLDOWN}", ms(cooldown.get(`${command.name}${message.author.id}`) - Date.now(), { long: true })),
         })
         .then((msg) => setTimeout(() => msg.delete(), cooldown.get(`${command.name}${message.author.id}`) - Date.now()));
       return;

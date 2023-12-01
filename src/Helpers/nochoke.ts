@@ -4,11 +4,10 @@ import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores
 import { response as UserResponse } from "osu-api-extended/dist/types/v2_user_details";
 import { downloadingMapUserCache, updateDownloadingCache } from "../cache";
 import { getUser } from "../functions";
-import { commands, noChokePlayDetails, osuModes } from "../Structure";
-import { ExtendedClient } from "../Structure/index";
+import { commands, ExtendedClient, Locales, noChokePlayDetails, osuModes } from "../Structure/index";
 import { buildActionRow, buttonBoolsTops, calculateWeightedScores, downloadMap, firstButton, getMapsInBulk, getPerformanceDetails, getUsernameFromArgs, grades, insertDataBulk, Interactionhandler, lastButton, nextButton, previousButton, rulesets, specifyButton } from "../utils";
 
-export async function start({ interaction, args, mode, client, locale }: { interaction: Message | ChatInputCommandInteraction; args?: string[]; mode?: osuModes; client: ExtendedClient; locale: any }) {
+export async function start({ interaction, args, mode, client, locale }: { interaction: Message | ChatInputCommandInteraction; args?: string[]; mode?: osuModes; client: ExtendedClient; locale: Locales }) {
   const interactionOptions = Interactionhandler(interaction, args);
   const { reply, author, userArgs } = interactionOptions;
   mode = (mode ?? interactionOptions.mode) as osuModes;
@@ -31,7 +30,7 @@ export async function start({ interaction, args, mode, client, locale }: { inter
   getNoChoke(interactionOptions, client, plays, parseInt((options.flags.p as string) || (options.flags.page as string)) - 1 || 0, user, reply, mode, locale);
 }
 
-async function getNoChoke(interactionOptions: any, client: ExtendedClient, plays: ScoreResponse[], page: number, user: UserResponse, reply: (options: any) => Promise<Message<boolean>>, mode: osuModes, locale: any) {
+async function getNoChoke(interactionOptions: any, client: ExtendedClient, plays: ScoreResponse[], page: number, user: UserResponse, reply: (options: any) => Promise<Message<boolean>>, mode: osuModes, locale: Locales) {
   const files = await getFiles(plays, user, reply, locale);
   if (files === false) {
     return;
@@ -61,7 +60,7 @@ async function getNoChoke(interactionOptions: any, client: ExtendedClient, plays
   client.sillyOptions[response.id] = { buttonHandler: "handleTopsButtons", type: commands["Top"], embedOptions, response, pageBuilder: getSubsequentPlays, initializer: interactionOptions.author };
 }
 
-async function getFiles(plays: ScoreResponse[], user: UserResponse, reply: (options: any) => Promise<Message<boolean>>, locale: any) {
+async function getFiles(plays: ScoreResponse[], user: UserResponse, reply: (options: any) => Promise<Message<boolean>>, locale: Locales) {
   const mapIds = plays.map((play) => play.beatmap.id);
   let mapsInBulk = getMapsInBulk(mapIds);
   const missingMapIds = mapIds.filter((id) => !mapsInBulk.some((map: any) => map.id === id));
@@ -72,7 +71,7 @@ async function getFiles(plays: ScoreResponse[], user: UserResponse, reply: (opti
     }
 
     updateDownloadingCache(user.id, true);
-    const message = await reply({ embeds: [new EmbedBuilder().setTitle(locale.misc.warning).setDescription(locale.embeds.nochoke.mapsArentInDb.replace("{MISSINGMAPS}", missingMapIds.length).replace("{USERNAME}", user.username)).setColor("Red")] });
+    const message = await reply({ embeds: [new EmbedBuilder().setTitle(locale.misc.warning).setDescription(locale.embeds.nochoke.mapsArentInDb.replace("{MISSINGMAPS}", missingMapIds.length.toString()).replace("{USERNAME}", user.username)).setColor("Red")] });
     const data = (await downloadMap(mapIds)).map((map: any) => ({ id: map.id, data: map.contents }));
     insertDataBulk({
       table: "maps",
@@ -91,8 +90,8 @@ async function getFiles(plays: ScoreResponse[], user: UserResponse, reply: (opti
   }, {});
 }
 
-async function getSubsequentPlays({ user, plays, page, mode, locale }: { user: UserResponse; plays: noChokePlayDetails[]; page: number; mode: osuModes; locale: any }) {
-  const userDetails = getUser({ user, mode });
+async function getSubsequentPlays({ user, plays, page, mode, locale }: { user: UserResponse; plays: noChokePlayDetails[]; page: number; mode: osuModes; locale: Locales }) {
+  const userDetails = getUser({ user, mode, locale });
   let description = [];
 
   const startPage = page * 5;

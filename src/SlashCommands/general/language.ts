@@ -1,15 +1,15 @@
 import { ChatInputCommandInteraction } from "discord.js";
 import fs from "fs";
-import { ExtendedClient } from "../../Structure";
+import { ExtendedClient, Locales } from "../../Structure";
 import { getServer, insertData } from "../../utils";
 
-export async function run({ interaction, client }: { interaction: ChatInputCommandInteraction; client: ExtendedClient }) {
+export async function run({ interaction, client, locale }: { interaction: ChatInputCommandInteraction; client: ExtendedClient; locale: Locales }) {
   await interaction.deferReply();
   if (!interaction.guildId) return;
 
   const language = interaction.options.getString("language", true).toLowerCase();
   if (!fs.existsSync(`./src/locales/${language}.json`)) {
-    interaction.editReply("That language doesn't exist in /locales consider [opening a pull request on github](https://github.com/YoruNoKen/HanamiBot) :)");
+    interaction.editReply(locale.fails.languageDoesntExist);
     return;
   }
 
@@ -18,6 +18,6 @@ export async function run({ interaction, client }: { interaction: ChatInputComma
   insertData({ table: "servers", data: JSON.stringify({ ...JSON.parse(guild.data), language }), id: guildId });
   client.localeLanguage.set(guildId, language);
 
-  interaction.editReply(`Successfully set language to: \`${language}\``);
+  interaction.editReply(locale.misc.languageSet.replace("{LANGUAGE}", language));
 }
 export { data } from "../data/language";
