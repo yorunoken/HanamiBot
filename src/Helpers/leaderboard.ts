@@ -101,7 +101,7 @@ async function buildMapEmbed({ map, fetched, page, file, initializer, locale }: 
     const hitValues = { count_300: stats.great || 0, count_100: stats.ok || 0, count_50: stats.meh || 0, count_miss: stats.miss || 0, count_geki: stats.perfect || 0, count_katu: stats.good || 0 };
     const performance = getPerformanceDetails({ mapText: file, maxCombo: score.max_combo, modsArg: mods, rulesetId: map.rulesetId, hitValues });
 
-    _userScore = `\n\n**__${locale.embeds.leaderboard.userScore.replace("{USERID}", initializer.user.id)}__**\n**#${initializer.index + 1} [${score.user.username}](https://osu.ppy.sh/users/${score.user.id})**: ${score.total_score.toLocaleString()} [**${score.max_combo}x**/${map.maxCombo}x] **+${mods.join("")}**\n${grades[score.rank]} **${performance.curPerf?.pp.toFixed(2)}**/${
+    _userScore = `\n\n**__${locale.embeds.leaderboard.playScore.replace("{USERID}", initializer.user.id)}__**\n**#${initializer.index + 1} [${score.user.username}](https://osu.ppy.sh/users/${score.user.id})**: ${score.total_score.toLocaleString()} [**${score.max_combo}x**/${map.maxCombo}x] **+${mods.join("")}**\n${grades[score.rank]} **${performance.curPerf?.pp.toFixed(2)}**/${
       performance.maxPerf.pp.toFixed(2)
     }pp (${(score.accuracy * 100).toFixed(2)}%) <t:${new Date(score.ended_at).getTime() / 1000}:R>`;
   }

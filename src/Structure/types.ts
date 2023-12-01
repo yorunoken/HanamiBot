@@ -190,7 +190,7 @@ interface Embeds {
     global: string;
     country: string;
     type: string;
-    userScore: string;
+    playScore: string;
   };
   map: {
     beatmapBy: string;
