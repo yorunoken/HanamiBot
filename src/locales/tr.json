@@ -13,14 +13,14 @@
       "noScores": "Bu beatmap'in sıralamasında hiç skor yok.",
       "global": "Küresel",
       "country": "Türk",
-      "type": "{TYPE} sıralama gösteriliyor.",
+      "type": "{TYPE} sıralaması gösteriliyor.",
       "playScore": "<@{USERID}> kişisinin skoru:"
     },
     "map": {
       "beatmapBy": "Beatmap {USERNAME} tarafından",
       "stars": "Zorluk",
       "mods": "Modlar",
-      "length": "Uzunkuk",
+      "length": "Uzunluk",
       "maxCombo": "Maksimum Kombo",
       "objects": "Objeler",
       "links": "Bağlantılar",
@@ -31,21 +31,21 @@
       "graveyard": "mezarlıkta"
     },
     "link": {
-      "success": "Discord hesabı (<@{ID}>) başarılı bir şekilde osu! hesabına {USERNAME} bağlandı"
+      "success": "Discord hesabı (<@{ID}>) başarılı bir şekilde {USERNAME} isimli oyuncuya bağlandı"
     },
     "plays": {
       "top": "yüksek skorlu",
       "recent": "yakın zamanlı",
-      "noScores": "oyuncu `{USERNAME}` tarafından yapılan {TYPE} bir skor bulunamadı.",
+      "noScores": "oyuncu `{USERNAME}` tarafından oynanılan {TYPE} bir skor bulunamadı.",
       "playsFound": "`{LENGTH}` adet skor bulundu",
       "try": "Deneme",
-      "length": "Uzunkuk",
+      "length": "Uzunluk",
       "mapper": "{USERNAME} tarafından"
     },
     "whatif": {
       "count": "bir",
       "plural": "",
-      "title": "{USERNAME} {COUNT} adet yeni {PP}pp skor alıyor",
+      "title": "{USERNAME} {COUNT} adet yeni {PP}pp skor alırsa ne olur",
       "samePp": "Bir {PP}pp skoru {USERNAME} kişisinin yüksek 100 skorlarının arasından olmaz, dolayısıyla sıralaması ve pp'si değişmez.",
       "description": "{COUNT} adet yeni {PP}pp skoru {USERNAME} kişisinin #{POSITION} yüksek skoru olur.\nToplam pp'sini {NEWPP}'e çıkarır, pp farkı {DIFFPP} olur ve sıralamasını #{RANK}'e çıkarır (+{RANKDIFF})."
     },
@@ -78,8 +78,8 @@
     "occupation": "Meslek",
     "interests": "İlgi Alanları",
     "location": "Konum",
-    "globalRank": "Küreseş Sıralama",
-    "ifFc": "{PP}pp FC için {ACCURACY}",
+    "globalRank": "Küresel Sıralama",
+    "ifFc": "{ACCURACY} ile FC {PP}pp'dir",
     "songPreview": "Şarkı Önizleme",
     "mapPreview": "Harita Önizleme",
     "fullBackground": "Arka Plan",
@@ -92,8 +92,8 @@
     "languageDoesntExist": "Bu dil /locales içinde mevcut değil. [Github üzerinden bir pull request açmayı düşünün](https://github.com/YoruNoKen/HanamiBot) :)",
     "channelDoesntExist": "Bu kanal mevcut değil.",
     "linkFail": "Bir şeyler yanlış gitti, kullanıcı adını tırnak içine almayı deneyin (\").",
-    "userDoesntExist": "{USER} kullanıcısı Bancho'da mevcut değil.",
-    "userHasNoScores": "{USER}, bu beatmap üzerinde skoru yok.",
+    "userDoesntExist": "{USER} kişisi Bancho'da mevcut değil.",
+    "userHasNoScores": "{USER} kişisinin, bu beatmap üzerinde skoru yok.",
     "provideValidPage": "Lütfen geçerli bir sayfa numarası sağlayın (1 ile {MAXVALUE} arasında).",
     "noLeaderboard": "Ya bu harita mevcut değil ya da bir sıralama tahtası yok.",
     "noBeatmapIdInCtx": "Bu konuşmada gömülü herhangi bir beatmap bulunamadı.",
@@ -109,7 +109,7 @@
   "misc": {
     "success": "Başarı!",
     "warning": "Uyarı!",
-    "poweredBy": "YoruNoKen'in osu! destekleyicisi ile güçlendirilmiştir",
+    "poweredBy": "YoruNoKen'in osu! supporter'ı ile sağlanmıştır",
     "languageSet": "Dil başarıyla {LANGUAGE} olarak ayarlandı",
     "feedbackSent": "Geri bildirim gönderildi, teşekkür ederiz!"
   }
