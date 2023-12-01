@@ -1,11 +1,11 @@
 import { ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
 import { v2 } from "osu-api-extended";
 import { getUser } from "../functions";
-import { commands, UserInfo } from "../Structure";
+import { commands, Locales, UserInfo } from "../Structure/index";
 import { ExtendedClient } from "../Structure/index";
 import { getUsernameFromArgs, Interactionhandler, showMoreButton } from "../utils";
 
-export async function start(interaction: Message | ChatInputCommandInteraction, client: ExtendedClient, locale: any, args?: string[], mode?: any) {
+export async function start(interaction: Message | ChatInputCommandInteraction, client: ExtendedClient, locale: Locales, args?: string[], mode?: any) {
   const options = Interactionhandler(interaction, args);
   options.mode = mode === "catch" ? "fruits" : mode ?? options.mode;
 
@@ -22,14 +22,14 @@ export async function start(interaction: Message | ChatInputCommandInteraction, 
     return options.reply(locale.fails.userDoesntExist.replace("{USER}", userOptions?.user));
   }
 
-  const userDetailOptions = getUser({ user, mode: options.mode });
+  const userDetailOptions = getUser({ user, mode: options.mode, locale });
 
   let page = buildPage1(userDetailOptions, locale);
   const response = await options.reply({ embeds: [page], components: [showMoreButton] });
   client.sillyOptions[response.id] = { buttonHandler: "handleProfileButtons", type: commands.Profile, embedOptions: { pageBuilder: [buildPage1, buildPage2], options: userDetailOptions, locale, response }, response, initializer: options.author };
 }
 
-function buildPage1(options: UserInfo, locale: any) {
+function buildPage1(options: UserInfo, locale: Locales) {
   const highRank = options.highestRank ? `\n**${locale.embeds.profile.peakRank}:** \`#${options.highestRank}\` **${locale.embeds.profile.achieved}:** <t:${options.highestRankTime}:R>` : "";
 
   return new EmbedBuilder()
@@ -57,7 +57,7 @@ function buildPage1(options: UserInfo, locale: any) {
     });
 }
 
-function buildPage2(options: UserInfo, locale: any) {
+function buildPage2(options: UserInfo, locale: Locales) {
   return new EmbedBuilder()
     .setColor("Purple")
     .setAuthor({

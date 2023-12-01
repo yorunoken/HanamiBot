@@ -4,12 +4,12 @@ import { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beat
 import { response as MapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
 import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_beatmap";
 import { getScore, getUser } from "../functions";
-import { osuModes, UserInfo } from "../Structure";
+import { Locales, osuModes, UserInfo } from "../Structure/index";
 import { downloadMap, getBeatmapId_FromContext, getMap, getPerformanceDetails, getUsernameFromArgs, insertData, Interactionhandler, rulesets } from "../utils";
 
 const leaderboardExists = (beatmap: BeatmapResponse) => typeof beatmap.id === "number" || ["qualified", "ranked", "loved"].includes(beatmap.status?.toLowerCase());
 
-export async function start({ interaction, client, args, mode, locale }: { interaction: Message<boolean>; client: Client<boolean>; args: string[]; mode: osuModes | string; locale: any }) {
+export async function start({ interaction, client, args, mode, locale }: { interaction: Message<boolean>; client: Client<boolean>; args: string[]; mode: osuModes | string; locale: Locales }) {
   const options = Interactionhandler(interaction, args);
 
   const userOptions = getUsernameFromArgs(options.author, options.userArgs);
@@ -35,7 +35,7 @@ export async function start({ interaction, client, args, mode, locale }: { inter
   if (!user.id) {
     return options.reply(locale.fails.userDoesntExist.replace("{USER}", userOptions.user));
   }
-  const userDetailOptions = getUser({ user, mode: options.mode });
+  const userDetailOptions = getUser({ user, mode: options.mode, locale });
 
   let scores = (await v2.scores.user.beatmap(beatmap.id, user.id, { mode: mode as osuModes })).sort((a, b) => b.pp - a.pp);
   const mods = userOptions?.mods?.codes;
@@ -83,12 +83,12 @@ export async function start({ interaction, client, args, mode, locale }: { inter
   return options.reply({ embeds: [await buildCompareEmbed(userDetailOptions, beatmap, scores, mode, locale)] });
 }
 
-async function buildCompareEmbed(user: UserInfo, map: MapResponse, scores: ScoreResponse[], mode: string, locale: any) {
+async function buildCompareEmbed(user: UserInfo, map: MapResponse, scores: ScoreResponse[], mode: string, locale: Locales) {
   const _scores = [];
   for (let i in scores) {
     const { max_combo } = scores[i];
 
-    const score = await getScore({ plays: scores as any, index: parseInt(i), mode: mode as osuModes, _isTops: false, isCompare: true, beatmap: map });
+    const score = await getScore({ plays: scores as any, index: parseInt(i), mode: mode as osuModes, _isTops: false, isCompare: true, beatmap: map, locale });
     _scores.push(
       i === "0"
         ? `${score.globalPlacement?.length && score.globalPlacement.length > 0 ? score.globalPlacement + "\n" : ""}${score.grade} ${score.modsPlay} **[${score.stars}★]** • ${score.totalScore} • ${score.accuracy}\n**${score.pp}pp**/${score.ssPp}pp ~~[${score.fcPp}pp]~~ • ${score.comboValue}\n${score.accValues} <t:${score.submittedTime}:R>\n`
