@@ -57,7 +57,7 @@
     "rank": {
       "rankHigh": "{USERNAME} zaten o sıralamadan yükste.",
       "playerMissing": "{USERNAME}, #{RANK}? sıralamasına ulaşmak için kaç pp skor yapması gerekiyor?",
-      "description": "{USERNAME}, **#{TARGET}** sıralamasına ulaşmak için bir **{PP}pp** skoru yapması gerekiyor. Bu skor #{POSITION} pozisyonunda olup, toplam pp'sini **{NEWPP}** sayısına"
+      "description": "{USERNAME}, **#{TARGET}** sıralamasına ulaşmak için bir **{PP}pp** skoru yapması gerekiyor. Bu skor #{POSITION} pozisyonunda olup, toplam pp'sini **{NEWPP}** sayısına yükseltir."
     },
     "profile": {
       "peakRank": "Zirve Sıralaması",
