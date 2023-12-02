@@ -39,7 +39,7 @@ export async function start({ interaction, client, locale }: { interaction: Mess
 }
 
 async function getEmbed(globalRank: number, user: UserInfo, newPlays: number[], ppValue: number, ppCount: number, newPp: number, oldPp: number, mode: osuModes, locale: Locales) {
-  const embed = new EmbedBuilder().setTitle(`${user.username} gets ${ppCount === 1 ? "a" : ppCount} ${ppValue}pp play.`).setColor("Purple")
+  const embed = new EmbedBuilder().setTitle(locale.embeds.whatif.title.replace("{PP}", ppValue.toFixed(2)).replace("{PLURAL}", ppCount === 1 ? "" : locale.embeds.whatif.plural).replace("{USERNAME}", user.username).replace("{COUNT}", ppCount === 1 ? locale.embeds.whatif.count : ppCount.toString())).setColor("Purple")
     .setAuthor({
       name: `${user.username} ${user.pp}pp (#${user.globalRank} ${user.countryCode}#${user.countryRank})`,
       iconURL: user.userAvatar,
@@ -50,22 +50,16 @@ async function getEmbed(globalRank: number, user: UserInfo, newPlays: number[], 
     return embed.setDescription(locale.embeds.whatif.samePp.replace("{PP}", ppValue.toFixed(2)).replace("{USERNAME}", user.username));
   }
 
-  const data = await fetch(`https://osudaily.net/api/pp.php?k=${Bun.env.OSU_DAILY_API}&m=${rulesets[mode]}&t=pp&v=${newPp}`).then(res => res.json()) as any;
-  const playPosition = newPlays.indexOf(ppValue) + 1;
+  const data: any = await fetch(`https://osudaily.net/api/pp.php?k=${Bun.env.OSU_DAILY_API}&m=${rulesets[mode]}&t=pp&v=${newPp}`).then(res => res.json());
   const differenceOfPp = newPp - oldPp;
-  return new EmbedBuilder().setTitle(locale.embeds.whatif.title.replace("{PP}", ppValue.toFixed(2)).replace("{PLURAL}", ppCount === 1 ? "" : locale.embeds.whatif.plural).replace("{USERNAME}", user.username).replace("{COUNT}", ppCount === 1 ? locale.embeds.whatif.count : ppCount.toString()))
-    .setColor("Purple")
-    .setAuthor({
-      name: `${user.username} ${user.pp}pp (#${user.globalRank} ${user.countryCode}#${user.countryRank})`,
-      iconURL: user.userAvatar,
-      url: user.userUrl,
-    }).setDescription(
+  return embed
+    .setDescription(
       locale.embeds.whatif.description
         .replace("{COUNT}", ppCount === 1 ? locale.embeds.whatif.count : ppCount.toString())
         .replace("{PP}", ppValue.toFixed(2))
         .replace("{PLURAL}", ppCount === 1 ? "" : locale.embeds.whatif.plural)
         .replace("{USERNAME}", user.username)
-        .replace("{POSITION}", playPosition.toString())
+        .replace("{POSITION}", (newPlays.indexOf(ppValue) + 1).toString())
         .replace("{NEWPP}", newPp.toFixed(2).toLocaleString())
         .replace("{DIFFPP}", `${differenceOfPp > 0 ? "+" : ""}${differenceOfPp.toLocaleString()}pp`)
         .replace("{RANK}", data.rank.toLocaleString())
