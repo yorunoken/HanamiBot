@@ -22,7 +22,6 @@ export async function start({ interaction, client, locale }: { interaction: Mess
   }
 
   const userRank = user.statistics.global_rank;
-  console.log(userRank, rankValue);
   if (userRank <= rankValue) {
     return reply(locale.embeds.rank.rankHigh.replace("{USERNAME}", user.username));
   }
