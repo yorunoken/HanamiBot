@@ -225,6 +225,16 @@ interface Embeds {
     title: string;
     description: string;
   };
+  pp: {
+    ppHigh: string;
+    playerMissing: string;
+    description: string;
+  };
+  rank: {
+    rankHigh: string;
+    playerMissing: string;
+    description: string;
+  };
   profile: {
     peakRank: string;
     achieved: string;

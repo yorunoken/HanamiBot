@@ -49,6 +49,16 @@
       "samePp": "A {PP}pp play would not be in {USERNAME}'s top 100 plays, so their rank and pp remains unchanged.",
       "description": "{COUNT} new {PP}pp play{PLURAL} would be {USERNAME}'s #{POSITION} top play.\nIt would increase their total pp to {NEWPP}, and by {DIFFPP} and increase their rank to #{RANK} (+{RANKDIFF})."
     },
+    "pp": {
+      "ppHigh": "{USERNAME} is already above that pp value.",
+      "playerMissing": "What play is {USERNAME} missing to reach {PP}pp?",
+      "description": "To reach **{TARGET}pp**, {USERNAME} needs to set one **{PP}pp** score which would be their top #{POSITION}, and push their to rank **#{RANK}**"
+    },
+    "rank": {
+      "rankHigh": "{USERNAME} is already above that rank.",
+      "playerMissing": "What play is {USERNAME} missing to reach #{RANK}?",
+      "description": "To reach **#{TARGET}**, {USERNAME} needs to set one **{PP}pp** score which would be their top #{POSITION}, and increase their total pp to **{NEWPP}**"
+    },
     "profile": {
       "peakRank": "Peak Rank",
       "achieved": "Achieved",

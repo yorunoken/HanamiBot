@@ -116,6 +116,53 @@ export const insertDataBulk = ({ table, object }: { table: string; object: { id:
   transaction();
 };
 
+export function calculateMissingPp(start: number, goal: number, pps: number[]): [number, number] {
+  let top = start;
+  let bot = 0.0;
+  const ppArray = pps;
+
+  function calculateRemaining(idx: number, goal: number, top: number, bot: number): [number, number] {
+    const factor = Math.pow(0.95, idx);
+    const required = (goal - top - bot) / factor;
+
+    return [required, idx];
+  }
+
+  for (let i = ppArray.length - 1; i > 0; i--) {
+    const factor = Math.pow(0.95, i);
+    const term = factor * ppArray[i];
+    const botTerm = term * 0.95;
+
+    if (top + bot + botTerm >= goal) {
+      return calculateRemaining(i + 1, goal, top, bot);
+    }
+
+    bot += botTerm;
+    top -= term;
+  }
+
+  return calculateRemaining(0, goal, top, bot);
+}
+
+export function approxMorePp(pps: number[]): void {
+  if (pps.length !== 100) {
+    return;
+  }
+
+  let diff = (pps[89] - pps[99]) / 10.0;
+
+  let curr = pps[99];
+
+  for (let i = 0; i < 50; i++) {
+    let next = curr - diff;
+
+    if (next < 0) break;
+
+    pps.push(next);
+    curr = next;
+  }
+}
+
 export function calculateWeightedScores({ user, plays }: { user: UserResponse; plays: noChokePlayDetails[] }) {
   const oldPlaysPp = plays.map((play, index) => Number(play.playInfo.play.pp) * Math.pow(0.95, index)).reduce((a, b) => a + b);
   const newPlaysPp = plays.map((play, index) => play.fcPerf.pp * Math.pow(0.95, index)).reduce((a, b) => a + b);
@@ -279,6 +326,7 @@ export function Interactionhandler(interaction: Message | ChatInputCommandIntera
   const userArgs = isSlash ? [interaction.options.getString("user") || ""] : args || [""];
   const ppCount = isSlash ? interaction.options.getNumber("count") || 1 : 1;
   const ppValue = isSlash ? interaction.options.getNumber("pp") || 1 : 1;
+  const rankValue = isSlash ? interaction.options.getNumber("rank") || 1 : 1;
   const commandName = isSlash ? [interaction.options.getString("command") || ""] : args || [""];
   const author = isSlash ? interaction.user : interaction.author;
   const mode = isSlash ? (interaction.options.getString("mode") as osuModes) || "osu" : "osu";
@@ -288,5 +336,5 @@ export function Interactionhandler(interaction: Message | ChatInputCommandIntera
   const prefix = isSlash ? interaction.options.getString("prefix") : undefined;
   const { guildId } = interaction;
 
-  return { reply, userArgs, author, mode, passOnly, index, commandName, subcommand, guildId, prefix, ppValue, ppCount };
+  return { reply, userArgs, author, mode, passOnly, index, commandName, subcommand, guildId, prefix, ppValue, ppCount, rankValue };
 }

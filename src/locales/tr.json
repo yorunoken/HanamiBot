@@ -49,6 +49,16 @@
       "samePp": "Bir {PP}pp skoru {USERNAME} kişisinin yüksek 100 skorlarının arasından olmaz, dolayısıyla sıralaması ve pp'si değişmez.",
       "description": "{COUNT} adet yeni {PP}pp skoru {USERNAME} kişisinin #{POSITION} yüksek skoru olur.\nToplam pp'sini {NEWPP}'e çıkarır, pp farkı {DIFFPP} olur ve sıralamasını #{RANK}'e çıkarır (+{RANKDIFF})."
     },
+    "pp": {
+      "ppHigh": "{USERNAME} zaten o pp'den daha yüksekte.",
+      "playerMissing": "{USERNAME}, {PP}pp'ye ulaşmak için kaç pp skor yapması gerekiyor?",
+      "description": "{USERNAME}, **{TARGET}pp**'ye ulaşmak için bir **{PP}pp** skoru yapması gerekiyor. Bu skor #{POSITION} pozisyonunda olup, sıralamasını **#{RANK}** sayısına çıkarır."
+    },
+    "rank": {
+      "rankHigh": "{USERNAME} zaten o sıralamadan yükste.",
+      "playerMissing": "{USERNAME}, #{RANK}? sıralamasına ulaşmak için kaç pp skor yapması gerekiyor?",
+      "description": "{USERNAME}, **#{TARGET}** sıralamasına ulaşmak için bir **{PP}pp** skoru yapması gerekiyor. Bu skor #{POSITION} pozisyonunda olup, toplam pp'sini **{NEWPP}** sayısına"
+    },
     "profile": {
       "peakRank": "Zirve Sıralaması",
       "achieved": "Kazanıldı",
