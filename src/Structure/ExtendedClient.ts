@@ -1,6 +1,6 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
-import { Client, ClientOptions } from "discord.js";
+import { Client, ClientOptions, Constants } from "discord.js";
 import fs from "fs";
 import { GuildCreateEvent, InteractionCreateEvent, MessageCreateEvent, ReadyEvent } from "../Events";
 import { getServer, getServersInBulk, insertData } from "../utils";
@@ -31,24 +31,25 @@ export default class extends Client {
     this.on("ready", () => new ReadyEvent(this).execute());
   }
 
-  public async putLanguages() {
-    const serversId = Array.from(this.guilds.cache.keys());
-    const guilds = getServersInBulk(serversId);
-    for (const guildId of serversId) {
-      const guild = guilds.find((item: any) => item.id === Number(guildId));
-      if (!guild.language) {
-        insertData({ table: "servers", data: JSON.stringify({ ...JSON.parse(guild.data), language: "en" }), id: guildId });
-      }
-      this.localeLanguage.set(guildId, guild.length > 0 ? guild.language : "en");
-    }
-  }
-
   public async deploy() {
     await this.loadSlashCmd();
     this.loadPrefixCmd();
     console.log("Loaded commands");
     await this.checkServers();
     await this.putLanguages();
+  }
+
+  public async putLanguages() {
+    const serversId = Array.from(this.guilds.cache.keys());
+    const guilds = getServersInBulk(serversId);
+    for (const guildId of serversId) {
+      const guild = JSON.parse(guilds.find((item: any) => item.id === Number(guildId)).data);
+      console.log(guild);
+      if (!guild.language) {
+        insertData({ table: "servers", data: JSON.stringify({ ...JSON.parse(guild.data), language: "en" }), id: guildId });
+      }
+      this.localeLanguage.set(guildId, guild.language || "en");
+    }
   }
 
   private loadPrefixCmd() {
@@ -99,13 +100,10 @@ export default class extends Client {
   }
 
   private async checkServers() {
-    const guilds = Object.fromEntries(this.guilds.cache);
+    const serversId = Array.from(this.guilds.cache.keys());
 
     let emptyServers = 0;
-    for (const index in guilds) {
-      const guild = guilds[index];
-      const guildId = guild.id;
-
+    for (const guildId of serversId) {
       const document = await getServer(guildId);
       if (!document) {
         const foobar = {

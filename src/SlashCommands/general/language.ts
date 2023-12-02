@@ -14,8 +14,10 @@ export async function run({ interaction, client, locale }: { interaction: ChatIn
   }
 
   const guildId = interaction.guildId;
-  const guild = getServer(guildId);
-  insertData({ table: "servers", data: JSON.stringify({ ...JSON.parse(guild.data), language }), id: guildId });
+  const data = JSON.parse(getServer(guildId).data);
+  data.language = language;
+
+  insertData({ table: "servers", data: JSON.stringify(data), id: guildId });
   client.localeLanguage.set(guildId, language);
 
   interaction.editReply(locale.misc.languageSet.replace("{LANGUAGE}", language));
