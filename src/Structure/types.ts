@@ -291,7 +291,7 @@ interface Fails {
   linkFail: string;
   userDoesntExist: (user: string) => string;
   userHasNoScores: (user: string) => string;
-  provideValidPage: string;
+  provideValidPage: (maxValue: string | number) => string;
   noLeaderboard: string;
   noBeatmapIdInCtx: string;
   error: string;

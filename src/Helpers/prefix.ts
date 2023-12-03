@@ -31,7 +31,6 @@ async function addPrefix({ options, prefix }: { options: any; prefix: string }) 
   const guildId = options.guildId;
 
   const data = JSON.parse((getServer(guildId)).data);
-
   const documentPrefixes: string[] | undefined = data.prefix;
 
   if (documentPrefixes && documentPrefixes.includes(prefix)) {

@@ -28,7 +28,7 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
 
   const user = await v2.user.details(userOptions.user, mode);
   if (!user.id) {
-    return reply(locale.fails.userDoesntExist.replace("{USER}", userOptions.user));
+    return reply(locale.fails.userDoesntExist(userOptions.user));
   }
 
   let plays = await v2.scores.user.category(user.id, isTops ? "best" : "recent", {
@@ -78,11 +78,11 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
     : plays;
 
   if (plays.length === 0) {
-    return reply(locale.embeds.plays.noScores.replace("{USERNAME}", user.username).replace("{TYPE}", isTops ? locale.embeds.plays.top : locale.embeds.plays.recent));
+    return reply(locale.embeds.plays.noScores(user.username, isTops ? locale.embeds.plays.top : locale.embeds.plays.recent));
   }
 
   if (page && (page < 0 || page >= Math.ceil(plays.length / 5))) {
-    return reply(locale.fails.provideValidPage.replace("{MAXVALUE}", Math.ceil(plays.length / 5).toString()));
+    return reply(locale.fails.provideValidPage(Math.ceil(plays.length / 5)));
   }
 
   const userDetailOptions = getUser({ user, mode, locale });
@@ -94,7 +94,7 @@ export async function start({ isTops, interaction, passOnly: passOnlyArg, args, 
   const embedOptions = isTops ? topsOptions : recentOptions;
 
   const components = [buildActionRow([firstButton, previousButton, specifyButton, nextButton, lastButton], [page === 0 || index === 0, index! >= 0 ? buttonBoolsIndex("previous", embedOptions) : buttonBoolsTops("previous", embedOptions), false, index! >= 0 ? buttonBoolsIndex("next", embedOptions) : buttonBoolsTops("next", embedOptions), plays.length - 1 === page || plays.length - 1 === index])];
-  const response = await reply({ content: locale.embeds.plays.playsFound.replace("{LENGTH}", plays.length.toString()), embeds: [embed], components });
+  const response = await reply({ content: locale.embeds.plays.playsFound(plays.length), embeds: [embed], components });
   client.sillyOptions[response.id] = { buttonHandler: isTops ? "handleTopsButtons" : "handleRecentButtons", type: commands[isTops ? "Top" : "Recent"], embedOptions, response, pageBuilder: isTops ? getSubsequentPlays : getRecentPlays, initializer: argOptions.author };
 }
 
@@ -116,7 +116,7 @@ async function getRecentPlays({ user, plays, mode, index, isTops, locale }: { us
       value: `${options.totalResult}\n${options.ifFcValue} • \`${locale.embeds.plays.try} #${options.retries}\`\n\nBPM: \`${options.bpm}\` ${locale.embeds.plays.length}: \`${options.minutesTotal}:${options.secondsTotal}\`\n\`${options.mapValues}\``,
     })
     .setThumbnail(`https://assets.ppy.sh/beatmaps/${options.mapsetId}/covers/list.jpg`)
-    .setFooter({ text: `${locale.embeds.plays.mapper.replace("{USERNAME}", options.creatorUsername)}, ${options.mapStatus}`, iconURL: `https://a.ppy.sh/${options.creatorId}?1668890819.jpeg` });
+    .setFooter({ text: `${locale.embeds.plays.mapper(options.creatorUsername)}, ${options.mapStatus}`, iconURL: `https://a.ppy.sh/${options.creatorId}?1668890819.jpeg` });
 }
 
 async function getSubsequentPlays({ user, plays, mode, page, index, isTops, locale }: { user: UserInfo; plays: ScoreResponse[]; mode: osuModes; page: number | undefined; index: number; isTops: boolean; locale: Locales }) {
@@ -145,7 +145,7 @@ async function getSubsequentPlays({ user, plays, mode, page, index, isTops, loca
         value: `${options.totalResult}${options.ifFcValue?.length && options.ifFcValue?.length > 0 ? "\n" + options.ifFcValue : ""}\n\nBPM: \`${options.bpm}\` ${locale.embeds.plays.length}: \`${options.minutesTotal}:${options.secondsTotal}\`\n\`${options.mapValues}\``,
       })
       .setThumbnail(`https://assets.ppy.sh/beatmaps/${options.mapsetId}/covers/list.jpg`)
-      .setFooter({ text: `${locale.embeds.plays.mapper.replace("{USERNAME}", options.creatorUsername)}, ${options.mapStatus}`, iconURL: `https://a.ppy.sh/${options.creatorId}?1668890819.jpeg` });
+      .setFooter({ text: `${locale.embeds.plays.mapper(options.creatorUsername)}, ${options.mapStatus}`, iconURL: `https://a.ppy.sh/${options.creatorId}?1668890819.jpeg` });
   }
 
   let description = [];
@@ -172,5 +172,5 @@ async function getSubsequentPlays({ user, plays, mode, page, index, isTops, loca
     .setAuthor({ url: user.userUrl, name: `${user.username}: ${user.pp} (#${user.globalRank} ${user.countryCode.toUpperCase()}#${user.countryRank})`, iconURL: `https://osu.ppy.sh/images/flags/${user.countryCode.toUpperCase()}.png` })
     .setThumbnail(user.userAvatar)
     .setDescription(description.join(""))
-    .setFooter({ text: locale.embeds.page.replace("{PAGE}", `${page! + 1}/${Math.ceil(plays.length / 5)}`) });
+    .setFooter({ text: locale.embeds.page(`${page! + 1}/${Math.ceil(plays.length / 5)}`) });
 }

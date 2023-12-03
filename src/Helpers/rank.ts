@@ -18,12 +18,12 @@ export async function start({ interaction, client, locale }: { interaction: Mess
 
   const user = await v2.user.details(userOptions.user, mode);
   if (!user.id) {
-    return reply(locale.fails.userDoesntExist.replace("{USER}", userOptions.user));
+    return reply(locale.fails.userDoesntExist(userOptions.user));
   }
 
   const userRank = user.statistics.global_rank;
   if (userRank <= rankValue) {
-    return reply(locale.embeds.rank.rankHigh.replace("{USERNAME}", user.username));
+    return reply(locale.embeds.rank.rankHigh(user.username));
   }
 
   const data: any = await fetch(`https://osudaily.net/api/pp.php?k=${Bun.env.OSU_DAILY_API}&m=${rulesets[mode]}&t=rank&v=${rankValue}`).then(res => res.json());
@@ -39,7 +39,7 @@ export async function start({ interaction, client, locale }: { interaction: Mess
 async function getEmbed(user: UserInfo, missingPps: number[], rankValue: number, data: any, locale: Locales) {
   const [targetPp, idx] = missingPps;
 
-  const embed = new EmbedBuilder().setTitle(locale.embeds.rank.playerMissing.replace("{USERNAME}", user.username).replace("{RANK}", rankValue.toLocaleString())).setColor("Purple")
+  const embed = new EmbedBuilder().setTitle(locale.embeds.rank.playerMissing(user.username, rankValue.toLocaleString())).setColor("Purple")
     .setAuthor({
       name: `${user.username} ${user.pp}pp (#${user.globalRank} ${user.countryCode}#${user.countryRank})`,
       iconURL: user.userAvatar,
@@ -47,11 +47,6 @@ async function getEmbed(user: UserInfo, missingPps: number[], rankValue: number,
     });
 
   return embed.setDescription(
-    locale.embeds.rank.description
-      .replace("{TARGET}", rankValue.toString())
-      .replace("{USERNAME}", user.username)
-      .replace("{PP}", targetPp.toFixed(2))
-      .replace("{POSITION}", (idx + 1).toString())
-      .replace("{NEWPP}", data.pp.toFixed(2)),
+    locale.embeds.rank.description(user.username, rankValue.toString(), targetPp.toFixed(2), idx + 1, data.pp.toFixed(2)),
   );
 }

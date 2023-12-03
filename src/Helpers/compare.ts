@@ -33,7 +33,7 @@ export async function start({ interaction, client, args, mode, locale }: { inter
 
   const user = await v2.user.details(userOptions.user, options.mode);
   if (!user.id) {
-    return options.reply(locale.fails.userDoesntExist.replace("{USER}", userOptions.user));
+    return options.reply(locale.fails.userDoesntExist(userOptions.user));
   }
   const userDetailOptions = getUser({ user, mode: options.mode, locale });
 
@@ -77,7 +77,7 @@ export async function start({ interaction, client, args, mode, locale }: { inter
     : scores;
 
   if (scores.length === 0) {
-    return options.reply(locale.fails.userHasNoScores.replace("{USER}", user.username));
+    return options.reply(locale.fails.userHasNoScores(user.username));
   }
 
   return options.reply({ embeds: [await buildCompareEmbed(userDetailOptions, beatmap, scores, mode, locale)] });

@@ -19,7 +19,7 @@ export async function start(interaction: Message | ChatInputCommandInteraction, 
 
   const user = await v2.user.details(userOptions.user, options.mode);
   if (!user.id) {
-    return options.reply(locale.fails.userDoesntExist.replace("{USER}", userOptions?.user));
+    return options.reply(locale.fails.userDoesntExist(userOptions?.user));
   }
 
   const userDetailOptions = getUser({ user, mode: options.mode, locale });
@@ -55,7 +55,7 @@ function buildPage1(options: UserInfo) {
     )
     .setImage(options.coverUrl)
     .setFooter({
-      text: locale.embeds.profile.joinDate.replace("{DATE}", options.formattedDate).replace("{AGO}", options.userJoinedAgo),
+      text: locale.embeds.profile.joinDate(options.formattedDate, options.userJoinedAgo),
     });
 }
 
@@ -79,6 +79,6 @@ function buildPage2(options: UserInfo) {
     )
     .setImage(options.coverUrl)
     .setFooter({
-      text: locale.embeds.profile.joinDate.replace("{DATE}", options.formattedDate).replace("{AGO}", options.userJoinedAgo),
+      text: locale.embeds.profile.joinDate(options.formattedDate, options.userJoinedAgo),
     });
 }
