@@ -177,23 +177,23 @@ export interface noChokePlayDetails {
 }
 
 interface Embeds {
-  page: string;
+  page: (page: string) => string;
   otherPlays: string;
   provideUsername: string;
   help: {
     title: string;
-    commandNotFound: string;
-    commandInfoTitleEmbed: string;
+    commandNotFound: (name: string) => string;
+    commandInfoTitleEmbed: (name: string) => string;
   };
   leaderboard: {
     noScores: string;
     global: string;
     country: string;
-    type: string;
-    playScore: string;
+    type: (type: string) => string;
+    playScore: (userId: string | number) => string;
   };
   map: {
-    beatmapBy: string;
+    beatmapBy: (username: string) => string;
     stars: string;
     mods: string;
     length: string;
@@ -207,33 +207,42 @@ interface Embeds {
     graveyard: string;
   };
   link: {
-    success: string;
+    success: (id: string | number, username: string) => string;
   };
   plays: {
     top: string;
     recent: string;
-    noScores: string;
-    playsFound: string;
+    noScores: (username: string, type: string) => string;
+    playsFound: (length: number) => string;
     try: string;
     length: string;
-    mapper: string;
+    mapper: (username: string) => string;
   };
   whatif: {
     count: string;
     plural: string;
-    samePp: string;
-    title: string;
-    description: string;
+    samePp: (pp: string | number, username: string) => string;
+    title: (username: string, count: string | number, pp: string | number) => string;
+    description: (
+      count: string | number,
+      pp: string | number,
+      username: string,
+      position: string | number,
+      newPp: string | number,
+      diffPp: string | number,
+      rank: string | number,
+      rankDiff: string | number,
+    ) => string;
   };
   pp: {
-    ppHigh: string;
-    playerMissing: string;
-    description: string;
+    ppHigh: (username: string) => string;
+    playerMissing: (username: string, pp: string | number) => string;
+    description: (username: string, target: string | number, pp: string | number, position: string | number, rank: string | number) => string;
   };
   rank: {
-    rankHigh: string;
-    playerMissing: string;
-    description: string;
+    rankHigh: (username: string) => string;
+    playerMissing: (username: string, rank: string | number) => string;
+    description: (username: string, target: string | number, pp: string | number, position: string | number, newPp: string | number) => string;
   };
   profile: {
     peakRank: string;
@@ -246,7 +255,7 @@ interface Embeds {
     maxCombo: string;
     recommendedStars: string;
     grades: string;
-    joinDate: string;
+    joinDate: (date: string, ago: string | number) => string;
     score: string;
     rankedScore: string;
     totalScore: string;
@@ -254,10 +263,10 @@ interface Embeds {
     profile: string;
   };
   nochoke: {
-    alreadyDownloading: string;
-    mapsArentInDb: string;
+    alreadyDownloading: (username: string) => string;
     mapsDownloaded: string;
-    approximateRank: string;
+    mapsArentInDb: (username: string, missingMaps: string | number) => string;
+    approximateRank: (pp: string | number, rank: string | number) => string;
   };
 }
 
@@ -266,7 +275,7 @@ interface Classes {
   interests: string;
   location: string;
   globalRank: string;
-  ifFc: string;
+  ifFc: (accuracy: string, pp: string | number) => string;
   songPreview: string;
   mapPreview: string;
   fullBackground: string;
@@ -280,20 +289,20 @@ interface Fails {
   languageDoesntExist: string;
   channelDoesntExist: string;
   linkFail: string;
-  userDoesntExist: string;
-  userHasNoScores: string;
+  userDoesntExist: (user: string) => string;
+  userHasNoScores: (user: string) => string;
   provideValidPage: string;
   noLeaderboard: string;
   noBeatmapIdInCtx: string;
   error: string;
   interactionError: string;
-  cooldownTime: string;
+  cooldownTime: (cooldown: string) => string;
   userButtonNotAllowed: string;
 }
 
 interface Modals {
   enterValue: string;
-  valueInsert: string;
+  valueInsert: (maxValue: string | number) => string;
 }
 
 interface Misc {
@@ -301,7 +310,7 @@ interface Misc {
   warning: string;
   poweredBy: string;
   feedbackSent: string;
-  languageSet: string;
+  languageSet: (language: string) => string;
 }
 
 export interface Locales {
