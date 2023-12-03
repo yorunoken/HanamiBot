@@ -13,6 +13,6 @@ export class LocalizationManager {
   }
 
   public getLanguage(): Locales {
-    return require(`./${this.language}`);
+    return require(`./${this.language}`).default;
   }
 }
