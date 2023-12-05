@@ -16,38 +16,6 @@ export default class MessageCreateEvent extends BaseEvent {
     super(client);
   }
 
-  private async checkForMention(message: Message) {
-    const messagesArray = [
-      "freedom for Palpatine!! :flag_sd: :flag_sd: :flag_sd:",
-      "did someone say anime girls?",
-      "haiiii ^_^ :3 heyyy haiiii X3 hiiiiiii!!!!!!!",
-      "hiii :3333",
-      "did you know humans have two hearts? I have mine, and yours (in my basement)",
-      "cannot read properties of undefined",
-      "[object Object]",
-      "undefined",
-      "strings are not numbers!",
-      "critical error: yoru has no bitches",
-      "I stole chips when I was a 6",
-      "nom my map",
-      "I like staplers,,,,",
-      "need me an autist gf, are you autist gf?",
-      "yknow I've always wanted? you :3",
-      "hm?",
-      "HELP     \"",
-      "one drink coming up for table 727! HAHA see what I did there?",
-      "sometimes I wish I was a woman",
-      "I love my owner! im gonna cry myself to sleep tonight",
-      "i love beeing a silly little goober",
-      "hey, dont stop pinging me. I like it when u do that..",
-      "i miss her",
-    ];
-
-    if (["hanami", "mia"].some((char) => message.content.toLowerCase().includes(char)) || message.content.includes(`<@${this.client.user?.id}>`) || (message.reference && (await message.fetchReference()).author.id === this.client.user?.id)) {
-      message.reply(messagesArray[Math.floor(messagesArray.length * Math.random())]);
-    }
-  }
-
   public async execute(message: Message): Promise<void> {
     const guildId = message.guildId;
     if (message.author.bot || !guildId || message.channel.type === ChannelType.DM || !this.client.user || !message.guild) return;
@@ -71,12 +39,10 @@ export default class MessageCreateEvent extends BaseEvent {
     const prefixOptions = prefixCache[guildId] ?? (prefixCache[guildId] = JSON.parse((getServer(guildId)).data)?.prefix) ?? (prefixCache[guildId] = [defaultPrefix]);
     let prefix = prefixOptions.find((p: string) => message.content.startsWith(p));
     if (!prefix) {
-      await this.checkForMention(message);
       return;
     }
 
     if (!message.content.startsWith(prefix)) {
-      await this.checkForMention(message);
       return;
     }
 
