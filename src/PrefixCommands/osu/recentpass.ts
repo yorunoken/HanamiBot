@@ -16,7 +16,7 @@ const modeAliases: { [key: string]: { mode: osuModes; passOnly: boolean } } = {
   recentpasscatch: { mode: "fruits", passOnly: true },
 };
 
-export const name = "recent";
+export const name = "recentpass";
 export const aliases = Object.keys(modeAliases);
 export const cooldown = 3000;
 export const description = `Get the recent passed play of an osu! player.\nMods can be specified through +_, +!_, -!_ syntax`;
