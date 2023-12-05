@@ -44,7 +44,6 @@ export default class extends Client {
     const guilds = getServersInBulk(serversId);
     for (const guildId of serversId) {
       const guild = JSON.parse(guilds.find((item: any) => item.id === Number(guildId)).data);
-      console.log(guild);
       if (!guild.language) {
         insertData({ table: "servers", data: JSON.stringify({ ...JSON.parse(guild.data), language: "en" }), id: guildId });
       }
