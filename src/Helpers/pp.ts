@@ -46,6 +46,6 @@ async function getEmbed(user: UserInfo, missingPps: number[], ppValue: number, m
 
   const data: any = await fetch(`https://osudaily.net/api/pp.php?k=${Bun.env.OSU_DAILY_API}&m=${rulesets[mode]}&t=pp&v=${ppValue}`).then(res => res.json());
   return embed.setDescription(
-    locale.embeds.pp.description(user.username, targetPp.toFixed(2), ppValue.toFixed(2), (idx + 1).toString(), data.rank.toLocaleString()),
+    locale.embeds.pp.description(user.username, ppValue.toFixed(2), targetPp.toFixed(2), (idx + 1).toString(), data.rank.toLocaleString()),
   );
 }

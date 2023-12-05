@@ -8,7 +8,7 @@ export async function run({ interaction, client, locale }: { interaction: ChatIn
   if (!interaction.guildId) return;
 
   const language = interaction.options.getString("language", true).toLowerCase();
-  if (!fs.existsSync(`./src/locales/${language}.json`)) {
+  if (!fs.existsSync(`./src/locales/${language}.ts`)) {
     interaction.editReply(locale.fails.languageDoesntExist);
     return;
   }
@@ -20,6 +20,6 @@ export async function run({ interaction, client, locale }: { interaction: ChatIn
   insertData({ table: "servers", data: JSON.stringify(data), id: guildId });
   client.localeLanguage.set(guildId, language);
 
-  interaction.editReply(locale.misc.languageSet.replace("{LANGUAGE}", language));
+  interaction.editReply(locale.misc.languageSet(`\`${language}\``));
 }
 export { data } from "../data/language";
