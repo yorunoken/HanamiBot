@@ -89,6 +89,7 @@ export const previousButton = new ButtonBuilder().setCustomId("previous").setEmo
 export const nextButton = new ButtonBuilder().setCustomId("next").setEmoji("1177027023030456420").setStyle(ButtonStyle.Secondary);
 export const specifyButton = new ButtonBuilder().setCustomId("indexbtn").setEmoji("1177027025672871936").setStyle(ButtonStyle.Secondary);
 
+export const getCommand = (id: string): any => db.prepare("SELECT * FROM commands WHERE id = ?").get(id);
 export const getUser = (id: string): any => db.prepare("SELECT * FROM users WHERE id = ?").get(id);
 export const getServer = (id: string): any => db.prepare("SELECT * FROM servers WHERE id = ?").get(id);
 export const getServersInBulk = (ids: string[] | number[]): any => {
