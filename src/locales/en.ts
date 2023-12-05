@@ -20,7 +20,7 @@ export default {
       playScore: (userId: strOrNum) => `<@{userId}>'s score:`,
     },
     map: {
-      beatmapBy: (username: string) => `Beatmap by {username}`,
+      beatmapBy: (username: string) => `Beatmap by ${username}`,
       stars: `Stars`,
       mods: `Mods`,
       length: `Length`,
@@ -49,8 +49,8 @@ export default {
       count: `a`,
       plural: `s`,
       title: (username: string, length: strOrNum, pp: strOrNum, plural: string) => `${username} gets ${length} new ${pp}pp play${plural}`,
-      samePp: (pp: strOrNum, username: string) => `A {pp}pp play would not be in {username}'s top 100 plays, so their rank and pp remains unchanged.`,
-      description: (length: strOrNum, pp: strOrNum, username: string, plural: string, position: strOrNum, newPp: strOrNum, diffPp: strOrNum, rank: strOrNum, rankDiff: strOrNum) => `${length} new ${pp}pp play${plural} would be $username}'s #${position} top play.\nIt would increase their total pp to ${newPp}, and by ${diffPp} and increase their rank to #${rank} (+${rankDiff}).`,
+      samePp: (pp: strOrNum, username: string) => `A ${pp}pp play would not be in ${username}'s top 100 plays, so their rank and pp remains unchanged.`,
+      description: (length: strOrNum, pp: strOrNum, username: string, plural: string, position: strOrNum, newPp: strOrNum, diffPp: strOrNum, rank: strOrNum, rankDiff: strOrNum) => `${length} new ${pp}pp play${plural} would be ${username}'s #${position} top play.\nIt would increase their total pp to ${newPp}, by ${diffPp} and increase their rank to #${rank} (+${rankDiff}).`,
     },
     pp: {
       ppHigh: (username: string) => `${username} is already above that pp value.`,

@@ -50,7 +50,7 @@ export default {
       plural: ``,
       samePp: (pp: strOrNum, username: string) => `Bir ${pp}pp skoru ${username} kişisinin yüksek 100 skorlarının arasından olmaz, dolayısıyla sıralaması ve pp'si değişmez.`,
       title: (username: string, count: strOrNum, pp: strOrNum) => `${username} ${count} adet yeni ${pp}pp skor alırsa ne olur`,
-      description: (count: strOrNum, pp: strOrNum, username: string, position: strOrNum, newPp: strOrNum, diffPp: strOrNum, rank: strOrNum, rankDiff: strOrNum) => `${count} adet yeni ${pp}pp skoru ${username} kişisinin #${position} yüksek skoru olur.\nToplam pp'sini ${newPp}'e çıkarır, pp farkı ${diffPp} olur ve sıralamasını #${rank}'e çıkarır (+${rankDiff}).`,
+      description: (length: strOrNum, pp: strOrNum, username: string, plural: string, position: strOrNum, newPp: strOrNum, diffPp: strOrNum, rank: strOrNum, rankDiff: strOrNum) => `${length} adet yeni ${pp}pp skoru ${username} kişisinin #${position} yüksek skoru olur.\nToplam pp'sini ${newPp}'e çıkarır, pp farkı ${diffPp} olur ve sıralamasını #${rank}'e çıkarır (+${rankDiff}).`,
     },
     pp: {
       ppHigh: (username: string) => `${username} zaten o pp'den daha yüksekte.`,
