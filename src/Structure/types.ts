@@ -123,7 +123,6 @@ export interface ScoreInfo {
 }
 
 export interface UserInfo {
-  locale: Locales;
   username: string;
   userCover: string;
   userAvatar: string;
@@ -222,17 +221,8 @@ interface Embeds {
     count: string;
     plural: string;
     samePp: (pp: string | number, username: string) => string;
-    title: (username: string, count: string | number, pp: string | number) => string;
-    description: (
-      count: string | number,
-      pp: string | number,
-      username: string,
-      position: string | number,
-      newPp: string | number,
-      diffPp: string | number,
-      rank: string | number,
-      rankDiff: string | number,
-    ) => string;
+    title: (username: string, count: string | number, pp: string | number, plural: string) => string;
+    description: (length: string | number, pp: string | number, username: string, plural: string, position: string | number, newPp: string | number, diffPp: string | number, rank: string | number, rankDiff: string | number) => string;
   };
   pp: {
     ppHigh: (username: string) => string;
