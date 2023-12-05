@@ -3,6 +3,7 @@ import { ButtonActions } from "../classes";
 import { LocalizationManager } from "../locales";
 import { ExtendedClient } from "../Structure";
 import BaseEvent from "../Structure/BaseEvent";
+import { getCommand, insertData } from "../utils";
 import { db } from "./ready";
 
 export default class InteractionCreateEvent extends BaseEvent {
@@ -77,6 +78,12 @@ export default class InteractionCreateEvent extends BaseEvent {
         const command = this.client.slashCommands.get(interaction.commandName);
         if (!command) return;
         command.run({ client: this.client, interaction, db, locale });
+
+        const cmd = this.client.prefixCommands.get(interaction.commandName)?.name;
+        if (cmd) {
+          const doc = getCommand(cmd);
+          insertData({ table: "commands", id: cmd, data: doc ? doc.count + 1 : 1 });
+        }
       } catch (e) {
         console.error(e);
         interaction.reply({ content: locale.fails.interactionError, ephemeral: true });

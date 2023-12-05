@@ -6,7 +6,7 @@ import { getLoneCommand } from "../Helpers/loneCommands";
 import { LocalizationManager } from "../locales";
 import { ExtendedClient } from "../Structure";
 import BaseEvent from "../Structure/BaseEvent";
-import { getServer } from "../utils";
+import { getCommand, getServer, insertData } from "../utils";
 import { db } from "./ready";
 
 const cooldown = new Map();
@@ -63,10 +63,6 @@ export default class MessageCreateEvent extends BaseEvent {
 
     const locale = new LocalizationManager(this.client.localeLanguage.get(guildId) ?? "en").getLanguage();
 
-    if (!command.cooldown) {
-      command.run({ client: this.client, message, args, prefix, index: number, commandName, db, locale });
-      return;
-    }
     if (cooldown.has(`${command.name}${message.author.id}`)) {
       message
         .reply({
@@ -81,6 +77,11 @@ export default class MessageCreateEvent extends BaseEvent {
     setTimeout(() => {
       cooldown.delete(`${command.name}${message.author.id}`);
     }, command.cooldown);
+
+    if (command.name) {
+      const doc = getCommand(command.name);
+      insertData({ table: "commands", id: command.name, data: doc ? doc.count + 1 : 1 });
+    }
     console.log(`(prefix) responded to ${message.author.username} for ${commandName}`);
   }
 }
