@@ -11,6 +11,10 @@ export default {
       title: `Use \`help <command>\` for details of a command`,
       commandNotFound: (name: string) => `The command with the name (or alias) ${name} was not found.`,
       commandInfoTitleEmbed: (name: string) => `Information of command: ${name}`,
+      botInfo: "Bot Info",
+      botServerCount: (length: string) => `Serving in ${length} servers`,
+      botUptime: (uptime: string) => `Started ${uptime}`, // uptime will display "X seconds/minuts/hours ago"
+      commands: "Command Usage",
     },
     leaderboard: {
       noScores: `This map has no scores in its leaderboard.`,
