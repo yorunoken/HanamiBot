@@ -10,13 +10,15 @@ db.run(`CREATE TABLE IF NOT EXISTS users (
 db.run(`CREATE TABLE IF NOT EXISTS servers (
   id INTEGER PRIMARY KEY,
   data TEXT
-);
-`);
+);`);
 db.run(`CREATE TABLE IF NOT EXISTS maps (
   id INTEGER PRIMARY KEY,
   data TEXT
-);
-`);
+);`);
+db.run(`CREATE TABLE IF NOT EXISTS commands (
+  name TEXT PRIMARY KEY,
+  count INTEGER
+);`);
 console.log("Database up and running!");
 
 export default class ReadyEvent extends BaseEvent {
