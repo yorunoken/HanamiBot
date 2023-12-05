@@ -19,7 +19,7 @@ export async function start({ interaction, args, mode, client, locale }: { inter
 
   const user = await v2.user.details(options.user, interactionOptions.mode);
   if (!user.id) {
-    return reply(locale.fails.userDoesntExist.replace("{USER}", options.user));
+    return reply(locale.fails.userDoesntExist(options.user));
   }
 
   let plays = await v2.scores.user.category(user.id, "best", {
@@ -66,12 +66,12 @@ async function getFiles(plays: ScoreResponse[], user: UserResponse, reply: (opti
   const missingMapIds = mapIds.filter((id) => !mapsInBulk.some((map: any) => map.id === id));
   if (missingMapIds.length > 0) {
     if (downloadingMapUserCache[user.id] === true) {
-      reply({ embeds: [new EmbedBuilder().setTitle(locale.misc.warning).setDescription(locale.embeds.nochoke.alreadyDownloading.replace("{USERNAME}", user.username)).setColor("Red")] });
+      reply({ embeds: [new EmbedBuilder().setTitle(locale.misc.warning).setDescription(locale.embeds.nochoke.alreadyDownloading(user.username)).setColor("Red")] });
       return false;
     }
 
     updateDownloadingCache(user.id, true);
-    const message = await reply({ embeds: [new EmbedBuilder().setTitle(locale.misc.warning).setDescription(locale.embeds.nochoke.mapsArentInDb.replace("{MISSINGMAPS}", missingMapIds.length.toString()).replace("{USERNAME}", user.username)).setColor("Red")] });
+    const message = await reply({ embeds: [new EmbedBuilder().setTitle(locale.misc.warning).setDescription(locale.embeds.nochoke.mapsArentInDb(user.username, missingMapIds.length)).setColor("Red")] });
     const data = (await downloadMap(mapIds)).map((map: any) => ({ id: map.id, data: map.contents }));
     insertDataBulk({
       table: "maps",
@@ -120,9 +120,9 @@ async function getSubsequentPlays({ user, plays, page, mode, locale }: { user: U
     .setThumbnail(userDetails.userAvatar)
     .setDescription(description.join(""))
     .setFooter({
-      text: `${locale.embeds.page.replace("{PAGE}", `${page + 1}/${Math.ceil(plays.length / 5)}`)} • ${
-        locale.embeds.nochoke.approximateRank.replace("{PP}", newTotalPp.toFixed(2)).replace(
-          "{RANK}",
+      text: `${locale.embeds.page(`${page + 1}/${Math.ceil(plays.length / 5)}`)} • ${
+        locale.embeds.nochoke.approximateRank(
+          newTotalPp.toFixed(2),
           await fetch(`https://osudaily.net/api/pp.php?k=${Bun.env.OSU_DAILY_API}&m=${rulesetId}&t=pp&v=${newTotalPp}`)
             .then((res) => res.json())
             .then((res: any) => res?.rank?.toLocaleString()),

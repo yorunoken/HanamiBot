@@ -52,7 +52,7 @@ export async function start({ interaction, client, args, type, locale }: { inter
   }
 
   if (page < 0 || page >= lengthCeil) {
-    return options.reply(locale.fails.provideValidPage.replace("{MAXVALUE}", lengthCeil.toString()));
+    return options.reply(locale.fails.provideValidPage(lengthCeil));
   }
 
   const embedOptions = {
@@ -66,7 +66,7 @@ export async function start({ interaction, client, args, type, locale }: { inter
     initializer: userOptions.user ? { user: interaction.author, score: scores.scores.find((score: any) => score.user.id === userOptions.user), index: scores.scores.findIndex((score: any) => score.user.id === userOptions.user) } : undefined,
   };
   const response = await options.reply({
-    content: locale.embeds.leaderboard.type.replace("{TYPE}", type === "global" ? locale.embeds.leaderboard.global : locale.embeds.leaderboard.country),
+    content: locale.embeds.leaderboard.type(type === "global" ? locale.embeds.leaderboard.global : locale.embeds.leaderboard.country),
     embeds: [await buildMapEmbed(embedOptions)],
     components: [buildActionRow([firstButton, previousButton, specifyButton, nextButton, lastButton], [page === 0, buttonBoolsTops("previous", embedOptions), false, buttonBoolsTops("next", embedOptions), page === lengthCeil - 1])],
   });
@@ -101,9 +101,9 @@ async function buildMapEmbed({ map, fetched, page, file, initializer, locale }: 
     const hitValues = { count_300: stats.great || 0, count_100: stats.ok || 0, count_50: stats.meh || 0, count_miss: stats.miss || 0, count_geki: stats.perfect || 0, count_katu: stats.good || 0 };
     const performance = getPerformanceDetails({ mapText: file, maxCombo: score.max_combo, modsArg: mods, rulesetId: map.rulesetId, hitValues });
 
-    _userScore = `\n\n**__${locale.embeds.leaderboard.playScore.replace("{USERID}", initializer.user.id)}__**\n**#${initializer.index + 1} [${score.user.username}](https://osu.ppy.sh/users/${score.user.id})**: ${score.total_score.toLocaleString()} [**${score.max_combo}x**/${map.maxCombo}x] **+${mods.join("")}**\n${grades[score.rank]} **${performance.curPerf?.pp.toFixed(2)}**/${
-      performance.maxPerf.pp.toFixed(2)
-    }pp (${(score.accuracy * 100).toFixed(2)}%) <t:${new Date(score.ended_at).getTime() / 1000}:R>`;
+    _userScore = `\n\n**__${locale.embeds.leaderboard.playScore(initializer.user.id)}__**\n**#${initializer.index + 1} [${score.user.username}](https://osu.ppy.sh/users/${score.user.id})**: ${score.total_score.toLocaleString()} [**${score.max_combo}x**/${map.maxCombo}x] **+${mods.join("")}**\n${grades[score.rank]} **${performance.curPerf?.pp.toFixed(2)}**/${performance.maxPerf.pp.toFixed(2)}pp (${
+      (score.accuracy * 100).toFixed(2)
+    }%) <t:${new Date(score.ended_at).getTime() / 1000}:R>`;
   }
 
   return new EmbedBuilder()
@@ -111,5 +111,5 @@ async function buildMapEmbed({ map, fetched, page, file, initializer, locale }: 
     .setURL(`https://osu.ppy.sh/b/${map.id}`)
     .setImage(map.background)
     .setDescription(description.join("\n") + _userScore)
-    .setFooter({ text: `${locale.embeds.page.replace("{PAGE}", `${page + 1}/${Math.ceil(scores.length / 5)}`)} - ${locale.misc.poweredBy}` });
+    .setFooter({ text: `${locale.embeds.page(`${page + 1}/${Math.ceil(scores.length / 5)}`)} - ${locale.misc.poweredBy}` });
 }

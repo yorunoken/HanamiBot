@@ -33,10 +33,10 @@ function helpMenu(options: any, commands: any, locale: Locales) {
 function commandHelp(options: any, name: string, commands: any, locale: Locales) {
   const command = Object.values(commands).find((cmd: any) => cmd.aliases.some((alias: string) => alias.toLowerCase() === name.toLowerCase()) || cmd.name.toLowerCase() === name.toLowerCase()) as ModuleReturn | undefined;
   if (!command) {
-    options.reply(locale.embeds.help.commandNotFound.replace("{NAME}", name));
+    options.reply(locale.embeds.help.commandNotFound(name));
     return;
   }
 
-  const embed = new EmbedBuilder().setTitle(locale.embeds.help.commandInfoTitleEmbed.replace("{NAME}", command.name)).setDescription(`\`\`\`/${command.name}\`\`\`\n${command.description}\n\nflags:\n${command.flags || "none"}\n\naliases: \`${command.aliases.join(", ")}\``);
+  const embed = new EmbedBuilder().setTitle(locale.embeds.help.commandInfoTitleEmbed(command.name)).setDescription(`\`\`\`/${command.name}\`\`\`\n${command.description}\n\nflags:\n${command.flags || "none"}\n\naliases: \`${command.aliases.join(", ")}\``);
   options.reply({ embeds: [embed] });
 }

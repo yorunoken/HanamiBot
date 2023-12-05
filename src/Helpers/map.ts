@@ -37,7 +37,7 @@ async function buildMapEmbed(map: BeatmapInfo, locale: Locales) {
     .setTitle(`${map.artist} - ${map.title}`)
     .setURL(`https://osu.ppy.sh/b/${map.id}`)
     .setAuthor({
-      name: locale.embeds.map.beatmapBy.replace("{USERNAME}", mapAuthor.username),
+      name: locale.embeds.map.beatmapBy(mapAuthor.username),
       iconURL: mapAuthor.avatar_url,
     })
     .setThumbnail(`https://assets.ppy.sh/beatmaps/${map.setId}/covers/list.jpg`)

@@ -10,7 +10,6 @@ export function getUser({ user, mode, locale }: { user: UserOsu; mode: osuModes;
   const userJoinDate = new Date(user.join_date);
 
   return {
-    locale: "" as unknown as Locales,
     username: user.username,
     userCover: user.cover_url,
     userAvatar: user.avatar_url,
@@ -151,8 +150,7 @@ export async function getScore({ plays, index, mode, _isTops, isCompare, perfDet
     ssPp: performance.maxPerf.pp.toFixed(2),
     totalResult: `**${performance.curPerf?.pp.toFixed(2)}**/${performance.maxPerf.pp.toFixed(2)}pp • ${play.max_combo}x/${performance.maxPerf.difficulty.maxCombo}x • { **${rulesetId === 3 ? count_geki + "/" : ""}${count_300}**/${rulesetId === 3 ? count_katu + "/" : ""}${count_100}/${rulesetId === 1 ? "" : count_50 + "/"}${count_miss} }`,
     ifFcValue: (performance.curPerf as any).effectiveMissCount > 0
-      ? locale.classes.ifFc.replace("{PP}", `**${performance.fcPerf.pp.toFixed(2)}**`).replace(
-        "{ACCURACY}",
+      ? locale.classes.ifFc(
         `**${
           tools
             .accuracy(
@@ -168,6 +166,7 @@ export async function getScore({ plays, index, mode, _isTops, isCompare, perfDet
             )
             .toFixed(2)
         }%**`,
+        `**${performance.fcPerf.pp.toFixed(2)}**`,
       )
       : "",
   };

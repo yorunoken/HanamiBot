@@ -20,7 +20,7 @@ export async function start(interaction: ChatInputCommandInteraction | Message, 
   const author = options.author;
   const user = await v2.user.details(userOptions?.user, "osu");
   if (!user.id) {
-    return options.reply(locale.fails.userDoesntExist.replace("{USER}", userOptions?.user));
+    return options.reply(locale.fails.userDoesntExist(userOptions?.user));
   }
 
   let currentDocs = await getUser(author.id);
@@ -34,6 +34,6 @@ export async function start(interaction: ChatInputCommandInteraction | Message, 
 
   insertData({ table: "users", id: author.id, data: JSON.stringify(data) });
 
-  const embed = new EmbedBuilder().setColor("Green").setTitle(locale.misc.success).setDescription(locale.embeds.link.success.replace("{ID}", author.id).replace("{USERNAME}", user.username)).setThumbnail(user.avatar_url);
+  const embed = new EmbedBuilder().setColor("Green").setTitle(locale.misc.success).setDescription(locale.embeds.link.success(author.id, user.username)).setThumbnail(user.avatar_url);
   await reply({ embeds: [embed] });
 }
