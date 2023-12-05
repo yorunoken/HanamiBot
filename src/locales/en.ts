@@ -21,7 +21,7 @@ export default {
       global: `global`,
       country: `Turkish`,
       type: (type: string) => `Showing ${type} leaderboard.`,
-      playScore: (userId: strOrNum) => `<@{userId}>'s score:`,
+      playScore: (userId: strOrNum) => `<@${userId}>'s score:`,
     },
     map: {
       beatmapBy: (username: string) => `Beatmap by ${username}`,
