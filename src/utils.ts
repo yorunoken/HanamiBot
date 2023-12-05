@@ -89,22 +89,24 @@ export const previousButton = new ButtonBuilder().setCustomId("previous").setEmo
 export const nextButton = new ButtonBuilder().setCustomId("next").setEmoji("1177027023030456420").setStyle(ButtonStyle.Secondary);
 export const specifyButton = new ButtonBuilder().setCustomId("indexbtn").setEmoji("1177027025672871936").setStyle(ButtonStyle.Secondary);
 
-export const getCommand = (id: string): any => db.prepare("SELECT * FROM commands WHERE id = ?").get(id);
-export const getUser = (id: string): any => db.prepare("SELECT * FROM users WHERE id = ?").get(id);
-export const getServer = (id: string): any => db.prepare("SELECT * FROM servers WHERE id = ?").get(id);
+export const getWholeDb = (dbName: string) => db.prepare(`SELECT * FROM ${dbName}`).all();
+
+export const getCommand = (id: string | number): any => db.prepare("SELECT * FROM commands WHERE name = ?").get(id);
+export const getUser = (id: string | number): any => db.prepare("SELECT * FROM users WHERE id = ?").get(id);
+export const getServer = (id: string | number): any => db.prepare("SELECT * FROM servers WHERE id = ?").get(id);
 export const getServersInBulk = (ids: string[] | number[]): any => {
   const placeholders = ids.map(() => "?").join(", ");
   const query = `SELECT * FROM servers WHERE id IN (${placeholders})`;
   return db.prepare(query).all(...ids);
 };
-export const getMap = (id: string): any => db.prepare(`SELECT * FROM maps WHERE id = ?`).get(id);
+export const getMap = (id: string | number): any => db.prepare(`SELECT * FROM maps WHERE id = ?`).get(id);
 export const getMapsInBulk = (ids: string[] | number[]): any => {
   const placeholders = ids.map(() => "?").join(", ");
   const query = `SELECT * FROM maps WHERE id IN (${placeholders})`;
   return db.prepare(query).all(...ids);
 };
 
-export const insertData = ({ table, id, data }: { table: string; id: string; data: string }): void => db.prepare(`INSERT OR REPLACE INTO ${table} values (?, ?)`).run(id, data);
+export const insertData = ({ table, id, data }: { table: string; id: string | number; data: string | number }): void => db.prepare(`INSERT OR REPLACE INTO ${table} values (?, ?)`).run(id, data);
 export const insertDataBulk = ({ table, object }: { table: string; object: { id: number; data: string }[] }): void => {
   const insertStatement = db.prepare(`INSERT OR REPLACE INTO ${table} values (?, ?)`);
 
