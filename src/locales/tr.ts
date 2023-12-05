@@ -11,6 +11,10 @@ export default {
       title: `Bir komutun detayları için \`help <command>\` kullanın`,
       commandNotFound: (name: string) => `${name} isimli komut bulunamadı.`,
       commandInfoTitleEmbed: (name: string) => `${name} İsimli komutun bilgileri`,
+      botInfo: "Bot Bilgileri",
+      botServerCount: (length: string) => `${length} adet sunucuya servis vermekte`,
+      botUptime: (uptime: string) => `${uptime} başladı`, // uptime will display "X seconds/minuts/hours ago"
+      commands: "Komut Kullanımı",
     },
     leaderboard: {
       noScores: `Bu beatmap'in sıralamasında hiç skor yok.`,

@@ -183,6 +183,10 @@ interface Embeds {
     title: string;
     commandNotFound: (name: string) => string;
     commandInfoTitleEmbed: (name: string) => string;
+    botInfo: string;
+    botServerCount: (length: string) => string;
+    botUptime: (uptime: string) => string;
+    commands: string;
   };
   leaderboard: {
     noScores: string;
