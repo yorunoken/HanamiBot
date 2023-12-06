@@ -309,6 +309,7 @@ interface Misc {
 
 export interface Locales {
   code: string;
+  errorAtRuntime: string;
   embeds: Embeds;
   classes: Classes;
   fails: Fails;

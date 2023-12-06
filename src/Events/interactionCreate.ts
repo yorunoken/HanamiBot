@@ -1,4 +1,4 @@
-import { ActionRowBuilder, Interaction, InteractionType, ModalActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ActionRowBuilder, EmbedBuilder, Interaction, InteractionType, ModalActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import { ButtonActions } from "../classes";
 import { LocalizationManager } from "../locales";
 import { ExtendedClient } from "../Structure";
@@ -75,11 +75,31 @@ export default class InteractionCreateEvent extends BaseEvent {
 
     if (interaction.type === InteractionType.ApplicationCommand) {
       try {
+        const cmd = this.client.prefixCommands.get(interaction.commandName)?.name;
+
         const command = this.client.slashCommands.get(interaction.commandName);
         if (!command) return;
-        command.run({ client: this.client, interaction, db, locale });
+        command.run({ client: this.client, interaction, db, locale }).catch(async (error) => {
+          interaction.editReply(locale.errorAtRuntime);
 
-        const cmd = this.client.prefixCommands.get(interaction.commandName)?.name;
+          const channel = await this.client.channels.fetch(Bun.env.ERRORS_CHANNELID as string);
+          if (!channel || !channel.isTextBased()) return;
+          channel.send({
+            content: `<@${Bun.env.OWNER_DISCORDID}> STACK ERROR, GET YOUR ASS TO WORK`,
+            embeds: [
+              new EmbedBuilder().setTitle(`Runtime error on command: ${cmd}`).setDescription(
+                `Initializer: <@${interaction.user.id}> (${interaction.user.username})\nServer: [${interaction.guild?.name}](https://discord.com/channels/${interaction.guildId}/${interaction.channelId})\nMessage: [Slash command.](https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${interaction.id})`,
+              )
+                .addFields(
+                  {
+                    name: "Error description:",
+                    value: `\`\`\`${error.stack}\`\`\``,
+                  },
+                ),
+            ],
+          });
+        });
+
         if (cmd) {
           const doc = getCommand(cmd);
           insertData({ table: "commands", id: cmd, data: doc ? doc.count + 1 : 1 });

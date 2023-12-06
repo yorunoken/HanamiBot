@@ -1,4 +1,4 @@
-import { ChannelType, Message, PermissionFlagsBits, TextChannel } from "discord.js";
+import { ChannelType, EmbedBuilder, Message, PermissionFlagsBits, TextChannel } from "discord.js";
 import ms from "ms";
 import { prefixCache } from "../cache";
 import { defaultPrefix } from "../constants";
@@ -72,7 +72,22 @@ export default class MessageCreateEvent extends BaseEvent {
       return;
     }
 
-    command.run({ client: this.client, message, args, prefix, index: number, commandName, db, locale });
+    command.run({ client: this.client, message, args, prefix, index: number, commandName, db, locale }).catch(async (error) => {
+      message.channel.send(locale.errorAtRuntime);
+
+      const channel = await this.client.channels.fetch(Bun.env.ERRORS_CHANNELID as string);
+      if (!channel || !channel.isTextBased()) return;
+      channel.send({
+        content: `<@${Bun.env.OWNER_DISCORDID}> STACK ERROR, GET YOUR ASS TO WORK`,
+        embeds: [
+          new EmbedBuilder().setTitle(`Runtime error on command: ${command.name}`).setDescription(`Initializer: <@${message.author.id}> (${message.author.username})\nServer: [${message.guild?.name}](https://discord.com/channels/${message.guildId}/${message.channelId})\nMessage: [${message.content}](https://discord.com/channels/${message.guildId}/${message.channelId}/${message.id})`).addFields({
+            name: "Error description:",
+            value: `\`\`\`${error.stack}\`\`\``,
+          }),
+        ],
+      });
+    });
+
     cooldown.set(`${command.name}${message.author.id}`, Date.now() + command.cooldown);
     setTimeout(() => {
       cooldown.delete(`${command.name}${message.author.id}`);

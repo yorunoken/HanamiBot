@@ -3,6 +3,7 @@ type strOrNum = string | number;
 
 export default {
   code: `en-US`,
+  errorAtRuntime: "It seems you've encountered a bug. Fret not! An error message has already been sent to the owner of the bot. You can reach out to him on Discord at @yorunoken",
   embeds: {
     page: (page: string) => `Page ${page}`,
     otherPlays: `**__Other plays on the map:__**`,

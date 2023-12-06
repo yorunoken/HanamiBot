@@ -3,6 +3,7 @@ type strOrNum = string | number;
 
 export default {
   code: `tr-TR`,
+  errorAtRuntime: "Görünüşe göre bir hata ile karşılaştınız. Endişelenmeyin! Botun sahibine çoktan bir hata mesajı gönderildi. Kendisine Discord üzerinden @yorunoken adresinden ulaşabilirsiniz.",
   embeds: {
     page: (page: string) => `Sayfa ${page}`,
     otherPlays: `**__Beatmap'teki başka skorlar:__**`,

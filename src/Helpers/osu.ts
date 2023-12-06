@@ -22,7 +22,7 @@ export async function start(interaction: Message | ChatInputCommandInteraction, 
     return options.reply(locale.fails.userDoesntExist(userOptions?.user));
   }
 
-  const userDetailOptions = getUser({ user, mode: options.mode, locale });
+  const userDetailOptions = getUser({ user, mode: options.mode, locale: undefined as any });
   userDetailOptions.locale = locale;
 
   let page = buildPage1(userDetailOptions);
