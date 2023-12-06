@@ -22,8 +22,7 @@ export async function start(interaction: Message | ChatInputCommandInteraction, 
     return options.reply(locale.fails.userDoesntExist(userOptions?.user));
   }
 
-  const userDetailOptions = getUser({ user, mode: options.mode, locale: undefined as any });
-  userDetailOptions.locale = locale;
+  const userDetailOptions = getUser({ user, mode: options.mode, locale });
 
   let page = buildPage1(userDetailOptions);
   const response = await options.reply({ embeds: [page], components: [showMoreButton] });

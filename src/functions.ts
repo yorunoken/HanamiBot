@@ -10,6 +10,7 @@ export function getUser({ user, mode, locale }: { user: UserOsu; mode: osuModes;
   const userJoinDate = new Date(user.join_date);
 
   return {
+    locale,
     username: user.username,
     userCover: user.cover_url,
     userAvatar: user.avatar_url,
