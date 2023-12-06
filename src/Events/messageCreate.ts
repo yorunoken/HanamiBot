@@ -32,9 +32,9 @@ export default class MessageCreateEvent extends BaseEvent {
       return;
     }
 
-    if (message.content.startsWith("https://")) {
-      getLoneCommand(message);
-    }
+    // if (message.content.startsWith("https://")) {
+    //   getLoneCommand(message);
+    // }
 
     const prefixOptions = prefixCache[guildId] ?? (prefixCache[guildId] = JSON.parse((getServer(guildId)).data)?.prefix) ?? (prefixCache[guildId] = [defaultPrefix]);
     let prefix = prefixOptions.find((p: string) => message.content.startsWith(p));
