@@ -180,6 +180,16 @@ interface Embeds {
   page: (page: string) => string;
   otherPlays: string;
   provideUsername: string;
+  prefix: {
+    provideFlags: string;
+    prefixAlreadySet: (prefix: string) => string;
+    maxPrefix: (maxPrefix: string) => string;
+    prefixAdded: (prefix: string) => string;
+    noPrefixes: string;
+    serverDoesntHavePrefix: string;
+    prefixRemoved: (prefix: string) => string;
+    currentPrefixes: (prefixes: string) => string;
+  };
   help: {
     title: string;
     commandNotFound: (name: string) => string;

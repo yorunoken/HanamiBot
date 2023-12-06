@@ -8,6 +8,16 @@ export default {
     page: (page: string) => `Page ${page}`,
     otherPlays: `**__Other plays on the map:__**`,
     provideUsername: `Please provide a username`,
+    prefix: {
+      provideFlags: "Please provide either of these flags: `add, remove, list`.",
+      prefixAlreadySet: (prefix: string) => `The prefix ${prefix} is already set!`,
+      maxPrefix: (maxPrefix: string) => `The maximum number of prefixes you can add is ${maxPrefix}`,
+      prefixAdded: (prefix: string) => `The prefix ${prefix} has been added to the array of prefixes!`,
+      noPrefixes: "There are no prefixes set for this server yet.",
+      serverDoesntHavePrefix: "This prefix isn't set in this server yet.",
+      prefixRemoved: (prefix: string) => `The prefix ${prefix} has been removed from the array of prefixes!`,
+      currentPrefixes: (prefixes: string) => `This server's current prefixes are: ${prefixes}`,
+    },
     help: {
       title: `Use \`help <command>\` for details of a command`,
       commandNotFound: (name: string) => `The command with the name (or alias) ${name} was not found.`,

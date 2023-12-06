@@ -8,6 +8,16 @@ export default {
     page: (page: string) => `Sayfa ${page}`,
     otherPlays: `**__Beatmap'teki başka skorlar:__**`,
     provideUsername: `Lütfen bir isim belirtin`,
+    prefix: {
+      provideFlags: "Lütfen herhangi bir tanesini belirtin: `add, remove, list`.",
+      prefixAlreadySet: (prefix: string) => `${prefix} prefix'i sunucuya zaten tanımlı!`,
+      maxPrefix: (maxPrefix: string) => `Bu sunucuya eklenebilecek maksimum prefix: ${maxPrefix}`,
+      prefixAdded: (prefix: string) => `${prefix} prefix'i sunucuya eklendi!`,
+      noPrefixes: "Bu sunucuya tanımlı herhangi bir prefix yok.",
+      serverDoesntHavePrefix: "Bu prefix sunucuya tanımlı değil.",
+      prefixRemoved: (prefix: string) => `${prefix} prefix'i sunucudan kaldırıldı!`,
+      currentPrefixes: (prefixes: string) => `Sunucuda tanımlı prefix'ler: ${prefixes}`,
+    },
     help: {
       title: `Bir komutun detayları için \`help <command>\` kullanın`,
       commandNotFound: (name: string) => `${name} isimli komut bulunamadı.`,
