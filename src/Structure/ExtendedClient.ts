@@ -45,7 +45,7 @@ export default class extends Client {
     for (const guildId of serversId) {
       const guild = JSON.parse(guilds.find((item: any) => item.id === Number(guildId)).data);
       if (!guild.language) {
-        insertData({ table: "servers", data: JSON.stringify({ ...JSON.parse(guild.data), language: "en" }), id: guildId });
+        insertData({ table: "servers", data: JSON.stringify({ ...guild, language: "en" }), id: guildId });
       }
       this.localeLanguage.set(guildId, guild.language || "en");
     }
