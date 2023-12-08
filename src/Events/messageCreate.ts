@@ -73,6 +73,7 @@ export default class MessageCreateEvent extends BaseEvent {
     }
 
     command.run({ client: this.client, message, args, prefix, index: number, commandName, db, locale }).catch(async (error) => {
+      console.log(error);
       message.channel.send(locale.errorAtRuntime);
 
       const channel = await this.client.channels.fetch(Bun.env.ERRORS_CHANNELID as string);

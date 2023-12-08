@@ -80,6 +80,7 @@ export default class InteractionCreateEvent extends BaseEvent {
         const command = this.client.slashCommands.get(interaction.commandName);
         if (!command) return;
         command.run({ client: this.client, interaction, db, locale }).catch(async (error) => {
+          console.log(error);
           interaction.editReply(locale.errorAtRuntime);
 
           const channel = await this.client.channels.fetch(Bun.env.ERRORS_CHANNELID as string);
