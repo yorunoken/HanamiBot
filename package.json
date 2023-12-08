@@ -6,8 +6,13 @@
     "start": "bun ."
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin": "^1.5.0",
     "@types/ms": "^0.7.32",
-    "bun-types": "latest"
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "bun-types": "latest",
+    "eslint": "^8.55.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
