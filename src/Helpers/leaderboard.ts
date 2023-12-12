@@ -2,7 +2,7 @@ import { EmbedBuilder, Message } from "discord.js";
 import { v2 } from "osu-api-extended";
 import { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
 import { getBeatmap } from "../functions";
-import { BeatmapInfo, commands, Locales } from "../Structure";
+import { BeatmapInfo, Commands, Locales } from "../Structure";
 import { ExtendedClient } from "../Structure/index";
 import { buildActionRow, buttonBoolsTops, downloadMap, firstButton, getBeatmapId_FromContext, getMap, getPerformanceDetails, getUsernameFromArgs, grades, insertData, Interactionhandler, lastButton, nextButton, previousButton, specifyButton } from "../utils";
 
@@ -70,7 +70,7 @@ export async function start({ interaction, client, args, type, locale }: { inter
     embeds: [await buildMapEmbed(embedOptions)],
     components: [buildActionRow([firstButton, previousButton, specifyButton, nextButton, lastButton], [page === 0, buttonBoolsTops("previous", embedOptions), false, buttonBoolsTops("next", embedOptions), page === lengthCeil - 1])],
   });
-  client.sillyOptions[response.id] = { buttonHandler: "handleTopsButtons", type: commands.Top, embedOptions, response, pageBuilder: buildMapEmbed, initializer: options.author };
+  client.sillyOptions[response.id] = { buttonHandler: "handleTopsButtons", type: Commands.Top, embedOptions, response, pageBuilder: buildMapEmbed, initializer: options.author };
 }
 
 async function buildMapEmbed({ map, fetched, page, file, initializer, locale }: { map: BeatmapInfo; fetched: any; page: number; file: string; initializer: any | undefined; locale: Locales }) {

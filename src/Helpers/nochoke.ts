@@ -4,7 +4,7 @@ import { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores
 import { response as UserResponse } from "osu-api-extended/dist/types/v2_user_details";
 import { downloadingMapUserCache, updateDownloadingCache } from "../cache";
 import { getUser } from "../functions";
-import { commands, ExtendedClient, Locales, noChokePlayDetails, osuModes } from "../Structure/index";
+import { Commands, ExtendedClient, Locales, NoChokePlayDetails, osuModes } from "../Structure/index";
 import { buildActionRow, buttonBoolsTops, calculateWeightedScores, downloadMap, firstButton, getMapsInBulk, getPerformanceDetails, getUsernameFromArgs, grades, insertDataBulk, Interactionhandler, lastButton, nextButton, previousButton, rulesets, specifyButton } from "../utils";
 
 export async function start({ interaction, args, mode, client, locale }: { interaction: Message | ChatInputCommandInteraction; args?: string[]; mode?: osuModes; client: ExtendedClient; locale: Locales }) {
@@ -36,7 +36,7 @@ async function getNoChoke(interactionOptions: any, client: ExtendedClient, plays
     return;
   }
 
-  const newPlays: noChokePlayDetails[] = plays
+  const newPlays: NoChokePlayDetails[] = plays
     .map((play) => {
       let { beatmap: map, statistics } = play;
 
@@ -57,7 +57,7 @@ async function getNoChoke(interactionOptions: any, client: ExtendedClient, plays
   const embedOptions = { user, plays: newPlays, page, mode, locale };
   const components = [buildActionRow([firstButton, previousButton, specifyButton, nextButton, lastButton], [page === 0, buttonBoolsTops("previous", embedOptions), false, buttonBoolsTops("next", embedOptions), plays.length - 1 === page])];
   const response = await reply({ embeds: [await getSubsequentPlays(embedOptions)], components });
-  client.sillyOptions[response.id] = { buttonHandler: "handleTopsButtons", type: commands["Top"], embedOptions, response, pageBuilder: getSubsequentPlays, initializer: interactionOptions.author };
+  client.sillyOptions[response.id] = { buttonHandler: "handleTopsButtons", type: Commands["Top"], embedOptions, response, pageBuilder: getSubsequentPlays, initializer: interactionOptions.author };
 }
 
 async function getFiles(plays: ScoreResponse[], user: UserResponse, reply: (options: any) => Promise<Message<boolean>>, locale: Locales) {
@@ -90,7 +90,7 @@ async function getFiles(plays: ScoreResponse[], user: UserResponse, reply: (opti
   }, {});
 }
 
-async function getSubsequentPlays({ user, plays, page, mode, locale }: { user: UserResponse; plays: noChokePlayDetails[]; page: number; mode: osuModes; locale: Locales }) {
+async function getSubsequentPlays({ user, plays, page, mode, locale }: { user: UserResponse; plays: NoChokePlayDetails[]; page: number; mode: osuModes; locale: Locales }) {
   const userDetails = getUser({ user, mode, locale });
   let description = [];
 

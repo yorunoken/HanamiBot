@@ -1,11 +1,12 @@
 import { db } from "./Events/ready";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionType } from "discord.js";
 import { mods } from "osu-api-extended";
+//@ts-expect-error idk lmao the owner just didn't want to include types ig
 import { DownloadEntry, Downloader } from "osu-downloader";
 import { Beatmap, Calculator } from "rosu-pp";
 import type { response as UserResponse } from "osu-api-extended/dist/types/v2_user_details";
 import type { ChatInputCommandInteraction, Client, Message, TextBasedChannel, User as UserDiscord } from "discord.js";
-import type { noChokePlayDetails, osuModes } from "./Structure";
+import type { DbCommands, DbMaps, DbServer, DbUser, EmbedOptions, NoChokePlayDetails, osuModes } from "./Structure";
 
 export const grades: Record<string, string> = {
     A: "<:A_:1057763284327080036>",
@@ -33,16 +34,16 @@ export const rulesets: Record<string, number> = {
     mania: 3
 };
 
-export const buildActionRow = (buttons: Array<ButtonBuilder>, disabledStates: Array<boolean> = []) => {
+export function buildActionRow(buttons: Array<ButtonBuilder>, disabledStates: Array<boolean> = []): ActionRowBuilder {
     const actionRow = new ActionRowBuilder();
     buttons.forEach((button, index) => {
         const isButtonDisabled = disabledStates[index];
         actionRow.addComponents(isButtonDisabled ? button.setDisabled(true) : button.setDisabled(false));
     });
     return actionRow;
-};
+}
 
-export function getRetryCount(retryMap: Array<number>, mapId: number) {
+export function getRetryCount(retryMap: Array<number>, mapId: number): number {
     let retryCounter = 0;
     for (let i = 0; i < retryMap.length; i++) {
         if (retryMap[i] === mapId)
@@ -51,23 +52,50 @@ export function getRetryCount(retryMap: Array<number>, mapId: number) {
     return retryCounter;
 }
 
-export const returnFlags = ({ page, index, mods }: { page?: boolean, index?: boolean, mods?: boolean }) => `${page ? "- page(p)=number (returns the page corresponding to `number`)\n" : ""}${index ? "- index(i)=number (returns the index corresponding to `number`)" : ""}${mods ? "- +MODS (returns play(s) with provided mod combination)\n" : ""}`;
-export const formatNumber = (value: number, decimalPlaces: number) => value.toFixed(decimalPlaces).replace(/\.0+$/, "");
-export const errMsg = (message: string) => ({ status: false, message });
-export const getUserData = (userId: string) => getUser(userId) || errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`);
-export const buttonBoolsTops = (type: string, options: any) => type === "previous" ? options.page * 5 === 0 : options.page * 5 + 5 === (options.plays?.length || options.length);
-export const buttonBoolsIndex = (type: string, options: any) => type === "previous" ? options.index === 0 : options.index + 1 === options.plays.length;
+export function returnFlags({ page, index, mods: modded }: { page?: boolean, index?: boolean, mods?: boolean }): string {
+    return `${page ? "- page(p)=number (returns the page corresponding to 'number')" : ""}
+${index ? "- index(i)=number (returns the index corresponding to 'number')" : ""}
+${modded ? "- +MODS (returns play(s) with provided mod combination)" : ""}`;
+}
+export function formatNumber(value: number, decimalPlaces: number): string {
+    return value.toFixed(decimalPlaces).replace(/\.0+$/, "");
+}
+export function errMsg(message: string): { status: false, message: string } {
+    return { status: false, message };
+}
+export function getUserData(userId: string): DbUser | { status: false, message: string } {
+    return getUser(userId) ?? errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`);
+}
+export function buttonBoolsTops(type: string, options: EmbedOptions): boolean | undefined {
+    if (options.page === undefined) return;
+    return type === "previous" ? options.page * 5 === 0 : options.page * 5 + 5 === (options.plays.length || options.length);
+}
+
+export function buttonBoolsIndex(type: string, options: EmbedOptions): boolean | undefined {
+    if (options.index === undefined) return;
+    return type === "previous" ? options.index === 0 : options.index + 1 === options.plays.length;
+}
 
 const flags = ["i", "index", "rev", "p", "page"];
-export const argParser = (str: string, flags: Array<string>) => [...str.matchAll(/-(\w+)|(\w+)=(\S+)/g)].filter((m) => flags.includes(m[1]) || flags.includes(m[2])).reduce<Record<string, string | boolean>>((acc, m) => (acc[m[1] || m[2]] = m[3] !== undefined ? m[3] : true, acc), {});
-function modsParser(str: string) {
-    const modCodes = (str.match(/[\-+!][\-+!]?[A-Za-z]+/g) || []).map((code) => code.toUpperCase());
+export function argParser(str: string, flagsArr: Array<string>): Record<string, string | boolean> {
+    const matches = [...str.matchAll(/-(\w+)|(\w+)=(\S+)/g)];
+
+    const filteredMatches = matches.filter((m) => flagsArr.includes(m[1]) || flagsArr.includes(m[2]));
+
+    return filteredMatches.reduce<Record<string, string | boolean>>((acc, m) => {
+        acc[m[1] || m[2]] = m[3] !== undefined ? m[3] : true;
+        return acc;
+    }, {});
+}
+
+function modsParser(str: string): undefined | Record<string, string | RegExpMatchArray | null | boolean> {
+    const modCodes = (str.match(/[-+!][-+!]?[A-Za-z]+/g) ?? []).map((code) => code.toUpperCase());
 
     const force = modCodes.some((code) => code.includes("!"));
     return modCodes.some((code) => code.includes("-")) && !force
         ? undefined
         : {
-            force: force,
+            force,
             include: !!modCodes.some((code) => code.includes("+")),
             remove: !!(modCodes.some((code) => code.includes("-")) && force),
             codes: modCodes
@@ -92,36 +120,41 @@ export function getWholeDb(dbName: string): unknown {
     return db.prepare(`SELECT * FROM ${dbName}`).all();
 }
 
-export function getCommand(id: string | number): unknown {
-    return db.prepare("SELECT * FROM commands WHERE name = ?").get(id);
+export function getCommand(id: string | number): DbCommands | undefined {
+    return db.prepare("SELECT * FROM commands WHERE name = ?").get(id) as DbCommands;
 }
 
-export function getUser(id: string | number): unknown {
-    return db.prepare("SELECT * FROM users WHERE id = ?").get(id);
+export function getUser(id: string | number): DbUser | undefined {
+    return db.prepare("SELECT * FROM users WHERE id = ?").get(id) as DbUser;
 }
 
-export function getServer(id: string | number): unknown {
-    return db.prepare("SELECT * FROM servers WHERE id = ?").get(id);
+export function getServer(id: string | number): DbServer | undefined {
+    return db.prepare("SELECT * FROM servers WHERE id = ?").get(id) as DbServer;
 }
 
-export function getServersInBulk(ids: Array<string> | Array<number>): Array<unknown> {
+export function getServersInBulk(ids: Array<string> | Array<number>): Array<DbServer> | undefined {
     const placeholders = ids.map(() => "?").join(", ");
     const query = `SELECT * FROM servers WHERE id IN (${placeholders})`;
-    return db.prepare(query).all(...ids);
+    return db.prepare(query).all(...ids) as Array<DbServer>;
 }
 
-export function getMap(id: string | number): unknown {
-    return db.prepare("SELECT * FROM maps WHERE id = ?").get(id);
+export function getMap(id: string | number): DbMaps | undefined {
+    return db.prepare("SELECT * FROM maps WHERE id = ?").get(id) as DbMaps;
 }
 
-export function getMapsInBulk(ids: Array<string> | Array<number>): Array<unknown> {
+export function getMapsInBulk(ids: Array<string> | Array<number>): Array<DbMaps> | undefined {
     const placeholders = ids.map(() => "?").join(", ");
     const query = `SELECT * FROM maps WHERE id IN (${placeholders})`;
-    return db.prepare(query).all(...ids);
+    return db.prepare(query).all(...ids) as Array<DbMaps>;
 }
 
-export function insertData({ table, id, data }: { table: string, id: string | number, data: string | number }): void {
-    db.prepare(`INSERT OR REPLACE INTO ${table} values (?, ?)`).run(id, data);
+export function insertData({ table, id, data }: { table: string, id: string | number, data: Array<{ name: string, value: string | number }> }): void {
+    const fields: Array<string> = data.map((item) => item.name);
+    const values: Array<string | number | null> = data.map((item) => item.value);
+    console.log(fields, values);
+
+    db.prepare(`INSERT OR REPLACE INTO ${table} (id, ${fields.join(", ")}) values (?, ${fields.map(() => "?").join(", ")})`)
+        .run(id, ...values);
 }
 
 export function insertDataBulk({ table, object }: { table: string, object: Array<{ id: number, data: string }> }): void {
@@ -134,17 +167,17 @@ export function insertDataBulk({ table, object }: { table: string, object: Array
     transaction();
 }
 
+function calculateRemaining(idx: number, goal: number, top: number, bot: number): [number, number] {
+    const factor = Math.pow(0.95, idx);
+    const required = (goal - top - bot) / factor;
+
+    return [required, idx];
+}
+
 export function calculateMissingPp(start: number, goal: number, pps: Array<number>): [number, number] {
     let top = start;
     let bot = 0.0;
     const ppArray = pps;
-
-    function calculateRemaining(idx: number, goal: number, top: number, bot: number): [number, number] {
-        const factor = Math.pow(0.95, idx);
-        const required = (goal - top - bot) / factor;
-
-        return [required, idx];
-    }
 
     for (let i = ppArray.length - 1; i > 0; i--) {
         const factor = Math.pow(0.95, i);
@@ -179,7 +212,7 @@ export function approxMorePp(pps: Array<number>): void {
     }
 }
 
-export function calculateWeightedScores({ user, plays }: { user: UserResponse, plays: Array<noChokePlayDetails> }) {
+export function calculateWeightedScores({ user, plays }: { user: UserResponse, plays: Array<NoChokePlayDetails> }): number {
     const oldPlaysPp = plays.map((play, index) => Number(play.playInfo.play.pp) * Math.pow(0.95, index)).reduce((a, b) => a + b);
     const newPlaysPp = plays.map((play, index) => play.fcPerf.pp * Math.pow(0.95, index)).reduce((a, b) => a + b);
     return newPlaysPp + (user.statistics.pp - oldPlaysPp);
@@ -195,9 +228,9 @@ export function getUsernameFromArgs(user: UserDiscord, args?: Array<string>, use
     const mapRegexResult = mapRegex.exec(argsJoined);
     const beatmapId = mapRegexResult ? (/\d+$/).exec(mapRegexResult[0])![0] : null;
     argsJoined = argsJoined.replace(new RegExp(mapRegex, "i"), "");
-    const mods = modsParser(argsJoined);
+    const parsedMods = modsParser(argsJoined);
 
-    argsJoined = mods ? argsJoined.toLowerCase().replace(mods.whole.toLowerCase(), "") : argsJoined;
+    argsJoined = parsedMods ? argsJoined.toLowerCase().replace(parsedMods.whole.toLowerCase(), "") : argsJoined;
 
     const argumentString = args.length > 0 ? argsJoined.replace(/(?:\s|^)(?=\s|$)|(-\w+|\w+=\S+|https:\/\/osu\.ppy\.sh\/(b|beatmaps|beatmapsets)\/\d+(#(osu|mania|fruits|taiko)\/\d+)?)?(?=\s|$)/g, "") : "";
 
@@ -211,16 +244,16 @@ export function getUsernameFromArgs(user: UserDiscord, args?: Array<string>, use
                 _user = parsedData.banchoId || errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`);
             } catch (_) {}
 
-            return { user: _user, flags: flagsParsed, beatmapId, mods };
+            return { user: _user, flags: flagsParsed, beatmapId, mods: parsedMods };
         }
-        return { user: userData ? JSON.parse(userData).banchoId : errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods };
+        return { user: userData ? JSON.parse(userData).banchoId : errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods: parsedMods };
     }
 
     const discordUserRegex = /\d{17,18}/;
     const discordUserMatch = discordUserRegex.exec(argumentString);
     const userId = discordUserMatch ? discordUserMatch[0] : undefined;
 
-    const userData = getUserData(userId!).data;
+    const userData = getUserData(userId).data;
     if (userId) {
         if (userNotNeeded) {
             let _user = undefined;
@@ -229,16 +262,16 @@ export function getUsernameFromArgs(user: UserDiscord, args?: Array<string>, use
                 _user = parsedData.banchoId || errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`);
             } catch (_) {}
 
-            return { user: _user, flags: flagsParsed, beatmapId, mods };
+            return { user: _user, flags: flagsParsed, beatmapId, mods: parsedMods };
         }
-        return { user: userData ? JSON.parse(userData)?.banchoId : errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods };
+        return { user: userData ? JSON.parse(userData)?.banchoId : errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods: parsedMods };
     }
 
     const osuUsernameRegex = /"(.*?)"/;
     const osuUsernameMatch = osuUsernameRegex.exec(argumentString);
     const osuUsername = osuUsernameMatch ? osuUsernameMatch[1] : argumentString || undefined;
 
-    return osuUsername ? { user: osuUsername, flags: flagsParsed, beatmapId, mods } : undefined;
+    return osuUsername ? { user: osuUsername, flags: flagsParsed, beatmapId, mods: parsedMods } : undefined;
 }
 
 export function getPerformanceDetails({ modsArg, maxCombo, rulesetId, hitValues, mapText, accuracy }: { modsArg: Array<string>, maxCombo?: number, rulesetId: number, hitValues?: any, mapText: string, accuracy?: number }) {
@@ -336,12 +369,12 @@ async function cycleThroughEmbeds(message: Message, client: Client) {
     }
     return beatmapId;
 }
-export const getBeatmapId_FromContext = async (message: Message, client: Client) => message.reference ? await getEmbedFromReply(message, client) : cycleThroughEmbeds(message, client);
+export const getBeatmapId_FromContext = async (message: Message, client: Client) => (message.reference ? await getEmbedFromReply(message, client) : cycleThroughEmbeds(message, client));
 
 export function Interactionhandler(interaction: Message | ChatInputCommandInteraction, args?: Array<string>) {
     const isSlash = interaction.type === InteractionType.ApplicationCommand;
 
-    const reply = async (options: any) => isSlash ? interaction.editReply(options) : interaction.channel.send(options);
+    const reply = async (options: any) => (isSlash ? interaction.editReply(options) : interaction.channel.send(options));
     const userArgs = isSlash ? [interaction.options.getString("user") || ""] : args || [""];
     const ppCount = isSlash ? interaction.options.getNumber("count") || 1 : 1;
     const ppValue = isSlash ? interaction.options.getNumber("pp") || 1 : 1;

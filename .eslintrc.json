@@ -458,7 +458,7 @@
     "@stylistic/implicit-arrow-linebreak": "warn",
     "@stylistic/jsx-quotes": "warn",
     "@stylistic/key-spacing": "warn",
-    "@stylistic/linebreak-style": "warn",
+    // "@stylistic/linebreak-style": "warn",
     "@stylistic/new-parens": "warn",
     "@stylistic/no-confusing-arrow": "warn",
     "@stylistic/no-extra-parens": "warn",

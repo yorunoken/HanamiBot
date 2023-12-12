@@ -1,11 +1,10 @@
-export const prefixCache: any = {};
-export function updatePrefixCache(object: string[], guildId: string) {
-  if (!prefixCache[guildId]) return false;
-  prefixCache[guildId] = object;
-  return true;
+export const prefixCache: Record<string, Array<string>> = {};
+export function updatePrefixCache(object: Array<string>, guildId: string): void {
+    prefixCache[guildId] = object;
 }
 
-export let downloadingMapUserCache: { [userId: number]: boolean } = {};
-export function updateDownloadingCache(userId: number, downloading: boolean) {
-  downloadingMapUserCache[userId] = downloading;
+export const downloadingMapUserCache: Record<number, boolean> = {};
+export function updateDownloadingCache(userId: number, downloading: boolean): void {
+    downloadingMapUserCache[userId] = downloading;
+    return;
 }
