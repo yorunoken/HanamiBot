@@ -83,7 +83,7 @@ export default class InteractionCreateEvent extends BaseEvent {
                     const channel = await this.client.channels.fetch(Bun.env.ERRORS_CHANNELID);
                     if (!channel || !channel.isTextBased()) return;
                     channel.send({
-                        content: `<@${Bun.env.OWNER_DISCORDID}> STACK ERROR, GET YOUR ASS TO WORK`,
+                        content: `<@${Bun.env.OWNER_DISCORDID!}> STACK ERROR, GET YOUR ASS TO WORK`,
                         embeds: [
                             new EmbedBuilder().setTitle(`Runtime error on command: ${cmd}`).setDescription(`Initializer: <@${interaction.user.id}> (${interaction.user.username})\nServer: [${interaction.guild?.name}](https://discord.com/channels/${interaction.guildId}/${interaction.channelId})\nMessage: [Slash command.](https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${interaction.id})`)
                                 .addFields({
