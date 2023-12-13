@@ -1,6 +1,6 @@
-export const prefixCache: Record<string, Array<string>> = {};
-export function updatePrefixCache(object: Array<string>, guildId: string): void {
-    prefixCache[guildId] = object;
+export const prefixCache: Record<string, string | undefined> = {};
+export function updatePrefixCache(prefix: string, guildId: string): void {
+    prefixCache[guildId] = prefix;
 }
 
 export const downloadingMapUserCache: Record<number, boolean> = {};

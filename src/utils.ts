@@ -1,14 +1,13 @@
 import { db } from "./Events/ready";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionType } from "discord.js";
 import { mods } from "osu-api-extended";
-//@ts-expect-error idk lmao the owner just didn't want to include types ig
 import { DownloadEntry, Downloader } from "osu-downloader";
 import { Beatmap, Calculator } from "rosu-pp";
 import type { response as UserResponse } from "osu-api-extended/dist/types/v2_user_details";
-import type { ChatInputCommandInteraction, Client, Message, TextBasedChannel, User as UserDiscord } from "discord.js";
+import type { ChatInputCommandInteraction, Client, Embed, Message, MessageActionRowComponentBuilder, TextBasedChannel, User as UserDiscord } from "discord.js";
 import type { DbCommands, DbMaps, DbServer, DbUser, EmbedOptions, NoChokePlayDetails, osuModes } from "./Structure";
 
-export const grades: Record<string, string> = {
+export const grades = {
     A: "<:A_:1057763284327080036>",
     B: "<:B_:1057763286097076405>",
     C: "<:C_:1057763287565086790>",
@@ -20,22 +19,22 @@ export const grades: Record<string, string> = {
     XH: "<:XH_:1057763296717045891>"
 };
 
-export const osuEmojis: Record<string, string> = {
+export const osuEmojis = {
     osu: "<:osu:1075928459014066286>",
     mania: "<:mania:1075928451602718771>",
     taiko: "<:taiko:1075928454651969606>",
     fruits: "<:ctb:1075928456367444018>"
 };
 
-export const rulesets: Record<string, number> = {
+export const rulesets = {
     osu: 0,
     taiko: 1,
     fruits: 2,
     mania: 3
 };
 
-export function buildActionRow(buttons: Array<ButtonBuilder>, disabledStates: Array<boolean> = []): ActionRowBuilder {
-    const actionRow = new ActionRowBuilder();
+export function buildActionRow(buttons: Array<ButtonBuilder>, disabledStates: Array<boolean> = []): ActionRowBuilder<MessageActionRowComponentBuilder> {
+    const actionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
     buttons.forEach((button, index) => {
         const isButtonDisabled = disabledStates[index];
         actionRow.addComponents(isButtonDisabled ? button.setDisabled(true) : button.setDisabled(false));
@@ -83,12 +82,12 @@ export function argParser(str: string, flagsArr: Array<string>): Record<string, 
     const filteredMatches = matches.filter((m) => flagsArr.includes(m[1]) || flagsArr.includes(m[2]));
 
     return filteredMatches.reduce<Record<string, string | boolean>>((acc, m) => {
-        acc[m[1] || m[2]] = m[3] !== undefined ? m[3] : true;
+        acc[m[1] || m[2]] = m[3] ?? true;
         return acc;
     }, {});
 }
 
-function modsParser(str: string): undefined | Record<string, string | RegExpMatchArray | null | boolean> {
+function modsParser(str: string): undefined | { force: boolean, include: boolean, remove: boolean, codes: RegExpMatchArray | null, whole: string } {
     const modCodes = (str.match(/[-+!][-+!]?[A-Za-z]+/g) ?? []).map((code) => code.toUpperCase());
 
     const force = modCodes.some((code) => code.includes("!"));
@@ -218,7 +217,12 @@ export function calculateWeightedScores({ user, plays }: { user: UserResponse, p
     return newPlaysPp + (user.statistics.pp - oldPlaysPp);
 }
 
-export function getUsernameFromArgs(user: UserDiscord, args?: Array<string>, userNotNeeded?: boolean) {
+export function getUsernameFromArgs(user: UserDiscord, args?: Array<string>, userNotNeeded?: boolean): {
+    user: string | undefined,
+    flags: Record<string, string | boolean>,
+    beatmapId: string | null,
+    mods: Record<string, string | boolean | RegExpMatchArray | null> | undefined
+} | undefined {
     args ||= [];
     let argsJoined = args.join(" ");
 
@@ -226,7 +230,7 @@ export function getUsernameFromArgs(user: UserDiscord, args?: Array<string>, use
 
     const mapRegex = /https:\/\/osu\.ppy\.sh\/(b|beatmaps|beatmapsets)\/\d+(#(osu|mania|fruits|taiko)\/\d+)?/;
     const mapRegexResult = mapRegex.exec(argsJoined);
-    const beatmapId = mapRegexResult ? (/\d+$/).exec(mapRegexResult[0])![0] : null;
+    const beatmapId = mapRegexResult ? (/\d+$/).exec(mapRegexResult[0])?.[0] : null;
     argsJoined = argsJoined.replace(new RegExp(mapRegex, "i"), "");
     const parsedMods = modsParser(argsJoined);
 
@@ -339,20 +343,25 @@ export async function downloadMap(beatmapId: number | Array<number>) {
     return !isIdArray ? downloaderResponse.buffer.toString() : downloaderResponse.map((response: any) => ({ id: response.id, contents: response.buffer.toString() }));
 }
 
-const findId = (embed: any) => {
-    const urlToCheck = embed.url || embed.author?.url;
-    return urlToCheck && !(/\/(user|u)/).test(urlToCheck) ? urlToCheck.match(/\d+/)?.[0] : null;
-};
-
-const getEmbedFromReply = async (message: Message, client: Client) => {
-    const channel = client.channels.cache.get(message.channelId) as TextBasedChannel;
-    if (!channel)
+function findId(embed: Embed | undefined | null): number | null {
+    if (!embed)
         return null;
 
-    const referencedMessage = await channel.messages.fetch(message.reference?.messageId!);
-    const embed = referencedMessage.embeds[0];
-    return findId(embed);
-};
+    const urlToCheck = embed.url ?? embed.author?.url;
+    return urlToCheck && !(/\/(user|u)/).test(urlToCheck) ? Number((/\d+/).exec(urlToCheck)?.[0]) : null;
+}
+
+async function getEmbedFromReply(message: Message, client: Client): Promise<number | null> {
+    const channel = client.channels.cache.get(message.channelId) as TextBasedChannel | undefined;
+    if (channel === undefined)
+        return null;
+
+    if (!message.reference?.messageId)
+        return null;
+
+    const referencedMessage = await channel.messages.fetch(message.reference.messageId);
+    return +findId(referencedMessage.embeds[0]);
+}
 
 async function cycleThroughEmbeds(message: Message, client: Client) {
     const channel = client.channels.cache.get(message.channelId) as TextBasedChannel;
@@ -369,12 +378,14 @@ async function cycleThroughEmbeds(message: Message, client: Client) {
     }
     return beatmapId;
 }
-export const getBeatmapId_FromContext = async (message: Message, client: Client) => (message.reference ? await getEmbedFromReply(message, client) : cycleThroughEmbeds(message, client));
+export async function getIdFromContext(message: Message, client: Client) {
+    return message.reference ? getEmbedFromReply(message, client) : cycleThroughEmbeds(message, client);
+}
 
 export function Interactionhandler(interaction: Message | ChatInputCommandInteraction, args?: Array<string>) {
     const isSlash = interaction.type === InteractionType.ApplicationCommand;
 
-    const reply = async (options: any) => (isSlash ? interaction.editReply(options) : interaction.channel.send(options));
+    const reply = async (options: any) => isSlash ? interaction.editReply(options) : interaction.channel.send(options);
     const userArgs = isSlash ? [interaction.options.getString("user") || ""] : args || [""];
     const ppCount = isSlash ? interaction.options.getNumber("count") || 1 : 1;
     const ppValue = isSlash ? interaction.options.getNumber("pp") || 1 : 1;

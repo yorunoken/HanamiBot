@@ -32,12 +32,7 @@ export default class MessageCreateEvent extends BaseEvent {
             return;
         }
 
-        // if (message.content.startsWith("https://")) {
-        //   getLoneCommand(message);
-        // }
-
-        const prefixOptions = (prefixCache[guildId] ??= JSON.parse(getServer(guildId).data)?.prefix) ?? (prefixCache[guildId] = [defaultPrefix]);
-        const prefix = prefixOptions.find((p: string) => message.content.startsWith(p));
+        const prefix = prefixCache[guildId] ?? getServer(guildId)?.prefix ?? defaultPrefix;
         if (!prefix)
             return;
 
@@ -45,14 +40,15 @@ export default class MessageCreateEvent extends BaseEvent {
             return;
 
         const args = message.content.slice(prefix.length).trim().split(/ +/g);
-        let commandName = args.length > 0 ? args.shift()!.toLowerCase() : "";
+        let commandName = args.length > 0 ? args.shift()?.toLowerCase() ?? "" : "";
         if (commandName.length === 0) return;
 
-        let number;
+        let number: number | undefined;
         const match = (/(\D+)(\d+)/).exec(commandName);
         if (match) {
-            commandName = match[1];
-            number = Number(match[2]);
+            const [, extractedCommandName, extractedNumber] = match;
+            commandName = extractedCommandName;
+            number = Number(extractedNumber);
         }
 
         const alias = this.client.aliases.get(commandName);
@@ -70,19 +66,29 @@ export default class MessageCreateEvent extends BaseEvent {
             return;
         }
 
-        command.run({ client: this.client, message, args, prefix, index: number, commandName, db, locale }).catch(async (error) => {
+        command.run({ client: this.client, message, args, prefix, index: number, commandName, db, locale }).catch(async (error: Error) => {
             await message.channel.send(locale.errorAtRuntime);
 
-            const channelToSendMessage = await this.client.channels.fetch(Bun.env.ERRORS_CHANNELID!);
+            const channelToSendMessage = await this.client.channels.fetch(Bun.env.ERRORS_CHANNELID);
             if (!channelToSendMessage || !channelToSendMessage.isTextBased()) return;
+
+            const messageAuthor = `<@${message.author.id}> (${message.author.username})`;
+            const channelLink = `https://discord.com/channels/${message.guildId}/${message.channelId}`;
+            const messageContent = `[${message.content}](${channelLink}/${message.id})`;
+            const guildName = `[${message.guild?.name}](${channelLink})`;
+
+            const embed = new EmbedBuilder()
+                .setTitle(`Runtime error on command: ${command.name}`)
+                .addFields(
+                    { name: "Initializer", value: messageAuthor },
+                    { name: "Server", value: guildName },
+                    { name: "Message", value: messageContent },
+                    { name: "Error description:", value: `\`\`\`${error.stack}\`\`\`` }
+                );
+
             await channelToSendMessage.send({
                 content: `<@${Bun.env.OWNER_DISCORDID}> STACK ERROR, GET YOUR ASS TO WORK`,
-                embeds: [
-                    new EmbedBuilder().setTitle(`Runtime error on command: ${command.name}`).setDescription(`Initializer: <@${message.author.id}> (${message.author.username})\nServer: [${message.guild?.name}](https://discord.com/channels/${message.guildId}/${message.channelId})\nMessage: [${message.content}](https://discord.com/channels/${message.guildId}/${message.channelId}/${message.id})`).addFields({
-                        name: "Error description:",
-                        value: `\`\`\`${error.stack}\`\`\``
-                    })
-                ]
+                embeds: [embed]
             });
         });
 
@@ -93,7 +99,7 @@ export default class MessageCreateEvent extends BaseEvent {
 
         if (command.name) {
             const doc = getCommand(command.name);
-            insertData({ table: "commands", id: command.name, data: doc ? doc.count + 1 : 1 });
+            insertData({ table: "commands", id: command.name, data: [ { name: "count", value: doc ? doc.count + 1 : 1 } ] });
         }
         console.log(`(prefix) responded to ${message.author.username} for ${commandName}`);
     }

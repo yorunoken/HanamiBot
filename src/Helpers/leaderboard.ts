@@ -4,7 +4,7 @@ import { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beat
 import { getBeatmap } from "../functions";
 import { BeatmapInfo, Commands, Locales } from "../Structure";
 import { ExtendedClient } from "../Structure/index";
-import { buildActionRow, buttonBoolsTops, downloadMap, firstButton, getBeatmapId_FromContext, getMap, getPerformanceDetails, getUsernameFromArgs, grades, insertData, Interactionhandler, lastButton, nextButton, previousButton, specifyButton } from "../utils";
+import { buildActionRow, buttonBoolsTops, downloadMap, firstButton, getIdFromContext, getMap, getPerformanceDetails, getUsernameFromArgs, grades, insertData, Interactionhandler, lastButton, nextButton, previousButton, specifyButton } from "../utils";
 
 const leaderboardExists = (beatmap: BeatmapResponse) => typeof beatmap.id === "number" || ["qualified", "ranked", "loved"].includes(beatmap.status?.toLowerCase());
 
@@ -17,7 +17,7 @@ export async function start({ interaction, client, args, type, locale }: { inter
   }
   const page = parseInt((userOptions.flags.p as string) || (userOptions.flags.page as string)) - 1 || 0;
 
-  const beatmapId = userOptions.beatmapId || (await getBeatmapId_FromContext(interaction, client));
+  const beatmapId = userOptions.beatmapId || (await getIdFromContext(interaction, client));
   if (!beatmapId) {
     return options.reply(locale.fails.noLeaderboard);
   }

@@ -2,7 +2,7 @@ import { Client, EmbedBuilder, Message } from "discord.js";
 import { v2 } from "osu-api-extended";
 import { getBeatmap } from "../functions";
 import { BeatmapInfo, Locales } from "../Structure/index";
-import { downloadMap, getBeatmapId_FromContext, getMap, getUsernameFromArgs, insertData, Interactionhandler } from "../utils";
+import { downloadMap, getIdFromContext, getMap, getUsernameFromArgs, insertData, Interactionhandler } from "../utils";
 
 export async function start({ interaction, client, args, mapId, locale }: { interaction: Message; client?: Client<boolean>; args: string[]; mapId?: string; locale: Locales }) {
   const options = Interactionhandler(interaction, args);
@@ -15,7 +15,7 @@ export async function start({ interaction, client, args, mapId, locale }: { inte
     return options.reply(userOptions.user.message);
   }
 
-  const beatmapId = mapId || userOptions.beatmapId || (await getBeatmapId_FromContext(interaction, client!));
+  const beatmapId = mapId || userOptions.beatmapId || (await getIdFromContext(interaction, client!));
   if (!beatmapId) {
     return options.reply(locale.fails.noBeatmapIdInCtx);
   }
