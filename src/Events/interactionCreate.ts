@@ -80,7 +80,7 @@ export default class InteractionCreateEvent extends BaseEvent {
                 command.run({ client: this.client, interaction, db, locale }).catch(async (error) => {
                     interaction.editReply(locale.errorAtRuntime);
 
-                    const channel = await this.client.channels.fetch(Bun.env.ERRORS_CHANNELID!);
+                    const channel = await this.client.channels.fetch(Bun.env.ERRORS_CHANNELID);
                     if (!channel || !channel.isTextBased()) return;
                     channel.send({
                         content: `<@${Bun.env.OWNER_DISCORDID}> STACK ERROR, GET YOUR ASS TO WORK`,
