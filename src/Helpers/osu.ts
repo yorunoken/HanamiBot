@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
 import { v2 } from "osu-api-extended";
 import { getUser } from "../functions";
-import { commands, Locales, UserInfo } from "../Structure/index";
+import { Commands, Locales, UserInfo } from "../Structure/index";
 import { ExtendedClient } from "../Structure/index";
 import { getUsernameFromArgs, Interactionhandler, showMoreButton } from "../utils";
 
@@ -26,7 +26,7 @@ export async function start(interaction: Message | ChatInputCommandInteraction, 
 
   let page = buildPage1(userDetailOptions);
   const response = await options.reply({ embeds: [page], components: [showMoreButton] });
-  client.sillyOptions[response.id] = { buttonHandler: "handleProfileButtons", type: commands.Profile, embedOptions: { pageBuilder: [buildPage1, buildPage2], options: userDetailOptions, locale, response }, response, initializer: options.author };
+  client.sillyOptions[response.id] = { buttonHandler: "handleProfileButtons", type: Commands.Profile, embedOptions: { pageBuilder: [buildPage1, buildPage2], options: userDetailOptions, locale, response }, response, initializer: options.author };
 }
 
 function buildPage1(options: UserInfo) {
