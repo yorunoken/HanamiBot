@@ -2,10 +2,10 @@ import { ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
 import { v2 } from "osu-api-extended";
 import { getUser } from "../functions";
 import { ExtendedClient, Locales, osuModes, UserInfo } from "../Structure/index";
-import { approxMorePp, calculateMissingPp, getUsernameFromArgs, Interactionhandler, rulesets } from "../utils";
+import { approxMorePp, calculateMissingPp, getUsernameFromArgs, interactionhandler, rulesets } from "../utils";
 
 export async function start({ interaction, client, locale }: { interaction: Message | ChatInputCommandInteraction; client: ExtendedClient; locale: Locales }) {
-  const options = Interactionhandler(interaction);
+  const options = interactionhandler(interaction);
   const { reply, mode, ppValue } = options;
 
   const userOptions = getUsernameFromArgs(options.author, options.userArgs);

@@ -1,10 +1,10 @@
 import { ChatInputCommandInteraction, Client, EmbedBuilder, Message } from "discord.js";
 import fs from "fs";
 import { Locales, ModuleReturn } from "../Structure/index";
-import { getWholeDb, Interactionhandler } from "../utils";
+import { getWholeDb, interactionhandler } from "../utils";
 
 export async function start({ interaction, args, locale }: { interaction: Message | ChatInputCommandInteraction; args?: string[]; locale: Locales }) {
-  const options = Interactionhandler(interaction, args);
+  const options = interactionhandler(interaction, args);
   const commandName = options.commandName?.length! > 0 ? options.commandName?.join("") : undefined;
 
   let commands: any = {};

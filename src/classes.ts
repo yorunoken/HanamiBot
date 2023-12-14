@@ -1,6 +1,6 @@
 import { buildActionRow, buttonBoolsIndex, buttonBoolsTops, firstButton, lastButton, loadingButtons, nextButton, previousButton, showLessButton, specifyButton } from "./utils";
 import { ModalSubmitInteraction } from "discord.js";
-import type { EmbedOptions } from "./Structure/types";
+import type { CommandInterface, EmbedOptions } from "./Structure/types";
 import type { ActionRowBuilder, ButtonInteraction, Message } from "discord.js";
 
 export class ButtonActions {
@@ -9,12 +9,14 @@ export class ButtonActions {
         return [buildActionRow(buttons, parameters)];
     }
 
-    public async handleProfileButtons({ i, options, response }: { i: ButtonInteraction | ModalSubmitInteraction, options: any, response: Message }): Promise<void> {
+    public async handleProfileButtons({ i, options, response }: { i: ButtonInteraction | ModalSubmitInteraction, options: CommandInterface, response: Message }): Promise<void> {
         if (i instanceof ModalSubmitInteraction)
             return;
 
         await i.update({ components: [loadingButtons] });
-        await response.edit({ embeds: [options.pageBuilder[i.customId === "more" ? 1 : 0](options.options)], components: [showLessButton] });
+        const { pageBuilder } = options;
+        if (pageBuilder === undefined) return;
+        await response.edit({ embeds: [pageBuilder[i.customId === "more" ? 1 : 0](options.options)], components: [showLessButton] });
     }
 
     public async handleRecentButtons({ pageBuilder, options, i, response }: { pageBuilder: any, options: EmbedOptions, i: ButtonInteraction | ModalSubmitInteraction, response: Message }): Promise<void> {

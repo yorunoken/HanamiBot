@@ -1,10 +1,12 @@
 import { db } from "./Events/ready";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionType } from "discord.js";
 import { mods } from "osu-api-extended";
-import { DownloadEntry, Downloader } from "osu-downloader";
+import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
 import { Beatmap, Calculator } from "rosu-pp";
+import type { DownloadResult } from "osu-downloader";
+import type { MapAttributes, PerformanceAttributes } from "rosu-pp";
 import type { response as UserResponse } from "osu-api-extended/dist/types/v2_user_details";
-import type { ChatInputCommandInteraction, Client, Embed, Message, MessageActionRowComponentBuilder, TextBasedChannel, User as UserDiscord } from "discord.js";
+import type { ChatInputCommandInteraction, Client, Embed, Message, MessageActionRowComponentBuilder, MessagePayload, TextBasedChannel, User as UserDiscord } from "discord.js";
 import type { DbCommands, DbMaps, DbServer, DbUser, EmbedOptions, NoChokePlayDetails, osuModes } from "./Structure";
 
 export const grades = {
@@ -67,7 +69,9 @@ export function getUserData(userId: string): DbUser | { status: false, message: 
 }
 export function buttonBoolsTops(type: string, options: EmbedOptions): boolean | undefined {
     if (options.page === undefined) return;
-    return type === "previous" ? options.page * 5 === 0 : options.page * 5 + 5 === (options.plays.length || options.length);
+
+    const pageTotal = options.page * 5;
+    return type === "previous" ? pageTotal === 0 : pageTotal + 5 === (options.plays.length || options.length);
 }
 
 export function buttonBoolsIndex(type: string, options: EmbedOptions): boolean | undefined {
@@ -82,7 +86,8 @@ export function argParser(str: string, flagsArr: Array<string>): Record<string, 
     const filteredMatches = matches.filter((m) => flagsArr.includes(m[1]) || flagsArr.includes(m[2]));
 
     return filteredMatches.reduce<Record<string, string | boolean>>((acc, m) => {
-        acc[m[1] || m[2]] = m[3] ?? true;
+        const [, flag1, flag2, value] = m;
+        acc[flag1 || flag2] = value;
         return acc;
     }, {});
 }
@@ -199,7 +204,7 @@ export function approxMorePp(pps: Array<number>): void {
 
     const diff = (pps[89] - pps[99]) / 10.0;
 
-    let curr = pps[99];
+    let [curr] = pps.toReversed();
 
     for (let i = 0; i < 50; i++) {
         const next = curr - diff;
@@ -218,9 +223,9 @@ export function calculateWeightedScores({ user, plays }: { user: UserResponse, p
 }
 
 export function getUsernameFromArgs(user: UserDiscord, args?: Array<string>, userNotNeeded?: boolean): {
-    user: string | undefined,
+    user: string | { status: false, message: string } | undefined,
     flags: Record<string, string | boolean>,
-    beatmapId: string | null,
+    beatmapId: string | null | undefined,
     mods: Record<string, string | boolean | RegExpMatchArray | null> | undefined
 } | undefined {
     args ||= [];
@@ -239,36 +244,36 @@ export function getUsernameFromArgs(user: UserDiscord, args?: Array<string>, use
     const argumentString = args.length > 0 ? argsJoined.replace(/(?:\s|^)(?=\s|$)|(-\w+|\w+=\S+|https:\/\/osu\.ppy\.sh\/(b|beatmaps|beatmapsets)\/\d+(#(osu|mania|fruits|taiko)\/\d+)?)?(?=\s|$)/g, "") : "";
 
     if (!argumentString) {
-        const userData = getUserData(user.id).data;
+        const userData = getUserData(user.id);
+        if (!("id" in userData))
+            return;
 
         if (userNotNeeded) {
-            let _user = undefined;
+            let userTemp = undefined;
             try {
-                const parsedData = JSON.parse(userData);
-                _user = parsedData.banchoId || errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`);
+                userTemp = userData.banchoId || errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`);
             } catch (_) {}
 
-            return { user: _user, flags: flagsParsed, beatmapId, mods: parsedMods };
+            return { user: userTemp, flags: flagsParsed, beatmapId, mods: parsedMods };
         }
-        return { user: userData ? JSON.parse(userData).banchoId : errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods: parsedMods };
+        return { user: userData.banchoId || errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods: parsedMods };
     }
 
     const discordUserRegex = /\d{17,18}/;
     const discordUserMatch = discordUserRegex.exec(argumentString);
     const userId = discordUserMatch ? discordUserMatch[0] : undefined;
 
-    const userData = getUserData(userId).data;
-    if (userId) {
+    const userData = getUserData(user.id);
+    if (userId && "id" in userData) {
         if (userNotNeeded) {
-            let _user = undefined;
+            let userTemp = undefined;
             try {
-                const parsedData = JSON.parse(userData);
-                _user = parsedData.banchoId || errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`);
+                userTemp = userData.banchoId || errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`);
             } catch (_) {}
 
-            return { user: _user, flags: flagsParsed, beatmapId, mods: parsedMods };
+            return { user: userTemp, flags: flagsParsed, beatmapId, mods: parsedMods };
         }
-        return { user: userData ? JSON.parse(userData)?.banchoId : errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods: parsedMods };
+        return { user: userData.banchoId || errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods: parsedMods };
     }
 
     const osuUsernameRegex = /"(.*?)"/;
@@ -278,10 +283,24 @@ export function getUsernameFromArgs(user: UserDiscord, args?: Array<string>, use
     return osuUsername ? { user: osuUsername, flags: flagsParsed, beatmapId, mods: parsedMods } : undefined;
 }
 
-export function getPerformanceDetails({ modsArg, maxCombo, rulesetId, hitValues, mapText, accuracy }: { modsArg: Array<string>, maxCombo?: number, rulesetId: number, hitValues?: any, mapText: string, accuracy?: number }) {
-    let { count_100 = 0, count_300 = 0, count_50 = 0, count_geki = 0, count_katu = 0, count_miss = 0 } = hitValues;
-    count_geki = [2, 3].includes(rulesetId) ? count_geki : 0;
-    count_katu = [2, 3].includes(rulesetId) ? count_katu : 0;
+export function getPerformanceDetails({ modsArg, maxCombo, rulesetId, hitValues, mapText, accuracy }:
+{ modsArg: Array<string>,
+    maxCombo?: number,
+    rulesetId: number,
+    hitValues: { count_100?: number, count_300?: number, count_50?: number, count_geki?: number, count_katu?: number, count_miss?: number },
+    mapText: string,
+    accuracy?: number
+}): {
+        mapValues: MapAttributes,
+        maxPerf: PerformanceAttributes,
+        curPerf: PerformanceAttributes,
+        fcPerf: PerformanceAttributes,
+        mapId: number,
+        playInfo: object
+    } {
+    let { count_100: count100 = 0, count_300: count300 = 0, count_50: count50 = 0, count_geki: countGeki = 0, count_katu: countKatu = 0, count_miss: countMiss = 0 } = hitValues;
+    countGeki = [2, 3].includes(rulesetId) ? countGeki : 0;
+    countKatu = [2, 3].includes(rulesetId) ? countKatu : 0;
 
     const scoreParam = {
         mode: rulesetId,
@@ -292,29 +311,32 @@ export function getPerformanceDetails({ modsArg, maxCombo, rulesetId, hitValues,
 
     const mapValues = calculator.mapAttributes(map);
     const maxPerf = calculator.performance(map);
-    const curPerf = accuracy
-        ? undefined
-        : calculator
-            .n300(count_300)
-            .n100(count_100)
-            .n50(count_50)
-            .nMisses(count_miss)
-            .combo(maxCombo ?? maxPerf.difficulty.maxCombo)
-            .nGeki(count_geki)
-            .nKatu(count_katu)
-            .performance(map);
-    const fcPerf = accuracy
-        ? calculator.acc(accuracy).performance(map)
-        : calculator.n300(count_300).n100(count_100).n50(count_50).nMisses(0)
-            .combo(maxPerf.difficulty.maxCombo)
-            .nGeki(count_geki)
-            .nKatu(count_katu)
-            .performance(map);
 
-    return { mapValues, maxPerf, curPerf, fcPerf, mapId: 0, playInfo: {} as any };
+    const calculatorWithAcc = accuracy !== undefined ? calculator.acc(accuracy) : calculator;
+    const curPerf = calculatorWithAcc
+        .n300(count300)
+        .n100(count100)
+        .n50(count50)
+        .nMisses(countMiss)
+        .combo(maxCombo ?? maxPerf.difficulty.maxCombo)
+        .nGeki(countGeki)
+        .nKatu(countKatu)
+        .performance(map);
+
+    const fcPerf = calculatorWithAcc
+        .n300(count300)
+        .n100(count100)
+        .n50(count50)
+        .nMisses(0)
+        .combo(maxPerf.difficulty.maxCombo)
+        .nGeki(countGeki)
+        .nKatu(countKatu)
+        .performance(map);
+
+    return { mapValues, maxPerf, curPerf, fcPerf, mapId: 0, playInfo: new Object() };
 }
 
-export async function downloadMap(beatmapId: number | Array<number>) {
+export async function downloadMap(beatmapId: number | Array<number>): Promise<string | Array<{ id: string | number | undefined, contents: string | undefined }> | undefined> {
     // const responseDirect = await fetch(`https://api.osu.direct/osu/${beatmapId}`);
     // if (responseDirect.status !== 404) {
     //   return new TextDecoder().decode(await responseDirect.arrayBuffer());
@@ -337,10 +359,16 @@ export async function downloadMap(beatmapId: number | Array<number>) {
     }
 
     const downloaderResponse = isIdArray ? await downloader.downloadAll() : await downloader.downloadSingle();
-    if (!isIdArray ? downloaderResponse.status == -3 : downloaderResponse.some((item: any) => item.status == -3))
+
+    const responseArray = downloaderResponse as Array<DownloadResult>;
+    const responseSingle = downloaderResponse as DownloadResult;
+
+    if (isIdArray ?
+        responseArray.some((item) => item.status === DownloadStatus.FailedToDownload) :
+        responseSingle.status === DownloadStatus.FailedToDownload)
         throw new Error("ERROR CODE 409, ABORTING TASK");
 
-    return !isIdArray ? downloaderResponse.buffer.toString() : downloaderResponse.map((response: any) => ({ id: response.id, contents: response.buffer.toString() }));
+    return isIdArray ? responseArray.map((response) => ({ id: response.id, contents: response.buffer?.toString() })) : responseSingle.buffer?.toString();
 }
 
 function findId(embed: Embed | undefined | null): number | null {
@@ -360,42 +388,60 @@ async function getEmbedFromReply(message: Message, client: Client): Promise<numb
         return null;
 
     const referencedMessage = await channel.messages.fetch(message.reference.messageId);
-    return +findId(referencedMessage.embeds[0]);
+
+    const foundId = findId(referencedMessage.embeds[0]);
+    return !foundId ? null : +foundId;
 }
 
-async function cycleThroughEmbeds(message: Message, client: Client) {
+async function cycleThroughEmbeds(message: Message, client: Client): Promise<number | null | undefined> {
     const channel = client.channels.cache.get(message.channelId) as TextBasedChannel;
     const messages = await channel.messages.fetch({ limit: 100 });
 
     let beatmapId;
-    for (const [_id, message] of messages) {
-        if (!(message.embeds.length > 0 && message.author.bot))
+    for (const [, ctx] of messages) {
+        if (!(ctx.embeds.length > 0 && ctx.author.bot))
             continue;
 
-        beatmapId = await findId(message.embeds[0]);
+        beatmapId = findId(ctx.embeds[0]);
         if (beatmapId)
             break;
     }
     return beatmapId;
 }
-export async function getIdFromContext(message: Message, client: Client) {
+export async function getIdFromContext(message: Message, client: Client): Promise<number | null | undefined> {
     return message.reference ? getEmbedFromReply(message, client) : cycleThroughEmbeds(message, client);
 }
 
-export function Interactionhandler(interaction: Message | ChatInputCommandInteraction, args?: Array<string>) {
+export function interactionhandler(interaction: Message | ChatInputCommandInteraction, args?: Array<string>): {
+    reply: (options: string | MessagePayload) => Promise<Message>,
+    userArgs: Array<string>,
+    author: UserDiscord,
+    mode: osuModes,
+    passOnly: boolean,
+    index: number,
+    commandName: Array<string>,
+    subcommand: string | undefined,
+    guildId: string | null,
+    prefix: string | null | undefined,
+    ppValue: number,
+    ppCount: number,
+    rankValue: number
+} {
     const isSlash = interaction.type === InteractionType.ApplicationCommand;
 
-    const reply = async (options: any) => isSlash ? interaction.editReply(options) : interaction.channel.send(options);
-    const userArgs = isSlash ? [interaction.options.getString("user") || ""] : args || [""];
-    const ppCount = isSlash ? interaction.options.getNumber("count") || 1 : 1;
-    const ppValue = isSlash ? interaction.options.getNumber("pp") || 1 : 1;
-    const rankValue = isSlash ? interaction.options.getNumber("rank") || 1 : 1;
-    const commandName = isSlash ? [interaction.options.getString("command") || ""] : args || [""];
+    async function reply(options: string | MessagePayload): Promise<Message> {
+        return isSlash ? interaction.editReply(options) : interaction.channel.send(options);
+    }
+    const userArgs = isSlash ? [interaction.options.getString("user") ?? ""] : args ?? [""];
+    const ppCount = isSlash ? interaction.options.getNumber("count") ?? 1 : 1;
+    const ppValue = isSlash ? interaction.options.getNumber("pp") ?? 1 : 1;
+    const rankValue = isSlash ? interaction.options.getNumber("rank") ?? 1 : 1;
+    const commandName = isSlash ? [interaction.options.getString("command") ?? ""] : args ?? [""];
     const author = isSlash ? interaction.user : interaction.author;
-    const mode = isSlash ? (interaction.options.getString("mode") as osuModes) || "osu" : "osu";
-    const passOnly = isSlash ? interaction.options.getBoolean("passonly") || false : false;
-    const index = isSlash ? interaction.options.getInteger("index") ? interaction.options.getInteger("index")! - 1 : 0 : 0;
-    const subcommand = isSlash ? interaction.options.getSubcommand(false) || undefined : undefined;
+    const mode = isSlash ? (interaction.options.getString("mode") as osuModes | undefined) ?? "osu" : "osu";
+    const passOnly = isSlash ? interaction.options.getBoolean("passonly") ?? false : false;
+    const index = isSlash ? interaction.options.getInteger("index") ? interaction.options.getInteger("index") ?? 0 - 1 : 0 : 0;
+    const subcommand = isSlash ? interaction.options.getSubcommand(false) ?? undefined : undefined;
     const prefix = isSlash ? interaction.options.getString("prefix") : undefined;
     const { guildId } = interaction;
 

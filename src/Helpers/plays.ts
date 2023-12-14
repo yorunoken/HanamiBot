@@ -1,6 +1,6 @@
 import { getScore, getUser } from "../functions";
 import { Commands } from "../Structure/index";
-import { buildActionRow, buttonBoolsIndex, buttonBoolsTops, downloadMap, firstButton, getMap, getUsernameFromArgs, insertData, Interactionhandler, lastButton, nextButton, previousButton, specifyButton } from "../utils";
+import { buildActionRow, buttonBoolsIndex, buttonBoolsTops, downloadMap, firstButton, getMap, getUsernameFromArgs, insertData, interactionhandler, lastButton, nextButton, previousButton, specifyButton } from "../utils";
 import { EmbedBuilder } from "discord.js";
 import { v2 } from "osu-api-extended";
 import type { ChatInputCommandInteraction, Message } from "discord.js";
@@ -8,7 +8,7 @@ import type { response as ScoreResponse } from "osu-api-extended/dist/types/v2_s
 import type { ExtendedClient, Locales, osuModes, UserInfo } from "../Structure/index";
 
 export async function start({ isTops, interaction, passOnly: passOnlyArg, args, mode: modeArg, number, recentTop, client, locale }: { isTops: boolean, interaction: Message | ChatInputCommandInteraction, passOnly?: boolean, args?: Array<string>, mode?: osuModes, number?: number, recentTop?: boolean, client: ExtendedClient, locale: Locales }) {
-    const argOptions = Interactionhandler(interaction, args);
+    const argOptions = interactionhandler(interaction, args);
     const { reply } = argOptions;
     argOptions.mode = modeArg ?? argOptions.mode;
     argOptions.passOnly = passOnlyArg ?? argOptions.passOnly;

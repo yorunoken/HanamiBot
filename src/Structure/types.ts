@@ -30,6 +30,8 @@ export enum Commands {
 export interface EmbedOptions {
     length: number;
     index?: number;
+    locale
+    options?: UserInfo;
     plays: {
         length: number
     };

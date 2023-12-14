@@ -2,10 +2,10 @@ import { Client, EmbedBuilder, Message } from "discord.js";
 import { v2 } from "osu-api-extended";
 import { getBeatmap } from "../functions";
 import { BeatmapInfo, Locales } from "../Structure/index";
-import { downloadMap, getIdFromContext, getMap, getUsernameFromArgs, insertData, Interactionhandler } from "../utils";
+import { downloadMap, getIdFromContext, getMap, getUsernameFromArgs, insertData, interactionhandler } from "../utils";
 
 export async function start({ interaction, client, args, mapId, locale }: { interaction: Message; client?: Client<boolean>; args: string[]; mapId?: string; locale: Locales }) {
-  const options = Interactionhandler(interaction, args);
+  const options = interactionhandler(interaction, args);
 
   const userOptions = getUsernameFromArgs(options.author, options.userArgs, true);
   if (!userOptions) {

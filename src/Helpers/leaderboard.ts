@@ -4,12 +4,12 @@ import { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beat
 import { getBeatmap } from "../functions";
 import { BeatmapInfo, Commands, Locales } from "../Structure";
 import { ExtendedClient } from "../Structure/index";
-import { buildActionRow, buttonBoolsTops, downloadMap, firstButton, getIdFromContext, getMap, getPerformanceDetails, getUsernameFromArgs, grades, insertData, Interactionhandler, lastButton, nextButton, previousButton, specifyButton } from "../utils";
+import { buildActionRow, buttonBoolsTops, downloadMap, firstButton, getIdFromContext, getMap, getPerformanceDetails, getUsernameFromArgs, grades, insertData, interactionhandler, lastButton, nextButton, previousButton, specifyButton } from "../utils";
 
 const leaderboardExists = (beatmap: BeatmapResponse) => typeof beatmap.id === "number" || ["qualified", "ranked", "loved"].includes(beatmap.status?.toLowerCase());
 
 export async function start({ interaction, client, args, type, locale }: { interaction: Message<boolean>; client: ExtendedClient; args: string[]; type: "global" | "country"; locale: Locales }) {
-  const options = Interactionhandler(interaction, args);
+  const options = interactionhandler(interaction, args);
 
   const userOptions = getUsernameFromArgs(options.author, options.userArgs, true);
   if (!userOptions) {

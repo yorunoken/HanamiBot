@@ -5,10 +5,10 @@ import { response as UserResponse } from "osu-api-extended/dist/types/v2_user_de
 import { downloadingMapUserCache, updateDownloadingCache } from "../cache";
 import { getUser } from "../functions";
 import { Commands, ExtendedClient, Locales, NoChokePlayDetails, osuModes } from "../Structure/index";
-import { buildActionRow, buttonBoolsTops, calculateWeightedScores, downloadMap, firstButton, getMapsInBulk, getPerformanceDetails, getUsernameFromArgs, grades, insertDataBulk, Interactionhandler, lastButton, nextButton, previousButton, rulesets, specifyButton } from "../utils";
+import { buildActionRow, buttonBoolsTops, calculateWeightedScores, downloadMap, firstButton, getMapsInBulk, getPerformanceDetails, getUsernameFromArgs, grades, insertDataBulk, interactionhandler, lastButton, nextButton, previousButton, rulesets, specifyButton } from "../utils";
 
 export async function start({ interaction, args, mode, client, locale }: { interaction: Message | ChatInputCommandInteraction; args?: string[]; mode?: osuModes; client: ExtendedClient; locale: Locales }) {
-  const interactionOptions = Interactionhandler(interaction, args);
+  const interactionOptions = interactionhandler(interaction, args);
   const { reply, author, userArgs } = interactionOptions;
   mode = (mode ?? interactionOptions.mode) as osuModes;
 

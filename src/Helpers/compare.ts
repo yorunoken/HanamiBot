@@ -1,5 +1,5 @@
 import { getScore, getUser } from "../functions";
-import { downloadMap, getIdFromContext, getMap, getPerformanceDetails, getUsernameFromArgs, insertData, Interactionhandler, rulesets } from "../utils";
+import { downloadMap, getIdFromContext, getMap, getPerformanceDetails, getUsernameFromArgs, insertData, interactionhandler, rulesets } from "../utils";
 import { EmbedBuilder } from "discord.js";
 import { v2 } from "osu-api-extended";
 import type { Client, Message } from "discord.js";
@@ -12,7 +12,7 @@ function leaderboardExists(beatmap: BeatmapResponse): boolean {
 }
 
 export async function start({ interaction, client, args, mode, locale }: { interaction: Message, client: Client, args: Array<string>, mode: osuModes | string, locale: Locales }): void {
-    const options = Interactionhandler(interaction, args);
+    const options = interactionhandler(interaction, args);
 
     const userOptions = getUsernameFromArgs(options.author, options.userArgs);
     if (!userOptions) {
@@ -25,8 +25,8 @@ export async function start({ interaction, client, args, mode, locale }: { inter
         return;
     }
 
-    const beatmapId = userOptions.beatmapId || await getIdFromContext(interaction, client);
-    if (!beatmapId) {
+    const beatmapId = userOptions.beatmapId ?? await getIdFromContext(interaction, client);
+    if (beatmapId === undefined || beatmapId === null) {
         await options.reply(locale.fails.noLeaderboard);
         return;
     }
@@ -94,7 +94,7 @@ async function buildCompareEmbed(user: UserInfo, map: MapResponse, scores: Array
     for (let i = 0; i < scores.length; i++) {
         const { max_combo: maxCombo } = scores[i];
 
-        const score = await getScore({ plays: scores, index: parseInt(i), mode: mode as osuModes, _isTops: false, isCompare: true, beatmap: map, locale });
+        const score = await getScore({ plays: scores, index: parseInt(i), mode: mode as osuModes, isCompare: true, beatmap: map, locale });
         scoresArr.push(i === "0"
             ? `${score.globalPlacement.length && score.globalPlacement.length > 0 ? `${score.globalPlacement}\n` : ""}${score.grade} ${score.modsPlay} **[${score.stars}★]** • ${score.totalScore} • ${score.accuracy}\n**${score.pp}pp**/${score.ssPp}pp ~~[${score.fcPp}pp]~~ • ${score.comboValue}\n${score.accValues} <t:${score.submittedTime}:R>\n`
             : `${i === "1" ? `${locale.embeds.otherPlays}\n` : ""}${score.grade} ${score.modsPlay} **[${score.stars}★]** • **${score.pp}pp** (${score.accuracy}) • **${maxCombo}x** • ${score.performance.curPerf.effectiveMissCount > 0 ? `${score.countMiss} <:hit00:1061254490075955231>` : ""} <t:${score.submittedTime}:R>`);

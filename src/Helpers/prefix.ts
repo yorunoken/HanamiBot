@@ -1,6 +1,6 @@
 import { updatePrefixCache } from "../cache";
 import { defaultPrefix } from "../constants";
-import { getServer, insertData, Interactionhandler } from "../utils";
+import { getServer, insertData, interactionhandler } from "../utils";
 import type { Locales } from "../Structure";
 import type { ChatInputCommandInteraction, Message } from "discord.js";
 
@@ -12,7 +12,7 @@ const commands: Record<string, Function> = {
 
 const MAX_PREFIXES = 10;
 export async function start({ interaction, args, locale }: { interaction: Message | ChatInputCommandInteraction, args?: Array<string>, locale: Locales }) {
-    const options = Interactionhandler(interaction, args);
+    const options = interactionhandler(interaction, args);
     const subcommand = options.subcommand || getsubCommand(args?.join("")!);
     if (!subcommand)
         return options.reply(locale.embeds.prefix.provideFlags);
