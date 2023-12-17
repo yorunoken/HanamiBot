@@ -11,7 +11,7 @@ function leaderboardExists(beatmap: BeatmapResponse): boolean {
     return typeof beatmap.id === "number" || ["qualified", "ranked", "loved"].includes(beatmap.status.toLowerCase());
 }
 
-export async function start({ interaction, client, args, mode, locale }: { interaction: Message, client: Client, args: Array<string>, mode: osuModes | string, locale: Locales }): void {
+export async function start({ interaction, client, args, mode, locale }: { interaction: Message, client: Client, args: Array<string>, mode: osuModes | "", locale: Locales }): Promise<void> {
     const options = interactionhandler(interaction, args);
 
     const userOptions = getUsernameFromArgs(options.author, options.userArgs);
