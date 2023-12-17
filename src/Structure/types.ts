@@ -4,9 +4,10 @@ import type { MapAttributes, PerformanceAttributes } from "rosu-pp";
 
 export interface PrefixCommands {
     name: string;
-    aliases: string;
+    aliases: Array<string>;
     cooldown: number;
     description: string;
+    flags?: string;
     run: (options: Record<string, any>) => Promise<void>;
 }
 
@@ -30,7 +31,7 @@ export enum Commands {
 export interface EmbedOptions {
     length: number;
     index?: number;
-    locale
+    locale: any;
     options?: UserInfo;
     plays: {
         length: number
@@ -353,7 +354,7 @@ export interface DbUser {
 }
 
 export interface DbServer {
-    id: string;
+    id: number;
     prefix: string;
     language: string;
 }
