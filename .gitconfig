@@ -1,8 +1,0 @@
-[user]
-	name = YoruNoKen
-	email = m.f.fetvaci@hotmail.com
-[credential]
-	helper = /mnt/c/Program\\ Files/Git/mingw64/bin/git-credential-manager.exe
-	credentialStore = gpg
-[credential "https://dev.azure.com"]
-	useHttpPath = true

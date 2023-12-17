@@ -4,6 +4,7 @@ import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
 import { Client } from "discord.js";
 import fs from "fs";
+import { readdir } from "node:fs/promises";
 import type { ClientOptions } from "discord.js";
 import type { CommandInterface, PrefixCommands, SlashCommands } from "./types";
 
@@ -34,7 +35,7 @@ export default class ExtendedClient extends Client {
 
     public async deploy(): Promise<void> {
         await this.loadSlashCmd();
-        this.loadPrefixCmd();
+        await this.loadPrefixCmd();
         console.log("Loaded commands");
         this.checkServers();
         this.putLanguages();
@@ -43,42 +44,50 @@ export default class ExtendedClient extends Client {
     public putLanguages(): void {
         const serversId = Array.from(this.guilds.cache.keys());
         const guilds = getServersInBulk(serversId);
+        if (!guilds)
+            throw new Error("Bot is in no servers.");
+
         for (const guildId of serversId) {
-            const guild = JSON.parse(guilds.find((item: any) => item.id === Number(guildId)).data);
+            const guild = guilds.find((item) => item.id === Number(guildId));
+            if (!guild) {
+                console.error("Guild cannot be found");
+                return;
+            }
+
             if (!guild.language)
-                insertData({ table: "servers", data: JSON.stringify({ ...JSON.parse(guild.data), language: "en" }), id: guildId });
+                insertData({ table: "servers", data: [ { name: "language", value: "en " } ], id: guildId });
 
             this.localeLanguage.set(guildId, guild.language || "en");
         }
     }
 
-    private loadPrefixCmd(): void {
+    private async loadPrefixCmd(): Promise<void> {
         if (!this.user) return;
 
-        const prefixCommands = [];
-        const commandsCategories = fs.readdirSync("./src/PrefixCommands");
-        for (const category of commandsCategories) {
-            if (category === "data") continue;
-            const commands = fs.readdirSync(`./src/PrefixCommands/${category}`);
+        const temp: Array<Promise<PrefixCommands>> = [];
 
-            for (const cmd of commands) {
-                const command = require(`../PrefixCommands/${category}/${cmd}`);
-                prefixCommands.push(command.name, command);
+        const items = await readdir("./src/PrefixCommands", { recursive: true });
+        for (const item of items) {
+            const [category, cmd] = item.split("/");
+            if (!category || !cmd) continue;
 
-                this.prefixCommands.set(command.name, command);
-                if (command.aliases && Array.isArray(command.aliases)) {
-                    command.aliases.forEach((alias: any) => {
-                        this.aliases.set(alias, command.name);
-                    });
-                }
-            }
+            const command = import(`../PrefixCommands/${category}/${cmd}`) as Promise<PrefixCommands>;
+            temp.push(command);
         }
+
+        const commands = await Promise.all(temp);
+        commands.forEach((command) => {
+            this.prefixCommands.set(command.name, command);
+            command.aliases.forEach((alias) => {
+                this.aliases.set(alias, command.name);
+            });
+        });
     }
 
     private async loadSlashCmd(): Promise<void> {
         if (!this.user) return;
 
-        const slashCommands: any = [];
+        const slashCommands: Array<SlashCommands> = [];
         const commandsCategories = fs.readdirSync("./src/SlashCommands");
         for (const category of commandsCategories) {
             if (category === "data") continue;
