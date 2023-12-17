@@ -1,24 +1,21 @@
-import { Client, Message } from "discord.js";
-import { start } from "../../Helpers/stats";
-import { Locales, osuModes } from "../../Structure";
+import type { osuModes } from "../../Structure";
 
-const modeAliases: { [key: string]: { mode: osuModes } } = {
-  stats: { mode: "osu" },
-  st: { mode: "osu" },
-  statstaiko: { mode: "taiko" },
-  stt: { mode: "taiko" },
-  statsmania: { mode: "mania" },
-  stm: { mode: "mania" },
-  statscatch: { mode: "fruits" },
-  stc: { mode: "fruits" },
+const modeAliases: Record<string, { mode: osuModes }> = {
+    stats: { mode: "osu" },
+    st: { mode: "osu" },
+    statstaiko: { mode: "taiko" },
+    stt: { mode: "taiko" },
+    statsmania: { mode: "mania" },
+    stm: { mode: "mania" },
+    statscatch: { mode: "fruits" },
+    stc: { mode: "fruits" }
 };
 
 export const name = "stats";
 export const aliases = Object.keys(modeAliases);
 export const cooldown = 3000;
-export const description = `Get information of a map.\nMods can be specified through +_, +!_, -!_ syntax`;
+export const description = "Get information of a map.\nMods can be specified through +_, +!_, -!_ syntax";
 
-export async function run({ message, args, commandName, locale }: { message: Message; args: string[]; commandName: string; locale: Locales }) {
-  await message.channel.sendTyping();
-  await start({ interaction: message, mode: modeAliases[commandName].mode, args });
+export async function run(): Promise<void> {
+    // hii
 }

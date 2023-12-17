@@ -1,28 +1,28 @@
-import { ChannelType, Message, PermissionFlagsBits, TextChannel } from "discord.js";
-import { serverJoinMessage } from "../../constants";
-import { ExtendedClient } from "../../Structure/index";
+import { PermissionFlagsBits } from "discord.js";
+import type { Message, TextChannel } from "discord.js";
+import type { ExtendedClient } from "../../Structure/index";
 
 export const name = "shout";
 export const aliases = ["shout"];
 export const cooldown = 0;
-export const description = `Shouts at all the servers`;
+export const description = "Shouts at all the servers";
 
-export async function run({ message, client, args }: { message: Message; client: ExtendedClient; args: string[] }) {
-  if (message.author.id !== "372343076578131968") {
-    return;
-  }
+export function run({ message, client, args }: { message: Message, client: ExtendedClient, args: Array<string> }): void {
+    if (message.author.id !== "372343076578131968" || !client.user)
+        return;
 
-  for (const [_, guild] of client.guilds.cache) {
-    for (const [_, channel] of guild.channels.cache) {
-      const textChannel = channel as TextChannel;
-      const botPermissions = textChannel.permissionsFor(client.user!.id);
+    const temp: Array<Promise<Message>> = [];
+    for (const [, guild] of client.guilds.cache) {
+        for (const [, channel] of guild.channels.cache) {
+            const textChannel = channel as TextChannel;
+            const botPermissions = textChannel.permissionsFor(client.user.id);
 
-      if (!botPermissions) continue;
+            if (!botPermissions) continue;
 
-      if (textChannel.type === ChannelType.GuildText && botPermissions.has(PermissionFlagsBits.SendMessages) && botPermissions.has(PermissionFlagsBits.ViewChannel)) {
-        textChannel.send(args.join(" "));
-        break;
-      }
+            if (botPermissions.has(PermissionFlagsBits.SendMessages) && botPermissions.has(PermissionFlagsBits.ViewChannel)) {
+                temp.push(textChannel.send(args.join(" ")));
+                break;
+            }
+        }
     }
-  }
 }

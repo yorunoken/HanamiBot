@@ -1,9 +1,9 @@
-import { ChatInputCommandInteraction } from "discord.js";
 import { start } from "../../Helpers/nochoke";
-import { ExtendedClient, Locales } from "../../Structure/index";
+import type { ExtendedClient, Locales } from "../../Structure/index";
+import type { ChatInputCommandInteraction } from "discord.js";
 
-export async function run({ interaction, client, locale }: { interaction: ChatInputCommandInteraction; client: ExtendedClient; locale: Locales }) {
-  await interaction.deferReply();
-  await start({ interaction, client, locale });
+export async function run({ interaction, client, locale }: { interaction: ChatInputCommandInteraction, client: ExtendedClient, locale: Locales }): Promise<void> {
+    await interaction.deferReply();
+    await start({ interaction, client, locale });
 }
 export { data } from "../data/nochoke";

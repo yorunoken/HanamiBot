@@ -1,9 +1,9 @@
-import { ChatInputCommandInteraction } from "discord.js";
 import { start } from "../../Helpers/link";
-import { Locales } from "../../Structure";
+import type { Locales } from "../../Structure";
+import type { ChatInputCommandInteraction } from "discord.js";
 
-export async function run({ interaction, locale }: { interaction: ChatInputCommandInteraction; locale: Locales }) {
-  await interaction.deferReply();
-  await start(interaction, locale);
+export async function run({ interaction, locale }: { interaction: ChatInputCommandInteraction, locale: Locales }): Promise<void> {
+    await interaction.deferReply();
+    await start(interaction, locale);
 }
 export { data } from "../data/link";
