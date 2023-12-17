@@ -3,9 +3,8 @@ import { getServer, getServersInBulk, insertData } from "../utils";
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
 import { Client } from "discord.js";
-import fs from "fs";
 import { readdir } from "node:fs/promises";
-import type { ClientOptions } from "discord.js";
+import type { ClientOptions, RESTPostAPIChatInputApplicationCommandsJSONBody } from "discord.js";
 import type { CommandInterface, PrefixCommands, SlashCommands } from "./types";
 
 export default class ExtendedClient extends Client {
@@ -54,10 +53,7 @@ export default class ExtendedClient extends Client {
                 return;
             }
 
-            if (!guild.language)
-                insertData({ table: "servers", data: [ { name: "language", value: "en " } ], id: guildId });
-
-            this.localeLanguage.set(guildId, guild.language || "en");
+            this.localeLanguage.set(guildId, guild.language);
         }
     }
 
@@ -87,25 +83,29 @@ export default class ExtendedClient extends Client {
     private async loadSlashCmd(): Promise<void> {
         if (!this.user) return;
 
-        const slashCommands: Array<SlashCommands> = [];
-        const commandsCategories = fs.readdirSync("./src/SlashCommands");
-        for (const category of commandsCategories) {
+        const slashCommands: Array<RESTPostAPIChatInputApplicationCommandsJSONBody> = [];
+        const temp: Array<Promise<SlashCommands>> = [];
+
+        const items = await readdir("./src/SlashCommands", { recursive: true });
+        for (const item of items) {
+            const [category, cmd] = item.split("/");
+            if (!category || !cmd) continue;
             if (category === "data") continue;
-            const commands = fs.readdirSync(`./src/SlashCommands/${category}`);
 
-            for (const cmd of commands) {
-                const command = require(`../SlashCommands/${category}/${cmd}`);
-                slashCommands.push(command.data.toJSON());
-
-                this.slashCommands.set(command.data.name, command);
-            }
+            const command = import(`../SlashCommands/${category}/${cmd}`) as Promise<SlashCommands>;
+            temp.push(command);
         }
 
-        try {
-            await new REST({ version: "10" }).setToken(Bun.env.TOKEN).put(Routes.applicationCommands(this.user.id), { body: slashCommands });
-        } catch (error) {
-            console.error(error);
-        }
+        const commands = await Promise.all(temp);
+        commands.forEach((command) => {
+            slashCommands.push(command.data.toJSON());
+            this.slashCommands.set(command.data.name, command);
+        });
+
+        await new REST({ version: "10" })
+            .setToken(Bun.env.TOKEN)
+            .put(Routes.applicationCommands(this.user.id), { body: slashCommands })
+            .catch((e) => { console.error(e); });
     }
 
     private checkServers(): void {
@@ -115,12 +115,7 @@ export default class ExtendedClient extends Client {
         for (const guildId of serversId) {
             const document = getServer(guildId);
             if (!document) {
-                const foobar = {
-                    foo: "bar"
-                };
-
-                const data = JSON.stringify(foobar);
-                insertData({ table: "servers", id: guildId, data });
+                insertData({ table: "servers", id: guildId, data: [ { name: "language", value: "en" } ] });
                 emptyServers++;
             }
         }
