@@ -6,10 +6,21 @@ import { Beatmap, Calculator } from "rosu-pp";
 import type { DownloadResult } from "osu-downloader";
 import type { MapAttributes, PerformanceAttributes } from "rosu-pp";
 import type { response as UserResponse } from "osu-api-extended/dist/types/v2_user_details";
-import type { ChatInputCommandInteraction, Client, Embed, Message, MessageActionRowComponentBuilder, MessagePayload, TextBasedChannel, User as UserDiscord } from "discord.js";
+import type {
+    ChatInputCommandInteraction,
+    Client,
+    Embed,
+    InteractionEditReplyOptions,
+    Message,
+    MessageActionRowComponentBuilder,
+    MessagePayload,
+    MessageReplyOptions,
+    TextBasedChannel,
+    User as UserDiscord
+} from "discord.js";
 import type { DbCommands, DbMaps, DbServer, DbUser, EmbedOptions, NoChokePlayDetails, osuModes } from "./Structure";
 
-export const grades = {
+export const grades: Record<string, string> = {
     A: "<:A_:1057763284327080036>",
     B: "<:B_:1057763286097076405>",
     C: "<:C_:1057763287565086790>",
@@ -125,7 +136,7 @@ export function getWholeDb(dbName: string): unknown {
 }
 
 export function getCommand(id: string | number): DbCommands | undefined {
-    return db.prepare("SELECT * FROM commands WHERE name = ?").get(id) as DbCommands;
+    return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DbCommands;
 }
 
 export function getUser(id: string | number): DbUser | undefined {
@@ -155,7 +166,6 @@ export function getMapsInBulk(ids: Array<string> | Array<number>): Array<DbMaps>
 export function insertData({ table, id, data }: { table: string, id: string | number, data: Array<{ name: string, value: string | number }> }): void {
     const fields: Array<string> = data.map((item) => item.name);
     const values: Array<string | number | null> = data.map((item) => item.value);
-    console.log(fields, values);
 
     db.prepare(`INSERT OR REPLACE INTO ${table} (id, ${fields.join(", ")}) values (?, ${fields.map(() => "?").join(", ")})`)
         .run(id, ...values);
@@ -223,10 +233,16 @@ export function calculateWeightedScores({ user, plays }: { user: UserResponse, p
 }
 
 export function getUsernameFromArgs(user: UserDiscord, args?: Array<string>, userNotNeeded?: boolean): {
-    user: string | { status: false, message: string } | undefined,
+    user: string | { status: boolean, message: string } | undefined,
     flags: Record<string, string | boolean>,
     beatmapId: string | null | undefined,
-    mods: Record<string, string | boolean | RegExpMatchArray | null> | undefined
+    mods: {
+        force: boolean,
+        include: boolean,
+        remove: boolean,
+        codes: RegExpMatchArray | null,
+        whole: string
+    } | undefined
 } | undefined {
     args ||= [];
     let argsJoined = args.join(" ");
@@ -413,7 +429,7 @@ export async function getIdFromContext(message: Message, client: Client): Promis
 }
 
 export function interactionhandler(interaction: Message | ChatInputCommandInteraction, args?: Array<string>): {
-    reply: (options: string | MessagePayload) => Promise<Message>,
+    reply: (options: string | MessagePayload | MessageReplyOptions | InteractionEditReplyOptions) => Promise<Message>,
     userArgs: Array<string>,
     author: UserDiscord,
     mode: osuModes,
@@ -429,8 +445,8 @@ export function interactionhandler(interaction: Message | ChatInputCommandIntera
 } {
     const isSlash = interaction.type === InteractionType.ApplicationCommand;
 
-    async function reply(options: string | MessagePayload): Promise<Message> {
-        return isSlash ? interaction.editReply(options) : interaction.channel.send(options);
+    async function reply(options: string | MessagePayload | MessageReplyOptions | InteractionEditReplyOptions): Promise<Message> {
+        return isSlash ? interaction.editReply(options) : interaction.channel.send(options as string | MessageReplyOptions | MessagePayload);
     }
     const userArgs = isSlash ? [interaction.options.getString("user") ?? ""] : args ?? [""];
     const ppCount = isSlash ? interaction.options.getNumber("count") ?? 1 : 1;
