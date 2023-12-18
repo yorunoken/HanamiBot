@@ -1,18 +1,19 @@
 import fs from "fs";
-import { Locales } from "../Structure/index";
+import type { Locales, LocalesModule } from "../Structure/index";
 
 export class LocalizationManager {
-  language: string;
+    public language: string;
 
-  constructor(language: string) {
-    this.language = language;
-  }
+    public constructor(language: string) {
+        this.language = language;
+    }
 
-  public checkLanguage(): boolean {
-    return fs.existsSync(`./src/locales/${this.language}`);
-  }
+    public checkLanguage(): boolean {
+        return fs.existsSync(`./src/locales/${this.language}.ts`);
+    }
 
-  public getLanguage(): Locales {
-    return require(`./${this.language}`).default;
-  }
+    public async getLanguage(): Promise<Locales> {
+        const imported = await import(`./${this.language}.ts`) as LocalesModule;
+        return imported.default;
+    }
 }
