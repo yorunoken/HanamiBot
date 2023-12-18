@@ -1,11 +1,11 @@
 import { getScore, getUser } from "../functions";
-import { downloadMap, getIdFromContext, getMap, getPerformanceDetails, getUsernameFromArgs, insertData, interactionhandler, rulesets } from "../utils";
+import { getIdFromContext, getUsernameFromArgs, interactionhandler } from "../utils";
 import { EmbedBuilder } from "discord.js";
 import { v2 } from "osu-api-extended";
 import type { Client, Message } from "discord.js";
 import type { response as BeatmapResponse, response as MapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
-import type { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_beatmap";
-import type { Locales, osuModes, UserInfo } from "../Structure/index";
+import type { response as ScoreResponseBeatmap } from "osu-api-extended/dist/types/v2_scores_user_beatmap";
+import type { Locales, osuModes, ScoreInfo, UserInfo } from "../Structure/index";
 
 function leaderboardExists(beatmap: BeatmapResponse): boolean {
     return typeof beatmap.id === "number" || ["qualified", "ranked", "loved"].includes(beatmap.status.toLowerCase());
@@ -20,10 +20,12 @@ export async function start({ interaction, client, args, mode, locale }: { inter
         return;
     }
 
-    if (userOptions.user?.status === false) {
+    if (typeof userOptions.user === "object") {
         await options.reply(userOptions.user.message);
         return;
     }
+    if (!userOptions.user)
+        return;
 
     const beatmapId = userOptions.beatmapId ?? await getIdFromContext(interaction, client);
     if (beatmapId === undefined || beatmapId === null) {
@@ -31,7 +33,7 @@ export async function start({ interaction, client, args, mode, locale }: { inter
         return;
     }
 
-    const beatmap = await v2.beatmap.id.details(beatmapId);
+    const beatmap = await v2.beatmap.id.details(+beatmapId);
     if (!leaderboardExists(beatmap)) {
         await options.reply(locale.fails.noBeatmapIdInCtx);
         return;
@@ -47,39 +49,44 @@ export async function start({ interaction, client, args, mode, locale }: { inter
 
     const userDetailOptions = getUser({ user, mode: options.mode, locale });
 
-    let scores = (await v2.scores.user.beatmap(beatmap.id, user.id, { mode: mode as osuModes })).sort((a, b) => b.pp - a.pp);
     const mods = userOptions.mods?.codes;
-    scores = mods
-        ? scores.filter((score) => {
+    const scores = (await v2.scores.user.beatmap(beatmap.id, user.id, { mode: mode as osuModes })).sort((a, b) => b.pp - a.pp);
+
+    if (mods !== undefined && mods !== null) {
+        scores.filter((score) => {
             const userMods = mods.join("").toUpperCase();
             const scoreMods = score.mods.join("").toUpperCase();
-            const { force } = userOptions.mods;
+            const force = userOptions.mods?.force;
 
             if (userMods === "NM")
-                return userOptions.mods!.include ? scoreMods === "" : userOptions.mods!.remove ? scoreMods !== "" : undefined;
+                return userOptions.mods?.include ? scoreMods === "" : userOptions.mods?.remove ? scoreMods !== "" : undefined;
 
-            const includedBool = (str: string) => scoreMods
-                .match(/.{1,2}/g)
-                ?.sort()
-                .join("")
-                .includes((str.match(/.{1,2}/g) || [""]).sort().join(""));
+            function includedBool(str: string): boolean | undefined {
+                return scoreMods
+                    .match(/.{1,2}/g)
+                    ?.sort()
+                    .join("")
+                    .includes((str.match(/.{1,2}/g) ?? [""]).sort().join(""));
+            }
 
-            const exactBool = (str: string) => scoreMods
-                .match(/.{1,2}/g)
-                ?.sort()
-                .join("") === str
-                .match(/.{1,2}/g)
-                ?.sort()
-                .join("");
+            function exactBool(str: string): boolean {
+                return scoreMods
+                    .match(/.{1,2}/g)
+                    ?.sort()
+                    .join("") === str
+                    .match(/.{1,2}/g)
+                    ?.sort()
+                    .join("");
+            }
 
-            if (userOptions.mods!.include)
+            if (userOptions.mods?.include)
                 return (force ? exactBool : includedBool)(userMods);
-            else if (userOptions.mods!.remove)
+            else if (userOptions.mods?.remove)
                 return !(force ? exactBool : includedBool)(userMods);
 
             return scoreMods === (userMods === "NM" ? "" : userMods);
-        })
-        : scores;
+        });
+    }
 
     if (scores.length === 0) {
         await options.reply(locale.fails.userHasNoScores(user.username));
@@ -89,16 +96,24 @@ export async function start({ interaction, client, args, mode, locale }: { inter
     await options.reply({ embeds: [await buildCompareEmbed(userDetailOptions, beatmap, scores, mode, locale)] });
 }
 
-async function buildCompareEmbed(user: UserInfo, map: MapResponse, scores: Array<ScoreResponse>, mode: string, locale: Locales): Promise<EmbedBuilder> {
-    const scoresArr = [];
-    for (let i = 0; i < scores.length; i++) {
-        const { max_combo: maxCombo } = scores[i];
+async function buildCompareEmbed(user: UserInfo, map: MapResponse, scores: Array<ScoreResponseBeatmap>, mode: string, locale: Locales): Promise<EmbedBuilder> {
+    const temp: Array<Promise<ScoreInfo>> = scores.map(async (_, index) => getScore({ plays: scores, index, mode: mode as osuModes, isCompare: true, beatmap: map, locale }));
 
-        const score = await getScore({ plays: scores, index: parseInt(i), mode: mode as osuModes, isCompare: true, beatmap: map, locale });
-        scoresArr.push(i === "0"
-            ? `${score.globalPlacement.length && score.globalPlacement.length > 0 ? `${score.globalPlacement}\n` : ""}${score.grade} ${score.modsPlay} **[${score.stars}★]** • ${score.totalScore} • ${score.accuracy}\n**${score.pp}pp**/${score.ssPp}pp ~~[${score.fcPp}pp]~~ • ${score.comboValue}\n${score.accValues} <t:${score.submittedTime}:R>\n`
-            : `${i === "1" ? `${locale.embeds.otherPlays}\n` : ""}${score.grade} ${score.modsPlay} **[${score.stars}★]** • **${score.pp}pp** (${score.accuracy}) • **${maxCombo}x** • ${score.performance.curPerf.effectiveMissCount > 0 ? `${score.countMiss} <:hit00:1061254490075955231>` : ""} <t:${score.submittedTime}:R>`);
-    }
+    const scoresPromise = await Promise.all(temp);
+    const scoresArr = scoresPromise.map((score, index) => {
+        const { max_combo: maxCombo } = scores[index];
+
+        if (index === 0) {
+            return `${score.globalPlacement.length && score.globalPlacement.length > 0 ? `${score.globalPlacement}\n` : ""}
+            ${score.grade} ${score.modsPlay} **[${score.stars}★]** • ${score.totalScore} • ${score.accuracy}
+            **${score.pp}pp**/${score.ssPp}pp ~~[${score.fcPp}pp]~~ • ${score.comboValue}\n${score.accValues} <t:${score.submittedTime}:R>\n`;
+        }
+
+        return `${index === 1 ? `${locale.embeds.otherPlays}\n` : ""}
+            ${score.grade} ${score.modsPlay} **[${score.stars}★]** • **${score.pp}pp** (${score.accuracy}) • **${maxCombo}x** • ${score.countMiss > 0 ?
+    `${score.countMiss} <:hit00:1061254490075955231>`
+    : ""} <t:${score.submittedTime}:R>`;
+    });
 
     return new EmbedBuilder()
         .setAuthor({
@@ -109,6 +124,6 @@ async function buildCompareEmbed(user: UserInfo, map: MapResponse, scores: Array
         })
         .setTitle(`${map.beatmapset.artist} - ${map.beatmapset.title} [${map.version}]`)
         .setURL(`https://osu.ppy.sh/b/${map.id}`)
-        .setDescription(scoresArr.join("\n"))
+        .setDescription(scoresArr.join(""))
         .setThumbnail(`https://assets.ppy.sh/beatmaps/${map.beatmapset_id}/covers/list.jpg`);
 }
