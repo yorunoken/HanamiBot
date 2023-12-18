@@ -45,7 +45,7 @@ export interface CommandInterface {
     type: Commands;
     embedOptions: EmbedOptions;
     response: Message;
-    pageBuilder?: <T>(...args: Array<any>) => T;
+    pageBuilder?: Array<(...args: Array<any>) => any> | ((...args: Array<any>) => any);
 }
 
 export type CallbackVoid = (value?: any) => void;
@@ -382,5 +382,5 @@ export interface DbCommands {
 }
 
 export interface Database {
-    DbCommands
+    DbCommands;
 }

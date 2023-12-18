@@ -4,7 +4,7 @@ import type { CommandInterface, EmbedOptions } from "./Structure/types";
 import type { ActionRowBuilder, ButtonInteraction, Message } from "discord.js";
 
 export class ButtonActions {
-    private getRow(parameters: Array<boolean>): Array<ActionRowBuilder> {
+    private getRow(parameters: Array<boolean | undefined>): Array<ActionRowBuilder> {
         const buttons = [firstButton, previousButton, specifyButton, nextButton, lastButton];
         return [buildActionRow(buttons, parameters)];
     }
@@ -16,11 +16,14 @@ export class ButtonActions {
         await i.update({ components: [loadingButtons] });
         const { pageBuilder } = options;
         if (pageBuilder === undefined) return;
-        await response.edit({ embeds: [pageBuilder[i.customId === "more" ? 1 : 0](options.options)], components: [showLessButton] });
+        if (pageBuilder.length < 1) return;
+
+        const pageBuilderArray = pageBuilder as Array<(...args: Array<any>) => any>;
+        await response.edit({ embeds: [pageBuilderArray[i.customId === "more" ? 1 : 0](options.options)], components: [showLessButton] });
     }
 
     public async handleRecentButtons({ pageBuilder, options, i, response }: { pageBuilder: any, options: EmbedOptions, i: ButtonInteraction | ModalSubmitInteraction, response: Message }): Promise<void> {
-        async function editEmbed(): Promise<void> {
+        const editEmbed = async (): Promise<void> => {
             await response.edit({
                 embeds: [await pageBuilder(options)],
                 components: this.getRow([
@@ -31,7 +34,7 @@ export class ButtonActions {
                     options.plays.length - 1 === options.index
                 ])
             });
-        }
+        };
 
         if (i instanceof ModalSubmitInteraction) {
             await response.edit({ components: [loadingButtons] });
@@ -50,9 +53,6 @@ export class ButtonActions {
                 break;
             case "last":
                 options.index = options.plays.length - 1;
-                break;
-            case "first":
-                options.index = 0;
                 break;
         }
 

@@ -46,7 +46,7 @@ export const rulesets = {
     mania: 3
 };
 
-export function buildActionRow(buttons: Array<ButtonBuilder>, disabledStates: Array<boolean> = []): ActionRowBuilder<MessageActionRowComponentBuilder> {
+export function buildActionRow(buttons: Array<ButtonBuilder>, disabledStates: Array<boolean | undefined> = []): ActionRowBuilder<MessageActionRowComponentBuilder> {
     const actionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
     buttons.forEach((button, index) => {
         const isButtonDisabled = disabledStates[index];
