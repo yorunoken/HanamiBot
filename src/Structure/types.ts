@@ -91,7 +91,7 @@ export interface BeatmapInfo {
 }
 
 export interface ScoreInfo {
-    performance: any;
+    performance: PerformanceAttributes;
     retries?: number;
     percentagePassed: string;
     modsPlay: string;
@@ -101,7 +101,7 @@ export interface ScoreInfo {
     countSliders: number;
     countSpinners: number;
     hitLength: number;
-    placement: number;
+    placement: number | undefined;
     version: string;
     creatorId: number;
     creatorUsername: string;
@@ -348,6 +348,18 @@ export interface Locales {
     misc: Misc;
 }
 
+export interface LocalesModule {
+    default: {
+        code: string,
+        errorAtRuntime: string,
+        embeds: Embeds,
+        classes: Classes,
+        fails: Fails,
+        modals: Modals,
+        misc: Misc
+    };
+}
+
 export interface DbUser {
     id: string;
     banchoId: string;
@@ -367,4 +379,8 @@ export interface DbMaps {
 export interface DbCommands {
     name: string;
     count: number;
+}
+
+export interface Database {
+    DbCommands
 }
