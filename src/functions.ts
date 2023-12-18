@@ -1,6 +1,7 @@
 import { downloadMap, formatNumber, getPerformanceDetails, getRetryCount, grades, insertData, osuEmojis, rulesets } from "./utils";
 import { tools, v2 } from "osu-api-extended";
 import type { response as BeatmapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
+import type { response as ScoreResponseCompare } from "osu-api-extended/dist/types/v2_scores_user_beatmap";
 import type { response as ScoreResponse } from "osu-api-extended/dist/types/v2_scores_user_category";
 import type { response as UserOsu } from "osu-api-extended/dist/types/v2_user_details";
 import type { BeatmapInfo, Locales, osuModes, ScoreInfo, UserInfo } from "./Structure/index";
@@ -59,20 +60,23 @@ export function getUser({ user, mode, locale }: { user: UserOsu, mode: osuModes,
 }
 
 export async function getScore({ plays, index, mode, isCompare, beatmap, file, locale }:
-{ plays: Array<ScoreResponse>, index: number, mode: osuModes, isCompare?: boolean, beatmap?: BeatmapResponse, file?: string, locale: Locales }): Promise<ScoreInfo> {
+{ plays: Array<ScoreResponse | ScoreResponseCompare>, index: number, mode: osuModes, isCompare?: boolean, beatmap?: BeatmapResponse, file?: string, locale: Locales }): Promise<ScoreInfo> {
     const play = plays[index];
     const rulesetId = rulesets[mode];
 
-    (play.beatmap as any) = isCompare ? beatmap : play.beatmap;
-    (play.beatmapset as any) = isCompare ? beatmap?.beatmapset : play.beatmapset;
+    const playScore = play as ScoreResponse;
 
-    if (!file || !["ranked", "loved", "approved"].includes(play.beatmap.status)) {
-        file = (await downloadMap(play.beatmap.id) as string);
-        insertData({ table: "maps", id: play.beatmap.id.toString(), data: [ { name: "data", value: file } ] });
+    const map = beatmap ?? playScore.beatmap;
+
+    const mapset = beatmap?.beatmapset ?? playScore.beatmapset;
+
+    if (!file || !["ranked", "loved", "approved"].includes(map.status)) {
+        file = (await downloadMap(map.id) as string);
+        insertData({ table: "maps", id: map.id.toString(), data: [ { name: "data", value: file } ] });
     }
 
-    const { id: beatmapId, count_circles: circles, count_sliders: sliders, count_spinners: spinners, hit_length: hLength, version } = play.beatmap;
-    const { user_id: creatorId, creator: creatorUsername, status: mapStatus, id: mapsetId, artist, title } = play.beatmapset;
+    const { id: beatmapId, count_circles: circles, count_sliders: sliders, count_spinners: spinners, hit_length: hLength, version } = map;
+    const { user_id: creatorId, creator: creatorUsername, status: mapStatus, id: mapsetId, artist, title } = mapset;
     const { count_100: count100, count_300: count300, count_50: count50, count_geki: countGeki, count_katu: countKatu, count_miss: countMiss } = play.statistics;
 
     const objectshit = count300 + count100 + count50 + countMiss;
@@ -113,7 +117,7 @@ export async function getScore({ plays, index, mode, isCompare, beatmap, file, l
     const accValues = `{ **${rulesetId === 3 ? `${countGeki}/` : ""}${count300}**/${rulesetId === 3 ? `${countKatu}/` : ""}${count100}/${rulesetId === 1 ? "" : `${count50}/`}${countMiss} }`;
     return {
         performance,
-        retries: isCompare ? undefined : getRetryCount(plays.map((x) => x.beatmap.id).splice(index, plays.length), beatmapId),
+        retries: isCompare ? undefined : getRetryCount((plays as Array<ScoreResponse>).map((x) => x.beatmap.id).splice(index, plays.length), beatmapId),
         percentagePassed: percentageNum === 100 || play.passed ? "" : `@${percentageNum.toFixed(1)}% `,
         modsPlay,
         beatmapId,
@@ -122,7 +126,7 @@ export async function getScore({ plays, index, mode, isCompare, beatmap, file, l
         countSliders: sliders,
         countSpinners: spinners,
         hitLength,
-        placement: play.position,
+        placement: isCompare ? undefined : playScore.position,
         version: version,
         creatorId: creatorId,
         creatorUsername: creatorUsername,
