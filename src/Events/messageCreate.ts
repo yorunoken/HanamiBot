@@ -55,7 +55,7 @@ export default class MessageCreateEvent extends BaseEvent {
         const command = alias ? this.client.prefixCommands.get(alias) : this.client.prefixCommands.get(commandName);
         if (!command) return;
 
-        const locale = new LocalizationManager(this.client.localeLanguage.get(guildId) ?? "en").getLanguage();
+        const locale = await new LocalizationManager(this.client.localeLanguage.get(guildId) ?? "en").getLanguage();
 
         if (cooldown.has(`${command.name}${message.author.id}`)) {
             await message
@@ -67,6 +67,7 @@ export default class MessageCreateEvent extends BaseEvent {
         }
 
         command.run({ client: this.client, message, args, prefix, index: number, commandName, db, locale }).catch(async (error: Error) => {
+            console.log(error);
             await message.channel.send(locale.errorAtRuntime);
 
             const channelToSendMessage = await this.client.channels.fetch(Bun.env.ERRORS_CHANNELID);

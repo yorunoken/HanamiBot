@@ -7,7 +7,7 @@ const tables = [
     { name: "users", columns: ["id TEXT PRIMARY KEY", "banchoId TEXT"] },
     { name: "servers", columns: ["id INTEGER PRIMARY KEY", "prefix TEXT", "language TEXT"] },
     { name: "maps", columns: ["id INTEGER PRIMARY KEY", "data TEXT"] },
-    { name: "commands", columns: ["name TEXT PRIMARY KEY", "count INTEGER"] }
+    { name: "commands", columns: ["id TEXT PRIMARY KEY", "count INTEGER"] }
 ];
 
 interface Columns {

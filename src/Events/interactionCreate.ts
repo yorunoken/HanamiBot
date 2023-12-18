@@ -16,7 +16,7 @@ export default class InteractionCreateEvent extends BaseEvent {
         if (!interaction.guildId)
             return;
 
-        const locale = new LocalizationManager(this.client.localeLanguage.get(interaction.guildId) ?? "en").getLanguage();
+        const locale = await new LocalizationManager(this.client.localeLanguage.get(interaction.guildId) ?? "en").getLanguage();
 
         if (interaction.isModalSubmit()) {
             const { message } = interaction;
@@ -89,6 +89,7 @@ export default class InteractionCreateEvent extends BaseEvent {
                 const command = this.client.slashCommands.get(interaction.commandName);
                 if (!command) return;
                 command.run({ client: this.client, interaction, db, locale }).catch(async (error: Error) => {
+                    console.log(error);
                     await interaction.editReply(locale.errorAtRuntime);
 
                     const channel = await this.client.channels.fetch(Bun.env.ERRORS_CHANNELID);
