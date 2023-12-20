@@ -3,6 +3,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionType } from "d
 import { mods } from "osu-api-extended";
 import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
 import { Beatmap, Calculator } from "rosu-pp";
+import type { InteractionHandler } from "./Structure/types/utils";
 import type { DownloadResult } from "osu-downloader";
 import type { MapAttributes, PerformanceAttributes } from "rosu-pp";
 import type { response as UserResponse } from "osu-api-extended/dist/types/v2_user_details";
@@ -261,34 +262,31 @@ export function getUsernameFromArgs(user: UserDiscord, args?: Array<string>, use
 
     if (!argumentString) {
         const userData = getUserData(user.id);
+
         if (!("id" in userData))
-            return;
+            return { user: errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods: parsedMods };
 
         if (userNotNeeded) {
-            let userTemp = undefined;
-            try {
-                userTemp = userData.banchoId || errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`);
-            } catch (_) {}
-
+            const userTemp = userData.banchoId || errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`);
             return { user: userTemp, flags: flagsParsed, beatmapId, mods: parsedMods };
         }
+
         return { user: userData.banchoId || errMsg(`The Discord user <@${user.id}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods: parsedMods };
     }
 
-    const discordUserRegex = /\d{17,18}/;
-    const discordUserMatch = discordUserRegex.exec(argumentString);
+    const discordUserMatch = (/\d{17,18}/).exec(argumentString);
     const userId = discordUserMatch ? discordUserMatch[0] : undefined;
 
     const userData = getUserData(user.id);
-    if (userId && "id" in userData) {
-        if (userNotNeeded) {
-            let userTemp = undefined;
-            try {
-                userTemp = userData.banchoId || errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`);
-            } catch (_) {}
+    if (userId) {
+        if (!("id" in userData))
+            return { user: errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods: parsedMods };
 
+        if (userNotNeeded) {
+            const userTemp = userData.banchoId || errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`);
             return { user: userTemp, flags: flagsParsed, beatmapId, mods: parsedMods };
         }
+
         return { user: userData.banchoId || errMsg(`The Discord user <@${userId}> hasn't linked their account to the bot yet!`), flags: flagsParsed, beatmapId, mods: parsedMods };
     }
 
@@ -428,21 +426,7 @@ export async function getIdFromContext(message: Message, client: Client): Promis
     return message.reference ? getEmbedFromReply(message, client) : cycleThroughEmbeds(message, client);
 }
 
-export function interactionhandler(interaction: Message | ChatInputCommandInteraction, args?: Array<string>): {
-    reply: (options: string | MessagePayload | MessageReplyOptions | InteractionEditReplyOptions) => Promise<Message>,
-    userArgs: Array<string>,
-    author: UserDiscord,
-    mode: osuModes,
-    passOnly: boolean,
-    index: number,
-    commandName: Array<string>,
-    subcommand: string | undefined,
-    guildId: string | null,
-    prefix: string | null | undefined,
-    ppValue: number,
-    ppCount: number,
-    rankValue: number
-} {
+export function interactionhandler(interaction: Message | ChatInputCommandInteraction, args?: Array<string>): InteractionHandler {
     const isSlash = interaction.type === InteractionType.ApplicationCommand;
 
     async function reply(options: string | MessagePayload | MessageReplyOptions | InteractionEditReplyOptions): Promise<Message> {
