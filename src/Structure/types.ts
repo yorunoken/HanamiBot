@@ -7,6 +7,7 @@ export interface PrefixCommands {
     aliases: Array<string>;
     cooldown: number;
     description: string;
+    category: string;
     flags?: string;
     run: (options: Record<string, any>) => Promise<void>;
 }
@@ -377,10 +378,8 @@ export interface DbMaps {
 }
 
 export interface DbCommands {
-    name: string;
+    id: string;
     count: number;
 }
 
-export interface Database {
-    DbCommands;
-}
+export type Database = DbUser | DbServer | DbMaps | DbCommands;
