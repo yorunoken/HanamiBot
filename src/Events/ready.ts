@@ -20,6 +20,7 @@ interface Columns {
 }
 
 tables.forEach((table) => {
+    db.run(`CREATE TABLE IF NOT EXISTS ${table.name} (${table.columns.join(", ")});`);
     const existingColumns = db.prepare(`PRAGMA table_info(${table.name});`).all() as Array<Columns>;
 
     table.columns.forEach((columnNameType) => {
