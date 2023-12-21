@@ -2,16 +2,16 @@ import { getScore, getUser } from "../functions";
 import { getIdFromContext, getUsernameFromArgs, interactionhandler } from "../utils";
 import { EmbedBuilder } from "discord.js";
 import { v2 } from "osu-api-extended";
-import type { Client, Message } from "discord.js";
+import type { Message } from "discord.js";
 import type { response as BeatmapResponse, response as MapResponse } from "osu-api-extended/dist/types/v2_beatmap_id_details";
 import type { response as ScoreResponseBeatmap } from "osu-api-extended/dist/types/v2_scores_user_beatmap";
-import type { Locales, osuModes, ScoreInfo, UserInfo } from "../Structure/index";
+import type { ExtendedClient, Locales, osuModes, ScoreInfo, UserInfo } from "../Structure/index";
 
 function leaderboardExists(beatmap: BeatmapResponse): boolean {
     return typeof beatmap.id === "number" || ["qualified", "ranked", "loved"].includes(beatmap.status.toLowerCase());
 }
 
-export async function start({ interaction, client, args, mode, locale }: { interaction: Message, client: Client, args: Array<string>, mode: osuModes | "", locale: Locales }): Promise<void> {
+export async function start({ interaction, client, args, mode, locale }: { interaction: Message, client: ExtendedClient, args: Array<string>, mode: string, locale: Locales }): Promise<void> {
     const options = interactionhandler(interaction, args);
 
     const userOptions = getUsernameFromArgs(options.author, options.userArgs);
@@ -38,7 +38,6 @@ export async function start({ interaction, client, args, mode, locale }: { inter
         await options.reply(locale.fails.noBeatmapIdInCtx);
         return;
     }
-
     mode = mode.length > 0 ? mode : beatmap.mode;
 
     const user = await v2.user.details(userOptions.user, options.mode);

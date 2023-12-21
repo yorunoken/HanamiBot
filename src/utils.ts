@@ -19,7 +19,7 @@ import type {
     TextBasedChannel,
     User as UserDiscord
 } from "discord.js";
-import type { DbCommands, DbMaps, DbServer, DbUser, EmbedOptions, NoChokePlayDetails, osuModes } from "./Structure";
+import type { DbCommands, DbMaps, DbServer, DbUser, EmbedOptions, ExtendedClient, NoChokePlayDetails, osuModes } from "./Structure";
 
 export const grades: Record<string, string> = {
     A: "<:A_:1057763284327080036>",
@@ -350,7 +350,7 @@ export function getPerformanceDetails({ modsArg, maxCombo, rulesetId, hitValues,
     return { mapValues, maxPerf, curPerf, fcPerf, mapId: 0, playInfo: new Object() };
 }
 
-export async function downloadMap(beatmapId: number | Array<number>): Promise<string | Array<{ id: string | number | undefined, contents: string | undefined }> | undefined> {
+export async function downloadMap(beatmapId: number | Array<number>): Promise<string | Array<{ id: string | number | undefined, contents: string | undefined }>> {
     // const responseDirect = await fetch(`https://api.osu.direct/osu/${beatmapId}`);
     // if (responseDirect.status !== 404) {
     //   return new TextDecoder().decode(await responseDirect.arrayBuffer());
@@ -422,7 +422,7 @@ async function cycleThroughEmbeds(message: Message, client: Client): Promise<num
     }
     return beatmapId;
 }
-export async function getIdFromContext(message: Message, client: Client): Promise<number | null | undefined> {
+export async function getIdFromContext(message: Message, client: ExtendedClient): Promise<number | null | undefined> {
     return message.reference ? getEmbedFromReply(message, client) : cycleThroughEmbeds(message, client);
 }
 
