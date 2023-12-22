@@ -62,6 +62,66 @@ export interface ModuleReturn {
     run: <T>(...args: Array<any>) => T;
 }
 
+export interface LeaderboardScores {
+    position: number;
+    accuracy: number;
+    best_id: number;
+    ended_at: string;
+    id: number;
+    max_combo: number;
+    mode: string;
+    mode_int: number;
+    mods: Array<{ acronym: string }>;
+    passed: boolean;
+    perfect: boolean;
+    pp: number;
+    rank: string;
+    replay: boolean;
+    total_score: number;
+    statistics: {
+        great: number | null,
+        ok: number | null,
+        meh: number | null,
+        miss: number | null,
+        perfect: number | null,
+        good: number | null
+    };
+    ruleset_id: number;
+    type: string;
+    user_id: number;
+    current_user_attributes: {
+        pin: string
+    };
+    user: {
+        avatar_url: string,
+        country_code: string,
+        default_group: string,
+        id: number,
+        is_active: boolean,
+        is_bot: boolean,
+        is_deleted: boolean,
+        is_online: boolean,
+        is_supporter: boolean,
+        last_visit: string,
+        pm_friends_only: boolean,
+        profile_colour: string,
+        username: string,
+        country: {
+            code: string,
+            name: string
+        },
+        cover: {
+            custom_url: string,
+            url: string,
+            id: string
+        }
+    };
+}
+
+export interface Leaderboard {
+    scores: Array<LeaderboardScores>;
+}
+
 export interface BeatmapInfo {
     title: string;
     artist: string;

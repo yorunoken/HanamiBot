@@ -92,12 +92,12 @@ export function buttonBoolsIndex(type: string, options: EmbedOptions): boolean |
 }
 
 const flags = ["i", "index", "rev", "p", "page"];
-export function argParser(str: string, flagsArr: Array<string>): Record<string, string | boolean> {
+export function argParser(str: string, flagsArr: Array<string>): Record<string, string | undefined> {
     const matches = [...str.matchAll(/-(\w+)|(\w+)=(\S+)/g)];
 
     const filteredMatches = matches.filter((m) => flagsArr.includes(m[1]) || flagsArr.includes(m[2]));
 
-    return filteredMatches.reduce<Record<string, string | boolean>>((acc, m) => {
+    return filteredMatches.reduce<Record<string, string>>((acc, m) => {
         const [, flag1, flag2, value] = m;
         acc[flag1 || flag2] = value;
         return acc;
@@ -235,7 +235,7 @@ export function calculateWeightedScores({ user, plays }: { user: UserResponse, p
 
 export function getUsernameFromArgs(user: UserDiscord, args?: Array<string>, userNotNeeded?: boolean): {
     user: string | { status: boolean, message: string } | undefined,
-    flags: Record<string, string | boolean>,
+    flags: Record<string, string | undefined>,
     beatmapId: string | null | undefined,
     mods: {
         force: boolean,
@@ -350,7 +350,7 @@ export function getPerformanceDetails({ modsArg, maxCombo, rulesetId, hitValues,
     return { mapValues, maxPerf, curPerf, fcPerf, mapId: 0, playInfo: new Object() };
 }
 
-export async function downloadMap(beatmapId: number | Array<number>): Promise<string | Array<{ id: string | number | undefined, contents: string | undefined }>> {
+export async function downloadMap(beatmapId: number | Array<number>): Promise<string | Array<{ id: string | number | undefined, contents: string }>> {
     // const responseDirect = await fetch(`https://api.osu.direct/osu/${beatmapId}`);
     // if (responseDirect.status !== 404) {
     //   return new TextDecoder().decode(await responseDirect.arrayBuffer());
@@ -382,7 +382,7 @@ export async function downloadMap(beatmapId: number | Array<number>): Promise<st
         responseSingle.status === DownloadStatus.FailedToDownload)
         throw new Error("ERROR CODE 409, ABORTING TASK");
 
-    return isIdArray ? responseArray.map((response) => ({ id: response.id, contents: response.buffer?.toString() })) : responseSingle.buffer?.toString();
+    return isIdArray ? responseArray.map((response) => ({ id: response.id, contents: (response.buffer ?? "").toString() })) : (responseSingle.buffer ?? "").toString();
 }
 
 function findId(embed: Embed | undefined | null): number | null {
