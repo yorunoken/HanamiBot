@@ -23,7 +23,7 @@ import type { BeatmapInfo, Locales, ExtendedClient, Leaderboard, LeaderboardScor
 import type { Message, User } from "discord.js";
 
 function leaderboardExists(beatmap: BeatmapResponse): boolean {
-    return typeof beatmap.id === "number" || ["qualified", "ranked", "loved"].includes(beatmap.status.toLowerCase());
+    return typeof beatmap.id === "number" && ["qualified", "ranked", "loved"].includes(beatmap.status.toLowerCase());
 }
 
 interface LeaderboardInitializer {

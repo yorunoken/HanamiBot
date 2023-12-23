@@ -27,6 +27,10 @@ export async function start({ interaction, client, args, mapId, locale }: { inte
     beatmapId = +beatmapId;
 
     const beatmap = await v2.beatmap.id.details(beatmapId);
+    if (!beatmap.id) {
+        await options.reply(locale.fails.noBeatmapIdInCtx);
+        return;
+    }
 
     let file = getMap(beatmapId.toString())?.data;
     if (!file || !["ranked", "loved", "approved"].includes(beatmap.status)) {

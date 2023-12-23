@@ -148,7 +148,7 @@ export default {
         userHasNoScores: (user: string) => `${user} has no scores on this beatmap.`,
         provideValidPage: (maxValue: strOrNum) => `Please provide a valid page (between 1 and ${maxValue})`,
         noLeaderboard: "Either this map doesn't exist, or it doesn't have a leaderboard.",
-        noBeatmapIdInCtx: "There doesn't seem to be any beatmap embeds in this conversation.",
+        noBeatmapIdInCtx: "Either this beatmap doesn't exist, has no leaderboard, or a wrong ID was given.",
         error: "Something went wrong.",
         interactionError: "There was an error with this interaction. Please try again.",
         cooldownTime: (cooldown: string) => `Try again in ${cooldown}`,

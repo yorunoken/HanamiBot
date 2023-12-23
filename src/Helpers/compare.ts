@@ -8,7 +8,7 @@ import type { response as ScoreResponseBeatmap } from "osu-api-extended/dist/typ
 import type { ExtendedClient, Locales, osuModes, ScoreInfo, UserInfo } from "../Structure/index";
 
 function leaderboardExists(beatmap: BeatmapResponse): boolean {
-    return typeof beatmap.id === "number" || ["qualified", "ranked", "loved"].includes(beatmap.status.toLowerCase());
+    return typeof beatmap.id === "number" && ["qualified", "ranked", "loved"].includes(beatmap.status.toLowerCase());
 }
 
 export async function start({ interaction, client, args, mode, locale }: { interaction: Message, client: ExtendedClient, args: Array<string>, mode: string, locale: Locales }): Promise<void> {
