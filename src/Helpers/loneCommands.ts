@@ -5,6 +5,12 @@ const functions: Record<string, (arg: any) => void> = {
     map
 };
 
+/**
+ * Parses a Discord message content URL to extract an osu! user ID or beatmap ID.
+ * Checks the URL against regex patterns for user and beatmap URLs.
+ * Returns an object with the extracted ID and type if a match is found,
+ * otherwise returns undefined.
+*/
 export function getLoneCommand(message: Message): void {
     const url = message.content;
 
