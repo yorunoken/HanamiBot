@@ -1,4 +1,4 @@
-.env.local
+.env
 node_modules/
 data.db
 tests/
