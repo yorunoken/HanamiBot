@@ -5,7 +5,6 @@ import type { Interaction } from "lilybird";
 import type { Event } from "@lilybird/handlers";
 
 async function run(interaction: Interaction): Promise<void> {
-    await interaction.deferReply(true);
     if (interaction.isMessageComponentInteraction()) {
         const { embeds, author } = interaction.message;
         const messageEmbed = embeds?.[0];
