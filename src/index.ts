@@ -1,4 +1,3 @@
-import { Server } from "../server";
 import { initializeDatabase } from "./utils";
 import { createHandler } from "@lilybird/handlers";
 import { createClient, Intents } from "lilybird";
@@ -30,7 +29,4 @@ await createClient({
     ],
     ...listeners
 });
-
-// Starts the express server
-new Server().start();
 
