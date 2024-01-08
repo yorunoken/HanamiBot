@@ -1,5 +1,4 @@
 import { cryptr } from "..";
-import { ApplicationCommand } from "@lilybird/jsx";
 import { auth } from "osu-api-extended";
 import type { auth_scopes } from "osu-api-extended/dist/utility/types";
 import type { SlashCommand } from "@lilybird/handlers";
@@ -13,8 +12,7 @@ function redirectPage(discordId: string): string {
 
 export default {
     post: "GLOBAL",
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    data: ApplicationCommand({ name: "link", description: "Link your osu! account to the bot." }),
+    data: { name: "link", description: "Link your osu! account to the bot." },
     run: async (interaction) => {
         if (!interaction.inGuild()) return;
         await interaction.deferReply(true);

@@ -1,11 +1,13 @@
 import { insertData } from "../utils";
 import { v2 } from "osu-api-extended";
-import { Embed } from "@lilybird/jsx";
+import { EmbedType } from "lilybird";
 import type { Interaction } from "lilybird";
 import type { Event } from "@lilybird/handlers";
 
 async function run(interaction: Interaction): Promise<void> {
-    if (interaction.isMessageComponentInteraction()) {
+    if (!interaction.isMessageComponentInteraction()) return;
+
+    if (interaction.data.id === "verify") {
         await interaction.deferReply(true);
 
         const { embeds, author } = interaction.message;
@@ -26,11 +28,12 @@ async function run(interaction: Interaction): Promise<void> {
 
         insertData({ table: "users", id: discordId, data: [ { name: "banchoId", value: osuId } ] });
 
-        const embed = Embed({
+        const embed = {
+            type: EmbedType.Rich,
             title: "Success!",
             description: `Successfully linked <@${discordId}> with ${user.username}`,
             children: { data: { url: user.avatar_url }, type: "thumbnail" }
-        });
+        };
 
         await interaction.editReply({ embeds: [embed] });
     }

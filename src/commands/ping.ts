@@ -1,10 +1,8 @@
-import { ApplicationCommand } from "@lilybird/jsx";
 import type { SlashCommand } from "@lilybird/handlers";
 
 export default {
     post: "GLOBAL",
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    data: ApplicationCommand({ name: "ping", description: "pong!!" }),
+    data: { name: "ping", description: "pong!!" },
     run: async (interaction) => {
         await interaction.deferReply();
 
