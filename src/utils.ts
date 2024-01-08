@@ -44,6 +44,10 @@ export function getUser(id: string | number): DbUser | undefined {
     return db.prepare("SELECT * FROM users WHERE id = ?").get(id) as DbUser;
 }
 
+export function removeUser(id: string | number): void {
+    db.prepare("DELETE FROM users WHERE id = ?").run(id);
+}
+
 export function insertData({ table, id, data }: { table: string, id: string | number, data: Array<{ name: string, value: string | number }> }): void {
     const fields: Array<string> = data.map((item) => item.name);
     const values: Array<string | number | null> = data.map((item) => item.value);

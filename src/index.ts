@@ -2,6 +2,10 @@ import { initializeDatabase } from "./utils";
 import { createHandler } from "@lilybird/handlers";
 import { createClient, Intents } from "lilybird";
 import { Database } from "bun:sqlite";
+import Cryptr from "cryptr";
+import { auth } from "osu-api-extended";
+
+export const cryptr = new Cryptr(process.env.ENCRYPT_SECRET, { saltLength: 10 });
 
 export const db = new Database("./src/data.db");
 initializeDatabase();
@@ -18,6 +22,8 @@ const listeners = await createHandler({
         listeners: `${import.meta.dir}/listeners`
     }
 });
+
+await auth.login(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
 
 await createClient({
     token: process.env.DISCORD_BOT_TOKEN,

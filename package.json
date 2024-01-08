@@ -18,11 +18,8 @@
   "dependencies": {
     "@lilybird/handlers": "^0.2.1",
     "@lilybird/jsx": "^0.2.0",
-    "express": "^4.18.2",
-    "express-session": "^1.17.3",
+    "cryptr": "^6.3.0",
     "lilybird": "^0.4.4",
-    "osu-api-extended": "^2.7.67",
-    "passport": "^0.7.0",
-    "passport-osu": "^1.2.0"
+    "osu-api-extended": "^2.7.67"
   }
 }
