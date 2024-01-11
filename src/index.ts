@@ -1,4 +1,4 @@
-import { initializeDatabase } from "./utils";
+import { initializeDatabase } from "./utils/database";
 import { createHandler } from "@lilybird/handlers";
 import { createClient, Intents } from "lilybird";
 import { Database } from "bun:sqlite";
