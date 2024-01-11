@@ -16,6 +16,7 @@ process.on("unhandledRejection", console.error);
 process.on("uncaughtException", console.error);
 
 const listeners = await createHandler({
+    prefix: "!",
     dirs: {
         slashCommands: `${import.meta.dir}/commands`,
         messageCommands: `${import.meta.dir}/message-commands`,
@@ -23,7 +24,7 @@ const listeners = await createHandler({
     }
 });
 
-await auth.login(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
+console.log(await auth.login(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]));
 
 await createClient({
     token: process.env.DISCORD_BOT_TOKEN,
