@@ -1,4 +1,4 @@
-import { getUser } from "../utils/database";
+import { getCommandArgs } from "../utils/args";
 import { ApplicationCommandOptionType } from "lilybird";
 import type { ApplicationCommandData, Interaction } from "lilybird";
 import type { SlashCommand } from "@lilybird/handlers";
@@ -7,23 +7,9 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     if (!interaction.inGuild()) return;
     await interaction.deferReply();
 
-    const { data, member } = interaction;
-
-    const username = data.getString("username") ?? getUser(member.user.id);
-    const mode = data.getString("mode") ?? "osu";
-
-    const discordUserId = data.getUser("discord");
-    const discordUser = getUser(discordUserId ?? "");
-
-    console.log(discordUser, username);
-
-    if (typeof discordUser === "undefined" && typeof username !== "undefined") {
-        await interaction.editReply(`The user <@${discordUserId}> hasn't linked their account to the bot yet! mode: ${mode}`);
-        return;
-    }
-
-    if (typeof username === "undefined") {
-        await interaction.editReply(`Please link your account to the bot using /link! mode: ${mode}`);
+    const commandArgs = getCommandArgs(interaction);
+    if (commandArgs?.user.type === "fail") {
+        await interaction.editReply(commandArgs.user.failMessage);
         return;
     }
 }
