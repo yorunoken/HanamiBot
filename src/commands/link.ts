@@ -1,14 +1,13 @@
 import { cryptr } from "..";
 import { auth } from "osu-api-extended";
-import type { auth_scopes } from "osu-api-extended/dist/utility/types";
+import type { auth_scopes as authScopes } from "osu-api-extended/dist/utility/types";
 import type { SlashCommand } from "@lilybird/handlers";
 import type { ApplicationCommandData, Interaction } from "lilybird";
 
 function redirectPage(discordId: string): string {
-    const scoreList: auth_scopes = ["public"];
+    const scoreList: authScopes = ["public"];
 
-    const url = auth.build_url(+process.env.CLIENT_ID, "https://hanami-verifier.vercel.app/auth/osu/cb", scoreList, discordId);
-    return url;
+    return auth.build_url(+process.env.CLIENT_ID, "https://hanami-verifier.vercel.app/auth/osu/cb", scoreList, discordId);
 }
 
 async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {

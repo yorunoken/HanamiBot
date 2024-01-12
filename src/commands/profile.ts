@@ -1,5 +1,7 @@
 import { getCommandArgs } from "../utils/args";
+import { profileBuilder } from "../embed-builders/profile";
 import { ApplicationCommandOptionType } from "lilybird";
+import { v2 } from "osu-api-extended";
 import type { ApplicationCommandData, Interaction } from "lilybird";
 import type { SlashCommand } from "@lilybird/handlers";
 
@@ -7,11 +9,18 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     if (!interaction.inGuild()) return;
     await interaction.deferReply();
 
-    const commandArgs = getCommandArgs(interaction);
-    if (commandArgs?.user.type === "fail") {
-        await interaction.editReply(commandArgs.user.failMessage);
+    const { user } = getCommandArgs(interaction);
+
+    if (user.type === "fail") {
+        await interaction.editReply(user.failMessage);
         return;
     }
+
+    const osuUser = await v2.user.details(user.banchoId, user.mode);
+
+    const embed = profileBuilder(osuUser);
+
+    await interaction.editReply({ embeds: [embed] });
 }
 
 export default {

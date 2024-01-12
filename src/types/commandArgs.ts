@@ -1,3 +1,5 @@
+import type { modes } from "./osu";
+
 interface BaseUser {
     birthDay?: string;
 }
@@ -5,7 +7,7 @@ interface BaseUser {
 interface SuccessUser extends BaseUser {
     type: "success";
     banchoId: string;
-    mode: string;
+    mode: modes;
 }
 
 interface FailUser extends BaseUser {
