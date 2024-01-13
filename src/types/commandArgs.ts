@@ -20,3 +20,16 @@ export type User = SuccessUser | FailUser;
 export interface CommandArgs {
     user: User;
 }
+
+interface Mods {
+    include: boolean | null;
+    exclude: boolean | null;
+    forceInclude: boolean | null;
+    name: string | null;
+}
+
+export interface ParsedArgs {
+    username: Array<string> | null;
+    flags: Record<string, string>;
+    mods: Mods;
+}
