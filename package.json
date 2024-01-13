@@ -19,7 +19,7 @@
     "@lilybird/handlers": "^0.2.1",
     "@lilybird/jsx": "^0.2.0",
     "cryptr": "^6.3.0",
-    "lilybird": "^0.4.4",
+    "lilybird": "^0.5.0",
     "osu-api-extended": "^2.7.67"
   }
 }

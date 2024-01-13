@@ -1,14 +1,13 @@
+import { parseOsuArguments } from "../utils/args";
 import type { Message } from "lilybird";
 import type { MessageCommand } from "@lilybird/handlers";
 
-async function run(message: Message): Promise<void> {
-    await message.reply("This command has been deprecated. Use `/link` instead.");
+async function run(message: Message, args: Array<string>): Promise<void> {
+    const argOptions = parseOsuArguments(args);
 }
 
 export default {
-    name: "link",
+    name: "profile",
     alias: ["osu", "mania", "taiko", "ctb"],
-    run: async (message, args) => {
-        //
-    }
+    run
 } satisfies MessageCommand;

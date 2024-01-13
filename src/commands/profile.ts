@@ -17,7 +17,6 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     }
 
     const osuUser = await v2.user.details(user.banchoId, user.mode);
-
     const embed = profileBuilder(osuUser);
 
     await interaction.editReply({ embeds: [embed] });
