@@ -19,12 +19,12 @@ const listeners = await createHandler({
     prefix: "!",
     dirs: {
         slashCommands: `${import.meta.dir}/commands`,
-        messageCommands: `${import.meta.dir}/message-commands`,
+        messageCommands: `${import.meta.dir}/commands-message`,
         listeners: `${import.meta.dir}/listeners`
     }
 });
 
-console.log(await auth.login(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]));
+await auth.login(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
 
 await createClient({
     token: process.env.DISCORD_BOT_TOKEN,
