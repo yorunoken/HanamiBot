@@ -1,20 +1,22 @@
-import type { ProfileInfo } from "../types/osu";
+import type { Modes, ProfileInfo } from "../types/osu";
 import type { response as User } from "osu-api-extended/dist/types/v2_user_details";
 
-export function getProfile(user: User): ProfileInfo {
+export function getProfile(user: User, mode: Modes): ProfileInfo {
     const { statistics } = user;
     const userJoinDate = new Date(user.join_date);
 
     return {
         username: user.username,
         userCover: user.cover_url,
-        userAvatar: user.avatar_url,
+        avatarUrl: user.avatar_url,
         userUrl: `https://osu.ppy.sh/users/${user.id}/${mode}`,
         coverUrl: user.cover_url,
-        userFlag: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
+        flagUrl: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
         countryCode: user.country.code,
-        globalRank: statistics.global_rank.toLocaleString() || "-",
-        countryRank: statistics.country_rank.toLocaleString() || "-",
+        globalRank: statistics.global_rank?.toLocaleString() ?? "-",
+        countryRank: statistics.country_rank?.toLocaleString() ?? "-",
+        peakGlobalRank: user.rank_highest?.rank.toLocaleString() ?? "",
+        peakGlobalRankTime: new Date(user.rank_highest?.updated_at ?? 0).getTime() / 1000,
         pp: statistics.pp.toLocaleString(),
         accuracy: statistics.hit_accuracy.toFixed(2),
         level: `${user.statistics.level.current}.${statistics.level.progress.toString(10).padStart(2, "0")}`,
@@ -28,11 +30,9 @@ export function getProfile(user: User): ProfileInfo {
         occupation: user.occupation,
         interest: user.interests,
         location: user.location,
-        highestRank: user.rank_highest.rank.toLocaleString(),
-        highestRankTime: new Date(user.rank_highest.updated_at).getTime() / 1000,
         recommendedStarRating: (Math.pow(statistics.pp, 0.4) * 0.195).toFixed(2),
-        userJoinedAgo: (Math.floor((Date.now() - userJoinDate.valueOf()) / (1000 * 60 * 60 * 24 * 30)) / 12).toFixed(1),
-        formattedDate: userJoinDate.toLocaleDateString("en-US", {
+        joinedAgo: (Math.floor((Date.now() - userJoinDate.valueOf()) / (1000 * 60 * 60 * 24 * 30)) / 12).toFixed(1),
+        joinedAt: userJoinDate.toLocaleDateString("en-US", {
             hour: "2-digit",
             minute: "2-digit",
             year: "numeric",
