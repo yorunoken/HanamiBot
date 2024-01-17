@@ -1,7 +1,6 @@
 import { cryptr } from "..";
-import { ActionRow, Button } from "@lilybird/jsx";
-import { ButtonStyle, EmbedType } from "lilybird";
-import type { Client, Message } from "lilybird";
+import { ButtonStyle, EmbedType, ComponentType } from "lilybird";
+import type { Client, EmbedStructure, Message } from "lilybird";
 import type { Event } from "@lilybird/handlers";
 
 async function verifyUser(client: Client, message: Message): Promise<void> {
@@ -17,24 +16,29 @@ async function verifyUser(client: Client, message: Message): Promise<void> {
         type: EmbedType.Rich,
         title: "Welcome to the osu! verifier!",
         description: "Your Discord account is being linked to an osu! user. Please confirm it by pressing the `confirm` button below.\n\nIf you did not mean for this to happen, you can ignore this message.",
-        children: [
-            { data: { name: "disordId", value: discordId }, type: "field" },
-            { data: { name: "osuId", value: osuId }, type: "field" }
+        fields: [
+            { name: "disordId", value: discordId },
+            { name: "osuId", value: osuId }
         ]
-    };
 
-    const verifyButton = ActionRow({ children: Button({ id: "verify", label: "Confirm", style: ButtonStyle.Primary }) });
+    } as EmbedStructure;
 
-    await client.rest.createMessage(memberDm.id, { embeds: [embed], components: [verifyButton] });
+    await client.rest.createMessage(memberDm.id, {
+        embeds: [embed],
+        components: [
+            {
+                type: ComponentType.ActionRow,
+                components: [ { style: ButtonStyle.Primary, custom_id: "verify", label: "Confirm", type: ComponentType.Button } ]
+            }
+        ]
+    });
 }
 
 async function run(message: Message): Promise<void> {
-    const { client } = message;
+    if (message.channelId === "1193529619907891331")
+        await verifyUser(message.client, message);
 
-    if (message.channelId === "1193529619907891331") {
-        await verifyUser(client, message);
-        return;
-    }
+    return;
 }
 
 export default {

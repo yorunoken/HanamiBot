@@ -21,7 +21,7 @@ async function run(interaction: Interaction): Promise<void> {
 
             const user = await v2.user.details(osuId);
             if (!user.id) {
-                await interaction.editReply("It seems like this a user with this osu! ID doesn't exist.. They might've gotten banned.");
+                await interaction.editReply("It seems like this a user with this osu! ID doesn't exist.. might be a banned user...");
                 return;
             }
 
