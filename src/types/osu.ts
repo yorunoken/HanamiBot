@@ -1,15 +1,17 @@
-export type modes = "osu" | "mania" | "taiko" | "fruits";
+export type Modes = "osu" | "mania" | "taiko" | "fruits";
 
 export interface ProfileInfo {
     username: string;
     userCover: string;
-    userAvatar: string;
+    avatarUrl: string;
     userUrl: string;
     coverUrl: string;
-    userFlag: string;
+    flagUrl: string;
     countryCode: string;
     globalRank: string;
     countryRank: string;
+    peakGlobalRank: string;
+    peakGlobalRankTime: number;
     pp: string;
     rankedScore: string;
     totalScore: string;
@@ -17,11 +19,9 @@ export interface ProfileInfo {
     occupation: string;
     interest: string;
     location: string;
-    highestRank: string;
-    highestRankTime: number;
     recommendedStarRating: string;
-    userJoinedAgo: string;
-    formattedDate: string;
+    joinedAgo: string;
+    joinedAt: string;
     accuracy: string;
     level: string;
     playCount: string;
