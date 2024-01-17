@@ -17,7 +17,12 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     }
 
     const osuUser = await v2.user.details(user.banchoId, user.mode);
-    const embed = profileBuilder(osuUser);
+    if (!osuUser.id) {
+        await interaction.editReply("This user does not exist.");
+        return;
+    }
+
+    const embed = profileBuilder(osuUser, user.mode);
 
     await interaction.editReply({ embeds: [embed] });
 }
