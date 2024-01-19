@@ -1,4 +1,4 @@
-import { db } from "..";
+import db from "../data.db" with { type: "sqlite" };
 import type { DbUser } from "../types/database";
 
 interface Columns {
@@ -38,6 +38,8 @@ export function initializeDatabase(): void {
             }
         });
     });
+
+    console.log("Database up and running!");
 }
 
 export function getUser(id: string | number): DbUser | undefined {

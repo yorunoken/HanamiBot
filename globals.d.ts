@@ -6,3 +6,8 @@ declare module "bun" {
     ENCRYPT_SECRET: string;
   }
 }
+
+declare module "*.db" {
+    var db: import("bun:sqlite").Database;
+    export = db;
+}
