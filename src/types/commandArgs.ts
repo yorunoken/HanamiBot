@@ -29,7 +29,8 @@ interface Mods {
 }
 
 export interface ParsedArgs {
-    username: Array<string> | null;
+    tempUserDoNotUse: Array<string> | null;
+    user: User;
     flags: Record<string, string>;
     mods: Mods;
 }

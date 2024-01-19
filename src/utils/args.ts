@@ -33,9 +33,13 @@ export function getCommandArgs(interaction: Interaction<ApplicationCommandData> 
     return "" as unknown as CommandArgs;
 }
 
-export function parseOsuArguments(args: Array<string>): ParsedArgs {
+export function parseOsuArguments(message: Message, args: Array<string>, mode: Modes): ParsedArgs {
     const result: ParsedArgs = {
-        username: null,
+        tempUserDoNotUse: null,
+        user: {
+            type: "fail",
+            failMessage: "Please link your account to the bot using /link!"
+        },
         flags: {},
         mods: {
             exclude: null,
@@ -61,19 +65,44 @@ export function parseOsuArguments(args: Array<string>): ParsedArgs {
             continue;
         }
 
-        if (key && !value && quoteCounts < 2) { // Check if it's a username (key without value) and within quote limits
+        // Check if it's a username (key without value) and within quote limits
+        if (key && !value && quoteCounts < 2) {
             // Increase quote count if the key includes double-quotes
             // This is to select the first username in quotes
             if (key.includes('"')) quoteCounts++;
 
-            (result.username ??= []).push(key.replace(/"/g, ""));
-
+            (result.tempUserDoNotUse ??= []).push(key.replace(/"/g, ""));
             continue;
         }
 
-        if (key && value) {
-            //  Check if it's a "=" value
+        //  Check if it's a "=" value
+        if (key && value)
             result.flags[key] = value;
+    }
+
+    const userId = getUser(message.author.id)?.banchoId;
+
+    if (!result.tempUserDoNotUse && userId) {
+        result.user = {
+            type: "success",
+            banchoId: userId,
+            mode
+        };
+    } else if (result.tempUserDoNotUse) {
+        const discordUserId = (/<@!?(\d+)>/).exec(result.tempUserDoNotUse.join(" "))?.[1];
+        const discordUser = getUser(discordUserId ?? "")?.banchoId;
+
+        if (discordUserId && !discordUser) {
+            result.user = {
+                type: "fail",
+                failMessage: `The user <@${discordUserId}> hasn't linked their account to the bot yet!`
+            };
+        } else {
+            result.user = {
+                type: "success",
+                banchoId: discordUser ?? result.tempUserDoNotUse.join(" "),
+                mode
+            };
         }
     }
 
