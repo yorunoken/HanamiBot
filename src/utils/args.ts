@@ -55,14 +55,16 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
     for (const arg of args) {
         const [key, value] = arg.split("=");
 
-        const [, modType, mod, excl] = (/^(?!.*")([+-]?)([A-Z]+)(!)?$/).exec(arg) ?? [];
+        const [, modType, mod, force] = (/^(?!.*")([+-]?)([A-Za-z]+)(!)?$/).exec(arg) ?? [];
 
         if (mod) {
             result.mods.include = modType !== "-";
-            result.mods.exclude = modType === "-" && typeof excl !== "undefined";
-            result.mods.forceInclude = modType === "+" && typeof excl !== "undefined";
-            result.mods.name = mod.replaceAll(/\+|!|-/g, "");
-            continue;
+            result.mods.exclude = modType === "-" && typeof force !== "undefined";
+            result.mods.forceInclude = modType === "+" && typeof force !== "undefined";
+            if (result.mods.include || result.mods.exclude || result.mods.forceInclude) {
+                result.mods.name = mod.replaceAll(/\+|!|-/g, "");
+                continue;
+            }
         }
 
         // Check if it's a username (key without value) and within quote limits
