@@ -1,4 +1,4 @@
-import { loadMessageCommands } from "../utils/initalize";
+import { checkServers } from "../utils/initalize";
 import type { MessageCommands } from "../types/commands";
 import type { Event } from "@lilybird/handlers";
 
@@ -10,12 +10,9 @@ export function setMapData(aliasBool: boolean, key: string, value: MessageComman
 }
 
 export default {
-    event: "ready",
-    run: async (client) => {
-        console.log(`Successfully logged in as ${client.user.username} ✅`);
-        await loadMessageCommands();
-        console.log("Loaded message commands ✅");
-        // checkServers(client);
-        console.log("Checked for new servers ✅");
+    event: "guildCreate",
+    run: (guild) => {
+        console.log("New guild found!");
+        checkServers(undefined, [guild.id]);
     }
-} satisfies Event<"ready">;
+} satisfies Event<"guildCreate">;

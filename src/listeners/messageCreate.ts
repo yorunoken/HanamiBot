@@ -35,8 +35,19 @@ async function verifyUser(client: Client, message: Message): Promise<void> {
 }
 
 async function run(message: Message): Promise<void> {
-    if (message.channelId === "1193529619907891331")
+    if (message.channelId === "1193529619907891331") {
         await verifyUser(message.client, message);
+        return;
+    }
+
+    const channel = await message.fetchChannel();
+
+    // nyann :3333
+    const CHANCE_TO_SEND_CUTE_KITTY_CAT_I_LOVE_CATS = 0.6;
+    if ([":3", "3:"].some((item) => message.content === item) && Math.random() > CHANCE_TO_SEND_CUTE_KITTY_CAT_I_LOVE_CATS) {
+        await channel.send(message.content === ":3" ? "3:" : ":3");
+        return;
+    }
 
     return;
 }
