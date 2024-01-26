@@ -1,4 +1,4 @@
-import { initializeDatabase } from "./utils/database";
+import { initializeDatabase } from "./utils/initalize";
 import { createHandler } from "@lilybird/handlers";
 import { createClient, Intents } from "lilybird";
 import Cryptr from "cryptr";
@@ -6,17 +6,15 @@ import { auth } from "osu-api-extended";
 
 export const cryptr = new Cryptr(process.env.ENCRYPT_SECRET, { saltLength: 10 });
 
-initializeDatabase();
-
 // Make sure bubu will not crash
 process.on("unhandledRejection", console.error);
 process.on("uncaughtException", console.error);
 
+initializeDatabase();
+
 const listeners = await createHandler({
-    prefix: "!",
     dirs: {
         slashCommands: `${import.meta.dir}/commands`,
-        messageCommands: `${import.meta.dir}/commands-message`,
         listeners: `${import.meta.dir}/listeners`
     }
 });
