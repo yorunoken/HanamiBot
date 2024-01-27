@@ -1,7 +1,13 @@
 import { cryptr } from "..";
+import { DEFAULT_PREFIX } from "../utils/constants";
+import { getServer } from "../utils/database";
+import { commandAliases, messageCommands } from "../utils/initalize";
+import { prefixesCache } from "./guildCreate";
 import { ButtonStyle, EmbedType, ComponentType } from "lilybird";
 import type { Client, EmbedStructure, Message } from "lilybird";
 import type { Event } from "@lilybird/handlers";
+
+const cooldown = new Map();
 
 async function verifyUser(client: Client, message: Message): Promise<void> {
     const { content } = message;
@@ -40,7 +46,11 @@ async function run(message: Message): Promise<void> {
         return;
     }
 
+    const { content, guildId, client } = message;
+    if (!content || !guildId) return;
+
     const channel = await message.fetchChannel();
+    if (!channel.isText()) return;
 
     // nyann :3333
     const CHANCE_TO_SEND_CUTE_KITTY_CAT_I_LOVE_CATS = 0.6;
@@ -48,6 +58,55 @@ async function run(message: Message): Promise<void> {
         await channel.send(message.content === ":3" ? "3:" : ":3");
         return;
     }
+
+    const guild = getServer(guildId);
+    if (!guild) return;
+
+    const prefixes = prefixesCache.get(guildId) ?? DEFAULT_PREFIX;
+    console.log(prefixes);
+    const prefix = prefixes.find((item) => content.startsWith(item));
+
+    if (!prefix)
+        return;
+
+    const args = content.slice(prefix.length).trim().split(/ +/g);
+    let commandName = args.shift()?.toLowerCase();
+    if (!commandName) return;
+
+    let index: number | undefined;
+    const match = (/(\D+)(\d+)/).exec(commandName);
+    if (match) {
+        const [, extractedCommandName, extractedNumber] = match;
+        commandName = extractedCommandName;
+        index = parseInt(extractedNumber);
+    }
+
+    const alias = commandAliases.get(commandName);
+    const commandDefault = alias ? messageCommands.get(alias) : messageCommands.get(commandName);
+
+    if (!commandDefault) return;
+    const { default: command } = commandDefault;
+
+    if (cooldown.has(`${command.name}${message.author.id}`)) {
+        await message
+            .reply({
+                content: `${cooldown.get(`${command.name}${message.author.id}`)}ms`
+            })
+            .then((msg) => setTimeout(async () => msg.delete(), cooldown.get(`${command.name}${message.author.id}`) - Date.now()));
+        return;
+    }
+
+    await client.rest.triggerTypingIndicator(channel.id);
+    command.run({ client: client, message, args, prefix, index, commandName }).then(() => {
+        // I love eslint
+    }).catch(() => {
+        //
+    });
+
+    cooldown.set(`${command.name}${message.author.id}`, Date.now() + command.cooldown);
+    setTimeout(() => {
+        cooldown.delete(`${command.name}${message.author.id}`);
+    }, command.cooldown);
 
     return;
 }
