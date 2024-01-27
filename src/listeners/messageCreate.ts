@@ -63,7 +63,6 @@ async function run(message: Message): Promise<void> {
     if (!guild) return;
 
     const prefixes = prefixesCache.get(guildId) ?? DEFAULT_PREFIX;
-    console.log(prefixes);
     const prefix = prefixes.find((item) => content.startsWith(item));
 
     if (!prefix)
