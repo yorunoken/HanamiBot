@@ -5,6 +5,6 @@ export interface DbUser {
 
 export interface DbServer {
     id: string;
-    prefixes: string | Array<string> | null;
+    prefixes: Array<string> | string | null;
 }
 
