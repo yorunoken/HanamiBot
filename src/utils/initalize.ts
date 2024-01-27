@@ -1,33 +1,31 @@
-import { setMapData } from "../listeners/ready";
 import db from "../data.db" with { type: "sqlite" };
-import { getServer, insertData } from "./database";
 import { readdir } from "fs/promises";
-import type { Client } from "lilybird";
-import type { MessageCommands } from "../types/commands";
+import type { DefaultMessageCommands } from "../types/commands";
+
+export const messageCommands = new Map<string, DefaultMessageCommands>();
+export const commandAliases = new Map<string, string>();
 
 export async function loadMessageCommands(): Promise<void> {
     // Temporary array to store promises of MessageCommands
-    const temp: Array<Promise<MessageCommands>> = [];
+    const temp: Array<Promise<DefaultMessageCommands>> = [];
 
-    const items = await readdir("./src/commands-message", { recursive: true });
-    for (const item of items) {
-        // Split the path into category and command
-        const [category, cmd] = item.split("/");
-        if (!category || !cmd) continue; // Skip if category or command is missing
-
-        const command = import(`../commands-message/${category}/${cmd}`) as Promise<MessageCommands>;
+    const cmds = await readdir("./src/commands-message");
+    for (const cmd of cmds) {
+        const command = import(`../commands-message/${cmd}`) as Promise<DefaultMessageCommands>;
         temp.push(command);
     }
 
     const commands = await Promise.all(temp);
     for (const command of commands) {
+        const { default: cmd } = command;
+
         // Add the command to the command map
-        setMapData(false, command.name, command);
+        messageCommands.set(cmd.name, command);
 
         // Check if the command has aliases and add them to the command map
-        if (command.aliases.length > 0 && Array.isArray(command.aliases)) {
-            command.aliases.forEach((alias) => {
-                setMapData(true, alias, command.name);
+        if (cmd.aliases && cmd.aliases.length > 0 && Array.isArray(cmd.aliases)) {
+            cmd.aliases.forEach((alias) => {
+                commandAliases.set(alias, cmd.name);
             });
         }
     }
@@ -48,12 +46,15 @@ export function initializeDatabase(): void {
         { name: "servers", columns: ["id TEXT PRIMARY KEY", "prefixes TEXT"] }
     ];
 
-    // I promise I will make this prettier
-    tables.forEach((table) => {
+    for (const table of tables) {
+        // Create the Databases if they don't exist
         db.run(`CREATE TABLE IF NOT EXISTS ${table.name} (${table.columns.join(", ")});`);
+
+        //  Get all of the existing databases
         const existingColumns = db.prepare(`PRAGMA table_info(${table.name});`).all() as Array<Columns>;
 
-        table.columns.forEach((columnNameType) => {
+        // Loop through Columns and add/remove them
+        for (const columnNameType of table.columns) {
             const [columnName] = columnNameType.split(" ");
 
             const columnExists = existingColumns.some((col) => col.name === columnName);
@@ -62,9 +63,9 @@ export function initializeDatabase(): void {
                 db.run(`ALTER TABLE ${table.name} ADD COLUMN ${columnNameType};`);
                 console.log(`Added column ${columnName} in ${table.name} table`);
             }
-        });
+        }
 
-        existingColumns.forEach((col) => {
+        for (const col of existingColumns) {
             const columnName = col.name;
             const columnNotInTables = !table.columns.some((colType) => colType.startsWith(columnName));
 
@@ -72,22 +73,9 @@ export function initializeDatabase(): void {
                 db.run(`ALTER TABLE ${table.name} DROP COLUMN ${columnName};`);
                 console.log(`Removed column ${columnName} from ${table.name}`);
             }
-        });
-    });
+        }
+    }
 
     console.log("Database up and running!");
-}
-
-export function checkServers(client?: Client, guildsId?: Array<string | number>): void {
-    if (client)
-        guildsId = Array.from(client.guilds.keys());
-
-    if (!guildsId) return;
-
-    for (const guildId of guildsId) {
-        const document = getServer(guildId);
-        if (!document)
-            insertData({ table: "servers", id: guildId, data: [ { name: "prefixes", value: null } ] });
-    }
 }
 
