@@ -1,8 +1,11 @@
-import type { MessageCommand } from "@lilybird/handlers";
+import type { MessageCommands } from "../types/commands";
+import type { Message } from "lilybird";
 
 export default {
     name: "ping",
-    run: async (message) => {
+    description: "pong!!",
+    cooldown: 1000,
+    run: async ({ message }: { message: Message }) => {
         const newMessage = await message.reply({
             content: "🏓..."
         });
@@ -13,4 +16,4 @@ export default {
             content: `🏓 WebSocket: \`${ws}ms\` | Rest: \`${rest}ms\``
         });
     }
-} satisfies MessageCommand;
+} satisfies MessageCommands;

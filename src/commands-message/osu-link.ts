@@ -1,12 +1,14 @@
 import { linkSlash } from "../utils/constants";
+import type { MessageCommands } from "../types/commands";
 import type { Message } from "lilybird";
-import type { MessageCommand } from "@lilybird/handlers";
 
-async function run(message: Message): Promise<void> {
+async function run({ message }: { message: Message }): Promise<void> {
     await message.reply(`This command has been deprecated. Use ${linkSlash} instead.`);
 }
 
 export default {
     name: "link",
+    description: "Link your osu! account",
+    cooldown: 1000,
     run
-} satisfies MessageCommand;
+} satisfies MessageCommands;

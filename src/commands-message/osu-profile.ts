@@ -1,14 +1,14 @@
 import { parseOsuArguments } from "../utils/args";
 import { profileBuilder } from "../embed-builders/profile";
 import { v2 } from "osu-api-extended";
+import type { MessageCommands } from "../types/commands";
 import type { Modes } from "../types/osu";
 import type { Message } from "lilybird";
-import type { MessageCommand } from "@lilybird/handlers";
 
-async function run(message: Message, args: Array<string>, meta: { alias: string }): Promise<void> {
+async function run({ message, args, commandName }: { message: Message, args: Array<string>, commandName: string }): Promise<void> {
     const channel = await message.fetchChannel();
 
-    const { user } = parseOsuArguments(message, args, meta.alias as Modes);
+    const { user } = parseOsuArguments(message, args, commandName as Modes);
     if (user.type === "fail") {
         await channel.send(user.failMessage);
         return;
@@ -26,6 +26,8 @@ async function run(message: Message, args: Array<string>, meta: { alias: string 
 
 export default {
     name: "profile",
-    alias: ["osu", "mania", "taiko", "fruits"],
+    aliases: ["osu", "mania", "taiko", "fruits"],
+    description: "Display statistics of a user.",
+    cooldown: 1000,
     run
-} satisfies MessageCommand;
+} satisfies MessageCommands;
