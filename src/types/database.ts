@@ -8,3 +8,8 @@ export interface DbServer {
     prefixes: Array<string> | string | null;
 }
 
+export interface DbMap {
+    id: string;
+    data: string;
+}
+
