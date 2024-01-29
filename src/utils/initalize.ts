@@ -43,7 +43,8 @@ interface Columns {
 export function initializeDatabase(): void {
     const tables = [
         { name: "users", columns: ["id TEXT PRIMARY KEY", "banchoId TEXT"] },
-        { name: "servers", columns: ["id TEXT PRIMARY KEY", "prefixes TEXT"] }
+        { name: "servers", columns: ["id TEXT PRIMARY KEY", "prefixes TEXT"] },
+        { name: "maps", columns: ["id TEXT PRIMARY KEY", "data TEXT"] }
     ];
 
     for (const table of tables) {
