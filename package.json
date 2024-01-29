@@ -19,7 +19,9 @@
     "@lilybird/handlers": "^0.3.1",
     "@lilybird/jsx": "^0.2.0",
     "cryptr": "^6.3.0",
-    "lilybird": "^0.5.1",
-    "osu-api-extended": "^2.7.67"
+    "lilybird": "^0.5.2",
+    "osu-api-extended": "^2.7.67",
+    "osu-downloader": "^0.8.1",
+    "rosu-pp": "^0.9.4"
   }
 }
