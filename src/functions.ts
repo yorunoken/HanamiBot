@@ -58,7 +58,27 @@ export function getUser({ user, mode, locale }: { user: UserOsu; mode: osuModes;
   };
 }
 
-export async function getScore({ plays, index, mode, _isTops, isCompare, perfDetails, beatmap, file, locale }: { plays: ScoreResponse[]; index: number; mode: osuModes; _isTops?: boolean; isCompare?: boolean; perfDetails?: any; beatmap?: BeatmapResponse; file?: string; locale: Locales }): Promise<ScoreInfo> {
+export async function getScore({
+  plays,
+  index,
+  mode,
+  _isTops,
+  isCompare,
+  perfDetails,
+  beatmap,
+  file,
+  locale,
+}: {
+  plays: ScoreResponse[];
+  index: number;
+  mode: osuModes;
+  _isTops?: boolean;
+  isCompare?: boolean;
+  perfDetails?: any;
+  beatmap?: BeatmapResponse;
+  file?: string;
+  locale: Locales;
+}): Promise<ScoreInfo> {
   const play = plays[index];
   const rulesetId = rulesets[mode];
 
@@ -72,7 +92,9 @@ export async function getScore({ plays, index, mode, _isTops, isCompare, perfDet
 
   const { id: beatmapId, count_circles, count_sliders, count_spinners, hit_length, version } = play.beatmap;
   const { user_id: creatorId, creator: creatorUsername, status: mapStatus, id: mapsetId, artist, title } = play.beatmapset;
-  const { count_100, count_300, count_50, count_geki, count_katu, count_miss } = play.statistics;
+  let { count_100, count_300, count_50, count_geki, count_katu, count_miss } = play.statistics;
+  count_geki ??= 0;
+  count_katu ??= 0;
 
   const objectshit = count_300 + count_100 + count_50 + count_miss;
   const objects = count_circles + count_sliders + count_spinners;
@@ -149,27 +171,28 @@ export async function getScore({ plays, index, mode, _isTops, isCompare, perfDet
     pp: performance.curPerf?.pp.toFixed(2),
     fcPp: performance.fcPerf.pp.toFixed(2),
     ssPp: performance.maxPerf.pp.toFixed(2),
-    totalResult: `**${performance.curPerf?.pp.toFixed(2)}**/${performance.maxPerf.pp.toFixed(2)}pp • ${play.max_combo}x/${performance.maxPerf.difficulty.maxCombo}x • { **${rulesetId === 3 ? count_geki + "/" : ""}${count_300}**/${rulesetId === 3 ? count_katu + "/" : ""}${count_100}/${rulesetId === 1 ? "" : count_50 + "/"}${count_miss} }`,
-    ifFcValue: (performance.curPerf as any).effectiveMissCount > 0
-      ? locale.classes.ifFc(
-        `**${
-          tools
-            .accuracy(
-              {
-                300: (objects - count_100 - count_50).toString(),
-                geki: count_geki.toString(),
-                100: count_100.toString(),
-                katu: count_katu.toString(),
-                50: count_50.toString(),
-                0: "0",
-              },
-              mode,
-            )
-            .toFixed(2)
-        }%**`,
-        `**${performance.fcPerf.pp.toFixed(2)}**`,
-      )
-      : "",
+    totalResult: `**${performance.curPerf?.pp.toFixed(2)}**/${performance.maxPerf.pp.toFixed(2)}pp • ${play.max_combo}x/${performance.maxPerf.difficulty.maxCombo}x • { **${rulesetId === 3 ? count_geki + "/" : ""}${count_300}**/${
+      rulesetId === 3 ? count_katu + "/" : ""
+    }${count_100}/${rulesetId === 1 ? "" : count_50 + "/"}${count_miss} }`,
+    ifFcValue:
+      (performance.curPerf as any).effectiveMissCount > 0
+        ? locale.classes.ifFc(
+            `**${tools
+              .accuracy(
+                {
+                  300: (objects - count_100 - count_50).toString(),
+                  geki: count_geki.toString(),
+                  100: count_100.toString(),
+                  katu: count_katu.toString(),
+                  50: count_50.toString(),
+                  0: "0",
+                },
+                mode
+              )
+              .toFixed(2)}%**`,
+            `**${performance.fcPerf.pp.toFixed(2)}**`
+          )
+        : "",
   };
 }
 
@@ -216,18 +239,15 @@ export async function getBeatmap(map: BeatmapResponse, valueOptions: { mods: str
     favorited: map.beatmapset.favourite_count.toLocaleString(),
     playCount: map.beatmapset.play_count.toLocaleString(),
     ppValues: `\`\`\`Acc | PP\n100%: ${performance[100].fcPerf.pp.toFixed()}pp\n99%:  ${performance[99].fcPerf.pp.toFixed()}pp\n98%:  ${performance[98].fcPerf.pp.toFixed()}pp\n95%:  ${performance[95].fcPerf.pp.toFixed()}pp\`\`\``,
-    links:
-      `<:chimu:1117792339549761576>[Chimu](https://chimu.moe/d/${map.beatmapset_id})\n<:beatconnect:1075915329512931469>[Beatconnect](https://beatconnect.io/b/${map.beatmapset_id})\n:notes:[${locale.classes.songPreview}](https://b.ppy.sh/preview/${map.beatmapset_id}.mp3)\n🎬[${locale.classes.mapPreview}](https://osu.pages.dev/preview#${map.id})\n🖼️[${locale.classes.fullBackground}](https://assets.ppy.sh/beatmaps/${map.beatmapset_id}/covers/raw.jpg)`,
+    links: `<:chimu:1117792339549761576>[Chimu](https://chimu.moe/d/${map.beatmapset_id})\n<:beatconnect:1075915329512931469>[Beatconnect](https://beatconnect.io/b/${map.beatmapset_id})\n:notes:[${locale.classes.songPreview}](https://b.ppy.sh/preview/${map.beatmapset_id}.mp3)\n🎬[${locale.classes.mapPreview}](https://osu.pages.dev/preview#${map.id})\n🖼️[${locale.classes.fullBackground}](https://assets.ppy.sh/beatmaps/${map.beatmapset_id}/covers/raw.jpg)`,
     background: `https://assets.ppy.sh/beatmaps/${map.beatmapset_id}/covers/cover.jpg`,
 
-    updatedAt: `${locale.classes[map.status as "ranked" | "qualified" | "loved"]} ${
-      new Date(map.last_updated).toLocaleDateString(locale.code, {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    }`,
+    updatedAt: `${locale.classes[map.status as "ranked" | "qualified" | "loved"]} ${new Date(map.last_updated).toLocaleDateString(locale.code, {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })}`,
     modeEmoji: osuEmojis[map.mode],
   };
 }

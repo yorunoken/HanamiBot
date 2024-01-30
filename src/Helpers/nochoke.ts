@@ -5,7 +5,24 @@ import { response as UserResponse } from "osu-api-extended/dist/types/v2_user_de
 import { downloadingMapUserCache, updateDownloadingCache } from "../cache";
 import { getUser } from "../functions";
 import { commands, ExtendedClient, Locales, noChokePlayDetails, osuModes } from "../Structure/index";
-import { buildActionRow, buttonBoolsTops, calculateWeightedScores, downloadMap, firstButton, getMapsInBulk, getPerformanceDetails, getUsernameFromArgs, grades, insertDataBulk, Interactionhandler, lastButton, nextButton, previousButton, rulesets, specifyButton } from "../utils";
+import {
+  buildActionRow,
+  buttonBoolsTops,
+  calculateWeightedScores,
+  downloadMap,
+  firstButton,
+  getMapsInBulk,
+  getPerformanceDetails,
+  getUsernameFromArgs,
+  grades,
+  insertDataBulk,
+  Interactionhandler,
+  lastButton,
+  nextButton,
+  previousButton,
+  rulesets,
+  specifyButton,
+} from "../utils";
 
 export async function start({ interaction, args, mode, client, locale }: { interaction: Message | ChatInputCommandInteraction; args?: string[]; mode?: osuModes; client: ExtendedClient; locale: Locales }) {
   const interactionOptions = Interactionhandler(interaction, args);
@@ -48,7 +65,11 @@ async function getNoChoke(interactionOptions: any, client: ExtendedClient, plays
       performance.mapId = map.id;
       performance.playInfo.play = play;
       performance.playInfo.misses = misses;
-      performance.playInfo.grade = tools.rank({ "0": "0", "100": statistics.count_100.toString(), "300": statistics.count_300.toString(), "50": statistics.count_50.toString(), geki: statistics.count_geki.toString(), katu: statistics.count_katu.toString() }, "DT", mode);
+      performance.playInfo.grade = tools.rank(
+        { "0": "0", "100": statistics.count_100.toString(), "300": statistics.count_300.toString(), "50": statistics.count_50.toString(), geki: (statistics.count_geki ?? 0).toString(), katu: (statistics.count_katu ?? 0).toString() },
+        "DT",
+        mode
+      );
 
       return performance;
     })
@@ -105,28 +126,36 @@ async function getSubsequentPlays({ user, plays, page, mode, locale }: { user: U
     const { count_100, count_300, count_50, count_geki, count_katu, count_miss } = play.statistics;
     const mods = options.playInfo.play.mods;
 
-    const accValues = `{ **${rulesetId === 3 ? count_geki + "/" : ""}${count_300}**/${rulesetId === 3 ? count_katu + "/" : ""}${count_100}/${rulesetId === 1 ? "" : count_50 + "/"}~~${count_miss}~~ } **•** Removed ${options.playInfo.misses} <:hit00:1061254490075955231>`;
+    const accValues = `{ **${rulesetId === 3 ? count_geki + "/" : ""}${count_300}**/${rulesetId === 3 ? count_katu + "/" : ""}${count_100}/${rulesetId === 1 ? "" : count_50 + "/"}~~${count_miss}~~ } **•** Removed ${
+      options.playInfo.misses
+    } <:hit00:1061254490075955231>`;
 
-    const textRow1 = `\n**#${i + 1} __~~[${play.position}]~~__ [${play.beatmapset.title} [${play.beatmap.version}]](https://osu.ppy.sh/b/${play.beatmap.id})** **+${mods.length > 0 ? mods.join("") : "NM"}** [${options.maxPerf.difficulty.stars.toFixed(2)}★]\n`;
-    const textRow2 = `${grades[options.playInfo.grade]} ~~${play.pp}~~ ➜ **${options.fcPerf.pp.toFixed(2)}pp** **(${(play.accuracy * 100).toFixed(2)}%)**\n>> [${play.max_combo} ➜ ${options.maxPerf.difficulty.maxCombo}x / ${options.maxPerf.difficulty.maxCombo}x] <t:${new Date(play.created_at).getTime() / 1000}:R>\n`;
+    const textRow1 = `\n**#${i + 1} __~~[${play.position}]~~__ [${play.beatmapset.title} [${play.beatmap.version}]](https://osu.ppy.sh/b/${play.beatmap.id})** **+${mods.length > 0 ? mods.join("") : "NM"}** [${options.maxPerf.difficulty.stars.toFixed(
+      2
+    )}★]\n`;
+    const textRow2 = `${grades[options.playInfo.grade]} ~~${play.pp}~~ ➜ **${options.fcPerf.pp.toFixed(2)}pp** **(${(play.accuracy * 100).toFixed(2)}%)**\n>> [${play.max_combo} ➜ ${options.maxPerf.difficulty.maxCombo}x / ${
+      options.maxPerf.difficulty.maxCombo
+    }x] <t:${new Date(play.created_at).getTime() / 1000}:R>\n`;
     const textRow3 = `>> ${play.score.toLocaleString()} ${accValues}`;
     description.push(textRow1 + textRow2 + textRow3);
   }
 
   const newTotalPp = calculateWeightedScores({ user, plays });
   return new EmbedBuilder()
-    .setAuthor({ url: userDetails.userUrl, name: `${userDetails.username}: ${userDetails.pp} (#${userDetails.globalRank} ${userDetails.countryCode.toUpperCase()}#${userDetails.countryRank})`, iconURL: `https://osu.ppy.sh/images/flags/${userDetails.countryCode.toUpperCase()}.png` })
+    .setAuthor({
+      url: userDetails.userUrl,
+      name: `${userDetails.username}: ${userDetails.pp} (#${userDetails.globalRank} ${userDetails.countryCode.toUpperCase()}#${userDetails.countryRank})`,
+      iconURL: `https://osu.ppy.sh/images/flags/${userDetails.countryCode.toUpperCase()}.png`,
+    })
     .setTitle(`Total PP: ${user.statistics.pp.toFixed(2)}pp ➜ ${newTotalPp.toFixed(2)}pp (+${(newTotalPp - user.statistics.pp).toFixed(2)})`)
     .setThumbnail(userDetails.userAvatar)
     .setDescription(description.join(""))
     .setFooter({
-      text: `${locale.embeds.page(`${page + 1}/${Math.ceil(plays.length / 5)}`)} • ${
-        locale.embeds.nochoke.approximateRank(
-          newTotalPp.toFixed(2),
-          await fetch(`https://osudaily.net/api/pp.php?k=${Bun.env.OSU_DAILY_API}&m=${rulesetId}&t=pp&v=${newTotalPp}`)
-            .then((res) => res.json())
-            .then((res: any) => res?.rank?.toLocaleString()),
-        )
-      } `,
+      text: `${locale.embeds.page(`${page + 1}/${Math.ceil(plays.length / 5)}`)} • ${locale.embeds.nochoke.approximateRank(
+        newTotalPp.toFixed(2),
+        await fetch(`https://osudaily.net/api/pp.php?k=${Bun.env.OSU_DAILY_API}&m=${rulesetId}&t=pp&v=${newTotalPp}`)
+          .then((res) => res.json())
+          .then((res: any) => res?.rank?.toLocaleString())
+      )} `,
     });
 }
