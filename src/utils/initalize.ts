@@ -1,17 +1,20 @@
 import db from "../data.db" with { type: "sqlite" };
 import { readdir } from "fs/promises";
-import type { DefaultMessageCommands } from "../types/commands";
+import type { DefaultMessageCommand } from "../types/commands";
 
-export const messageCommands = new Map<string, DefaultMessageCommands>();
+export const messageCommands = new Map<string, DefaultMessageCommand>();
 export const commandAliases = new Map<string, string>();
 
 export async function loadMessageCommands(): Promise<void> {
     // Temporary array to store promises of MessageCommands
-    const temp: Array<Promise<DefaultMessageCommands>> = [];
+    const temp: Array<Promise<DefaultMessageCommand>> = [];
 
-    const cmds = await readdir("./src/commands-message");
-    for (const cmd of cmds) {
-        const command = import(`../commands-message/${cmd}`) as Promise<DefaultMessageCommands>;
+    const items = await readdir("./src/commands-message", { recursive: true });
+    for (const item of items) {
+        const [category, cmd] = item.split("/");
+        if (!category || !cmd) continue;
+
+        const command = import(`../commands-message/${category}/${cmd}`) as Promise<DefaultMessageCommand>;
         temp.push(command);
     }
 
