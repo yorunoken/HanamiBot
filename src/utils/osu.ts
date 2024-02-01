@@ -2,9 +2,9 @@ import { getMap } from "./database";
 import { Beatmap, Calculator } from "rosu-pp";
 import { mods } from "osu-api-extended";
 import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
+import type { UserBestScore, UserScore } from "osu-web.js";
 import type { AccessTokenJson, AuthScope } from "../types/osu";
 import type { MapAttributes, PerformanceAttributes, Score as ScoreData } from "rosu-pp";
-import type { response as ScoreDetails } from "osu-api-extended/dist/types/v2_scores_details";
 
 /**
  * Build OAuth authorization URL for osu! using the provided parameters.
@@ -62,7 +62,7 @@ Promise<{
 }
 
 export async function getPerformanceResults({ play, maxCombo, hitValues }:
-{ play: ScoreDetails,
+{ play: UserBestScore | UserScore,
     maxCombo?: number,
     hitValues: { count_100?: number, count_300?: number, count_50?: number, count_geki?: number, count_katu?: number, count_miss?: number }
 }): Promise<{ mapValues: MapAttributes,
@@ -70,7 +70,7 @@ export async function getPerformanceResults({ play, maxCombo, hitValues }:
     currentPerformance: PerformanceAttributes,
     fcPerformance: PerformanceAttributes,
     mapId: number } | null> {
-    const { beatmap: map, ruleset_id: rulesetId } = play;
+    const { beatmap: map, mode_int: rulesetId } = play;
     const mapData = getMap(map.id)?.data ?? (await downloadBeatmap([map.id]))[0].contents;
     if (!mapData) return null;
 

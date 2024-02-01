@@ -1,6 +1,6 @@
 import { getPerformanceResults } from "../utils/osu";
+import type { UserBestScore, UserScore } from "osu-web.js";
 import type { Modes } from "../types/osu";
-import type { response as Score } from "osu-api-extended/dist/types/v2_scores_details";
 
 interface HitValues {
     h320: null | number;
@@ -11,7 +11,7 @@ interface HitValues {
     hMiss: null | number;
 }
 
-export async function getScore({ scores, index, mode, getPerformance }: { scores: Array<Score>, index: number, mode: Modes, getPerformance: boolean }) {
+export async function getScore({ scores, index, mode, getPerformance }: { scores: Array<UserBestScore> | Array<UserScore>, index: number, mode: Modes, getPerformance: boolean }) {
     const play = scores[index];
 
     const { score, accuracy, statistics, beatmap } = play;
