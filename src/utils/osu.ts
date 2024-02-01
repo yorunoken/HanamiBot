@@ -31,17 +31,16 @@ export async function getPerformanceResults({ play, maxCombo, hitValues }:
     currentPerformance: PerformanceAttributes,
     fcPerformance: PerformanceAttributes,
     mapId: number } | null> {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { beatmap: map, mode_int } = play;
+    const { beatmap: map, mode_int: rulesetId } = play;
     const mapData = getMap(map.id)?.data ?? (await downloadBeatmap([map.id]))[0].contents;
     if (!mapData) return null;
 
     let { count_100: count100 = 0, count_300: count300 = 0, count_50: count50 = 0, count_geki: countGeki = 0, count_katu: countKatu = 0, count_miss: countMiss = 0 } = hitValues;
-    countGeki = [2, 3].includes(mode_int) ? countGeki : 0;
-    countKatu = [2, 3].includes(mode_int) ? countKatu : 0;
+    countGeki = [2, 3].includes(rulesetId) ? countGeki : 0;
+    countKatu = [2, 3].includes(rulesetId) ? countKatu : 0;
 
     const calculatorData: ScoreData = {
-        mode: mode_int,
+        mode: rulesetId,
         mods: mods.id(play.mods.join(""))
     };
 
