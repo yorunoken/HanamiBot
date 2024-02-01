@@ -1,6 +1,6 @@
-import { getServer, insertData } from "../utils/database";
-import { DEFAULT_PREFIX, MAX_AMOUNT_OF_PREFIXES } from "../utils/constants";
-import { updatePrefixCache } from "../listeners/guildCreate";
+import { getServer, insertData } from "../../utils/database";
+import { DEFAULT_PREFIX, MAX_AMOUNT_OF_PREFIXES } from "../../utils/constants";
+import { updatePrefixCache } from "../../listeners/guildCreate";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { ApplicationCommandData, GuildInteraction, Interaction } from "lilybird";
 import type { SlashCommand } from "@lilybird/handlers";

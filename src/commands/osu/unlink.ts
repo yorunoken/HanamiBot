@@ -1,5 +1,5 @@
-import { getUser, removeUser } from "../utils/database";
-import { linkSlash } from "../utils/constants";
+import { getUser, removeUser } from "../../utils/database";
+import { linkSlash } from "../../utils/constants";
 import type { SlashCommand } from "@lilybird/handlers";
 import type { ApplicationCommandData, Interaction } from "lilybird";
 

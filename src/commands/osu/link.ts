@@ -1,6 +1,6 @@
-import { cryptr } from "..";
-import { buildAuthUrl } from "../utils/osu";
-import type { authScope } from "../types/osu";
+import { cryptr } from "../..";
+import { buildAuthUrl } from "../../utils/osu";
+import type { authScope } from "../../types/osu";
 import type { SlashCommand } from "@lilybird/handlers";
 import type { ApplicationCommandData, Interaction } from "lilybird";
 

@@ -1,5 +1,5 @@
-import { unlinkSlash } from "../utils/constants";
-import type { MessageCommands } from "../types/commands";
+import { unlinkSlash } from "../../utils/constants";
+import type { MessageCommands } from "../../types/commands";
 import type { Message } from "lilybird";
 
 async function run({ message }: { message: Message }): Promise<void> {

@@ -1,8 +1,8 @@
-import { parseOsuArguments } from "../utils/args";
-import { profileBuilder } from "../embed-builders/profile";
+import { parseOsuArguments } from "../../utils/args";
+import { profileBuilder } from "../../embed-builders/profile";
 import { v2 } from "osu-api-extended";
-import type { MessageCommands } from "../types/commands";
-import type { Modes } from "../types/osu";
+import type { MessageCommands } from "../../types/commands";
+import type { Modes } from "../../types/osu";
 import type { Message } from "lilybird";
 
 async function run({ message, args, commandName }: { message: Message, args: Array<string>, commandName: string }): Promise<void> {

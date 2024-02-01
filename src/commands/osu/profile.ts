@@ -1,5 +1,5 @@
-import { getCommandArgs } from "../utils/args";
-import { profileBuilder } from "../embed-builders/profile";
+import { getCommandArgs } from "../../utils/args";
+import { profileBuilder } from "../../embed-builders/profile";
 import { ApplicationCommandOptionType } from "lilybird";
 import { v2 } from "osu-api-extended";
 import type { ApplicationCommandData, Interaction } from "lilybird";

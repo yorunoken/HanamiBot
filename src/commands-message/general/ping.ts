@@ -1,4 +1,4 @@
-import type { MessageCommands } from "../types/commands";
+import type { MessageCommands } from "../../types/commands";
 import type { Message } from "lilybird";
 
 export default {
