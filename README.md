@@ -16,7 +16,7 @@ use `/help` in your server for more information.
 
 ## Contributing
 
-To start contributing, you either need to be on a UNIX operating system (Linux, MacOS, etc.) or you need to use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) (Windows Subsystem for Linux) to instal [Bun](https://bun.sh/)
+To start contributing, you either need to be on a UNIX operating system (Linux, MacOS, etc.) or you need to use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) (Windows Subsystem for Linux) to install [Bun](https://bun.sh/)
 
 1. Install Bun using curl
    - `curl -fsSL https://bun.sh/install | bash`
