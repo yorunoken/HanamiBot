@@ -4,7 +4,8 @@
   "name": "hanamibot",
   "type": "module",
   "scripts": {
-    "start": "bun src/index.ts"
+    "start": "bun src/index.ts",
+    "db": "bun tools/database.ts"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^1.5.0",
