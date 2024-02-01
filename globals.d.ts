@@ -4,6 +4,7 @@ declare module "bun" {
     CLIENT_SECRET: string;
     CLIENT_ID: string;
     ENCRYPT_SECRET: string;
+    CALLBACK_URL: string;
   }
 }
 

@@ -34,3 +34,5 @@ export interface ProfileInfo {
     rankSh: string;
     rankSsh: string;
 }
+
+export type authScope = "public" | "chat.write" | "delegate" | "forum.write" | "friends.read" | "identify";

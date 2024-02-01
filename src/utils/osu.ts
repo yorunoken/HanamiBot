@@ -2,8 +2,25 @@ import { getMap } from "./database";
 import { Beatmap, Calculator } from "rosu-pp";
 import { mods } from "osu-api-extended";
 import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
+import type { authScope } from "../types/osu";
 import type { MapAttributes, PerformanceAttributes, Score as ScoreData } from "rosu-pp";
 import type { response as ScoreDetails } from "osu-api-extended/dist/types/v2_scores_details";
+
+export function buildAuthUrl(clientId: string | number, callbackUri: string, scope: Array<authScope>, state?: string): string {
+    const url = new URL("https://osu.ppy.sh/oauth/authorize");
+    const params: Record<string, string> = {
+        client_id: clientId.toString(),
+        redirect_uri: callbackUri,
+        response_type: "code",
+        scope: scope.join(" "),
+        state: state ?? ""
+    };
+
+    Object.keys(params)
+        .forEach((key) => { url.searchParams.append(key, params[key]); });
+
+    return url.href;
+}
 
 export async function getPerformanceResults({ play, maxCombo, hitValues }:
 { play: ScoreDetails,
