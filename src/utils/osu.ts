@@ -6,8 +6,19 @@ import type { authScope } from "../types/osu";
 import type { MapAttributes, PerformanceAttributes, Score as ScoreData } from "rosu-pp";
 import type { response as ScoreDetails } from "osu-api-extended/dist/types/v2_scores_details";
 
+/**
+ * Build OAuth authorization URL for osu! using the provided parameters.
+ * @param clientId - Client ID for the application.
+ * @param callbackUri - Redirect URI where the authorization code will be sent.
+ * @param scope - Array of authorization scopes.
+ * @param state - Optional parameter for preserving state between the request and callback.
+ * @returns Fully constructed authorization URL.
+ */
 export function buildAuthUrl(clientId: string | number, callbackUri: string, scope: Array<authScope>, state?: string): string {
+    // Create a new URL to later append parameters.
     const url = new URL("https://osu.ppy.sh/oauth/authorize");
+
+    // Initialize parameters
     const params: Record<string, string> = {
         client_id: clientId.toString(),
         redirect_uri: callbackUri,
@@ -16,8 +27,8 @@ export function buildAuthUrl(clientId: string | number, callbackUri: string, sco
         state: state ?? ""
     };
 
-    Object.keys(params)
-        .forEach((key) => { url.searchParams.append(key, params[key]); });
+    // Append parameters to URL.
+    for (const [key, value] of Object.entries(params)) url.searchParams.append(key, value);
 
     return url.href;
 }
@@ -31,7 +42,7 @@ export async function getPerformanceResults({ play, maxCombo, hitValues }:
     currentPerformance: PerformanceAttributes,
     fcPerformance: PerformanceAttributes,
     mapId: number } | null> {
-    const { beatmap: map, mode_int: rulesetId } = play;
+    const { beatmap: map, ruleset_id: rulesetId } = play;
     const mapData = getMap(map.id)?.data ?? (await downloadBeatmap([map.id]))[0].contents;
     if (!mapData) return null;
 
