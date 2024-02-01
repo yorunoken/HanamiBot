@@ -1,6 +1,11 @@
 import db from "../data.db" with { type: "sqlite" };
+import { getAccessToken } from "./osu";
+import { Client } from "osu-web.js";
 import { readdir } from "fs/promises";
 import type { DefaultMessageCommand } from "../types/commands";
+
+const access = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
+export const client = new Client(access.access_token);
 
 export const messageCommands = new Map<string, DefaultMessageCommand>();
 export const commandAliases = new Map<string, string>();

@@ -1,6 +1,6 @@
 import { parseOsuArguments } from "../../utils/args";
 import { profileBuilder } from "../../embed-builders/profile";
-import { v2 } from "osu-api-extended";
+import { client } from "../../utils/initalize";
 import type { MessageCommand } from "../../types/commands";
 import type { Modes } from "../../types/osu";
 import type { Message } from "lilybird";
@@ -14,7 +14,7 @@ async function run({ message, args, commandName }: { message: Message, args: Arr
         return;
     }
 
-    const osuUser = await v2.user.details(user.banchoId, user.mode);
+    const osuUser = await client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } });
     if (!osuUser.id) {
         await channel.send("This user does not exist.");
         return;

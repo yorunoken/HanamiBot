@@ -16,9 +16,9 @@ export interface ProfileInfo {
     rankedScore: string;
     totalScore: string;
     objectsHit: string;
-    occupation: string;
-    interest: string;
-    location: string;
+    occupation: string | null;
+    interest: string | null;
+    location: string | null;
     recommendedStarRating: string;
     joinedAgo: string;
     joinedAt: string;
@@ -35,4 +35,9 @@ export interface ProfileInfo {
     rankSsh: string;
 }
 
-export type authScope = "public" | "chat.write" | "delegate" | "forum.write" | "friends.read" | "identify";
+export type AuthScope = "public" | "chat.write" | "delegate" | "forum.write" | "friends.read" | "identify";
+
+export interface AccessTokenJson {
+    access_token: string;
+    expires_in: string;
+}

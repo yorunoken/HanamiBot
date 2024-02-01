@@ -2,7 +2,7 @@ import { getMap } from "./database";
 import { Beatmap, Calculator } from "rosu-pp";
 import { mods } from "osu-api-extended";
 import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
-import type { authScope } from "../types/osu";
+import type { AccessTokenJson, AuthScope } from "../types/osu";
 import type { MapAttributes, PerformanceAttributes, Score as ScoreData } from "rosu-pp";
 import type { response as ScoreDetails } from "osu-api-extended/dist/types/v2_scores_details";
 
@@ -14,7 +14,7 @@ import type { response as ScoreDetails } from "osu-api-extended/dist/types/v2_sc
  * @param state - Optional parameter for preserving state between the request and callback.
  * @returns Fully constructed authorization URL.
  */
-export function buildAuthUrl(clientId: string | number, callbackUri: string, scope: Array<authScope>, state?: string): string {
+export function buildAuthUrl(clientId: string | number, callbackUri: string, scope: Array<AuthScope>, state?: string): string {
     // Create a new URL to later append parameters.
     const url = new URL("https://osu.ppy.sh/oauth/authorize");
 
@@ -31,6 +31,34 @@ export function buildAuthUrl(clientId: string | number, callbackUri: string, sco
     for (const [key, value] of Object.entries(params)) url.searchParams.append(key, value);
 
     return url.href;
+}
+
+export async function getAccessToken(clientId: number, clientSecret: string, scope: Array<AuthScope>):
+Promise<{
+    access_token: string,
+    expires_in: string
+}> {
+    const body = JSON.stringify({
+        grant_type: "client_credentials",
+        client_id: clientId,
+        client_secret: clientSecret,
+        scope: scope.join(" "),
+        code: "code"
+    });
+
+    const data = await fetch("https://osu.ppy.sh/oauth/token", {
+        method: "POST",
+        headers: {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            "Content-Type": "application/json"
+        },
+        body
+    }).then(async (res) => res.json()) as AccessTokenJson;
+
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const { access_token, expires_in } = data;
+
+    return { access_token, expires_in };
 }
 
 export async function getPerformanceResults({ play, maxCombo, hitValues }:
