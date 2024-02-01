@@ -2,12 +2,19 @@
 
 Hello! This is Hanami, a Discord bot written in TypeScript, using the Bun runtime engine.
 
-I mainly wrote this bot for my friends, but realized the potential it had, and decided to expand it. (Like no one else has writte an osu! Discord bot before, lol.)
+I mainly wrote this bot for my friends, but realized the potential it had, and decided to expand it. (Like no one else has written an osu! Discord bot before, lol.)
+
+---
 
 So now, we're here. Hopefuly it meets your expectations.
+
 If you're here to contribute/look at the code, welcome!
+
 Although, the code is not very well documented, I tried my best!
+
 Feel free to open up an issue/pull request over at the main [repository](https://github.com/YoruNoKen/HanamiBot)
+
+---
 
 Probably wasn't needed, but this project is liscenced with [Apache version 2.0](http://www.apache.org/licenses)!
 
