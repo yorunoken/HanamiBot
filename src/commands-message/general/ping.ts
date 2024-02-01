@@ -1,4 +1,4 @@
-import type { MessageCommands } from "../../types/commands";
+import type { MessageCommand } from "../../types/commands";
 import type { Message } from "lilybird";
 
 export default {
@@ -16,4 +16,4 @@ export default {
             content: `🏓 WebSocket: \`${ws}ms\` | Rest: \`${rest}ms\``
         });
     }
-} satisfies MessageCommands;
+} satisfies MessageCommand;

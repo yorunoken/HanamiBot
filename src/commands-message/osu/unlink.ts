@@ -1,5 +1,5 @@
 import { unlinkSlash } from "../../utils/constants";
-import type { MessageCommands } from "../../types/commands";
+import type { MessageCommand } from "../../types/commands";
 import type { Message } from "lilybird";
 
 async function run({ message }: { message: Message }): Promise<void> {
@@ -11,4 +11,4 @@ export default {
     description: "Unlink your account from the bot.",
     cooldown: 1000,
     run
-} satisfies MessageCommands;
+} satisfies MessageCommand;

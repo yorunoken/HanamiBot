@@ -1,7 +1,7 @@
 import { parseOsuArguments } from "../../utils/args";
 import { profileBuilder } from "../../embed-builders/profile";
 import { v2 } from "osu-api-extended";
-import type { MessageCommands } from "../../types/commands";
+import type { MessageCommand } from "../../types/commands";
 import type { Modes } from "../../types/osu";
 import type { Message } from "lilybird";
 
@@ -30,4 +30,4 @@ export default {
     description: "Display statistics of a user.",
     cooldown: 1000,
     run
-} satisfies MessageCommands;
+} satisfies MessageCommand;
