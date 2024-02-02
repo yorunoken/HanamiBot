@@ -25,7 +25,7 @@ export function profileBuilder(user: UserExtended, mode: Modes): EmbedStructure 
         },
         {
             name: "Grades :mortar_board:",
-            value: `${grades.XH}\`${profile.rankSsh}\` ${grades.X}\`${profile.rankSs}\` ${grades.SH}\`${profile.rankSh}\` ${grades.S}\`${profile.rankS}\` ${grades.A}\`${profile.rankA}\``,
+            value: `${grades.SSH}\`${profile.rankSsh}\` ${grades.SS}\`${profile.rankSs}\` ${grades.SH}\`${profile.rankSh}\` ${grades.S}\`${profile.rankS}\` ${grades.A}\`${profile.rankA}\``,
             inline: false
         }
     ] as Array<EmbedFieldStructure>;
