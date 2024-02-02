@@ -1,10 +1,11 @@
+/* eslint-disable @stylistic/no-mixed-operators */
 import { getMap } from "./database";
 import { Beatmap, Calculator } from "rosu-pp";
-import { mods } from "osu-api-extended";
+import { mods as modsCalc } from "osu-api-extended";
 import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
 import type { UserBestScore, UserScore } from "osu-web.js";
-import type { AccessTokenJson, AuthScope } from "../types/osu";
-import type { MapAttributes, PerformanceAttributes, Score as ScoreData } from "rosu-pp";
+import type { AccessTokenJson, AuthScope, Modes, PerformanceInfo } from "../types/osu";
+import type { Score as ScoreData } from "rosu-pp";
 
 /**
  * Build OAuth authorization URL for osu! using the provided parameters.
@@ -61,15 +62,12 @@ Promise<{
     return { access_token, expires_in };
 }
 
-export async function getPerformanceResults({ play, maxCombo, hitValues }:
+export async function getPerformanceResults({ play, maxCombo, hitValues, mods }:
 { play: UserBestScore | UserScore,
     maxCombo?: number,
-    hitValues: { count_100?: number, count_300?: number, count_50?: number, count_geki?: number, count_katu?: number, count_miss?: number }
-}): Promise<{ mapValues: MapAttributes,
-    perfectPerformance: PerformanceAttributes,
-    currentPerformance: PerformanceAttributes,
-    fcPerformance: PerformanceAttributes,
-    mapId: number } | null> {
+    hitValues: { count_100?: number, count_300?: number, count_50?: number, count_geki?: number, count_katu?: number, count_miss?: number },
+    mods: Array<string>
+}): Promise<PerformanceInfo | null> {
     const { beatmap: map, mode_int: rulesetId } = play;
     const mapData = getMap(map.id)?.data ?? (await downloadBeatmap([map.id]))[0].contents;
     if (!mapData) return null;
@@ -80,7 +78,7 @@ export async function getPerformanceResults({ play, maxCombo, hitValues }:
 
     const calculatorData: ScoreData = {
         mode: rulesetId,
-        mods: mods.id(play.mods.join(""))
+        mods: modsCalc.id(mods.join(""))
     };
 
     const beatmap = new Beatmap({ content: mapData });
@@ -129,3 +127,27 @@ export async function downloadBeatmap(ids: Array<number>): Promise<Array<{
 
     return downloaderResponse.map((response) => ({ id: response.id, contents: response.buffer?.toString() }));
 }
+
+export function accuracyCalculator(mode: Modes, hits: {
+    count_300?: number,
+    count_100?: number,
+    count_50?: number,
+    count_miss?: number,
+    count_geki?: number,
+    count_katu?: number
+}): number {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const { count_100 = 0, count_300 = 0, count_50 = 0, count_geki = 0, count_katu = 0, count_miss = 0 } = hits;
+
+    let acc = 0.0;
+
+    switch (mode) {
+        case "osu": acc = (6 * count_300 + 2 * count_100 + count_50) / (6 * (count_50 + count_100 + count_300 + count_miss)); break;
+        case "taiko": acc = (2 * count_300 + count_100) / (2 * (count_300 + count_100 + count_miss)); break;
+        case "fruits": acc = count_300 + count_100 + count_50 + count_katu + count_miss; break;
+        case "mania": acc = (6 * count_geki + 6 * count_300 + 4 * count_katu + 2 * count_100 + count_50) / (6 * (count_50 + count_100 + count_300 + count_miss + count_geki + count_katu)); break;
+    }
+
+    return 100 * acc;
+}
+
