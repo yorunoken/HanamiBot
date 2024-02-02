@@ -1,3 +1,5 @@
+import type { MapAttributes, PerformanceAttributes } from "rosu-pp";
+
 export type Modes = "osu" | "mania" | "taiko" | "fruits";
 
 export interface ProfileInfo {
@@ -35,9 +37,46 @@ export interface ProfileInfo {
     rankSsh: string;
 }
 
+export interface ScoresInfo {
+    songTitle: string;
+    difficultyName: string;
+    score: string;
+    accuracy: string;
+    mapLink: string;
+    coverLink: string;
+    grade: string;
+    hitValues: string;
+    mods: Array<string>;
+    drainLength: string;
+    stars: string;
+    rulesetEmote: string;
+    ppFormatted: string;
+    playSubmitted: string;
+    ifFcValues: string | null;
+    comboValues: string;
+    performance: PerformanceInfo;
+}
+
+export interface PerformanceInfo {
+    mapValues: MapAttributes;
+    perfectPerformance: PerformanceAttributes;
+    currentPerformance: PerformanceAttributes;
+    fcPerformance: PerformanceAttributes;
+    mapId: number;
+}
+
 export type AuthScope = "public" | "chat.write" | "delegate" | "forum.write" | "friends.read" | "identify";
 
 export interface AccessTokenJson {
     access_token: string;
     expires_in: string;
+}
+
+export interface PlayStatistics {
+    count_100: number | undefined;
+    count_300: number | undefined;
+    count_50: number | undefined;
+    count_geki: number | undefined;
+    count_katu: number | undefined;
+    count_miss: number;
 }
