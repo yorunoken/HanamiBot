@@ -1,4 +1,5 @@
 import { getUser } from "./database";
+import { linkSlash } from "./constants";
 import { InteractionType } from "lilybird";
 import type { Modes } from "../types/osu";
 import type { CommandArgs, ParsedArgs, User } from "../types/commandArgs";
@@ -19,7 +20,7 @@ export function getCommandArgs(interaction: Interaction<ApplicationCommandData> 
         const user: User = discordUserId
             ? discordUser
                 ? { type: "success", banchoId: discordUser, mode }
-                : { type: "fail", failMessage: discordUserId ? `The user <@${discordUserId}> hasn't linked their account to the bot yet!` : "Please link your account to the bot using /link!" }
+                : { type: "fail", failMessage: discordUserId ? `The user <@${discordUserId}> hasn't linked their account to the bot yet!` : `Please link your account to the bot using ${linkSlash}!` }
             : userArg
                 ? { type: "success", banchoId: userArg, mode }
                 : userId
@@ -28,9 +29,6 @@ export function getCommandArgs(interaction: Interaction<ApplicationCommandData> 
 
         return { user };
     }
-
-    // Placeholder until I get the message command logic in place
-    return "" as unknown as CommandArgs;
 }
 
 export function parseOsuArguments(message: Message, args: Array<string>, mode: Modes): ParsedArgs {
@@ -38,7 +36,7 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
         tempUserDoNotUse: null,
         user: {
             type: "fail",
-            failMessage: "Please link your account to the bot using /link!"
+            failMessage: `Please link your account to the bot using ${linkSlash}!`
         },
         flags: {},
         mods: {
@@ -55,7 +53,7 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
     for (const arg of args) {
         const [key, value] = arg.split("=");
 
-        const [, modType, mod, force] = (/^(?!.*")([+-]?)([A-Za-z]+)(!)?$/).exec(arg) ?? [];
+        const [, modType, mod, force] = (/^([+-])([A-Za-z]+)(!)?$/).exec(arg) ?? [];
 
         if (mod) {
             result.mods.include = modType !== "-";
