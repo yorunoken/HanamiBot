@@ -22,7 +22,7 @@
     "lilybird": "^0.5.2",
     "osu-api-extended": "^2.8.1",
     "osu-downloader": "^0.8.1",
-    "osu-web.js": "^1.4.0",
+    "osu-web.js": "^2.0.1",
     "rosu-pp": "^0.9.4"
   }
 }
