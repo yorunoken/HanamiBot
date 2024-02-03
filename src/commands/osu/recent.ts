@@ -1,7 +1,8 @@
 import { getCommandArgs } from "../../utils/args";
-import { profileBuilder } from "../../embed-builders/profile";
+import { playBuilder } from "../../embed-builders/plays";
+import { client } from "../../utils/initalize";
 import { ApplicationCommandOptionType } from "lilybird";
-import { v2 } from "osu-api-extended";
+import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, Interaction } from "lilybird";
 import type { SlashCommand } from "@lilybird/handlers";
 
@@ -10,20 +11,22 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     await interaction.deferReply();
 
     const { user } = getCommandArgs(interaction);
+    const includeFails = !(interaction.data.getBoolean("passes") ?? false);
+    const index = interaction.data.getInteger("index") ?? 0;
+    const mod = interaction.data.getString("mods") as Mod;
 
     if (user.type === "fail") {
         await interaction.editReply(user.failMessage);
         return;
     }
 
-    const osuUser = await v2.user.details(user.banchoId, user.mode);
+    const osuUser = await client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } });
     if (!osuUser.id) {
         await interaction.editReply("This user does not exist.");
         return;
     }
 
-    const embed = profileBuilder(osuUser, user.mode);
-
+    const embed = await playBuilder({ user: osuUser, mode: user.mode, type: "recent", includeFails, index, mods: { exclude: false, forceInclude: false, include: true, name: mod } });
     await interaction.editReply({ embeds: [embed] });
 }
 

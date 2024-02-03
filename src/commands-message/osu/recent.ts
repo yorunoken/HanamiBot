@@ -31,7 +31,7 @@ async function run({ message, args, commandName, index = 0 }: { message: Message
     const channel = await message.fetchChannel();
 
     const { mode, includeFails } = modeAliases[commandName];
-    const { user } = parseOsuArguments(message, args, mode);
+    const { user, mods } = parseOsuArguments(message, args, mode);
     if (user.type === "fail") {
         await channel.send(user.failMessage);
         return;
@@ -43,7 +43,7 @@ async function run({ message, args, commandName, index = 0 }: { message: Message
         return;
     }
 
-    const embed = await playBuilder({ user: osuUser, mode: user.mode, type: "recent", includeFails, index });
+    const embed = await playBuilder({ user: osuUser, mode: user.mode, type: "recent", includeFails, index, mods });
     await channel.send({ embeds: [embed] });
 }
 
