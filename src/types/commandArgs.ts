@@ -1,3 +1,4 @@
+import type { Mod } from "osu-web.js";
 import type { Modes } from "./osu";
 
 interface BaseUser {
@@ -25,7 +26,7 @@ interface Mods {
     include: boolean | null;
     exclude: boolean | null;
     forceInclude: boolean | null;
-    name: string | null;
+    name: Mod | null;
 }
 
 export interface ParsedArgs {
