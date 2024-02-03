@@ -5,12 +5,51 @@ import { SPACE } from "../utils/constants";
 import { EmbedType } from "lilybird";
 import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedStructure, EmbedThumbnailStructure } from "lilybird";
 import type { Modes } from "../types/osu";
-import type { UserExtended } from "osu-web.js";
+import type { Mod, UserExtended } from "osu-web.js";
 
-export async function playBuilder({ user, mode, includeFails = true, index, type }:
-{ user: UserExtended, mode: Modes, type: "best" | "firsts" | "recent", includeFails: boolean, index: number }): Promise<EmbedStructure> {
+export async function playBuilder({ user, mode, includeFails = true, index, type, mods }:
+{
+    user: UserExtended,
+    mode: Modes,
+    type: "best" | "firsts" | "recent",
+    includeFails: boolean,
+    index: number,
+    mods?: {
+        exclude: null | boolean,
+        include: null | boolean,
+        forceInclude: null | boolean,
+        name: null | Mod
+    }
+}): Promise<EmbedStructure> {
     const profile = getProfile(user, mode);
-    const plays = await client.users.getUserScores(user.id, type, { query: { mode, limit: 100, include_fails: includeFails } });
+
+    let plays = await client.users.getUserScores(user.id, type, { query: { mode, limit: 100, include_fails: includeFails } });
+
+    if (mods?.name) {
+        const { exclude, forceInclude, include, name } = mods;
+        plays = plays.filter((play) => {
+            const modsStr = play.mods.join("").toUpperCase();
+
+            if (exclude)
+                return !modsStr.includes(name.toUpperCase());
+            else if (forceInclude)
+                return modsStr === name.toUpperCase();
+            else if (include)
+                return modsStr.includes(name.toUpperCase());
+
+            // If none of the conditions match, return normal plays array
+            return true;
+        });
+    }
+
+    if (plays.length === 0) {
+        return {
+            type: EmbedType.Rich,
+            title: "Uh oh! :x:",
+            description: `It seems like \`${profile.username}\` hasn't had any recent plays in the last 24 hours with those filters!`
+        } as EmbedStructure;
+    }
+
     const play = await getScore({ scores: plays, index, mode });
     const { mapValues } = play.performance;
 
