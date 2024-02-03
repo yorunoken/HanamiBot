@@ -67,12 +67,14 @@ export async function getScore({ scores, index, mode }: { scores: Array<UserBest
     const { maxCombo } = performance.currentPerformance.difficulty;
     const isFc = statistics.count_miss === 0 || playMaxCombo + 7 >= maxCombo;
 
+    // set fcValues to null because we won't always need it.
     let ifFcValues = null;
     if (!isFc) {
         const fcAccuracy = accuracyCalculator(mode, statistics);
         ifFcValues = `FC: **${performance.fcPerformance.pp.toFixed(2).toLocaleString()}pp** for **${fcAccuracy.toFixed(2)}%**`;
     }
 
+    // Get beatmap's drain length
     const drainLengthInSeconds = beatmap.total_length / performance.mapValues.clockRate;
     const drainMinutes = Math.floor(drainLengthInSeconds / 60);
 
@@ -88,7 +90,7 @@ export async function getScore({ scores, index, mode }: { scores: Array<UserBest
         mapLink: `https://osu.ppy.sh/b/${beatmap.id}`,
         coverLink: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/list.jpg`,
         grade: grades[play.rank],
-        hitValues: `{ ${hitValues} }`, // Returns the value in this format: 433/12/2/4
+        hitValues: `{ ${hitValues} }`, // Returns the value in this format: { 433/12/2/4 }
         mods,
         drainLength: `${drainMinutes}:${drainSeconds}`,
         stars: `${performance.currentPerformance.difficulty.stars.toFixed(2).toLocaleString()}★`,
