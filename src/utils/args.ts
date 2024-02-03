@@ -1,6 +1,8 @@
 import { getUser } from "./database";
 import { linkSlash } from "./constants";
 import { InteractionType } from "lilybird";
+import { ModsEnum } from "osu-web.js";
+import type { Mod } from "osu-web.js";
 import type { Modes } from "../types/osu";
 import type { CommandArgs, ParsedArgs, User } from "../types/commandArgs";
 import type { ApplicationCommandData, Interaction, Message } from "lilybird";
@@ -56,11 +58,18 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
         const [, modType, mod, force] = (/^([+-])([A-Za-z]+)(!)?$/).exec(arg) ?? [];
 
         if (mod) {
+            const modName = mod.replaceAll(/\+|!|-/g, "");
+            const modSections = (/.{1,2}/g).exec(modName);
+
+            // Make sure `modName` is an actual mod in osu!
+            if (modSections && !modSections.every((selectedMod) => selectedMod.toUpperCase() in ModsEnum))
+                continue;
+
             result.mods.include = modType !== "-";
             result.mods.exclude = modType === "-" && typeof force !== "undefined";
             result.mods.forceInclude = modType === "+" && typeof force !== "undefined";
             if (result.mods.include || result.mods.exclude || result.mods.forceInclude) {
-                result.mods.name = mod.replaceAll(/\+|!|-/g, "");
+                result.mods.name = mod.replaceAll(/\+|!|-/g, "") as Mod;
                 continue;
             }
         }
