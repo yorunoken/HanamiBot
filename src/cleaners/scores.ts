@@ -18,7 +18,7 @@ export async function getScore({ scores, index, mode }: { scores: Array<UserBest
 
     const { score, accuracy, beatmap, beatmapset } = play;
     const statistics = play.statistics as PlayStatistics;
-    const mods = play.mods.length > 0 ? play.mods : ["NM"];
+    const { mods } = play;
 
     const performance = await getPerformanceResults({ hitValues: statistics, play, maxCombo: play.max_combo, mods });
 
@@ -93,7 +93,7 @@ export async function getScore({ scores, index, mode }: { scores: Array<UserBest
         listLink: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/list.jpg`,
         grade: grades[play.rank],
         hitValues: `{ ${hitValues} }`, // Returns the value in this format: { 433/12/2/4 }
-        mods,
+        mods: mods.length > 0 ? mods : ["NM"],
         mapAuthor: beatmapset.creator,
         mapStatus: beatmapStatus.charAt(0).toUpperCase() + beatmapStatus.slice(1),
         drainLength: `${drainMinutes}:${drainSeconds}`,
