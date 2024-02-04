@@ -68,7 +68,6 @@ async function getSinglePlay({ mode, index, plays, profile }:
     profile: ProfileInfo,
     index: number
 }): Promise<Array<EmbedStructure>> {
-    console.log(plays[index]);
     const play = await getScore({ scores: plays, index, mode });
     const { mapValues } = play.performance;
 
