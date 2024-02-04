@@ -1,7 +1,7 @@
 import { getServer, insertData } from "../../utils/database";
 import { DEFAULT_PREFIX, MAX_AMOUNT_OF_PREFIXES } from "../../utils/constants";
 import { updatePrefixCache } from "../../listeners/guildCreate";
-import { ApplicationCommandOptionType, EmbedType } from "lilybird";
+import { ApplicationCommandOptionType, EmbedType, PermissionFlags } from "lilybird";
 import type { ApplicationCommandData, GuildInteraction, Interaction } from "lilybird";
 import type { SlashCommand } from "@lilybird/handlers";
 
@@ -22,7 +22,33 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     await commands[subcommand]({ prefix, interaction, guildId: interaction.guildId });
 }
 
+const PermissionNames: Record<number, string> = {};
+Object.entries(PermissionFlags).forEach(([name, value]) => {
+    PermissionNames[Number(value)] = name;
+});
+
+const PERMISSIONS_NEEDED_INT = PermissionFlags.MANAGE_GUILD;
+const PERMISSIONS_NEEDED = PermissionNames[Number(PERMISSIONS_NEEDED_INT)];
+const PERMISSION_NEEDED_STRING = `Looks like you don't have the necessary permissions for this command. Permission(s) needed: \`${PERMISSIONS_NEEDED}\``;
+
+async function checkForPermissions(interaction: GuildInteraction<ApplicationCommandData>): Promise<false | undefined> {
+    const { member } = interaction;
+    if (!member.permissions) {
+        await interaction.editReply(PERMISSION_NEEDED_STRING);
+        return false;
+    }
+
+    if ((BigInt(member.permissions) & BigInt(PERMISSIONS_NEEDED_INT)) === BigInt(0)) {
+        await interaction.editReply(PERMISSION_NEEDED_STRING);
+        return false;
+    }
+}
+
 async function add({ prefix, interaction, guildId }: { prefix?: string, interaction: GuildInteraction<ApplicationCommandData>, guildId: string }): Promise<void> {
+    const checkPerms = await checkForPermissions(interaction);
+    if (checkPerms === false)
+        return;
+
     const server = getServer(guildId);
     if (!prefix || !server) return;
     let { prefixes } = server;
@@ -50,6 +76,10 @@ async function add({ prefix, interaction, guildId }: { prefix?: string, interact
 }
 
 async function remove({ prefix, interaction, guildId }: { prefix?: string, interaction: GuildInteraction<ApplicationCommandData>, guildId: string }): Promise<void> {
+    const checkPerms = await checkForPermissions(interaction);
+    if (checkPerms === false)
+        return;
+
     const server = getServer(guildId);
     if (!prefix || !server) return;
     let { prefixes } = server;
