@@ -44,8 +44,11 @@ export interface ScoresInfo {
     accuracy: string;
     mapLink: string;
     coverLink: string;
+    listLink: string;
     grade: string;
     hitValues: string;
+    mapAuthor: string;
+    mapStatus: string;
     mods: Array<string>;
     drainLength: string;
     stars: string;
