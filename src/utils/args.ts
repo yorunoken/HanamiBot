@@ -62,7 +62,7 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
             const modSections = (/.{1,2}/g).exec(mod);
 
             // Make sure `mod` is an actual mod in osu!
-            if (modSections && !modSections.every((selectedMod) => selectedMod.toUpperCase() in ModsEnum))
+            if (modSections && !modSections.every((selectedMod) => selectedMod.toUpperCase() in ModsEnum || mod.toUpperCase() === "NM"))
                 continue;
 
             result.mods.include = modType !== "-";
