@@ -7,6 +7,7 @@ import type { Modes } from "../types/osu";
 import type { CommandArgs, ParsedArgs, User } from "../types/commandArgs";
 import type { ApplicationCommandData, Interaction, Message } from "lilybird";
 
+// I'll leave `CommandArgs` type erroring for now, will fix later I promise
 export function getCommandArgs(interaction: Interaction<ApplicationCommandData> | Message): CommandArgs {
     if (interaction.type === InteractionType.APPLICATION_COMMAND && interaction.inGuild()) {
         const { data, member } = interaction;
@@ -58,10 +59,9 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
         const [, modType, mod, force] = (/^([+-])([A-Za-z]+)(!)?$/).exec(arg) ?? [];
 
         if (mod) {
-            const modName = mod.replaceAll(/\+|!|-/g, "");
-            const modSections = (/.{1,2}/g).exec(modName);
+            const modSections = (/.{1,2}/g).exec(mod);
 
-            // Make sure `modName` is an actual mod in osu!
+            // Make sure `mod` is an actual mod in osu!
             if (modSections && !modSections.every((selectedMod) => selectedMod.toUpperCase() in ModsEnum))
                 continue;
 
