@@ -3,7 +3,7 @@ import { client } from "../utils/initalize";
 import { getScore } from "../cleaners/scores";
 import { SPACE } from "../utils/constants";
 import { EmbedType } from "lilybird";
-import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedStructure, EmbedThumbnailStructure } from "lilybird";
+import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, EmbedImageStructure, EmbedStructure } from "lilybird";
 import type { Modes } from "../types/osu";
 import type { Mod, UserExtended } from "osu-web.js";
 
@@ -49,7 +49,7 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
                 title: "Uh oh! :x:",
                 description: `It seems like \`${profile.username}\` hasn't had any recent plays in the last 24 hours with those filters!`
             }
-        ] as Array<EmbedStructure>;
+        ] satisfies Array<EmbedStructure>;
     }
 
     const play = await getScore({ scores: plays, index, mode });
@@ -63,8 +63,8 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
 
     const fields = [
         {
-            name: `${play.rulesetEmote} ${play.difficultyName} [${play.stars}]`,
-            value: `${play.grade} **+${play.mods.join("")}** ${SPACE} ${play.score} ${SPACE} ${play.accuracy}% ${SPACE} ${play.playSubmitted}
+            name: `${play.rulesetEmote} ${play.difficultyName} **+${play.mods.join("")}** [${play.stars}]`,
+            value: `${play.grade} ${SPACE} ${play.score === "0" ? "140,000" : play.score} ${SPACE} **${play.accuracy}%** ${SPACE} ${play.playSubmitted}
             ${play.ppFormatted} ${SPACE} ${play.comboValues} ${SPACE} ${play.hitValues}
             ${play.ifFcValues ?? ""}`,
             inline: false
@@ -77,9 +77,10 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
         }
     ] satisfies Array<EmbedFieldStructure>;
 
-    const thumbnail = { url: play.coverLink } as EmbedThumbnailStructure;
+    const image = { url: play.coverLink } satisfies EmbedImageStructure;
     const title = play.songTitle;
     const url = play.mapLink;
+    const footer = { text: `${play.mapStatus} mapset by ${play.mapAuthor}` } satisfies EmbedFooterStructure;
 
-    return [ { type: EmbedType.Rich, author, fields, thumbnail, url, title } ] as Array<EmbedStructure>;
+    return [ { type: EmbedType.Rich, author, fields, image, footer, url, title } ] satisfies Array<EmbedStructure>;
 }
