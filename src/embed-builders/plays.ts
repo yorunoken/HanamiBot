@@ -4,16 +4,16 @@ import { getScore } from "../cleaners/scores";
 import { SPACE } from "../utils/constants";
 import { EmbedType } from "lilybird";
 import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, EmbedImageStructure, EmbedStructure } from "lilybird";
-import type { Modes } from "../types/osu";
-import type { Mod, UserExtended } from "osu-web.js";
+import type { Modes, ProfileInfo } from "../types/osu";
+import type { Mod, UserBestScore, UserExtended, UserScore } from "osu-web.js";
 
 export async function playBuilder({ user, mode, includeFails = true, index, type, mods }:
 {
     user: UserExtended,
     mode: Modes,
     type: "best" | "firsts" | "recent",
-    includeFails: boolean,
     index: number,
+    includeFails?: boolean,
     mods?: {
         exclude: null | boolean,
         include: null | boolean,
@@ -25,10 +25,14 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
 
     let plays = await client.users.getUserScores(user.id, type, { query: { mode, limit: 100, include_fails: includeFails } });
 
+    if (type === "best" && index === 0) {
+        // Implement page-based plays here
+    }
+
     if (mods?.name) {
         const { exclude, forceInclude, include, name } = mods;
         plays = plays.filter((play) => {
-            const modsStr = play.mods.join("").toUpperCase();
+            const modsStr = play.mods.join("").toUpperCase() || "NM";
 
             if (exclude)
                 return !modsStr.includes(name.toUpperCase());
@@ -52,6 +56,19 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
         ] satisfies Array<EmbedStructure>;
     }
 
+    const singePlayEmbed = await getSinglePlay({ mode, index, plays, profile });
+
+    return singePlayEmbed;
+}
+
+async function getSinglePlay({ mode, index, plays, profile }:
+{
+    plays: Array<UserBestScore> | Array<UserScore>,
+    mode: Modes,
+    profile: ProfileInfo,
+    index: number
+}): Promise<Array<EmbedStructure>> {
+    console.log(plays[index]);
     const play = await getScore({ scores: plays, index, mode });
     const { mapValues } = play.performance;
 
