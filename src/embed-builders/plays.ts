@@ -75,11 +75,11 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
             **AR:** \`${mapValues.ar.toFixed(1)}\` ${SPACE} **OD:** \`${mapValues.od.toFixed(1)}\` ${SPACE} **CS:** \`${mapValues.cs.toFixed(1)}\` ${SPACE} **HP:** \`${mapValues.hp.toFixed(1)}\``,
             inline: false
         }
-    ] as Array<EmbedFieldStructure>;
+    ] satisfies Array<EmbedFieldStructure>;
 
     const thumbnail = { url: play.coverLink } as EmbedThumbnailStructure;
     const title = play.songTitle;
     const url = play.mapLink;
 
-    return [ { type: EmbedType.Rich, author, fields, thumbnail, url, title }, { type: EmbedType.Rich } ] as Array<EmbedStructure>;
+    return [ { type: EmbedType.Rich, author, fields, thumbnail, url, title } ] as Array<EmbedStructure>;
 }

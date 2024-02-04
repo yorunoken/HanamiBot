@@ -11,7 +11,7 @@ export function profileBuilder(user: UserExtended, mode: Modes): Array<EmbedStru
         name: `${user.username}: ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}#${profile.countryRank})`,
         icon_url: profile.flagUrl,
         url: profile.userUrl
-    } as EmbedAuthorStructure;
+    } satisfies EmbedAuthorStructure;
 
     const fields = [
         {
@@ -28,11 +28,11 @@ export function profileBuilder(user: UserExtended, mode: Modes): Array<EmbedStru
             value: `${grades.SSH}\`${profile.rankSsh}\` ${grades.SS}\`${profile.rankSs}\` ${grades.SH}\`${profile.rankSh}\` ${grades.S}\`${profile.rankS}\` ${grades.A}\`${profile.rankA}\``,
             inline: false
         }
-    ] as Array<EmbedFieldStructure>;
+    ] satisfies Array<EmbedFieldStructure>;
 
-    const footer = { text: `Joined osu! on ${profile.joinedAt} (${profile.joinedAgo} yrs ago)` } as EmbedFooterStructure;
-    const thumbnail = { url: profile.avatarUrl } as EmbedThumbnailStructure;
-    const image = { url: profile.coverUrl } as EmbedImageStructure;
+    const footer = { text: `Joined osu! on ${profile.joinedAt} (${profile.joinedAgo} yrs ago)` } satisfies EmbedFooterStructure;
+    const thumbnail = { url: profile.avatarUrl } satisfies EmbedThumbnailStructure;
+    const image = { url: profile.coverUrl } satisfies EmbedImageStructure;
 
-    return [ { type: EmbedType.Rich, author, fields, footer, thumbnail, image } ] as Array<EmbedStructure>;
+    return [ { type: EmbedType.Rich, author, fields, footer, thumbnail, image } ] satisfies Array<EmbedStructure>;
 }
