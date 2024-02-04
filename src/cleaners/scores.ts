@@ -82,16 +82,20 @@ export async function getScore({ scores, index, mode }: { scores: Array<UserBest
     // Instead of rounding it down to 40, it would make more sense to round it to 41.
     const drainSeconds = Math.ceil(drainLengthInSeconds % 60);
 
+    const beatmapStatus = beatmapset.status;
     return {
         songTitle: `${beatmapset.artist} - ${beatmapset.title}`,
         difficultyName: beatmap.version,
         score: score.toLocaleString(),
-        accuracy: accuracy.toFixed(2),
+        accuracy: (accuracy * 100).toFixed(2),
         mapLink: `https://osu.ppy.sh/b/${beatmap.id}`,
-        coverLink: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/list.jpg`,
+        coverLink: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/cover.jpg`,
+        listLink: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/list.jpg`,
         grade: grades[play.rank],
         hitValues: `{ ${hitValues} }`, // Returns the value in this format: { 433/12/2/4 }
         mods,
+        mapAuthor: beatmapset.creator,
+        mapStatus: beatmapStatus.charAt(0).toUpperCase() + beatmapStatus.slice(1),
         drainLength: `${drainMinutes}:${drainSeconds}`,
         stars: `${performance.currentPerformance.difficulty.stars.toFixed(2).toLocaleString()}★`,
         rulesetEmote: rulesets[mode],
