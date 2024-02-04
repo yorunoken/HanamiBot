@@ -23,7 +23,6 @@ import { initializeDatabase } from "./utils/initalize";
 import { createHandler } from "@lilybird/handlers";
 import { createClient, Intents } from "lilybird";
 import Cryptr from "cryptr";
-import { auth } from "osu-api-extended";
 
 export const cryptr = new Cryptr(process.env.ENCRYPT_SECRET, { saltLength: 10 });
 
@@ -39,8 +38,6 @@ const listeners = await createHandler({
         listeners: `${import.meta.dir}/listeners`
     }
 });
-
-await auth.login(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
 
 await createClient({
     token: process.env.DISCORD_BOT_TOKEN,
