@@ -1,7 +1,7 @@
 import { getCommandArgs } from "../../utils/args";
 import { profileBuilder } from "../../embed-builders/profile";
+import { client } from "../../utils/initalize";
 import { ApplicationCommandOptionType } from "lilybird";
-import { v2 } from "osu-api-extended";
 import type { ApplicationCommandData, Interaction } from "lilybird";
 import type { SlashCommand } from "@lilybird/handlers";
 
@@ -16,15 +16,15 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    const osuUser = await v2.user.details(user.banchoId, user.mode);
+    const osuUser = await client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } });
     if (!osuUser.id) {
         await interaction.editReply("This user does not exist.");
         return;
     }
 
-    const embed = profileBuilder(osuUser, user.mode);
+    const embeds = profileBuilder(osuUser, user.mode);
 
-    await interaction.editReply({ embeds: [embed] });
+    await interaction.editReply({ embeds });
 }
 
 export default {

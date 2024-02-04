@@ -26,8 +26,8 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    const embed = await playBuilder({ user: osuUser, mode: user.mode, type: "recent", includeFails, index, mods: { exclude: false, forceInclude: false, include: true, name: mod } });
-    await interaction.editReply({ embeds: [embed] });
+    const embeds = await playBuilder({ user: osuUser, mode: user.mode, type: "recent", includeFails, index, mods: { exclude: false, forceInclude: false, include: true, name: mod } });
+    await interaction.editReply({ embeds });
 }
 
 export default {

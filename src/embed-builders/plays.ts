@@ -20,7 +20,7 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
         forceInclude: null | boolean,
         name: null | Mod
     }
-}): Promise<EmbedStructure> {
+}): Promise<Array<EmbedStructure>> {
     const profile = getProfile(user, mode);
 
     let plays = await client.users.getUserScores(user.id, type, { query: { mode, limit: 100, include_fails: includeFails } });
@@ -43,11 +43,13 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
     }
 
     if (plays.length === 0) {
-        return {
-            type: EmbedType.Rich,
-            title: "Uh oh! :x:",
-            description: `It seems like \`${profile.username}\` hasn't had any recent plays in the last 24 hours with those filters!`
-        } as EmbedStructure;
+        return [
+            {
+                type: EmbedType.Rich,
+                title: "Uh oh! :x:",
+                description: `It seems like \`${profile.username}\` hasn't had any recent plays in the last 24 hours with those filters!`
+            }
+        ] as Array<EmbedStructure>;
     }
 
     const play = await getScore({ scores: plays, index, mode });
@@ -79,5 +81,5 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
     const title = play.songTitle;
     const url = play.mapLink;
 
-    return { type: EmbedType.Rich, author, fields, thumbnail, url, title } as EmbedStructure;
+    return [ { type: EmbedType.Rich, author, fields, thumbnail, url, title }, { type: EmbedType.Rich } ] as Array<EmbedStructure>;
 }

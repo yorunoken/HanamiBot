@@ -5,7 +5,7 @@ import type { UserExtended } from "osu-web.js";
 import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, EmbedImageStructure, EmbedStructure, EmbedThumbnailStructure } from "lilybird";
 import type { Modes } from "../types/osu";
 
-export function profileBuilder(user: UserExtended, mode: Modes): EmbedStructure {
+export function profileBuilder(user: UserExtended, mode: Modes): Array<EmbedStructure> {
     const profile = getProfile(user, mode);
     const author = {
         name: `${user.username}: ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}#${profile.countryRank})`,
@@ -34,5 +34,5 @@ export function profileBuilder(user: UserExtended, mode: Modes): EmbedStructure 
     const thumbnail = { url: profile.avatarUrl } as EmbedThumbnailStructure;
     const image = { url: profile.coverUrl } as EmbedImageStructure;
 
-    return { type: EmbedType.Rich, author, fields, footer, thumbnail, image } as EmbedStructure;
+    return [ { type: EmbedType.Rich, author, fields, footer, thumbnail, image } ] as Array<EmbedStructure>;
 }

@@ -20,8 +20,8 @@ async function run({ message, args, commandName }: { message: Message, args: Arr
         return;
     }
 
-    const embed = profileBuilder(osuUser, user.mode);
-    await channel.send({ embeds: [embed] });
+    const embeds = profileBuilder(osuUser, user.mode);
+    await channel.send({ embeds });
 }
 
 export default {
