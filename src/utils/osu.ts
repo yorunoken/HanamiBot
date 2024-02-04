@@ -1,9 +1,9 @@
 /* eslint-disable @stylistic/no-mixed-operators */
 import { getMap } from "./database";
 import { Beatmap, Calculator } from "rosu-pp";
-import { mods as modsCalc } from "osu-api-extended";
 import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
-import type { UserBestScore, UserScore } from "osu-web.js";
+import { getModsEnum } from "osu-web.js";
+import type { Mod, UserBestScore, UserScore } from "osu-web.js";
 import type { AccessTokenJson, AuthScope, Modes, PerformanceInfo } from "../types/osu";
 import type { Score as ScoreData } from "rosu-pp";
 
@@ -78,7 +78,7 @@ export async function getPerformanceResults({ play, maxCombo, hitValues, mods }:
 
     const calculatorData: ScoreData = {
         mode: rulesetId,
-        mods: modsCalc.id(mods.join(""))
+        mods: getModsEnum((mods.includes("NM") ? mods.filter((mod) => mod !== "NM") : mods) as Array<Mod>)
     };
 
     const beatmap = new Beatmap({ content: mapData });
