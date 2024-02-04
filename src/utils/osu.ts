@@ -66,7 +66,7 @@ export async function getPerformanceResults({ play, maxCombo, hitValues, mods }:
 { play: UserBestScore | UserScore,
     maxCombo?: number,
     hitValues: { count_100?: number, count_300?: number, count_50?: number, count_geki?: number, count_katu?: number, count_miss?: number },
-    mods: Array<string>
+    mods: Array<Mod>
 }): Promise<PerformanceInfo | null> {
     const { beatmap: map, mode_int: rulesetId } = play;
     const mapData = getMap(map.id)?.data ?? (await downloadBeatmap([map.id]))[0].contents;
@@ -78,7 +78,7 @@ export async function getPerformanceResults({ play, maxCombo, hitValues, mods }:
 
     const calculatorData: ScoreData = {
         mode: rulesetId,
-        mods: getModsEnum((mods.includes("NM") ? mods.filter((mod) => mod !== "NM") : mods) as Array<Mod>)
+        mods: getModsEnum(mods)
     };
 
     const beatmap = new Beatmap({ content: mapData });
