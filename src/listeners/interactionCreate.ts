@@ -1,5 +1,5 @@
 import { insertData } from "../utils/database";
-import { v2 } from "osu-api-extended";
+import { client } from "../utils/initalize";
 import { EmbedType } from "lilybird";
 import type { Interaction } from "lilybird";
 import type { Event } from "@lilybird/handlers";
@@ -19,7 +19,7 @@ async function run(interaction: Interaction): Promise<void> {
             const discordId = fields[0].value;
             const osuId = fields[1].value;
 
-            const user = await v2.user.details(osuId);
+            const user = await client.users.getUser(osuId);
             if (!user.id) {
                 await interaction.editReply("It seems like this a user with this osu! ID doesn't exist.. might be a banned user...");
                 return;
