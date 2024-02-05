@@ -1,14 +1,16 @@
 import db from "../data.db" with { type: "sqlite" };
 import { getAccessToken } from "./osu";
-import { Client } from "osu-web.js";
+import { Client as OsuClient } from "osu-web.js";
 import { readdir } from "fs/promises";
-import type { DefaultMessageCommand } from "../types/commands";
+import type { Client as LilybirdClient, POSTApplicationCommandStructure } from "lilybird";
+import type { DefaultMessageCommand, DefaultSlashCommand } from "../types/commands";
 
 const access = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
-export const client = new Client(access.access_token);
+export const client = new OsuClient(access.access_token);
 
 export const messageCommands = new Map<string, DefaultMessageCommand>();
 export const commandAliases = new Map<string, string>();
+export const applicationCommands = new Map<string, DefaultSlashCommand>();
 
 export async function loadMessageCommands(): Promise<void> {
     // Temporary array to store promises of MessageCommands
@@ -37,6 +39,31 @@ export async function loadMessageCommands(): Promise<void> {
             });
         }
     }
+}
+
+export async function loadApplicationCommands(clnt: LilybirdClient): Promise<void> {
+    const slashCommands: Array<POSTApplicationCommandStructure> = [];
+    const temp: Array<Promise<DefaultSlashCommand>> = [];
+
+    const items = await readdir("./src/commands", { recursive: true });
+    for (const item of items) {
+        const [category, cmd] = item.split("/");
+        if (!category || !cmd) continue;
+        if (category === "data") continue;
+
+        const command = import(`../commands/${category}/${cmd}`) as Promise<DefaultSlashCommand>;
+        temp.push(command);
+    }
+
+    const commands = await Promise.all(temp);
+    for (const command of commands) {
+        const { default: cmd } = command;
+        slashCommands.push(cmd.data);
+        applicationCommands.set(cmd.data.name, command);
+    }
+
+    const { rest } = clnt;
+    await rest.bulkOverwriteGlobalApplicationCommand(clnt.user.id, slashCommands);
 }
 
 interface Columns {
