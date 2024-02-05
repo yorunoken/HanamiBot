@@ -1,7 +1,7 @@
 import { cryptr } from "..";
 import { DEFAULT_PREFIX } from "../utils/constants";
 import { getServer } from "../utils/database";
-import { commandAliases, messageCommands } from "../utils/initalize";
+import { commandAliases, loadLogs, messageCommands } from "../utils/initalize";
 import { prefixesCache } from "./guildCreate";
 import { ButtonStyle, EmbedType, ComponentType } from "lilybird";
 import type { Client, EmbedStructure, Message } from "lilybird";
@@ -48,6 +48,7 @@ async function run(message: Message): Promise<void> {
 
     const { content, guildId, client } = message;
     if (!content || !guildId) return;
+    const server = await client.rest.getGuild(guildId);
 
     const channel = await message.fetchChannel();
     if (!channel.isText()) return;
@@ -96,10 +97,10 @@ async function run(message: Message): Promise<void> {
     }
 
     await client.rest.triggerTypingIndicator(channel.id);
-    command.run({ client: client, message, args, prefix, index, commandName }).then(() => {
-        // I love eslint
-    }).catch(() => {
-        //
+    command.run({ client: client, message, args, prefix, index, commandName }).then(async () => {
+        await loadLogs(`INFO: [${server.name}] ${message.author.username} used prefix command \`${command.name}\``);
+    }).catch(async (error: Error) => {
+        await loadLogs(`ERROR: [${server.name}] ${message.author.username} had an error in prefix command \`${command.name}\`: ${error.stack}`, true);
     });
 
     cooldown.set(`${command.name}${message.author.id}`, Date.now() + command.cooldown);

@@ -6,8 +6,8 @@ import { mkdir, exists, readFile, writeFile } from "node:fs/promises";
 import type { Client as LilybirdClient, POSTApplicationCommandStructure } from "lilybird";
 import type { DefaultMessageCommand, DefaultSlashCommand } from "../types/commands";
 
-const access = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
-export const client = new OsuClient(access.access_token);
+const { accessToken } = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
+export const client = new OsuClient(accessToken);
 
 export const messageCommands = new Map<string, DefaultMessageCommand>();
 export const commandAliases = new Map<string, string>();
@@ -63,13 +63,10 @@ export async function loadApplicationCommands(clnt: LilybirdClient): Promise<voi
         applicationCommands.set(cmd.data.name, command);
     }
 
-    const { rest } = clnt;
-    await rest.bulkOverwriteGlobalApplicationCommand(clnt.user.id, slashCommands);
+    await clnt.rest.bulkOverwriteGlobalApplicationCommand(clnt.user.id, slashCommands);
 }
 
-export async function loadLogs(): Promise<void> {
-    console.log("Setting up Logs..");
-
+export async function loadLogs(message: string, error?: boolean): Promise<void> {
     const date = new Date(Date.now());
     const formattedDate = `${new Intl.DateTimeFormat("en-US", {
         year: "numeric",
@@ -121,7 +118,8 @@ export async function loadLogs(): Promise<void> {
         await writeFile(`./logs/${year}/${month}/${day}.txt`, `${formattedDate}Created log file.`);
     } else {
         const todaysLogFile = await readFile(`./logs/${year}/${month}/${day}.txt`, "utf-8");
-        await writeFile(`./logs/${year}/${month}/${day}.txt`, `${todaysLogFile}\n${formattedDate}Started the bot.`);
+        await writeFile(`./logs/${year}/${month}/${day}.txt`, `${todaysLogFile}\n${formattedDate}${message}`);
+        console[error ? "error" : "log"](`${formattedDate}${message}`);
     }
 }
 
