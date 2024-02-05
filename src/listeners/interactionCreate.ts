@@ -1,5 +1,5 @@
 import { insertData } from "../utils/database";
-import { client } from "../utils/initalize";
+import { client, applicationCommands } from "../utils/initalize";
 import { EmbedType } from "lilybird";
 import type { Interaction } from "lilybird";
 import type { Event } from "@lilybird/handlers";
@@ -36,6 +36,21 @@ async function run(interaction: Interaction): Promise<void> {
 
             await interaction.editReply({ embeds: [embed] });
         }
+        return;
+    }
+    if (interaction.isApplicationCommandInteraction()) {
+        console.log("hiii");
+        console.log(applicationCommands);
+        const commandDefault = applicationCommands.get(interaction.data.name);
+        console.log(commandDefault, interaction.data.name);
+        if (!commandDefault) return;
+        const { default: command } = commandDefault;
+
+        command.run(interaction).then(() => {
+            // I love eslint
+        }).catch(() => {
+            //
+        });
     }
 }
 
