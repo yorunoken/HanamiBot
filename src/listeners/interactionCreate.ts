@@ -39,10 +39,7 @@ async function run(interaction: Interaction): Promise<void> {
         return;
     }
     if (interaction.isApplicationCommandInteraction()) {
-        console.log("hiii");
-        console.log(applicationCommands);
         const commandDefault = applicationCommands.get(interaction.data.name);
-        console.log(commandDefault, interaction.data.name);
         if (!commandDefault) return;
         const { default: command } = commandDefault;
 
