@@ -36,8 +36,8 @@ export function buildAuthUrl(clientId: string | number, callbackUri: string, sco
 
 export async function getAccessToken(clientId: number, clientSecret: string, scope: Array<AuthScope>):
 Promise<{
-    access_token: string,
-    expires_in: string
+    accessToken: string,
+    expiresIn: string
 }> {
     const body = JSON.stringify({
         grant_type: "client_credentials",
@@ -56,10 +56,9 @@ Promise<{
         body
     }).then(async (res) => res.json()) as AccessTokenJson;
 
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { access_token, expires_in } = data;
+    const { access_token: accessToken, expires_in: expiresIn } = data;
 
-    return { access_token, expires_in };
+    return { accessToken, expiresIn };
 }
 
 export async function getPerformanceResults({ play, maxCombo, hitValues, mods }:
