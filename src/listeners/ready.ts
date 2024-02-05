@@ -1,10 +1,12 @@
-import { loadApplicationCommands, loadMessageCommands } from "../utils/initalize";
+import { loadApplicationCommands, loadLogs, loadMessageCommands } from "../utils/initalize";
 import type { Event } from "@lilybird/handlers";
 
 export default {
     event: "ready",
     run: async (client) => {
         console.log(`Successfully logged in as ${client.user.username} ✅`);
+        await loadLogs();
+        console.log("Prepared logs ✅");
         await loadMessageCommands();
         console.log("Loaded message commands ✅");
         await loadApplicationCommands(client);

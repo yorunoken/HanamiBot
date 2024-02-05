@@ -3,3 +3,4 @@ node_modules/
 data.db
 tests/
 package-lock.json
+logs/*
