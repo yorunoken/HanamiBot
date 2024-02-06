@@ -78,7 +78,7 @@ async function run(message: Message): Promise<void> {
     if (match) {
         const [, extractedCommandName, extractedNumber] = match;
         commandName = extractedCommandName;
-        index = parseInt(extractedNumber);
+        index = parseInt(extractedNumber) - 1;
     }
 
     const alias = commandAliases.get(commandName);
