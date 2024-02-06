@@ -38,7 +38,10 @@ export interface ProfileInfo {
 }
 
 export interface ScoresInfo {
+    position: number;
     songTitle: string;
+    songArtist: string;
+    songName: string;
     difficultyName: string;
     score: string;
     accuracy: string;
