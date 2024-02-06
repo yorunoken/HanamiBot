@@ -5,10 +5,10 @@ import { SPACE } from "../utils/constants";
 import { getUser } from "../utils/database";
 import { EmbedType } from "lilybird";
 import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, EmbedImageStructure, EmbedStructure, EmbedThumbnailStructure } from "lilybird";
-import type { Modes, ProfileInfo } from "../types/osu";
+import type { Modes, ProfileInfo, ScoresInfo } from "../types/osu";
 import type { Mod, UserBestScore, UserExtended, UserScore } from "osu-web.js";
 
-export async function playBuilder({ user, mode, includeFails = true, index, type, mods, initiatorId }:
+export async function playBuilder({ user, mode, includeFails = true, index, type, mods, initiatorId, isMultiple }:
 {
     user: UserExtended,
     mode: Modes,
@@ -21,7 +21,8 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
         include: null | boolean,
         forceInclude: null | boolean,
         name: null | Mod
-    }
+    },
+    isMultiple?: boolean
 }): Promise<Array<EmbedStructure>> {
     const profile = getProfile(user, mode);
 
@@ -58,9 +59,7 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
         ] satisfies Array<EmbedStructure>;
     }
 
-    const singePlayEmbed = await getSinglePlay({ mode, index, plays, profile, initiatorId });
-
-    return singePlayEmbed;
+    return isMultiple ? getMultiplePlays({ plays, page: index, mode, profile }) : getSinglePlay({ mode, index, plays, profile, initiatorId });
 }
 
 async function getSinglePlay({ mode, index, plays, profile, initiatorId }:
@@ -105,7 +104,7 @@ async function getSinglePlay({ mode, index, plays, profile, initiatorId }:
     const thumbnail = maximized === 0 ? { url: play.listLink } satisfies EmbedThumbnailStructure : undefined;
     const title = play.songTitle;
     const url = play.mapLink;
-    const footer = { text: `${play.mapStatus} mapset by ${play.mapAuthor}` } satisfies EmbedFooterStructure;
+    const footer: EmbedFooterStructure = { text: `${play.mapStatus} mapset by ${play.mapAuthor}` };
 
     return [ { type: EmbedType.Rich, author, fields, image, thumbnail, footer, url, title } ] satisfies Array<EmbedStructure>;
 }
@@ -117,11 +116,26 @@ async function getMultiplePlays({ plays, page, mode, profile }:
     mode: Modes,
     profile: ProfileInfo
 }): Promise<Array<EmbedStructure>> {
-    const tempDescription = [];
-
     const pageStart = page * 5;
     const pageEnd = pageStart + 5;
 
-    for (let i = pageStart; pageEnd < i && i < plays.length; i++) {
-    }
+    const playsTemp: Array<Promise<ScoresInfo>> = [];
+    for (let i = pageStart; pageEnd > i && i < plays.length; i++) playsTemp.push(getScore({ scores: plays, index: i, mode }));
+
+    const embed: EmbedStructure = {
+        type: EmbedType.Rich,
+        author: {
+            name: `${profile.username} ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}#${profile.countryRank})`,
+            url: profile.userUrl,
+            icon_url: profile.flagUrl
+        },
+        thumbnail: { url: profile.avatarUrl },
+        description: (await Promise.all(playsTemp))
+            .map((play) => `**#${play.position} [${play.songName} [${play.difficultyName}]](${play.mapLink}) +${play.mods.join("")} ${play.stars}**
+            ${play.grade} ${play.ppFormatted} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%**
+            ${play.hitValues} ${SPACE} ${play.comboValues} ${SPACE} ${play.playSubmitted}`)
+            .join("\n")
+    };
+
+    return [embed] satisfies Array<EmbedStructure>;
 }
