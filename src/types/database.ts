@@ -1,6 +1,8 @@
 export interface DbUser {
     id: string;
-    banchoId: string;
+    banchoId: string | null;
+    score_embeds: number | null;
+    mode: string | null;
 }
 
 export interface DbServer {
@@ -11,5 +13,10 @@ export interface DbServer {
 export interface DbMap {
     id: string;
     data: string;
+}
+
+export enum ScoreEmbed {
+    Maximized = 1,
+    Minimized = 0
 }
 
