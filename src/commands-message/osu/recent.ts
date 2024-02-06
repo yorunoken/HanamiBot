@@ -43,7 +43,7 @@ async function run({ message, args, commandName, index = 0 }: { message: Message
         return;
     }
 
-    const embeds = await playBuilder({ user: osuUser, mode: user.mode, type: "recent", includeFails, index, mods });
+    const embeds = await playBuilder({ user: osuUser, mode: user.mode, initiatorId: message.author.id, type: "recent", includeFails, index, mods });
     await channel.send({ embeds });
 }
 
