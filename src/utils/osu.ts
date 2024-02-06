@@ -1,5 +1,5 @@
 /* eslint-disable @stylistic/no-mixed-operators */
-import { getMap } from "./database";
+import { getMap, insertData } from "./database";
 import { Beatmap, Calculator } from "rosu-pp";
 import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
 import { getModsEnum } from "osu-web.js";
@@ -123,6 +123,8 @@ export async function downloadBeatmap(ids: Array<number>): Promise<Array<{
     const downloaderResponse = await downloader.downloadAll();
     if (downloaderResponse.some((item) => item.status === DownloadStatus.FailedToDownload))
         throw new Error("ERROR CODE 409, ABORTING TASK");
+
+    for (const downloaded of downloaderResponse) insertData({ table: "maps", id: downloaded.id ?? 0, data: [ { name: "data", value: downloaded.buffer?.toString() ?? "" } ] });
 
     return downloaderResponse.map((response) => ({ id: response.id, contents: response.buffer?.toString() }));
 }
