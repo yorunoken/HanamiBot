@@ -58,21 +58,21 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
         ] satisfies Array<EmbedStructure>;
     }
 
-    const maximized = getUser(initiatorId)?.score_embeds;
-    const singePlayEmbed = await getSinglePlay({ mode, index, plays, profile, maximized });
+    const singePlayEmbed = await getSinglePlay({ mode, index, plays, profile, initiatorId });
 
     return singePlayEmbed;
 }
 
-async function getSinglePlay({ mode, index, plays, profile, maximized }:
+async function getSinglePlay({ mode, index, plays, profile, initiatorId }:
 {
     plays: Array<UserBestScore> | Array<UserScore>,
     mode: Modes,
     profile: ProfileInfo,
     index: number,
-    maximized: number | null | undefined
+    initiatorId: string
 }): Promise<Array<EmbedStructure>> {
-    maximized ??= 1;
+    const maximized = getUser(initiatorId)?.score_embeds ?? 1;
+
     const play = await getScore({ scores: plays, index, mode });
     const { mapValues } = play.performance;
 
@@ -108,4 +108,20 @@ async function getSinglePlay({ mode, index, plays, profile, maximized }:
     const footer = { text: `${play.mapStatus} mapset by ${play.mapAuthor}` } satisfies EmbedFooterStructure;
 
     return [ { type: EmbedType.Rich, author, fields, image, thumbnail, footer, url, title } ] satisfies Array<EmbedStructure>;
+}
+
+async function getMultiplePlays({ plays, page, mode, profile }:
+{
+    plays: Array<UserBestScore> | Array<UserScore>,
+    page: number,
+    mode: Modes,
+    profile: ProfileInfo
+}): Promise<Array<EmbedStructure>> {
+    const tempDescription = [];
+
+    const pageStart = page * 5;
+    const pageEnd = pageStart + 5;
+
+    for (let i = pageStart; pageEnd < i && i < plays.length; i++) {
+    }
 }
