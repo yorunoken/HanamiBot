@@ -2,17 +2,19 @@ import { getProfile } from "../cleaners/profile";
 import { client } from "../utils/initalize";
 import { getScore } from "../cleaners/scores";
 import { SPACE } from "../utils/constants";
+import { getUser } from "../utils/database";
 import { EmbedType } from "lilybird";
-import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, EmbedImageStructure, EmbedStructure } from "lilybird";
+import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, EmbedImageStructure, EmbedStructure, EmbedThumbnailStructure } from "lilybird";
 import type { Modes, ProfileInfo } from "../types/osu";
 import type { Mod, UserBestScore, UserExtended, UserScore } from "osu-web.js";
 
-export async function playBuilder({ user, mode, includeFails = true, index, type, mods }:
+export async function playBuilder({ user, mode, includeFails = true, index, type, mods, initiatorId }:
 {
     user: UserExtended,
     mode: Modes,
     type: "best" | "firsts" | "recent",
     index: number,
+    initiatorId: string,
     includeFails?: boolean,
     mods?: {
         exclude: null | boolean,
@@ -56,18 +58,21 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
         ] satisfies Array<EmbedStructure>;
     }
 
-    const singePlayEmbed = await getSinglePlay({ mode, index, plays, profile });
+    const maximized = getUser(initiatorId)?.score_embeds;
+    const singePlayEmbed = await getSinglePlay({ mode, index, plays, profile, maximized });
 
     return singePlayEmbed;
 }
 
-async function getSinglePlay({ mode, index, plays, profile }:
+async function getSinglePlay({ mode, index, plays, profile, maximized }:
 {
     plays: Array<UserBestScore> | Array<UserScore>,
     mode: Modes,
     profile: ProfileInfo,
-    index: number
+    index: number,
+    maximized: number | null | undefined
 }): Promise<Array<EmbedStructure>> {
+    maximized ??= 1;
     const play = await getScore({ scores: plays, index, mode });
     const { mapValues } = play.performance;
 
@@ -84,19 +89,23 @@ async function getSinglePlay({ mode, index, plays, profile }:
             ${play.ppFormatted} ${SPACE} ${play.comboValues} ${SPACE} ${play.hitValues}
             ${play.ifFcValues ?? ""}`,
             inline: false
-        },
-        {
+        }
+    ] satisfies Array<EmbedFieldStructure>;
+
+    if (maximized === 1) {
+        fields.push({
             name: "Beatmap Info:",
             value: `**BPM:** \`${mapValues.bpm.toFixed().toLocaleString()}\` ${SPACE} **Length:** \`${play.drainLength}\`
             **AR:** \`${mapValues.ar.toFixed(1)}\` ${SPACE} **OD:** \`${mapValues.od.toFixed(1)}\` ${SPACE} **CS:** \`${mapValues.cs.toFixed(1)}\` ${SPACE} **HP:** \`${mapValues.hp.toFixed(1)}\``,
             inline: false
-        }
-    ] satisfies Array<EmbedFieldStructure>;
+        });
+    }
 
-    const image = { url: play.coverLink } satisfies EmbedImageStructure;
+    const image = maximized === 1 ? { url: play.coverLink } satisfies EmbedImageStructure : undefined;
+    const thumbnail = maximized === 0 ? { url: play.listLink } satisfies EmbedThumbnailStructure : undefined;
     const title = play.songTitle;
     const url = play.mapLink;
     const footer = { text: `${play.mapStatus} mapset by ${play.mapAuthor}` } satisfies EmbedFooterStructure;
 
-    return [ { type: EmbedType.Rich, author, fields, image, footer, url, title } ] satisfies Array<EmbedStructure>;
+    return [ { type: EmbedType.Rich, author, fields, image, thumbnail, footer, url, title } ] satisfies Array<EmbedStructure>;
 }
