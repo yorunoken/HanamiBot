@@ -134,7 +134,7 @@ interface Columns {
 
 export function initializeDatabase(): void {
     const tables = [
-        { name: "users", columns: ["id TEXT PRIMARY KEY", "banchoId TEXT"] },
+        { name: "users", columns: ["id TEXT PRIMARY KEY", "banchoId TEXT", "score_embeds INTEGER", "mode TEXT"] },
         { name: "servers", columns: ["id TEXT PRIMARY KEY", "prefixes TEXT"] },
         { name: "maps", columns: ["id TEXT PRIMARY KEY", "data TEXT"] }
     ];
