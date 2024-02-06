@@ -52,9 +52,12 @@ async function run(interaction: Interaction): Promise<void> {
         const { default: command } = commandDefault;
 
         command.run(interaction).then(async () => {
-            await loadLogs(`INFO: [${server.name}] ${username} used slash command \`${command.data.name}\``);
+            await loadLogs(`INFO: [${server.name}] ${username} used slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}`);
         }).catch(async (error: Error) => {
-            await loadLogs(`ERROR: [${server.name}] ${username} had an error in slash command \`${command.data.name}\`: ${error.stack}`, true);
+            await loadLogs(
+                `ERROR: [${server.name}] ${username} had an error in slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}: ${error.stack}`,
+                true
+            );
         });
     }
 }
