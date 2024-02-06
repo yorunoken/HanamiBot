@@ -19,7 +19,7 @@
     Hope you have fun with whatever you're doing!
 */
 
-import { initializeDatabase } from "./utils/initalize";
+import { initializeDatabase, loadLogs } from "./utils/initalize";
 import { createHandler } from "@lilybird/handlers";
 import { createClient, Intents } from "lilybird";
 import Cryptr from "cryptr";
@@ -27,8 +27,18 @@ import Cryptr from "cryptr";
 export const cryptr = new Cryptr(process.env.ENCRYPT_SECRET, { saltLength: 10 });
 
 // Make sure bubu will not crash
-process.on("unhandledRejection", console.error);
-process.on("uncaughtException", console.error);
+process.on("unhandledRejection", async (error: Error) => {
+    await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);
+});
+process.on("uncaughtException", async (error: Error) => {
+    await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);
+});
+process.on("uncaughtExceptionMonitor", async (error: Error) => {
+    await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);
+});
+process.on("exit", async (error: Error) => {
+    await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);
+});
 
 initializeDatabase();
 
