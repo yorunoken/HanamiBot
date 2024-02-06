@@ -18,9 +18,17 @@ export function getMap(id: string | number): DbMap | undefined {
 }
 
 export function insertData({ table, id, data }: { table: string, id: string | number, data: Array<{ name: string, value: string | number | null }> }): void {
-    const fields: Array<string> = data.map((item) => item.name);
+    const setClause = data.map((item) => `${item.name} = ?`).join(", ");
     const values: Array<string | number | null> = data.map((item) => item.value);
 
-    db.prepare(`INSERT OR REPLACE INTO ${table} (id, ${fields.join(", ")}) values (?, ${fields.map(() => "?").join(", ")})`)
-        .run(id, ...values);
+    const existingRow = db.prepare(`SELECT * FROM ${table} WHERE id = ?`).get(id);
+    if (!existingRow) {
+        const fields: Array<string> = data.map((item) => item.name);
+
+        db.prepare(`INSERT OR REPLACE INTO ${table} (id, ${fields.join(", ")}) values (?, ${fields.map(() => "?").join(", ")})`)
+            .run(id, ...values);
+    }
+
+    db.prepare(`UPDATE ${table} SET ${setClause} WHERE id = ?`)
+        .run(...values, id);
 }
