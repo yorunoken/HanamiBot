@@ -84,7 +84,10 @@ export async function getScore({ scores, index, mode }: { scores: Array<UserBest
 
     const beatmapStatus = beatmapset.status;
     return {
+        position: index + 1,
         songTitle: `${beatmapset.artist} - ${beatmapset.title}`,
+        songArtist: beatmapset.artist,
+        songName: beatmapset.title,
         difficultyName: beatmap.version,
         score: score.toLocaleString(),
         accuracy: (accuracy * 100).toFixed(2),
