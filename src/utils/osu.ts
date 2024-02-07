@@ -34,6 +34,13 @@ export function buildAuthUrl(clientId: string | number, callbackUri: string, sco
     return url.href;
 }
 
+/**
+ * Gets the access token of the client.
+ * @param clientId - Client ID for the application.
+ * @param clientSecret - Client Secret for the application.
+ * @param scope - Array of authorization scopes.
+ * @returns An object containing the access token and its expiration date.
+ */
 export async function getAccessToken(clientId: number, clientSecret: string, scope: Array<AuthScope>):
 Promise<{
     accessToken: string,
@@ -47,18 +54,18 @@ Promise<{
         code: "code"
     });
 
-    const data = await fetch("https://osu.ppy.sh/oauth/token", {
+    const request = await fetch("https://osu.ppy.sh/oauth/token", {
         method: "POST",
         headers: {
             // eslint-disable-next-line @typescript-eslint/naming-convention
             "Content-Type": "application/json"
         },
         body
-    }).then(async (res) => res.json()) as AccessTokenJson;
+    });
+    if (!request.ok) throw new Error("Couldn't GET access token");
+    const data = await request.json() as AccessTokenJson;
 
-    const { access_token: accessToken, expires_in: expiresIn } = data;
-
-    return { accessToken, expiresIn };
+    return { accessToken: data.access_token, expiresIn: data.expires_in };
 }
 
 export async function getPerformanceResults({ play, maxCombo, hitValues, mods }:
