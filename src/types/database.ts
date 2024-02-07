@@ -1,16 +1,16 @@
-export interface DbUser {
+export interface DatabaseUser {
     id: string;
     banchoId: string | null;
     score_embeds: number | null;
     mode: string | null;
 }
 
-export interface DbServer {
+export interface DatabaseGuild {
     id: string;
-    prefixes: Array<string> | string | null;
+    prefixes: Array<string> | null;
 }
 
-export interface DbMap {
+export interface DatabaseMap {
     id: string;
     data: string;
 }

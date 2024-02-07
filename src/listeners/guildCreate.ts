@@ -10,9 +10,7 @@ export default {
     event: "guildCreate",
     run: (guild) => {
         const document = getServer(guild.id);
-        if (!document)
-            insertData({ table: "servers", id: guild.id, data: [ { name: "prefixes", value: null } ] });
-        else if (document.prefixes !== null && !Array.isArray(document.prefixes))
-            prefixesCache.set(guild.id, JSON.parse(document.prefixes) as Array<string>);
+        if (document === null) insertData({ table: "servers", id: guild.id, data: [ { name: "prefixes", value: null } ] });
+        else if (document.prefixes !== null) prefixesCache.set(guild.id, document.prefixes);
     }
 } satisfies Event<"guildCreate">;

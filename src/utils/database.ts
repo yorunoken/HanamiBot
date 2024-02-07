@@ -1,20 +1,26 @@
 import db from "../data.db" with { type: "sqlite" };
-import type { DbMap, DbServer, DbUser } from "../types/database";
+import type { DatabaseMap, DatabaseGuild, DatabaseUser } from "../types/database";
 
-export function getUser(id: string | number): DbUser | undefined {
-    return db.prepare("SELECT * FROM users WHERE id = ?").get(id) as DbUser;
+export function getUser(id: string | number): DatabaseUser | null {
+    const data: DatabaseUser | null = db.prepare("SELECT * FROM users WHERE id = ?").get(id) as DatabaseUser | null;
+    if (typeof data?.score_embeds === "string") data.score_embeds = Number(data.score_embeds);
+
+    return data;
 }
 
 export function removeUser(id: string | number): void {
     db.prepare("DELETE FROM users WHERE id = ?").run(id);
 }
 
-export function getServer(id: string | number): DbServer | undefined {
-    return db.prepare("SELECT * FROM servers WHERE id = ?").get(id) as DbServer;
+export function getServer(id: string | number): DatabaseGuild | null {
+    const data: DatabaseGuild | null = db.prepare("SELECT * FROM servers WHERE id = ?").get(id) as DatabaseGuild | null;
+    if (typeof data?.prefixes === "string") data.prefixes = JSON.parse(data.prefixes) as Array<string>;
+
+    return data;
 }
 
-export function getMap(id: string | number): DbMap | undefined {
-    return db.prepare("SELECT * FROM maps WHERE id = ?").get(id) as DbMap;
+export function getMap(id: string | number): DatabaseMap | undefined {
+    return db.prepare("SELECT * FROM maps WHERE id = ?").get(id) as DatabaseMap;
 }
 
 export function insertData({ table, id, data }: { table: string, id: string | number, data: Array<{ name: string, value: string | number | null }> }): void {
