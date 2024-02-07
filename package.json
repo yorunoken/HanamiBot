@@ -7,15 +7,6 @@
     "start": "bun src/index.ts",
     "db": "bun tools/database.ts"
   },
-  "devDependencies": {
-    "@stylistic/eslint-plugin": "^1.5.0",
-    "@types/express-session": "^1.17.10",
-    "@typescript-eslint/eslint-plugin": "^6.13.2",
-    "bun-types": "^1.0.26",
-    "eslint": "^8.55.0",
-    "eslint-import-resolver-typescript": "^3.6.1",
-    "eslint-plugin-import": "^2.29.0"
-  },
   "dependencies": {
     "@lilybird/handlers": "^0.3.1",
     "cryptr": "^6.3.0",
@@ -24,5 +15,14 @@
     "osu-downloader": "^0.8.1",
     "osu-web.js": "^2.0.1",
     "rosu-pp": "^0.9.4"
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^1.6.0",
+    "@types/express-session": "^1.17.10",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "bun-types": "^1.0.26",
+    "eslint": "^8.56.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1"
   }
 }
