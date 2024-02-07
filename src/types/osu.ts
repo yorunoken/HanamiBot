@@ -73,7 +73,7 @@ export interface PerformanceInfo {
 
 export type AuthScope = "public" | "chat.write" | "delegate" | "forum.write" | "friends.read" | "identify";
 
-export interface AccessTokenJson {
+export interface AccessTokenJSON {
     access_token: string;
     expires_in: string;
 }

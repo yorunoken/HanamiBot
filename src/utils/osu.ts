@@ -4,7 +4,7 @@ import { Beatmap, Calculator } from "rosu-pp";
 import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
 import { getModsEnum } from "osu-web.js";
 import type { Mod, UserBestScore, UserScore } from "osu-web.js";
-import type { AccessTokenJson, AuthScope, Modes, PerformanceInfo } from "../types/osu";
+import type { AccessTokenJSON, AuthScope, Modes, PerformanceInfo } from "../types/osu";
 import type { Score as ScoreData } from "rosu-pp";
 
 /**
@@ -63,7 +63,7 @@ Promise<{
         body
     });
     if (!request.ok) throw new Error("Couldn't GET access token");
-    const data = await request.json() as AccessTokenJson;
+    const data = await request.json() as AccessTokenJSON;
 
     return { accessToken: data.access_token, expiresIn: data.expires_in };
 }
