@@ -11,7 +11,7 @@
     "@stylistic/eslint-plugin": "^1.5.0",
     "@types/express-session": "^1.17.10",
     "@typescript-eslint/eslint-plugin": "^6.13.2",
-    "bun-types": "^1.0.23",
+    "bun-types": "^1.0.26",
     "eslint": "^8.55.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.0"
