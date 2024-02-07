@@ -1,4 +1,6 @@
-To start contributing, you either need to be on a UNIX operating system (Linux, MacOS, etc.) or you need to use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) (Windows Subsystem for Linux) to install [Bun](https://bun.sh/)
+# Contributing
+
+To start contributing, you either need to be on a UNIX operating system (Linux, MacOS, etc.) or you need to use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)(Windows Subsystem for Linux) to install [Bun](https://bun.sh/)
 
 1. Install Bun using curl
    - `curl -fsSL https://bun.sh/install | bash`
@@ -13,7 +15,7 @@ To start contributing, you either need to be on a UNIX operating system (Linux, 
 
 5. Install ESLint as an extension in your IDE to help with types.
 
-6. Fill out `.env.local.example` with your API keys (see below to see how) and delete the `.example` off of it.
+6. Fill out `.env.local` with your API keys (see below to see how).
 
 7. You can use `bun start` to start the bot and test your code.
 

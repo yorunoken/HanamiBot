@@ -1,6 +1,7 @@
-.env
 node_modules/
-data.db
 tests/
+logs/
 package-lock.json
-logs/*
+.env.*
+*.db
+*.tsbuildinfo

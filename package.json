@@ -4,21 +4,22 @@
   "name": "hanamibot",
   "type": "module",
   "scripts": {
+    "check": "tsc && eslint",
     "start": "bun src/index.ts",
     "db": "bun tools/database.ts"
   },
+  "trustedDependencies": [
+    "rosu-pp"
+  ],
   "dependencies": {
     "@lilybird/handlers": "^0.3.1",
-    "cryptr": "^6.3.0",
     "lilybird": "^0.5.2",
-    "octokit": "^3.1.2",
     "osu-downloader": "^0.8.1",
     "osu-web.js": "^2.0.1",
     "rosu-pp": "^0.9.4"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^1.6.0",
-    "@types/express-session": "^1.17.10",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "bun-types": "^1.0.26",
     "eslint": "^8.56.0",
