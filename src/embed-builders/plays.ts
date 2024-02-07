@@ -134,7 +134,8 @@ async function getMultiplePlays({ plays, page, mode, profile }:
             .map((play) => `**#${play.position} [${play.songName} [${play.difficultyName}]](${play.mapLink}) +${play.mods.join("")} ${play.stars}**
             ${play.grade} ${play.ppFormatted} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%**
             ${play.hitValues} ${SPACE} ${play.comboValues} ${SPACE} ${play.playSubmitted}`)
-            .join("\n")
+            .join("\n"),
+        footer: { text: `Page ${page + 1} of ${Math.ceil(plays.length / 5)}` }
     };
 
     return [embed] satisfies Array<EmbedStructure>;
