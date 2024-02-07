@@ -1,4 +1,5 @@
 import type { MapAttributes, PerformanceAttributes } from "rosu-pp";
+import type { Beatmapset, Fails, Beatmap as BeatmapWeb } from "osu-web.js";
 
 export const enum Mode {
     OSU = "osu",
@@ -91,3 +92,12 @@ export interface PlayStatistics {
     count_katu: number | undefined;
     count_miss: number;
 }
+
+export type Beatmap = BeatmapWeb & {
+    beatmapset: Beatmapset & {
+        ratings: Array<number>
+    },
+    checksum: string | null,
+    failtimes: Fails,
+    max_combo: number
+};
