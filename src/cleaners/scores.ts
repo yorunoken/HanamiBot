@@ -1,7 +1,7 @@
 import { accuracyCalculator, getPerformanceResults } from "../utils/osu";
 import { grades, rulesets } from "../utils/emotes";
-import type { UserBestScore, UserScore } from "osu-web.js";
-import type { Mode, PlayStatistics, ScoresInfo } from "../types/osu";
+import type { Beatmap, Mode, PlayStatistics, ScoresInfo } from "../types/osu";
+import type { Score, UserBestScore, UserScore } from "osu-web.js";
 
 // We won't be needing this either!
 // interface HitValues {
@@ -13,14 +13,26 @@ import type { Mode, PlayStatistics, ScoresInfo } from "../types/osu";
 //     hMiss: null | number;
 // }
 
-export async function getScore({ scores, index, mode }: { scores: Array<UserBestScore> | Array<UserScore>, index: number, mode: Mode }): Promise<ScoresInfo> {
+export async function getScore({ scores, beatmap: map_, index, mode }: { scores: Array<UserBestScore> | Array<UserScore> | Array<Score>, beatmap?: Beatmap, index: number, mode: Mode }): Promise<ScoresInfo> {
     const play = scores[index];
 
-    const { score, accuracy, beatmap, beatmapset } = play;
+    let beatmap;
+    let beatmapset;
+    if (map_) {
+        const { beatmapset: mapset, ...rest } = map_;
+        beatmap = { ...rest };
+        beatmapset = mapset;
+    } else {
+        const { beatmap: map, beatmapset: set } = play as UserBestScore | UserScore;
+        beatmap = map;
+        beatmapset = set;
+    }
+
+    const { score, accuracy } = play;
     const statistics = play.statistics as PlayStatistics;
     const { mods } = play;
 
-    const performance = await getPerformanceResults({ hitValues: statistics, play, maxCombo: play.max_combo, mods });
+    const performance = await getPerformanceResults({ hitValues: statistics, beatmapId: beatmap.id, play, maxCombo: play.max_combo, mods });
 
     // Throw an error if performance doesn't exist.
     // This can only mean one thing, and it's because the map couldn't be downloaded for some reason.
