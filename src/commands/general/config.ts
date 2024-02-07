@@ -36,7 +36,6 @@ async function list(interaction: GuildInteraction<ApplicationCommandData>): Prom
 
     for (const [key, v] of Object.entries(user)) {
         const value = v as string | number | null;
-        console.log(key, value);
         if (key === "id" || key === "banchoId") continue;
 
         if (value !== null)
@@ -45,7 +44,6 @@ async function list(interaction: GuildInteraction<ApplicationCommandData>): Prom
             embeds.fields?.push({ name: key, value: defaults[key || "unknown"] });
     }
 
-    console.log(embeds);
     await interaction.editReply({ embeds: [embeds] });
 }
 
