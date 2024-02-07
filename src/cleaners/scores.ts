@@ -84,7 +84,7 @@ export async function getScore({ scores, index, mode }: { scores: Array<UserBest
 
     const beatmapStatus = beatmapset.status;
     return {
-        position: index + 1,
+        position: play.position,
         songTitle: `${beatmapset.artist} - ${beatmapset.title}`,
         songArtist: beatmapset.artist,
         songName: beatmapset.title,

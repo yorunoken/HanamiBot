@@ -34,7 +34,9 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
 
     const profile = getProfile(user, mode);
 
-    let plays = await client.users.getUserScores(user.id, type, { query: { mode, limit: 100, include_fails: includeFails } });
+    let plays = (await client.users.getUserScores(user.id, type, { query: { mode, limit: 100, include_fails: includeFails } })).map((item, idx) => {
+        return { ...item, position: idx + 1 };
+    });
 
     if (mods?.name) {
         const { exclude, forceInclude, include, name } = mods;
