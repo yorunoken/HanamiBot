@@ -4,8 +4,9 @@ import { getMap, insertData } from "./database";
 import { Beatmap, Calculator } from "rosu-pp";
 import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
 import { getModsEnum } from "osu-web.js";
+import type { Client, EmbedStructure, Message } from "lilybird";
 import type { AccessTokenJSON, AuthScope, PerformanceInfo } from "../types/osu";
-import type { Mod, UserBestScore, UserScore } from "osu-web.js";
+import type { Mod, Score, UserBestScore, UserScore } from "osu-web.js";
 import type { Score as ScoreData } from "rosu-pp";
 
 /**
@@ -69,14 +70,16 @@ Promise<{
     return { accessToken: data.access_token, expiresIn: data.expires_in };
 }
 
-export async function getPerformanceResults({ play, maxCombo, hitValues, mods }:
-{ play: UserBestScore | UserScore,
+export async function getPerformanceResults({ play, beatmapId, maxCombo, hitValues, mods }:
+{
+    play: UserBestScore | UserScore | Score,
+    beatmapId: number,
     maxCombo?: number,
     hitValues: { count_100?: number, count_300?: number, count_50?: number, count_geki?: number, count_katu?: number, count_miss?: number },
     mods: Array<Mod>
 }): Promise<PerformanceInfo | null> {
-    const { beatmap: map, mode_int: rulesetId } = play;
-    const mapData = getMap(map.id)?.data ?? (await downloadBeatmap([map.id]))[0].contents;
+    const { mode_int: rulesetId } = play;
+    const mapData = getMap(beatmapId)?.data ?? (await downloadBeatmap([beatmapId]))[0].contents;
     if (!mapData) return null;
 
     let { count_100: count100 = 0, count_300: count300 = 0, count_50: count50 = 0, count_geki: countGeki = 0, count_katu: countKatu = 0, count_miss: countMiss = 0 } = hitValues;
@@ -114,7 +117,7 @@ export async function getPerformanceResults({ play, maxCombo, hitValues, mods }:
         .nKatu(countKatu)
         .performance(beatmap);
 
-    return { mapValues, perfectPerformance, currentPerformance, fcPerformance, mapId: map.id };
+    return { mapValues, perfectPerformance, currentPerformance, fcPerformance, mapId: beatmapId };
 }
 
 export async function downloadBeatmap(ids: Array<number>): Promise<Array<{
@@ -160,3 +163,38 @@ export function accuracyCalculator(mode: Mode, hits: {
     return 100 * acc;
 }
 
+function findId(embed: EmbedStructure): number | null {
+    const urlToCheck = embed.url ?? embed.author?.url;
+    return urlToCheck && !(/\/(user|u)/).test(urlToCheck) ? Number((/\d+/).exec(urlToCheck)?.[0]) : null;
+}
+
+function getEmbedFromReply(message: Message): number | null {
+    const { referencedMessage } = message;
+    if (typeof referencedMessage?.embeds === "undefined")
+        return null;
+
+    const foundId = findId(referencedMessage.embeds[0]);
+    return Number(foundId) || null;
+}
+
+async function cycleThroughEmbeds(message: Message, client: Client): Promise<number | null | undefined> {
+    const channel = await message.fetchChannel();
+    if (!channel.isText()) return;
+    const messages = await client.rest.getChannelMessages(channel.id, { limit: 100 });
+
+    let beatmapId;
+    for (let i = 0; i < messages.length; i++) {
+        const msg = messages[i];
+        if (!(msg.embeds.length > 0 && msg.author.bot))
+            continue;
+
+        beatmapId = findId(msg.embeds[0]);
+        if (beatmapId)
+            break;
+    }
+    return beatmapId;
+}
+
+export async function getBeatmapIdFromContext(message: Message, client: Client): Promise<number | null | undefined> {
+    return typeof message.referencedMessage !== "undefined" ? getEmbedFromReply(message) : cycleThroughEmbeds(message, client);
+}
