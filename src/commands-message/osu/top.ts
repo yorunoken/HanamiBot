@@ -21,11 +21,11 @@ const modeAliases: Record<string, { mode: Modes }> = {
     tctb: { mode: "fruits" }
 };
 
-async function run({ message, args, commandName, index = 0 }: { message: Message, args: Array<string>, commandName: string, index: number | undefined }): Promise<void> {
+async function run({ message, args, commandName, index }: { message: Message, args: Array<string>, commandName: string, index: number | undefined }): Promise<void> {
     const channel = await message.fetchChannel();
 
     const { mode } = modeAliases[commandName];
-    const { user, mods } = parseOsuArguments(message, args, mode);
+    const { user, mods, flags } = parseOsuArguments(message, args, mode);
     if (user.type === "fail") {
         await channel.send(user.failMessage);
         return;
@@ -37,7 +37,7 @@ async function run({ message, args, commandName, index = 0 }: { message: Message
         return;
     }
 
-    const embeds = await playBuilder({ user: osuUser, mode: user.mode, initiatorId: message.author.id, type: "best", index, mods, isMultiple: true });
+    const embeds = await playBuilder({ user: osuUser, mode: user.mode, initiatorId: message.author.id, type: "best", page: Number(flags.p ?? flags.page) || undefined, index, mods, isMultiple: true });
     await channel.send({ embeds });
 }
 
