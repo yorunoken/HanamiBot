@@ -1,4 +1,3 @@
-
 /**
     Hello! This is Hanami, a Discord bot written in TypeScript, using the Bun runtime engine.
     I mainly wrote this bot for my friends, but realized the potential it had, and decided to expand it. (Like no one else has written an osu! Discord bot before, lol.)
@@ -22,22 +21,22 @@
 import { initializeDatabase, loadLogs } from "./utils/initalize";
 import { createHandler } from "@lilybird/handlers";
 import { createClient, Intents } from "lilybird";
-import Cryptr from "cryptr";
+import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
 
-export const cryptr = new Cryptr(process.env.ENCRYPT_SECRET, { saltLength: 10 });
+const key = randomBytes(32);
+const iv = randomBytes(16);
 
-// Make sure bubu will not crash
-process.on("unhandledRejection", async (error: Error) => {
-    await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);
-});
-process.on("uncaughtException", async (error: Error) => {
-    await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);
-});
-process.on("uncaughtExceptionMonitor", async (error: Error) => {
-    await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);
-});
-process.on("exit", async (error: Error) => {
-    await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);
+export const encrypt = createCipheriv("aes256", key, iv);
+export const decrypt = createDecipheriv("aes256", key, iv);
+
+// process.on("unhandledRejection", async (error: Error) => {
+//     await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);
+// });
+// process.on("uncaughtException", async (error: Error) => {
+//     await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);
+// });
+process.on("exit", async (code: number) => {
+    await loadLogs(`ERROR: the client exited with code ${code}`, true);
 });
 
 initializeDatabase();
@@ -58,4 +57,3 @@ await createClient({
     ],
     ...listeners
 });
-

@@ -1,4 +1,4 @@
-import { cryptr } from "../..";
+import { encrypt } from "../..";
 import { buildAuthUrl } from "../../utils/osu";
 import type { AuthScope } from "../../types/osu";
 import type { SlashCommand } from "@lilybird/handlers";
@@ -14,7 +14,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     if (!interaction.inGuild()) return;
     await interaction.deferReply(true);
 
-    const encryptedDiscordId = cryptr.encrypt(interaction.member.user.id);
+    const encryptedDiscordId = `${encrypt.update(interaction.member.user.id, "utf-8", "hex")}${encrypt.final("hex")}`;
 
     const authUrl = redirectPage(encryptedDiscordId);
     await interaction.editReply(`You can [click here](<${authUrl}>) to link your osu! account to the bot!`);

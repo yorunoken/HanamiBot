@@ -1,4 +1,4 @@
-import { cryptr } from "..";
+import { decrypt } from "..";
 import { DEFAULT_PREFIX } from "../utils/constants";
 import { getServer } from "../utils/database";
 import { commandAliases, loadLogs, messageCommands } from "../utils/initalize";
@@ -14,7 +14,7 @@ async function verifyUser(client: Client, message: Message): Promise<void> {
     if (!content) return;
 
     const [cryptedDiscordId, osuId] = content.split("\n");
-    const discordId = cryptr.decrypt(cryptedDiscordId);
+    const discordId = `${decrypt.update(cryptedDiscordId, "utf-8", "hex")}${decrypt.final("hex")}`;
 
     const memberDm = await client.rest.createDM(discordId);
 
