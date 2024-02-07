@@ -2,7 +2,7 @@ import db from "../data.db" with { type: "sqlite" };
 import { getAccessToken } from "./osu";
 import { Client as OsuClient } from "osu-web.js";
 import { readdir } from "fs/promises";
-import { mkdir, exists, readFile, writeFile } from "node:fs/promises";
+import { mkdir, stat, readFile, writeFile } from "node:fs/promises";
 import type { Client as LilybirdClient, POSTApplicationCommandStructure } from "lilybird";
 import type { DefaultMessageCommand, DefaultSlashCommand } from "../types/commands";
 
@@ -98,22 +98,23 @@ export async function loadLogs(message: string, error?: boolean): Promise<void> 
     const monthName = monthNames[date.getUTCMonth()];
     const day = date.getUTCDate().toString().padStart(2, "0");
 
-    if (!await exists("./logs")) {
+    console.log(await stat("./logs"));
+    if (!(await stat("./logs")).isDirectory()) {
         console.log("The logs folder couldn't be found❌, generating..");
         await mkdir("./logs", { recursive: true });
     }
 
-    if (!await exists(`./logs/${year}`)) {
+    if (!(await stat(`./logs/${year}`)).isDirectory()) {
         console.log(`The year ${year} couldn't be found❌, generating..`);
         await mkdir(`./logs/${year}`, { recursive: true });
     }
 
-    if (!await exists(`./logs/${year}/${month}`)) {
+    if (!(await stat(`./logs/${year}/${month}`)).isDirectory()) {
         console.log(`The month ${monthName}(${month}) couldn't be found❌, generating..`);
         await mkdir(`./logs/${year}/${month}`, { recursive: true });
     }
 
-    if (!await exists(`./logs/${year}/${month}/${day}.txt`)) {
+    if (!(await stat(`./logs/${year}/${month}/${day}.txt`)).isFile()) {
         console.log(`The day ${day} couldn't be found ❌, generating..`);
         await writeFile(`./logs/${year}/${month}/${day}.txt`, `${formattedDate}Created log file.`);
     } else {
