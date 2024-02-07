@@ -17,7 +17,21 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
 
     const includeFails = !(interaction.data.getBoolean("passes") ?? false);
     const index = interaction.data.getInteger("index") ?? 0;
+
     const mod = interaction.data.getString("mods") as Mod;
+    const modsAction = interaction.data.getString("mods_action");
+
+    const mods = { exclude: false, forceInclude: false, include: false, name: mod };
+    switch (modsAction) {
+        case "include":
+            mods.include = true; break;
+        case "force_include":
+            mods.forceInclude = true; break;
+        case "exclude":
+            mods.exclude = true; break;
+        default:
+            mods.include = true;
+    }
 
     if (user.type === UserType.FAIL) {
         await interaction.editReply(user.failMessage);
@@ -59,7 +73,6 @@ export default {
                 description: "Specify an osu! mode",
                 choices: [ { name: "osu", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "ctb", value: "fruits" } ]
             },
-
             {
                 type: ApplicationCommandOptionType.INTEGER,
                 name: "index",
@@ -72,6 +85,25 @@ export default {
                 name: "mods",
                 description: "Specify a mods combination.",
                 min_length: 2
+            },
+            {
+                type: ApplicationCommandOptionType.STRING,
+                name: "mods_action",
+                description: "Specify the action to perform on the mods combination.",
+                choices: [
+                    {
+                        name: "Include",
+                        value: "include"
+                    },
+                    {
+                        name: "Force Include",
+                        value: "force_include"
+                    },
+                    {
+                        name: "Exclude",
+                        value: "exclude"
+                    }
+                ]
             },
             {
                 type: ApplicationCommandOptionType.STRING,
