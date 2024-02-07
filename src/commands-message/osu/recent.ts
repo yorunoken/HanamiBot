@@ -1,30 +1,31 @@
 import { parseOsuArguments } from "../../utils/args";
 import { client } from "../../utils/initalize";
 import { playBuilder } from "../../embed-builders/plays";
+import { Mode } from "../../types/osu";
+import { UserType } from "../../types/commandArgs";
 import type { MessageCommand } from "../../types/commands";
-import type { Modes } from "../../types/osu";
 import type { Message } from "lilybird";
 
-const modeAliases: Record<string, { mode: Modes, includeFails: boolean }> = {
-    r: { mode: "osu", includeFails: true },
-    rs: { mode: "osu", includeFails: true },
-    rt: { mode: "taiko", includeFails: true },
-    rm: { mode: "mania", includeFails: true },
-    rc: { mode: "fruits", includeFails: true },
-    recent: { mode: "osu", includeFails: true },
-    recenttaiko: { mode: "taiko", includeFails: true },
-    recentmania: { mode: "mania", includeFails: true },
-    recentcatch: { mode: "fruits", includeFails: true },
+const modeAliases: Record<string, { mode: Mode, includeFails: boolean }> = {
+    r: { mode: Mode.OSU, includeFails: true },
+    rs: { mode: Mode.OSU, includeFails: true },
+    rt: { mode: Mode.TAIKO, includeFails: true },
+    rm: { mode: Mode.MANIA, includeFails: true },
+    rc: { mode: Mode.FRUITS, includeFails: true },
+    recent: { mode: Mode.OSU, includeFails: true },
+    recenttaiko: { mode: Mode.TAIKO, includeFails: true },
+    recentmania: { mode: Mode.MANIA, includeFails: true },
+    recentcatch: { mode: Mode.FRUITS, includeFails: true },
 
-    rp: { mode: "osu", includeFails: false },
-    rsp: { mode: "osu", includeFails: false },
-    rpt: { mode: "taiko", includeFails: false },
-    rpm: { mode: "mania", includeFails: false },
-    rpc: { mode: "fruits", includeFails: false },
-    recentpass: { mode: "osu", includeFails: false },
-    recentpasstaiko: { mode: "taiko", includeFails: false },
-    recentpassmania: { mode: "mania", includeFails: false },
-    recentpasscatch: { mode: "fruits", includeFails: false }
+    rp: { mode: Mode.OSU, includeFails: false },
+    rsp: { mode: Mode.OSU, includeFails: false },
+    rpt: { mode: Mode.TAIKO, includeFails: false },
+    rpm: { mode: Mode.MANIA, includeFails: false },
+    rpc: { mode: Mode.FRUITS, includeFails: false },
+    recentpass: { mode: Mode.OSU, includeFails: false },
+    recentpasstaiko: { mode: Mode.TAIKO, includeFails: false },
+    recentpassmania: { mode: Mode.MANIA, includeFails: false },
+    recentpasscatch: { mode: Mode.FRUITS, includeFails: false }
 };
 
 async function run({ message, args, commandName, index = 0 }: { message: Message, args: Array<string>, commandName: string, index: number | undefined }): Promise<void> {
@@ -32,7 +33,7 @@ async function run({ message, args, commandName, index = 0 }: { message: Message
 
     const { mode, includeFails } = modeAliases[commandName];
     const { user, mods } = parseOsuArguments(message, args, mode);
-    if (user.type === "fail") {
+    if (user.type === UserType.FAIL) {
         await channel.send(user.failMessage);
         return;
     }

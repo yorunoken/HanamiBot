@@ -1,10 +1,11 @@
 /* eslint-disable @stylistic/no-mixed-operators */
+import { Mode } from "../types/osu";
 import { getMap, insertData } from "./database";
 import { Beatmap, Calculator } from "rosu-pp";
 import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
 import { getModsEnum } from "osu-web.js";
+import type { AccessTokenJSON, AuthScope, PerformanceInfo } from "../types/osu";
 import type { Mod, UserBestScore, UserScore } from "osu-web.js";
-import type { AccessTokenJSON, AuthScope, Modes, PerformanceInfo } from "../types/osu";
 import type { Score as ScoreData } from "rosu-pp";
 
 /**
@@ -136,7 +137,7 @@ export async function downloadBeatmap(ids: Array<number>): Promise<Array<{
     return downloaderResponse.map((response) => ({ id: response.id, contents: response.buffer?.toString() }));
 }
 
-export function accuracyCalculator(mode: Modes, hits: {
+export function accuracyCalculator(mode: Mode, hits: {
     count_300?: number,
     count_100?: number,
     count_50?: number,
@@ -150,10 +151,10 @@ export function accuracyCalculator(mode: Modes, hits: {
     let acc = 0.0;
 
     switch (mode) {
-        case "osu": acc = (6 * count_300 + 2 * count_100 + count_50) / (6 * (count_50 + count_100 + count_300 + count_miss)); break;
-        case "taiko": acc = (2 * count_300 + count_100) / (2 * (count_300 + count_100 + count_miss)); break;
-        case "fruits": acc = count_300 + count_100 + count_50 + count_katu + count_miss; break;
-        case "mania": acc = (6 * count_geki + 6 * count_300 + 4 * count_katu + 2 * count_100 + count_50) / (6 * (count_50 + count_100 + count_300 + count_miss + count_geki + count_katu)); break;
+        case Mode.OSU: acc = (6 * count_300 + 2 * count_100 + count_50) / (6 * (count_50 + count_100 + count_300 + count_miss)); break;
+        case Mode.TAIKO: acc = (2 * count_300 + count_100) / (2 * (count_300 + count_100 + count_miss)); break;
+        case Mode.FRUITS: acc = count_300 + count_100 + count_50 + count_katu + count_miss; break;
+        case Mode.MANIA: acc = (6 * count_geki + 6 * count_300 + 4 * count_katu + 2 * count_100 + count_50) / (6 * (count_50 + count_100 + count_300 + count_miss + count_geki + count_katu)); break;
     }
 
     return 100 * acc;

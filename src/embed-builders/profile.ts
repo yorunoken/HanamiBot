@@ -3,9 +3,9 @@ import { grades } from "../utils/emotes";
 import { EmbedType } from "lilybird";
 import type { UserExtended } from "osu-web.js";
 import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, EmbedImageStructure, EmbedStructure, EmbedThumbnailStructure } from "lilybird";
-import type { Modes } from "../types/osu";
+import type { Mode } from "../types/osu";
 
-export function profileBuilder(user: UserExtended, mode: Modes): Array<EmbedStructure> {
+export function profileBuilder(user: UserExtended, mode: Mode): Array<EmbedStructure> {
     const profile = getProfile(user, mode);
     const author = {
         name: `${user.username}: ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}#${profile.countryRank})`,

@@ -1,15 +1,16 @@
 import { parseOsuArguments } from "../../utils/args";
 import { profileBuilder } from "../../embed-builders/profile";
 import { client } from "../../utils/initalize";
+import { UserType } from "../../types/commandArgs";
 import type { MessageCommand } from "../../types/commands";
-import type { Modes } from "../../types/osu";
+import type { Mode } from "../../types/osu";
 import type { Message } from "lilybird";
 
 async function run({ message, args, commandName }: { message: Message, args: Array<string>, commandName: string }): Promise<void> {
     const channel = await message.fetchChannel();
 
-    const { user } = parseOsuArguments(message, args, commandName as Modes);
-    if (user.type === "fail") {
+    const { user } = parseOsuArguments(message, args, commandName as Mode);
+    if (user.type === UserType.FAIL) {
         await channel.send(user.failMessage);
         return;
     }

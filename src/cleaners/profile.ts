@@ -1,7 +1,7 @@
 import type { UserExtended } from "osu-web.js";
-import type { Modes, ProfileInfo } from "../types/osu";
+import type { Mode, ProfileInfo } from "../types/osu";
 
-export function getProfile(user: UserExtended, mode: Modes): ProfileInfo {
+export function getProfile(user: UserExtended, mode: Mode): ProfileInfo {
     const { statistics } = user;
     const userJoinDate = new Date(user.join_date);
 

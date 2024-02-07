@@ -1,7 +1,7 @@
 import { accuracyCalculator, getPerformanceResults } from "../utils/osu";
 import { grades, rulesets } from "../utils/emotes";
 import type { UserBestScore, UserScore } from "osu-web.js";
-import type { Modes, PlayStatistics, ScoresInfo } from "../types/osu";
+import type { Mode, PlayStatistics, ScoresInfo } from "../types/osu";
 
 // We won't be needing this either!
 // interface HitValues {
@@ -13,7 +13,7 @@ import type { Modes, PlayStatistics, ScoresInfo } from "../types/osu";
 //     hMiss: null | number;
 // }
 
-export async function getScore({ scores, index, mode }: { scores: Array<UserBestScore> | Array<UserScore>, index: number, mode: Modes }): Promise<ScoresInfo> {
+export async function getScore({ scores, index, mode }: { scores: Array<UserBestScore> | Array<UserScore>, index: number, mode: Mode }): Promise<ScoresInfo> {
     const play = scores[index];
 
     const { score, accuracy, beatmap, beatmapset } = play;

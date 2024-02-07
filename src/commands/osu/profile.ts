@@ -1,6 +1,7 @@
 import { getCommandArgs } from "../../utils/args";
 import { profileBuilder } from "../../embed-builders/profile";
 import { client } from "../../utils/initalize";
+import { UserType } from "../../types/commandArgs";
 import { ApplicationCommandOptionType } from "lilybird";
 import type { ApplicationCommandData, Interaction } from "lilybird";
 import type { SlashCommand } from "@lilybird/handlers";
@@ -9,9 +10,12 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     if (!interaction.inGuild()) return;
     await interaction.deferReply();
 
-    const { user } = getCommandArgs(interaction);
+    const args = getCommandArgs(interaction);
 
-    if (user.type === "fail") {
+    if (typeof args === "undefined") return;
+    const { user } = args;
+
+    if (user.type === UserType.FAIL) {
         await interaction.editReply(user.failMessage);
         return;
     }

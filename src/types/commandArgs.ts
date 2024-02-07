@@ -1,18 +1,24 @@
 import type { Mod } from "osu-web.js";
-import type { Modes } from "./osu";
+import type { Mode } from "./osu";
+
+export const enum UserType {
+    SUCCESS = "success",
+    FAIL = "fail"
+}
 
 interface BaseUser {
+    type: UserType;
     birthDay?: string;
 }
 
 interface SuccessUser extends BaseUser {
-    type: "success";
+    type: UserType.SUCCESS;
     banchoId: string;
-    mode: Modes;
+    mode: Mode;
 }
 
 interface FailUser extends BaseUser {
-    type: "fail";
+    type: UserType.FAIL;
     failMessage: string;
 }
 

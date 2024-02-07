@@ -1,24 +1,25 @@
 import { parseOsuArguments } from "../../utils/args";
 import { client } from "../../utils/initalize";
 import { playBuilder } from "../../embed-builders/plays";
+import { Mode } from "../../types/osu";
+import { UserType } from "../../types/commandArgs";
 import type { MessageCommand } from "../../types/commands";
-import type { Modes } from "../../types/osu";
 import type { Message } from "lilybird";
 
-const modeAliases: Record<string, { mode: Modes }> = {
-    top: { mode: "osu" },
-    toposu: { mode: "osu" },
-    toptaiko: { mode: "taiko" },
-    topmania: { mode: "mania" },
-    topcatch: { mode: "fruits" },
-    topctb: { mode: "fruits" },
+const modeAliases: Record<string, { mode: Mode }> = {
+    top: { mode: Mode.OSU },
+    toposu: { mode: Mode.OSU },
+    toptaiko: { mode: Mode.TAIKO },
+    topmania: { mode: Mode.MANIA },
+    topcatch: { mode: Mode.FRUITS },
+    topctb: { mode: Mode.FRUITS },
 
-    t: { mode: "osu" },
-    to: { mode: "osu" },
-    tt: { mode: "taiko" },
-    tm: { mode: "mania" },
-    tc: { mode: "fruits" },
-    tctb: { mode: "fruits" }
+    t: { mode: Mode.OSU },
+    to: { mode: Mode.OSU },
+    tt: { mode: Mode.TAIKO },
+    tm: { mode: Mode.MANIA },
+    tc: { mode: Mode.FRUITS },
+    tctb: { mode: Mode.FRUITS }
 };
 
 async function run({ message, args, commandName, index }: { message: Message, args: Array<string>, commandName: string, index: number | undefined }): Promise<void> {
@@ -26,7 +27,7 @@ async function run({ message, args, commandName, index }: { message: Message, ar
 
     const { mode } = modeAliases[commandName];
     const { user, mods, flags } = parseOsuArguments(message, args, mode);
-    if (user.type === "fail") {
+    if (user.type === UserType.FAIL) {
         await channel.send(user.failMessage);
         return;
     }

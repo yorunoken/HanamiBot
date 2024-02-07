@@ -1,6 +1,11 @@
 import type { MapAttributes, PerformanceAttributes } from "rosu-pp";
 
-export type Modes = "osu" | "mania" | "taiko" | "fruits";
+export const enum Mode {
+    OSU = "osu",
+    MANIA = "mania",
+    TAIKO = "taiko",
+    FRUITS = "fruits"
+}
 
 export interface ProfileInfo {
     username: string;

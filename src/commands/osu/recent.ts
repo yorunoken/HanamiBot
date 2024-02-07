@@ -1,6 +1,7 @@
 import { getCommandArgs } from "../../utils/args";
 import { playBuilder } from "../../embed-builders/plays";
 import { client } from "../../utils/initalize";
+import { UserType } from "../../types/commandArgs";
 import { ApplicationCommandOptionType } from "lilybird";
 import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, Interaction } from "lilybird";
@@ -10,12 +11,15 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     if (!interaction.inGuild()) return;
     await interaction.deferReply();
 
-    const { user } = getCommandArgs(interaction);
+    const args = getCommandArgs(interaction);
+    if (typeof args === "undefined") return;
+    const { user } = args;
+
     const includeFails = !(interaction.data.getBoolean("passes") ?? false);
     const index = interaction.data.getInteger("index") ?? 0;
     const mod = interaction.data.getString("mods") as Mod;
 
-    if (user.type === "fail") {
+    if (user.type === UserType.FAIL) {
         await interaction.editReply(user.failMessage);
         return;
     }

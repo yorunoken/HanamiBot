@@ -5,13 +5,13 @@ import { SPACE } from "../utils/constants";
 import { getUser } from "../utils/database";
 import { EmbedType } from "lilybird";
 import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, EmbedImageStructure, EmbedStructure, EmbedThumbnailStructure } from "lilybird";
-import type { Modes, ProfileInfo, ScoresInfo } from "../types/osu";
+import type { Mode, ProfileInfo, ScoresInfo } from "../types/osu";
 import type { Mod, UserBestScore, UserExtended, UserScore } from "osu-web.js";
 
-export async function playBuilder({ user, mode, includeFails = true, index, type, mods, initiatorId, isMultiple, page }:
+export async function playBuilder({ user, mode, includeFails = true, index, type, mods, initiatorId, isMultiple, page, sortByDate }:
 {
     user: UserExtended,
-    mode: Modes,
+    mode: Mode,
     type: "best" | "firsts" | "recent",
     index?: number,
     initiatorId: string,
@@ -23,6 +23,7 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
         name: null | Mod
     },
     isMultiple?: boolean,
+    sortByDate?: boolean,
     page?: number
 }): Promise<Array<EmbedStructure>> {
     if (!page && !index) {
@@ -52,6 +53,9 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
         });
     }
 
+    if (sortByDate)
+        plays = plays.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
     if (plays.length === 0) {
         return [
             {
@@ -68,7 +72,7 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
 async function getSinglePlay({ mode, index, plays, profile, initiatorId, isMultiple }:
 {
     plays: Array<UserBestScore> | Array<UserScore>,
-    mode: Modes,
+    mode: Mode,
     profile: ProfileInfo,
     index: number,
     initiatorId: string,
@@ -119,7 +123,7 @@ async function getMultiplePlays({ plays, page, mode, profile }:
 {
     plays: Array<UserBestScore> | Array<UserScore>,
     page: number,
-    mode: Modes,
+    mode: Mode,
     profile: ProfileInfo
 }): Promise<Array<EmbedStructure>> {
     const pageStart = page * 5;
