@@ -8,12 +8,12 @@ import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, E
 import type { Modes, ProfileInfo, ScoresInfo } from "../types/osu";
 import type { Mod, UserBestScore, UserExtended, UserScore } from "osu-web.js";
 
-export async function playBuilder({ user, mode, includeFails = true, index, type, mods, initiatorId, isMultiple }:
+export async function playBuilder({ user, mode, includeFails = true, index, type, mods, initiatorId, isMultiple, page }:
 {
     user: UserExtended,
     mode: Modes,
     type: "best" | "firsts" | "recent",
-    index: number,
+    index?: number,
     initiatorId: string,
     includeFails?: boolean,
     mods?: {
@@ -22,15 +22,18 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
         forceInclude: null | boolean,
         name: null | Mod
     },
-    isMultiple?: boolean
+    isMultiple?: boolean,
+    page?: number
 }): Promise<Array<EmbedStructure>> {
+    if (!page && !index) {
+        if (isMultiple)
+            page = 0;
+        else index = 0;
+    }
+
     const profile = getProfile(user, mode);
 
     let plays = await client.users.getUserScores(user.id, type, { query: { mode, limit: 100, include_fails: includeFails } });
-
-    if (type === "best" && index === 0) {
-        // Implement page-based plays here
-    }
 
     if (mods?.name) {
         const { exclude, forceInclude, include, name } = mods;
@@ -59,16 +62,17 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
         ] satisfies Array<EmbedStructure>;
     }
 
-    return isMultiple ? getMultiplePlays({ plays, page: index, mode, profile }) : getSinglePlay({ mode, index, plays, profile, initiatorId });
+    return typeof page !== "undefined" ? getMultiplePlays({ plays, page, mode, profile }) : getSinglePlay({ mode, index: index ?? 0, plays, profile, initiatorId, isMultiple });
 }
 
-async function getSinglePlay({ mode, index, plays, profile, initiatorId }:
+async function getSinglePlay({ mode, index, plays, profile, initiatorId, isMultiple }:
 {
     plays: Array<UserBestScore> | Array<UserScore>,
     mode: Modes,
     profile: ProfileInfo,
     index: number,
-    initiatorId: string
+    initiatorId: string,
+    isMultiple?: boolean
 }): Promise<Array<EmbedStructure>> {
     const maximized = getUser(initiatorId)?.score_embeds ?? 1;
 
@@ -81,12 +85,14 @@ async function getSinglePlay({ mode, index, plays, profile, initiatorId }:
         icon_url: profile.avatarUrl
     } satisfies EmbedAuthorStructure;
 
+    const line1 = `${play.grade} ${SPACE} ${play.score === "0" ? "140,000" : play.score} ${SPACE} **${play.accuracy}%** ${SPACE} ${play.playSubmitted}\n`;
+    const line2 = `${play.ppFormatted} ${SPACE} ${play.comboValues} ${SPACE} ${play.hitValues}\n`;
+    const line3 = `${play.ifFcValues ?? ""}\n`;
+
     const fields = [
         {
-            name: `${play.rulesetEmote} ${play.difficultyName} **+${play.mods.join("")}** [${play.stars}]`,
-            value: `${play.grade} ${SPACE} ${play.score === "0" ? "140,000" : play.score} ${SPACE} **${play.accuracy}%** ${SPACE} ${play.playSubmitted}
-            ${play.ppFormatted} ${SPACE} ${play.comboValues} ${SPACE} ${play.hitValues}
-            ${play.ifFcValues ?? ""}`,
+            name: `${play.rulesetEmote} ${play.difficultyName} **+${play.mods.join("")}** [${play.stars}] ${isMultiple ? `${SPACE} Top **__#${play.position}__**` : ""}`,
+            value: line1 + line2 + line3,
             inline: false
         }
     ] satisfies Array<EmbedFieldStructure>;
@@ -131,9 +137,13 @@ async function getMultiplePlays({ plays, page, mode, profile }:
         },
         thumbnail: { url: profile.avatarUrl },
         description: (await Promise.all(playsTemp))
-            .map((play) => `**#${play.position} [${play.songName} [${play.difficultyName}]](${play.mapLink}) +${play.mods.join("")} ${play.stars}**
-            ${play.grade} ${play.ppFormatted} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%**
-            ${play.hitValues} ${SPACE} ${play.comboValues} ${SPACE} ${play.playSubmitted}`)
+            .map((play) => {
+                const line1 = `**#${play.position} [${play.songName} [${play.difficultyName}]](${play.mapLink}) +${play.mods.join("")} ${play.stars}**\n`;
+                const line2 = `${play.grade} ${play.ppFormatted} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%**\n`;
+                const line3 = `${play.hitValues} ${SPACE} ${play.comboValues} ${SPACE} ${play.playSubmitted}`;
+
+                return line1 + line2 + line3;
+            })
             .join("\n"),
         footer: { text: `Page ${page + 1} of ${Math.ceil(plays.length / 5)}` }
     };
