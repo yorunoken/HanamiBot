@@ -26,7 +26,7 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
     sortByDate?: boolean,
     page?: number
 }): Promise<Array<EmbedStructure>> {
-    if (!page && !index) {
+    if (typeof page === "undefined" && typeof index === "undefined") {
         if (isMultiple)
             page = 0;
         else index = 0;
@@ -58,7 +58,7 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
     if (sortByDate)
         plays = plays.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-    if (plays.length === 0) {
+    if ((index ?? 0) >= plays.length) {
         return [
             {
                 type: EmbedType.Rich,
