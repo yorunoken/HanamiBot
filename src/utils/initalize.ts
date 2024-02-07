@@ -98,7 +98,6 @@ export async function loadLogs(message: string, error?: boolean): Promise<void> 
     const monthName = monthNames[date.getUTCMonth()];
     const day = date.getUTCDate().toString().padStart(2, "0");
 
-    console.log(await stat("./logs"));
     if (!(await stat("./logs")).isDirectory()) {
         console.log("The logs folder couldn't be found❌, generating..");
         await mkdir("./logs", { recursive: true });
