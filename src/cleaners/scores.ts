@@ -1,7 +1,7 @@
 import { accuracyCalculator, getPerformanceResults } from "../utils/osu";
 import { grades, rulesets } from "../utils/emotes";
-import type { Beatmap, Mode, PlayStatistics, ScoresInfo } from "../types/osu";
-import type { Score, UserBestScore, UserScore } from "osu-web.js";
+import type { Beatmap, LeaderboardScores, Mode, PlayStatistics, ScoresInfo } from "../types/osu";
+import type { ISOTimestamp, Mod, Score, UserBestScore, UserScore } from "osu-web.js";
 
 // We won't be needing this either!
 // interface HitValues {
@@ -13,7 +13,8 @@ import type { Score, UserBestScore, UserScore } from "osu-web.js";
 //     hMiss: null | number;
 // }
 
-export async function getScore({ scores, beatmap: map_, index, mode }: { scores: Array<UserBestScore> | Array<UserScore> | Array<Score>, beatmap?: Beatmap, index: number, mode: Mode }): Promise<ScoresInfo> {
+export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
+{ scores: Array<UserBestScore> | Array<UserScore> | Array<Score> | LeaderboardScores, beatmap?: Beatmap, index: number, mode: Mode, mapData?: string }): Promise<ScoresInfo> {
     const play = scores[index];
 
     let beatmap;
@@ -28,11 +29,31 @@ export async function getScore({ scores, beatmap: map_, index, mode }: { scores:
         beatmapset = set;
     }
 
-    const { score, accuracy } = play;
-    const statistics = play.statistics as PlayStatistics;
-    const { mods } = play;
+    let totalScore: number;
+    let createdAt: ISOTimestamp;
+    let modsArr: Array<Mod>;
+    let scoreStatistics: PlayStatistics;
 
-    const performance = await getPerformanceResults({ hitValues: statistics, beatmapId: beatmap.id, play, maxCombo: play.max_combo, mods });
+    if ("score" in play) {
+        totalScore = play.score;
+        createdAt = play.created_at;
+        modsArr = play.mods;
+        scoreStatistics = play.statistics;
+    } else {
+        totalScore = play.total_score;
+        createdAt = play.ended_at;
+        modsArr = play.mods.map((x) => <Mod>x.acronym);
+        scoreStatistics = {
+            count_50: play.statistics.meh ?? 0,
+            count_100: play.statistics.good ?? 0,
+            count_300: play.statistics.great ?? 0,
+            count_geki: play.statistics.perfect ?? 0,
+            count_katu: play.statistics.ok ?? 0,
+            count_miss: play.statistics.miss ?? 0
+        };
+    }
+
+    const performance = await getPerformanceResults({ hitValues: scoreStatistics, beatmapId: beatmap.id, play, maxCombo: play.max_combo, mods: modsArr, mapData });
 
     // Throw an error if performance doesn't exist.
     // This can only mean one thing, and it's because the map couldn't be downloaded for some reason.
@@ -68,8 +89,8 @@ export async function getScore({ scores, beatmap: map_, index, mode }: { scores:
     const hitValues = order
         .map((count) => {
             // Cast the count key to a keyof typeof statistics to ensure type safety
-            const countKey = count as keyof typeof statistics;
-            return statistics[countKey] ?? null;
+            const countKey = count as keyof typeof scoreStatistics;
+            return scoreStatistics[countKey] ?? null;
         })
         // Filter the null values
         .filter((count) => count !== null)
@@ -77,12 +98,12 @@ export async function getScore({ scores, beatmap: map_, index, mode }: { scores:
 
     const playMaxCombo = play.max_combo;
     const { maxCombo } = performance.currentPerformance.difficulty;
-    const isFc = statistics.count_miss === 0 || playMaxCombo + 7 >= maxCombo;
+    const isFc = scoreStatistics.count_miss === 0 || playMaxCombo + 7 >= maxCombo;
 
     // set fcValues to null because we won't always need it.
     let ifFcValues = null;
     if (!isFc) {
-        const fcAccuracy = accuracyCalculator(mode, statistics);
+        const fcAccuracy = accuracyCalculator(mode, scoreStatistics);
         ifFcValues = `FC: **${performance.fcPerformance.pp.toFixed(2).toLocaleString()}pp** for **${fcAccuracy.toFixed(2)}%**`;
     }
 
@@ -96,26 +117,26 @@ export async function getScore({ scores, beatmap: map_, index, mode }: { scores:
 
     const beatmapStatus = beatmapset.status;
     return {
-        position: play.position,
+        position: play.position ?? index + 1,
         songTitle: `${beatmapset.artist} - ${beatmapset.title}`,
         songArtist: beatmapset.artist,
         songName: beatmapset.title,
         difficultyName: beatmap.version,
-        score: score.toLocaleString(),
-        accuracy: (accuracy * 100).toFixed(2),
+        score: totalScore.toLocaleString(),
+        accuracy: (play.accuracy * 100).toFixed(2),
         mapLink: `https://osu.ppy.sh/b/${beatmap.id}`,
         coverLink: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/cover.jpg`,
         listLink: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/list.jpg`,
         grade: grades[play.rank],
         hitValues: `{ ${hitValues} }`, // Returns the value in this format: { 433/12/2/4 }
-        mods: mods.length > 0 ? mods : ["NM"],
+        mods: modsArr.length > 0 ? modsArr : ["NM"],
         mapAuthor: beatmapset.creator,
         mapStatus: beatmapStatus.charAt(0).toUpperCase() + beatmapStatus.slice(1),
         drainLength: `${drainMinutes}:${drainSeconds}`,
         stars: `${performance.currentPerformance.difficulty.stars.toFixed(2).toLocaleString()}★`,
         rulesetEmote: rulesets[mode],
         ppFormatted: `**${performance.currentPerformance.pp.toFixed(2).toLocaleString()}**/${performance.perfectPerformance.pp.toFixed(2).toLocaleLowerCase()}pp`,
-        playSubmitted: `<t:${new Date(play.created_at).getTime() / 1000}:R>`,
+        playSubmitted: `<t:${new Date(createdAt).getTime() / 1000}:R>`,
         ifFcValues,
         comboValues: `[ **${playMaxCombo.toLocaleString()}**/${maxCombo.toLocaleString()}x ]`,
         performance
