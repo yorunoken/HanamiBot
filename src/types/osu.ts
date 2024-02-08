@@ -1,11 +1,16 @@
 import type { MapAttributes, PerformanceAttributes } from "rosu-pp";
-import type { Beatmapset, Fails, Beatmap as BeatmapWeb } from "osu-web.js";
+import type { Beatmapset, Fails, Beatmap as BeatmapWeb, Country, Cover, UserCompact, Rank, ISOTimestamp } from "osu-web.js";
 
 export const enum Mode {
     OSU = "osu",
     MANIA = "mania",
     TAIKO = "taiko",
     FRUITS = "fruits"
+}
+
+export const enum Leaderboard {
+    COUNTRY = "country",
+    GLOBAL = "global"
 }
 
 export interface ProfileInfo {
@@ -93,6 +98,50 @@ export interface PlayStatistics {
     count_miss: number;
 }
 
+export interface LeaderboardScore {
+    position?: number;
+    ranked: boolean;
+    preserve: boolean;
+    maximum_statistics: {
+        great: number,
+        legacy_combo_increase: number
+    };
+    mods: Array<{ acronym: string }>;
+    statistics: {
+        ok?: number,
+        great?: number,
+        meh?: number,
+        miss?: number,
+        perfect?: number,
+        good?: number
+    };
+    beatmap_id: number;
+    best_id: number | null;
+    id: number;
+    rank: Rank;
+    type: string;
+    user_id: number;
+    accuracy: number;
+    build_id: number | null;
+    ended_at: ISOTimestamp;
+    has_replay: boolean;
+    is_perfect_combo: boolean;
+    legacy_perfect: boolean;
+    legacy_score_id: number;
+    legacy_total_score: number;
+    max_combo: number;
+    passed: boolean;
+    pp: number;
+    ruleset_id: 0 | 1 | 2 | 3;
+    started_at: string | null;
+    total_score: number;
+    replay: boolean;
+    current_user_attributes: {
+        pin: number | null
+    } | null;
+
+}
+
 export type Beatmap = BeatmapWeb & {
     beatmapset: Beatmapset & {
         ratings: Array<number>
@@ -101,3 +150,14 @@ export type Beatmap = BeatmapWeb & {
     failtimes: Fails,
     max_combo: number
 };
+
+export type LeaderboardScores = Array<LeaderboardScore & {
+    user: UserCompact & {
+        country: Country,
+        cover: Cover
+    }
+}>;
+
+export interface LeaderboardScoresRaw {
+    scores: LeaderboardScores;
+}

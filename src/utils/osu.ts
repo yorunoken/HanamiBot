@@ -5,8 +5,8 @@ import { Beatmap, Calculator } from "rosu-pp";
 import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
 import { getModsEnum } from "osu-web.js";
 import type { Client, EmbedStructure, Message } from "lilybird";
-import type { AccessTokenJSON, AuthScope, PerformanceInfo } from "../types/osu";
-import type { Mod, Score, UserBestScore, UserScore } from "osu-web.js";
+import type { AccessTokenJSON, AuthScope, Leaderboard, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo } from "../types/osu";
+import type { GameMode, Mod, Score, UserBestScore, UserScore } from "osu-web.js";
 import type { Score as ScoreData } from "rosu-pp";
 
 /**
@@ -70,16 +70,34 @@ Promise<{
     return { accessToken: data.access_token, expiresIn: data.expires_in };
 }
 
-export async function getPerformanceResults({ play, beatmapId, maxCombo, hitValues, mods }:
+export async function getBeatmapTopScores({ beatmapId, type, mode, mods }: { beatmapId: number, type: Leaderboard, mode: GameMode, mods: Array<Mod> | undefined }): Promise<LeaderboardScoresRaw> {
+    return fetch(
+        `https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${mode}&type=${type}${mods ? mods.map((mod) => `&mods[]=${mod}`).join("") : ""}`,
+        {
+            headers: {
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                "Content-Type": "application/json",
+                Cookie: `osu_session=${process.env.ACCESS_TOKEN}`
+            }
+        }
+    ).then((res) => { return <LeaderboardScoresRaw><unknown>res.json(); });
+}
+
+export async function getPerformanceResults({ play, beatmapId, maxCombo, hitValues, mods, mapData }:
 {
-    play: UserBestScore | UserScore | Score,
+    play: UserBestScore | UserScore | Score | LeaderboardScore,
     beatmapId: number,
     maxCombo?: number,
     hitValues: { count_100?: number, count_300?: number, count_50?: number, count_geki?: number, count_katu?: number, count_miss?: number },
-    mods: Array<Mod>
+    mods: Array<Mod>,
+    mapData?: string
 }): Promise<PerformanceInfo | null> {
-    const { mode_int: rulesetId } = play;
-    const mapData = getMap(beatmapId)?.data ?? (await downloadBeatmap([beatmapId]))[0].contents;
+    let rulesetId: number;
+    if ("mode_int" in play)
+        rulesetId = play.mode_int;
+    else rulesetId = play.ruleset_id;
+
+    mapData ??= getMap(beatmapId)?.data ?? (await downloadBeatmap([beatmapId]))[0].contents;
     if (!mapData) return null;
 
     let { count_100: count100 = 0, count_300: count300 = 0, count_50: count50 = 0, count_geki: countGeki = 0, count_katu: countKatu = 0, count_miss: countMiss = 0 } = hitValues;
