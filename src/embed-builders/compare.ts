@@ -2,6 +2,8 @@ import { getProfile } from "../cleaners/profile";
 import { client } from "../utils/initalize";
 import { getScore } from "../cleaners/scores";
 import { SPACE } from "../utils/constants";
+import { getMap } from "../utils/database";
+import { downloadBeatmap } from "../utils/osu";
 import { EmbedType } from "lilybird";
 import type { EmbedStructure } from "lilybird";
 import type { Beatmap, Mode, ProfileInfo, ScoresInfo } from "../types/osu";
@@ -80,9 +82,13 @@ async function getMultiplePlays({ plays, profile, beatmap, mode }:
     beatmap: Beatmap,
     mode: Mode
 }): Promise<Array<EmbedStructure>> {
-    const playsTemp: Array<Promise<ScoresInfo>> = [];
-    for (let i = 0; i < plays.length; i++) playsTemp.push(getScore({ scores: plays, index: i, mode, beatmap }));
+    const beatmapId = beatmap.id;
+    const mapData = getMap(beatmapId)?.data ?? (await downloadBeatmap([beatmapId]))[0].contents;
 
+    const playsTemp: Array<Promise<ScoresInfo>> = [];
+    for (let i = 0; i < plays.length; i++) playsTemp.push(getScore({ scores: plays, index: i, mode, beatmap, mapData }));
+
+    const { beatmapset } = beatmap;
     const embed: EmbedStructure = {
         type: EmbedType.Rich,
         author: {
@@ -90,14 +96,15 @@ async function getMultiplePlays({ plays, profile, beatmap, mode }:
             url: profile.userUrl,
             icon_url: profile.flagUrl
         },
-        thumbnail: { url: profile.avatarUrl },
+        title: `${beatmapset.artist} - ${beatmapset.title} [${beatmap.version}]`,
+        url: `https://osu.ppy.sh/b/${beatmap.id}`,
+        thumbnail: { url: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/list.jpg` },
         description: (await Promise.all(playsTemp))
             .map((play) => {
-                const line1 = `**#${play.position} [${play.songName} [${play.difficultyName}]](${play.mapLink}) +${play.mods.join("")} ${play.stars}**\n`;
-                const line2 = `${play.grade} ${play.ppFormatted} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%**\n`;
-                const line3 = `${play.hitValues} ${SPACE} ${play.comboValues} ${SPACE} ${play.playSubmitted}`;
+                const line1 = `${play.grade} **[${play.stars}]** ${SPACE}  ${play.ppFormatted} ${SPACE} **${play.accuracy}% ${SPACE} +${play.mods.join("")}**\n`;
+                const line2 = `${play.score} ${SPACE} ${play.hitValues} ${SPACE} ${play.comboValues} ${SPACE} ${play.playSubmitted}`;
 
-                return line1 + line2 + line3;
+                return line1 + line2;
             })
             .join("\n"),
         footer: { text: `${beatmap.status.charAt(0).toUpperCase()}${beatmap.status.slice(1)} beatmapset by ${beatmap.beatmapset.creator}` }
