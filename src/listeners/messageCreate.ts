@@ -14,7 +14,7 @@ async function verifyUser(client: Client, message: Message): Promise<void> {
     if (!content) return;
 
     const [cryptedDiscordId, osuId] = content.split("\n");
-    const discordId = `${decrypt.update(cryptedDiscordId, "utf-8", "hex")}${decrypt.final("hex")}`;
+    const discordId = `${decrypt.update(cryptedDiscordId, "hex", "utf-8")}${decrypt.final("utf-8")}`;
 
     const memberDm = await client.rest.createDM(discordId);
 
