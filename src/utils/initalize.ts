@@ -2,7 +2,7 @@ import db from "../data.db" with { type: "sqlite" };
 import { getAccessToken } from "./osu";
 import { Client as OsuClient } from "osu-web.js";
 import { readdir } from "fs/promises";
-import { mkdir, stat, readFile, writeFile } from "node:fs/promises";
+import { mkdir, access, readFile, writeFile } from "node:fs/promises";
 import type { Client as LilybirdClient, POSTApplicationCommandStructure } from "lilybird";
 import type { DefaultMessageCommand, DefaultSlashCommand } from "../types/commands";
 
@@ -66,6 +66,15 @@ export async function loadApplicationCommands(clnt: LilybirdClient): Promise<voi
     await clnt.rest.bulkOverwriteGlobalApplicationCommand(clnt.user.id, slashCommands);
 }
 
+async function exists(path: string): Promise<boolean> {
+    try {
+        await access(path);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
 export async function loadLogs(message: string, error?: boolean): Promise<void> {
     const date = new Date(Date.now());
     const formattedDate = `${new Intl.DateTimeFormat("en-US", {
@@ -98,22 +107,22 @@ export async function loadLogs(message: string, error?: boolean): Promise<void> 
     const monthName = monthNames[date.getUTCMonth()];
     const day = date.getUTCDate().toString().padStart(2, "0");
 
-    if (!(await stat("./logs")).isDirectory()) {
+    if (!await exists("./logs")) {
         console.log("The logs folder couldn't be found❌, generating..");
         await mkdir("./logs", { recursive: true });
     }
 
-    if (!(await stat(`./logs/${year}`)).isDirectory()) {
+    if (!await exists(`./logs/${year}`)) {
         console.log(`The year ${year} couldn't be found❌, generating..`);
         await mkdir(`./logs/${year}`, { recursive: true });
     }
 
-    if (!(await stat(`./logs/${year}/${month}`)).isDirectory()) {
+    if (!await exists(`./logs/${year}/${month}`)) {
         console.log(`The month ${monthName}(${month}) couldn't be found❌, generating..`);
         await mkdir(`./logs/${year}/${month}`, { recursive: true });
     }
 
-    if (!(await stat(`./logs/${year}/${month}/${day}.txt`)).isFile()) {
+    if (!await exists(`./logs/${year}/${month}/${day}.txt`)) {
         console.log(`The day ${day} couldn't be found ❌, generating..`);
         await writeFile(`./logs/${year}/${month}/${day}.txt`, `${formattedDate}Created log file.`);
     } else {
