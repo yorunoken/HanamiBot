@@ -33,13 +33,16 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     let createdAt: ISOTimestamp;
     let modsArr: Array<Mod>;
     let scoreStatistics: PlayStatistics;
-
+    let user: string | undefined;
+    let userId: number | undefined;
     if ("score" in play) {
         totalScore = play.score;
         createdAt = play.created_at;
         modsArr = play.mods;
         scoreStatistics = play.statistics;
     } else {
+        user = play.user.username;
+        userId = play.user_id;
         totalScore = play.total_score;
         createdAt = play.ended_at;
         modsArr = play.mods.map((x) => <Mod>x.acronym);
@@ -117,6 +120,8 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
 
     const beatmapStatus = beatmapset.status;
     return {
+        user,
+        userId,
         position: play.position ?? index + 1,
         songTitle: `${beatmapset.artist} - ${beatmapset.title}`,
         songArtist: beatmapset.artist,

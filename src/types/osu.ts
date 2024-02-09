@@ -72,6 +72,8 @@ export interface ScoresInfo {
     ifFcValues: string | null;
     comboValues: string;
     performance: PerformanceInfo;
+    user: string | undefined;
+    userId: number | undefined;
 }
 
 export interface PerformanceInfo {

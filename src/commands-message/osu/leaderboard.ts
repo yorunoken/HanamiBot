@@ -40,7 +40,7 @@ async function run({ message, args, commandName }: { message: Message, args: Arr
         return;
     }
 
-    const embeds = await leaderboardBuilder({ initiator: message.author.id, type: modeAliases[commandName].type, page: Number(flags.p ?? flags.page) || undefined, beatmapId, mods });
+    const embeds = await leaderboardBuilder({ type: modeAliases[commandName].type, page: Number(flags.p ?? flags.page) || undefined, beatmapId, mods });
     await channel.send({ embeds });
 }
 

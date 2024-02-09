@@ -8,9 +8,8 @@ import type { EmbedStructure } from "lilybird";
 import type { Beatmap, Leaderboard, LeaderboardScores, Mode, ScoresInfo } from "../types/osu";
 import type { Mod } from "osu-web.js";
 
-export async function leaderboardBuilder({ initiator, type, beatmapId, mods, page = 0 }:
+export async function leaderboardBuilder({ type, beatmapId, mods, page = 0 }:
 {
-    initiator: string,
     type: Leaderboard,
     beatmapId: number,
     mods?: {
@@ -76,11 +75,11 @@ async function getPlays(plays: LeaderboardScores, beatmap: Beatmap, page: number
         thumbnail: { url: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/list.jpg` },
         description: (await Promise.all(playsTemp))
             .map((play) => {
-                console.log(play);
-                const line1 = `${play.grade} **[${play.stars}]** ${SPACE}  ${play.ppFormatted} ${SPACE} **${play.accuracy}% ${SPACE} +${play.mods.join("")}**\n`;
-                const line2 = `${play.score} ${SPACE} ${play.hitValues} ${SPACE} ${play.comboValues} ${SPACE} ${play.playSubmitted}`;
+                const line1 = `${play.grade} ${SPACE} **[${play.user}](https://osu.ppy.sh/u/${play.userId}) ${SPACE} [${play.stars}]** ${SPACE} +${play.mods.join("")}\n`;
+                const line2 = `${play.ppFormatted} ${SPACE} **${play.accuracy}% ${SPACE} ${play.score}**\n`;
+                const line3 = `${play.hitValues} ${SPACE} ${play.comboValues} ${SPACE} ${play.playSubmitted}`;
 
-                return line1 + line2;
+                return line1 + line2 + line3;
             })
             .join("\n"),
         footer: { text: `${beatmap.status.charAt(0).toUpperCase()}${beatmap.status.slice(1)} beatmapset by ${beatmap.beatmapset.creator}` }
