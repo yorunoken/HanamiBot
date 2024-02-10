@@ -43,6 +43,7 @@ export async function compareBuilder({ user, mode, beatmapId, mods }:
             }
         ] satisfies Array<EmbedStructure>;
     }
+
     let plays = (await client.beatmaps.getBeatmapUserScores(beatmapId, user.id, { query: { mode } })).sort((a, b) => b.pp - a.pp);
 
     if (mods?.name) {
