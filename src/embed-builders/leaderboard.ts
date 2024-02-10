@@ -85,7 +85,5 @@ async function getPlays(plays: LeaderboardScores, beatmap: Beatmap, page: number
         footer: { text: `${beatmap.status.charAt(0).toUpperCase()}${beatmap.status.slice(1)} beatmapset by ${beatmap.beatmapset.creator}` }
     };
 
-    console.log(embed);
-
     return [embed] satisfies Array<EmbedStructure>;
 }
