@@ -36,7 +36,7 @@ export async function leaderboardBuilder({ type, beatmapId, mods, page = 0 }:
             {
                 type: EmbedType.Rich,
                 title: "Uh oh! :x:",
-                description: "It seems like this beatmap's leaderboards don't exist! :("
+                description: "It seems like this beatmap's leaderboard doesn't exist! :("
             }
         ] satisfies Array<EmbedStructure>;
     }
