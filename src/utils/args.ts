@@ -3,9 +3,13 @@ import { UserType } from "../types/commandArgs";
 import { getUser } from "./database";
 import { linkSlash } from "./constants";
 import { ModsEnum } from "osu-web.js";
-import type { CommandArgs, ParsedArgs, User } from "../types/commandArgs";
+import type { CommandArgs, Mods, ParsedArgs, User } from "../types/commandArgs";
 import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, Interaction, Message } from "lilybird";
+
+function linkMatcher(link: string): RegExpExecArray | null {
+    return (/^https:\/\/osu\.ppy\.sh\/(beatmapsets|b)\/(?:\d+\/)?(\d+)$/).exec(link);
+}
 
 export function getCommandArgs(interaction: Interaction<ApplicationCommandData>): CommandArgs | undefined {
     if (!interaction.isApplicationCommandInteraction() || !interaction.inGuild()) return;
@@ -16,23 +20,49 @@ export function getCommandArgs(interaction: Interaction<ApplicationCommandData>)
     const discordUser = getUser(discordUserId ?? "")?.banchoId;
     const mode = <Mode | undefined>interaction.data.getString("mode") ?? Mode.OSU;
 
+    let mods: Mods = {
+        exclude: null,
+        include: null,
+        forceInclude: null,
+        name: null
+    };
+
+    const modsValue = interaction.data.getString("mods");
+    const modSections = modsValue?.match(/.{1,2}/g);
+    if (modSections && !modSections.every((selectedMod) => selectedMod.toUpperCase() in ModsEnum || modsValue?.toUpperCase() === "NM")) {
+        mods = {
+            exclude: interaction.data.getBoolean("exclude") ?? null,
+            include: interaction.data.getBoolean("include") ?? null,
+            forceInclude: interaction.data.getBoolean("force_include") ?? null,
+            name: <Mod | undefined>modsValue ?? null
+        };
+    }
+
+    const urlMatch = linkMatcher(interaction.data.getString("map") ?? "");
+    const beatmapId = urlMatch?.[2] ?? null;
+
     const user: User = discordUserId
         ? discordUser
-            ? { type: UserType.SUCCESS, banchoId: discordUser, mode }
-            : { type: UserType.FAIL, failMessage: discordUserId ? `The user <@${discordUserId}> hasn't linked their account to the bot yet!` : `Please link your account to the bot using ${linkSlash}!` }
+            ? { type: UserType.SUCCESS, banchoId: discordUser, mode, beatmapId }
+            : {
+                type: UserType.FAIL,
+                beatmapId,
+                failMessage: discordUserId ? `The user <@${discordUserId}> hasn't linked their account to the bot yet!` : `Please link your account to the bot using ${linkSlash}!`
+            }
         : userArg
-            ? { type: UserType.SUCCESS, banchoId: userArg, mode }
+            ? { type: UserType.SUCCESS, banchoId: userArg, mode, beatmapId }
             : userId
-                ? { type: UserType.SUCCESS, banchoId: userId, mode }
-                : { type: UserType.FAIL, failMessage: "Please link your account to the bot using /link!" };
+                ? { type: UserType.SUCCESS, banchoId: userId, mode, beatmapId }
+                : { type: UserType.FAIL, beatmapId, failMessage: "Please link your account to the bot using /link!" };
 
-    return { user };
+    return { user, mods };
 }
 
 export function parseOsuArguments(message: Message, args: Array<string>, mode: Mode): ParsedArgs {
     const result: ParsedArgs = {
         tempUserDoNotUse: null,
         user: {
+            beatmapId: null,
             type: UserType.FAIL,
             failMessage: `Please link your account to the bot using ${linkSlash}!`
         },
@@ -44,6 +74,17 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
             name: null
         }
     };
+
+    const mapLinkMatch = linkMatcher(args.join(" "));
+    if (mapLinkMatch) {
+        // Extract beatmap ID from link
+        const beatmapId = mapLinkMatch[mapLinkMatch.length - 1];
+        result.user.beatmapId = beatmapId;
+
+        // Remove the map link from args array
+        const indexToRemove = args.findIndex((link) => link === mapLinkMatch[0]);
+        args.splice(indexToRemove, 1);
+    }
 
     // Counter to keep track of double-quote and flag occurrences
     let quoteCounts = 0;
@@ -88,6 +129,7 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
 
     if (!result.tempUserDoNotUse && userId) {
         result.user = {
+            beatmapId: result.user.beatmapId,
             type: UserType.SUCCESS,
             banchoId: userId,
             mode
@@ -98,11 +140,13 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
 
         if (discordUserId && !user) {
             result.user = {
+                beatmapId: result.user.beatmapId,
                 type: UserType.FAIL,
                 failMessage: `The user <@${discordUserId}> hasn't linked their account to the bot yet!`
             };
         } else {
             result.user = {
+                beatmapId: result.user.beatmapId,
                 type: UserType.SUCCESS,
                 banchoId: user ?? result.tempUserDoNotUse.join(" "),
                 mode

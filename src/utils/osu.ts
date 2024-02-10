@@ -4,6 +4,7 @@ import { getMap, insertData } from "./database";
 import { Beatmap, Calculator } from "rosu-pp";
 import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
 import { getModsEnum } from "osu-web.js";
+import { ChannelType } from "lilybird";
 import type { Client, EmbedStructure, Message } from "lilybird";
 import type { AccessTokenJSON, AuthScope, Leaderboard, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo } from "../types/osu";
 import type { GameMode, Mod, Score, UserBestScore, UserScore } from "osu-web.js";
@@ -83,30 +84,30 @@ export async function getBeatmapTopScores({ beatmapId, type, mode, mods }: { bea
     ).then((res) => { return <LeaderboardScoresRaw><unknown>res.json(); });
 }
 
-export async function getPerformanceResults({ play, beatmapId, maxCombo, hitValues, mods, mapData }:
+export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, accuracy, hitValues, mods, mapData }:
 {
-    play: UserBestScore | UserScore | Score | LeaderboardScore,
+    play?: UserBestScore | UserScore | Score | LeaderboardScore,
+    setId?: number,
     beatmapId: number,
     maxCombo?: number,
-    hitValues: { count_100?: number, count_300?: number, count_50?: number, count_geki?: number, count_katu?: number, count_miss?: number },
-    mods: Array<Mod>,
+    accuracy?: number,
+    hitValues?: { count_100?: number, count_300?: number, count_50?: number, count_geki?: number, count_katu?: number, count_miss?: number },
+    mods: Array<Mod> | number,
     mapData?: string
 }): Promise<PerformanceInfo | null> {
     let rulesetId: number;
-    if ("mode_int" in play)
+    if (typeof play !== "undefined" && "mode_int" in play)
         rulesetId = play.mode_int;
-    else rulesetId = play.ruleset_id;
+    else if (typeof play !== "undefined" && "mode" in play) rulesetId = play.ruleset_id;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    else rulesetId = setId!;
 
     mapData ??= getMap(beatmapId)?.data ?? (await downloadBeatmap([beatmapId]))[0].contents;
     if (!mapData) return null;
 
-    let { count_100: count100 = 0, count_300: count300 = 0, count_50: count50 = 0, count_geki: countGeki = 0, count_katu: countKatu = 0, count_miss: countMiss = 0 } = hitValues;
-    countGeki = [2, 3].includes(rulesetId) ? countGeki : 0;
-    countKatu = [2, 3].includes(rulesetId) ? countKatu : 0;
-
     const calculatorData: ScoreData = {
         mode: rulesetId,
-        mods: getModsEnum(mods)
+        mods: typeof mods === "number" ? mods : getModsEnum(mods)
     };
 
     const beatmap = new Beatmap({ content: mapData });
@@ -115,20 +116,22 @@ export async function getPerformanceResults({ play, beatmapId, maxCombo, hitValu
     const mapValues = calculator.mapAttributes(beatmap);
     const perfectPerformance = calculator.performance(beatmap);
 
-    const currentPerformance = calculator
-        .n300(count300)
-        .n100(count100)
-        .n50(count50)
+    let { count_100: count100 = 0, count_300: count300 = 0, count_50: count50 = 0, count_geki: countGeki = 0, count_katu: countKatu = 0, count_miss: countMiss = 0 } = hitValues ?? {};
+    countGeki = [2, 3].includes(rulesetId) ? countGeki : 0;
+    countKatu = [2, 3].includes(rulesetId) ? countKatu : 0;
+
+    const currentPerformance = (!accuracy
+        ? calculator.n300(count300).n100(count100).n50(count50)
+        : calculator.acc(accuracy))
         .nMisses(countMiss)
         .combo(maxCombo ?? perfectPerformance.difficulty.maxCombo)
         .nGeki(countGeki)
         .nKatu(countKatu)
         .performance(beatmap);
 
-    const fcPerformance = calculator
-        .n300(count300)
-        .n100(count100)
-        .n50(count50)
+    const fcPerformance = (!accuracy
+        ? calculator.n300(count300).n100(count100).n50(count50)
+        : calculator.acc(accuracy))
         .nMisses(0)
         .combo(perfectPerformance.difficulty.maxCombo)
         .nGeki(countGeki)
@@ -195,9 +198,10 @@ function getEmbedFromReply(message: Message): number | null {
     return Number(foundId) || null;
 }
 
-async function cycleThroughEmbeds(message: Message, client: Client): Promise<number | null | undefined> {
-    const channel = await message.fetchChannel();
-    if (!channel.isText()) return;
+async function cycleThroughEmbeds({ client, message, channelId }: { message?: Message, channelId?: string, client: Client }): Promise<number | null | undefined> {
+    const channel = await client.rest.getChannel(message?.channelId ?? channelId ?? "");
+    if (!channel.id || channel.type !== ChannelType.GUILD_TEXT) return;
+
     const messages = await client.rest.getChannelMessages(channel.id, { limit: 100 });
 
     let beatmapId;
@@ -213,6 +217,6 @@ async function cycleThroughEmbeds(message: Message, client: Client): Promise<num
     return beatmapId;
 }
 
-export async function getBeatmapIdFromContext(message: Message, client: Client): Promise<number | null | undefined> {
-    return typeof message.referencedMessage !== "undefined" ? getEmbedFromReply(message) : cycleThroughEmbeds(message, client);
+export async function getBeatmapIdFromContext({ client, message, channelId }: { message?: Message, client: Client, channelId?: string }): Promise<number | null | undefined> {
+    return typeof message?.referencedMessage !== "undefined" ? getEmbedFromReply(message) : cycleThroughEmbeds({ message, client, channelId });
 }
