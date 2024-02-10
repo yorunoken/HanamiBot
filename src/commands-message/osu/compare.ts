@@ -33,8 +33,8 @@ async function run({ message, args, commandName }: { message: Message, args: Arr
         return;
     }
 
-    const beatmapId = await getBeatmapIdFromContext(message, message.client);
-    if (!beatmapId) {
+    const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ message, client: message.client });
+    if (typeof beatmapId === "undefined" || beatmapId === null) {
         await channel.send({
             embeds: [
                 {
@@ -47,14 +47,14 @@ async function run({ message, args, commandName }: { message: Message, args: Arr
         return;
     }
 
-    const embeds = await compareBuilder({ user: osuUser, mode: user.mode, beatmapId, mods });
+    const embeds = await compareBuilder({ user: osuUser, mode: user.mode, beatmapId: Number(beatmapId), mods });
     await channel.send({ embeds });
 }
 
 export default {
     name: "compare",
     aliases: Object.keys(modeAliases),
-    description: "Display recent play(s) of a user.",
+    description: "Display play(s) of a user on a beatmap.",
     cooldown: 1000,
     run
 } satisfies MessageCommand;

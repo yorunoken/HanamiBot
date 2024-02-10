@@ -1,6 +1,5 @@
 import { parseOsuArguments } from "../../utils/args";
 import { Mode, Leaderboard } from "../../types/osu";
-import { UserType } from "../../types/commandArgs";
 import { getBeatmapIdFromContext } from "../../utils/osu";
 import { leaderboardBuilder } from "../../embed-builders/leaderboard";
 import { EmbedType } from "lilybird";
@@ -21,13 +20,9 @@ async function run({ message, args, commandName }: { message: Message, args: Arr
     const channel = await message.fetchChannel();
 
     const { user, mods, flags } = parseOsuArguments(message, args, Mode.OSU);
-    if (user.type === UserType.FAIL) {
-        await channel.send(user.failMessage);
-        return;
-    }
 
-    const beatmapId = await getBeatmapIdFromContext(message, message.client);
-    if (!beatmapId) {
+    const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ message, client: message.client });
+    if (typeof beatmapId === "undefined" || beatmapId === null) {
         await channel.send({
             embeds: [
                 {
@@ -40,7 +35,7 @@ async function run({ message, args, commandName }: { message: Message, args: Arr
         return;
     }
 
-    const embeds = await leaderboardBuilder({ type: modeAliases[commandName].type, page: Number(flags.p ?? flags.page) || undefined, beatmapId, mods });
+    const embeds = await leaderboardBuilder({ type: modeAliases[commandName].type, page: Number(flags.p ?? flags.page) || undefined, beatmapId: Number(beatmapId), mods });
     await channel.send({ embeds });
 }
 
