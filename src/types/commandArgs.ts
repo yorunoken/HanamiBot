@@ -8,7 +8,7 @@ export const enum UserType {
 
 interface BaseUser {
     type: UserType;
-    birthDay?: string;
+    beatmapId: string | null;
 }
 
 interface SuccessUser extends BaseUser {
@@ -26,9 +26,10 @@ export type User = SuccessUser | FailUser;
 
 export interface CommandArgs {
     user: User;
+    mods: Mods;
 }
 
-interface Mods {
+export interface Mods {
     include: boolean | null;
     exclude: boolean | null;
     forceInclude: boolean | null;
