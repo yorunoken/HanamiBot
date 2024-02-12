@@ -3,7 +3,7 @@ import { Mode } from "../types/osu";
 import { getMap, insertData } from "./database";
 import { Beatmap, Calculator } from "rosu-pp";
 import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
-import { getModsEnum } from "osu-web.js";
+import { ModsEnum } from "osu-web.js";
 import { ChannelType } from "lilybird";
 import type { Client, EmbedStructure, Message } from "lilybird";
 import type { AccessTokenJSON, AuthScope, Leaderboard, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo } from "../types/osu";
@@ -69,6 +69,55 @@ Promise<{
     const data = await request.json() as AccessTokenJSON;
 
     return { accessToken: data.access_token, expiresIn: data.expires_in };
+}
+
+export function getModsEnum(mods: Array<Mod>, derivativeModsWithOriginal?: boolean): number {
+    return mods.reduce((count, mod) => {
+        if (
+            ![
+                "NF",
+                "EZ",
+                "TD",
+                "HD",
+                "HR",
+                "SD",
+                "DT",
+                "RX",
+                "HT",
+                "NC",
+                "FL",
+                "AT",
+                "SO",
+                "AP",
+                "PF",
+                "4K",
+                "5K",
+                "6K",
+                "7K",
+                "8K",
+                "FI",
+                "RD",
+                "CN",
+                "TP",
+                "K9",
+                "KC",
+                "1K",
+                "2K",
+                "3K",
+                "SV2",
+                "MR"
+            ].includes(mod)
+        )
+            return count;
+
+        if (mod === "NC" && derivativeModsWithOriginal)
+            return count + ModsEnum.NC + ModsEnum.DT;
+
+        if (mod === "PF" && derivativeModsWithOriginal)
+            return count + ModsEnum.PF + ModsEnum.SD;
+
+        return count + ModsEnum[mod as keyof typeof ModsEnum];
+    }, 0);
 }
 
 export async function getBeatmapTopScores({ beatmapId, type, mode, mods }: { beatmapId: number, type: Leaderboard, mode: GameMode, mods: Array<Mod> | undefined }): Promise<LeaderboardScoresRaw> {
