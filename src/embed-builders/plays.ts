@@ -58,7 +58,7 @@ export async function playBuilder({ user, mode, includeFails = true, index, type
     if (sortByDate)
         plays = plays.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-    if ((index ?? 0) >= plays.length) {
+    if (index && index >= plays.length) {
         return [
             {
                 type: EmbedType.Rich,
