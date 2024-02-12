@@ -1,6 +1,6 @@
 import db from "../data.db" with { type: "sqlite" };
 import { getAccessToken } from "./osu";
-import { slashCommandsIds } from "./ cache";
+import { slashCommandsIds } from "./cache";
 import { Client as OsuClient } from "osu-web.js";
 import { readdir } from "fs/promises";
 import { mkdir, access, readFile, writeFile } from "node:fs/promises";

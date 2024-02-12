@@ -1,7 +1,7 @@
 import { Mode } from "../types/osu";
 import { UserType } from "../types/commandArgs";
 import { getUser } from "./database";
-import { slashCommandsIds } from "./ cache";
+import { slashCommandsIds } from "./cache";
 import { ModsEnum } from "osu-web.js";
 import type { CommandArgs, Mods, ParsedArgs, User } from "../types/commandArgs";
 import type { Mod } from "osu-web.js";
