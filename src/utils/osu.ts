@@ -156,7 +156,7 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
 
     const calculatorData: ScoreData = {
         mode: rulesetId,
-        mods: typeof mods === "number" ? mods : getModsEnum(mods)
+        mods: typeof mods === "number" ? mods : getModsEnum(mods, true)
     };
 
     const beatmap = new Beatmap({ content: mapData });
