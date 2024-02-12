@@ -1,5 +1,6 @@
 import db from "../data.db" with { type: "sqlite" };
 import { getAccessToken } from "./osu";
+import { slashCommandsIds } from "./ cache";
 import { Client as OsuClient } from "osu-web.js";
 import { readdir } from "fs/promises";
 import { mkdir, access, readFile, writeFile } from "node:fs/promises";
@@ -63,7 +64,12 @@ export async function loadApplicationCommands(clnt: LilybirdClient): Promise<voi
         applicationCommands.set(cmd.data.name, command);
     }
 
-    await clnt.rest.bulkOverwriteGlobalApplicationCommand(clnt.user.id, slashCommands);
+    const commandsIds = await clnt.rest.bulkOverwriteGlobalApplicationCommand(clnt.user.id, slashCommands);
+    for (const command of commandsIds) {
+        const { name, id } = command;
+        slashCommandsIds.set(name, `</${name}:${id}>`);
+    }
+    console.log(slashCommandsIds);
 }
 
 async function exists(path: string): Promise<boolean> {

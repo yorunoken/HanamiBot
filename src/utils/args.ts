@@ -1,7 +1,7 @@
 import { Mode } from "../types/osu";
 import { UserType } from "../types/commandArgs";
 import { getUser } from "./database";
-import { linkSlash } from "./constants";
+import { slashCommandsIds } from "./ cache";
 import { ModsEnum } from "osu-web.js";
 import type { CommandArgs, Mods, ParsedArgs, User } from "../types/commandArgs";
 import type { Mod } from "osu-web.js";
@@ -9,6 +9,10 @@ import type { ApplicationCommandData, Interaction, Message } from "lilybird";
 
 function linkMatcher(link: string): RegExpExecArray | null {
     return (/^https:\/\/osu\.ppy\.sh\/(beatmapsets|b)\/(?:\d+\/)?(\d+)$/).exec(link);
+}
+
+function linkCommand(): string | undefined {
+    return slashCommandsIds.get("link");
 }
 
 export function getCommandArgs(interaction: Interaction<ApplicationCommandData>): CommandArgs | undefined {
@@ -47,7 +51,7 @@ export function getCommandArgs(interaction: Interaction<ApplicationCommandData>)
             : {
                 type: UserType.FAIL,
                 beatmapId,
-                failMessage: discordUserId ? `The user <@${discordUserId}> hasn't linked their account to the bot yet!` : `Please link your account to the bot using ${linkSlash}!`
+                failMessage: discordUserId ? `The user <@${discordUserId}> hasn't linked their account to the bot yet!` : `Please link your account to the bot using ${linkCommand()}!`
             }
         : userArg
             ? { type: UserType.SUCCESS, banchoId: userArg, mode, beatmapId }
@@ -64,7 +68,7 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
         user: {
             beatmapId: null,
             type: UserType.FAIL,
-            failMessage: `Please link your account to the bot using ${linkSlash}!`
+            failMessage: `Please link your account to the bot using ${linkCommand()}!`
         },
         flags: {},
         mods: {

@@ -1,9 +1,9 @@
-import { unlinkSlash } from "../../utils/constants";
+import { slashCommandsIds } from "../../utils/ cache";
 import type { MessageCommand } from "../../types/commands";
 import type { Message } from "lilybird";
 
 async function run({ message }: { message: Message }): Promise<void> {
-    await message.reply(`This command has been deprecated. Use ${unlinkSlash} instead.`);
+    await message.reply(`This command has been deprecated. Use ${slashCommandsIds.get("unlink")} instead.`);
 }
 
 export default {
