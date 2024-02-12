@@ -69,7 +69,6 @@ export async function loadApplicationCommands(clnt: LilybirdClient): Promise<voi
         const { name, id } = command;
         slashCommandsIds.set(name, `</${name}:${id}>`);
     }
-    console.log(slashCommandsIds);
 }
 
 async function exists(path: string): Promise<boolean> {

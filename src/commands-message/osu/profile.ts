@@ -2,6 +2,7 @@ import { parseOsuArguments } from "../../utils/args";
 import { profileBuilder } from "../../embed-builders/profile";
 import { client } from "../../utils/initalize";
 import { UserType } from "../../types/commandArgs";
+import { EmbedBuilderType } from "../../types/embedBuilders";
 import type { MessageCommand } from "../../types/commands";
 import type { Mode } from "../../types/osu";
 import type { Message } from "lilybird";
@@ -21,7 +22,7 @@ async function run({ message, args, commandName }: { message: Message, args: Arr
         return;
     }
 
-    const embeds = profileBuilder(osuUser, user.mode);
+    const embeds = profileBuilder({ builderType: EmbedBuilderType.PROFILE, user: osuUser, mode: user.mode });
     await channel.send({ embeds });
 }
 

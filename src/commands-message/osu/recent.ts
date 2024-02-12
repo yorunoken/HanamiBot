@@ -3,6 +3,7 @@ import { client } from "../../utils/initalize";
 import { playBuilder } from "../../embed-builders/plays";
 import { Mode } from "../../types/osu";
 import { UserType } from "../../types/commandArgs";
+import { EmbedBuilderType } from "../../types/embedBuilders";
 import type { MessageCommand } from "../../types/commands";
 import type { Message } from "lilybird";
 
@@ -44,7 +45,7 @@ async function run({ message, args, commandName, index = 0 }: { message: Message
         return;
     }
 
-    const embeds = await playBuilder({ user: osuUser, mode: user.mode, initiatorId: message.author.id, type: "recent", includeFails, index, mods });
+    const embeds = await playBuilder({ builderType: EmbedBuilderType.PLAYS, user: osuUser, mode: user.mode, initiatorId: message.author.id, type: "recent", includeFails, index, mods });
     await channel.send({ embeds });
 }
 

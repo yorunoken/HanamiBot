@@ -4,22 +4,12 @@ import { SPACE } from "../utils/constants";
 import { getMap } from "../utils/database";
 import { downloadBeatmap, getBeatmapTopScores } from "../utils/osu";
 import { EmbedType } from "lilybird";
+import type { LeaderboardBuilderOptions } from "../types/embedBuilders";
 import type { EmbedStructure } from "lilybird";
-import type { Beatmap, Leaderboard, LeaderboardScores, Mode, ScoresInfo } from "../types/osu";
+import type { Beatmap, LeaderboardScores, Mode, ScoresInfo } from "../types/osu";
 import type { Mod } from "osu-web.js";
 
-export async function leaderboardBuilder({ type, beatmapId, mods, page = 0 }:
-{
-    type: Leaderboard,
-    beatmapId: number,
-    mods?: {
-        exclude: null | boolean,
-        include: null | boolean,
-        forceInclude: null | boolean,
-        name: null | Mod
-    },
-    page: number | undefined
-}): Promise<Array<EmbedStructure>> {
+export async function leaderboardBuilder({ type, beatmapId, mods, page = 0 }: LeaderboardBuilderOptions): Promise<Array<EmbedStructure>> {
     const beatmap: Beatmap = await client.beatmaps.getBeatmap(beatmapId);
     if (!beatmap.id) {
         return [

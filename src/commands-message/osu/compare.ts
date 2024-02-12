@@ -4,6 +4,7 @@ import { compareBuilder } from "../../embed-builders/compare";
 import { Mode } from "../../types/osu";
 import { UserType } from "../../types/commandArgs";
 import { getBeatmapIdFromContext } from "../../utils/osu";
+import { EmbedBuilderType } from "../../types/embedBuilders";
 import { EmbedType } from "lilybird";
 import type { Message } from "lilybird";
 import type { MessageCommand } from "../../types/commands";
@@ -47,7 +48,7 @@ async function run({ message, args, commandName }: { message: Message, args: Arr
         return;
     }
 
-    const embeds = await compareBuilder({ user: osuUser, mode: user.mode, beatmapId: Number(beatmapId), mods });
+    const embeds = await compareBuilder({ builderType: EmbedBuilderType.COMPARE, user: osuUser, mode: user.mode, beatmapId: Number(beatmapId), mods });
     await channel.send({ embeds });
 }
 

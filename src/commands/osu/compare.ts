@@ -3,6 +3,7 @@ import { client } from "../../utils/initalize";
 import { UserType } from "../../types/commandArgs";
 import { compareBuilder } from "../../embed-builders/compare";
 import { getBeatmapIdFromContext } from "../../utils/osu";
+import { EmbedBuilderType } from "../../types/embedBuilders";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { ApplicationCommandData, Interaction } from "lilybird";
 import type { SlashCommand } from "@lilybird/handlers";
@@ -41,7 +42,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    const embeds = await compareBuilder({ beatmapId: Number(beatmapId), mode: user.mode, user: osuUser, mods });
+    const embeds = await compareBuilder({ builderType: EmbedBuilderType.COMPARE, beatmapId: Number(beatmapId), mode: user.mode, user: osuUser, mods });
     await interaction.editReply({ embeds });
 }
 

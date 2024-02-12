@@ -2,6 +2,7 @@ import { parseOsuArguments } from "../../utils/args";
 import { mapBuilder } from "../../embed-builders/mapBuilder";
 import { getBeatmapIdFromContext } from "../../utils/osu";
 import { Mode } from "../../types/osu";
+import { EmbedBuilderType } from "../../types/embedBuilders";
 import { EmbedType } from "lilybird";
 import type { Mod } from "osu-web.js";
 import type { Message } from "lilybird";
@@ -26,7 +27,7 @@ async function run({ message, args }: { message: Message, args: Array<string> })
         return;
     }
 
-    const embeds = await mapBuilder(Number(beatmapId), <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null);
+    const embeds = await mapBuilder({ builderType: EmbedBuilderType.MAP, beatmapId: Number(beatmapId), mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null });
     await channel.send({ embeds });
 }
 

@@ -2,6 +2,7 @@ import { getCommandArgs } from "../../utils/args";
 import { profileBuilder } from "../../embed-builders/profile";
 import { client } from "../../utils/initalize";
 import { UserType } from "../../types/commandArgs";
+import { EmbedBuilderType } from "../../types/embedBuilders";
 import { ApplicationCommandOptionType } from "lilybird";
 import type { ApplicationCommandData, Interaction } from "lilybird";
 import type { SlashCommand } from "@lilybird/handlers";
@@ -26,7 +27,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    const embeds = profileBuilder(osuUser, user.mode);
+    const embeds = profileBuilder({ builderType: EmbedBuilderType.PROFILE, user: osuUser, mode: user.mode });
 
     await interaction.editReply({ embeds });
 }

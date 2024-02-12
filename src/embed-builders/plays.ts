@@ -4,28 +4,12 @@ import { getScore } from "../cleaners/scores";
 import { SPACE } from "../utils/constants";
 import { getUser } from "../utils/database";
 import { EmbedType } from "lilybird";
+import type { PlaysBuilderOptions } from "../types/embedBuilders";
 import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, EmbedImageStructure, EmbedStructure, EmbedThumbnailStructure } from "lilybird";
 import type { Mode, ProfileInfo, ScoresInfo } from "../types/osu";
-import type { Mod, UserBestScore, UserExtended, UserScore } from "osu-web.js";
+import type { UserBestScore, UserScore } from "osu-web.js";
 
-export async function playBuilder({ user, mode, includeFails = true, index, type, mods, initiatorId, isMultiple, page, sortByDate }:
-{
-    user: UserExtended,
-    mode: Mode,
-    type: "best" | "firsts" | "recent",
-    index?: number,
-    initiatorId: string,
-    includeFails?: boolean,
-    mods?: {
-        exclude: null | boolean,
-        include: null | boolean,
-        forceInclude: null | boolean,
-        name: null | Mod
-    },
-    isMultiple?: boolean,
-    sortByDate?: boolean,
-    page?: number
-}): Promise<Array<EmbedStructure>> {
+export async function playBuilder({ user, mode, includeFails = true, index, type, mods, initiatorId, isMultiple, page, sortByDate }: PlaysBuilderOptions): Promise<Array<EmbedStructure>> {
     if (typeof page === "undefined" && typeof index === "undefined") {
         if (isMultiple)
             page = 0;

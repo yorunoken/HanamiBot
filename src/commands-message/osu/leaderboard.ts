@@ -2,6 +2,7 @@ import { parseOsuArguments } from "../../utils/args";
 import { Mode, Leaderboard } from "../../types/osu";
 import { getBeatmapIdFromContext } from "../../utils/osu";
 import { leaderboardBuilder } from "../../embed-builders/leaderboard";
+import { EmbedBuilderType } from "../../types/embedBuilders";
 import { EmbedType } from "lilybird";
 import type { Message } from "lilybird";
 import type { MessageCommand } from "../../types/commands";
@@ -35,7 +36,13 @@ async function run({ message, args, commandName }: { message: Message, args: Arr
         return;
     }
 
-    const embeds = await leaderboardBuilder({ type: modeAliases[commandName].type, page: Number(flags.p ?? flags.page) || undefined, beatmapId: Number(beatmapId), mods });
+    const embeds = await leaderboardBuilder({
+        builderType: EmbedBuilderType.LEADERBOARD,
+        type: modeAliases[commandName].type,
+        page: Number(flags.p ?? flags.page) || undefined,
+        beatmapId: Number(beatmapId),
+        mods
+    });
     await channel.send({ embeds });
 }
 

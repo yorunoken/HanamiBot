@@ -2,6 +2,7 @@ import { getCommandArgs } from "../../utils/args";
 import { playBuilder } from "../../embed-builders/plays";
 import { client } from "../../utils/initalize";
 import { UserType } from "../../types/commandArgs";
+import { EmbedBuilderType } from "../../types/embedBuilders";
 import { ApplicationCommandOptionType } from "lilybird";
 import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, Interaction } from "lilybird";
@@ -45,6 +46,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     }
 
     const embeds = await playBuilder({
+        builderType: EmbedBuilderType.PLAYS,
         user: osuUser,
         mode: user.mode,
         type: "recent",

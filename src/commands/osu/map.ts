@@ -1,6 +1,7 @@
 import { getCommandArgs } from "../../utils/args";
 import { getBeatmapIdFromContext } from "../../utils/osu";
 import { mapBuilder } from "../../embed-builders/mapBuilder";
+import { EmbedBuilderType } from "../../types/embedBuilders";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, Interaction } from "lilybird";
@@ -29,7 +30,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    const embeds = await mapBuilder(Number(beatmapId), <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null);
+    const embeds = await mapBuilder({ builderType: EmbedBuilderType.MAP, beatmapId: Number(beatmapId), mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null });
     await interaction.editReply({ embeds });
 }
 

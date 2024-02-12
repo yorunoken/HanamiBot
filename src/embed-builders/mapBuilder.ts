@@ -3,10 +3,10 @@ import { downloadBeatmap, getPerformanceResults } from "../utils/osu";
 import { getMap } from "../utils/database";
 import { rulesets } from "../utils/emotes";
 import { EmbedType } from "lilybird";
-import type { Mod } from "osu-web.js";
+import type { MapBuilderOptions } from "../types/embedBuilders";
 import type { EmbedStructure } from "lilybird";
 
-export async function mapBuilder(beatmapId: number, mods: Array<Mod> | null): Promise<Array<EmbedStructure>> {
+export async function mapBuilder({ beatmapId, mods }: MapBuilderOptions): Promise<Array<EmbedStructure>> {
     const map = await client.beatmaps.getBeatmap(beatmapId);
     if (!map.id) {
         return [

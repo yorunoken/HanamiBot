@@ -1,6 +1,7 @@
 import { getCommandArgs } from "../../utils/args";
 import { getBeatmapIdFromContext } from "../../utils/osu";
 import { leaderboardBuilder } from "../../embed-builders/leaderboard";
+import { EmbedBuilderType } from "../../types/embedBuilders";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { Leaderboard } from "../../types/osu";
 import type { ApplicationCommandData, Interaction } from "lilybird";
@@ -29,7 +30,13 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    const embeds = await leaderboardBuilder({ beatmapId: Number(beatmapId), page: interaction.data.getNumber("page"), type: <Leaderboard>(interaction.data.getString("type") ?? "global"), mods });
+    const embeds = await leaderboardBuilder({
+        builderType: EmbedBuilderType.LEADERBOARD,
+        beatmapId: Number(beatmapId),
+        page: interaction.data.getNumber("page"),
+        type: <Leaderboard>(interaction.data.getString("type") ?? "global"),
+        mods
+    });
     await interaction.editReply({ embeds });
 }
 

@@ -5,22 +5,12 @@ import { SPACE } from "../utils/constants";
 import { getMap } from "../utils/database";
 import { downloadBeatmap } from "../utils/osu";
 import { EmbedType } from "lilybird";
+import type { CompareBuilderOptions } from "../types/embedBuilders";
 import type { EmbedStructure } from "lilybird";
 import type { Beatmap, Mode, ProfileInfo, ScoresInfo } from "../types/osu";
-import type { Mod, Score, UserExtended } from "osu-web.js";
+import type { Score } from "osu-web.js";
 
-export async function compareBuilder({ user, mode, beatmapId, mods }:
-{
-    user: UserExtended,
-    mode: Mode,
-    beatmapId: number,
-    mods?: {
-        exclude: null | boolean,
-        include: null | boolean,
-        forceInclude: null | boolean,
-        name: null | Mod
-    }
-}): Promise<Array<EmbedStructure>> {
+export async function compareBuilder({ user, mode, beatmapId, mods }: CompareBuilderOptions): Promise<Array<EmbedStructure>> {
     const profile = getProfile(user, mode);
 
     const beatmap: Beatmap = await client.beatmaps.getBeatmap(beatmapId);
