@@ -10,7 +10,7 @@ import type { EmbedStructure } from "lilybird";
 import type { Beatmap, Mode, ProfileInfo, ScoresInfo } from "../types/osu";
 import type { Score } from "osu-web.js";
 
-export async function compareBuilder({ user, mode, beatmapId, mods }: CompareBuilderOptions): Promise<Array<EmbedStructure>> {
+export async function compareBuilder({ beatmap, plays, user, mode, beatmapId, mods }: CompareBuilderOptions): Promise<Array<EmbedStructure>> {
     const profile = getProfile(user, mode);
 
     const beatmap: Beatmap = await client.beatmaps.getBeatmap(beatmapId);

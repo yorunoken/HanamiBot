@@ -1,5 +1,5 @@
 import type { Leaderboard, Mode } from "./osu";
-import type { UserExtended, Mod } from "osu-web.js";
+import type { UserExtended, Mod, Score, Beatmap } from "osu-web.js";
 
 export const enum EmbedBuilderType {
     COMPARE = "compareBuilder",
@@ -11,6 +11,8 @@ export const enum EmbedBuilderType {
 
 export interface CompareBuilderOptions {
     builderType: EmbedBuilderType.COMPARE;
+    beatmap: Beatmap;
+    plays: Array<Score>;
     user: UserExtended;
     mode: Mode;
     beatmapId: number;
@@ -33,6 +35,8 @@ export interface LeaderboardBuilderOptions {
         name: null | Mod
     };
     page: number | undefined;
+    isMaxValue?: boolean;
+    isMinValue?: boolean;
 }
 
 export interface MapBuilderOptions { builderType: EmbedBuilderType.MAP; beatmapId: number; mods: Array<Mod> | null }
@@ -54,6 +58,8 @@ export interface PlaysBuilderOptions {
     isMultiple?: boolean;
     sortByDate?: boolean;
     page?: number;
+    isMaxValue?: boolean;
+    isMinValue?: boolean;
 }
 
 export interface ProfileBuilderOptions { builderType: EmbedBuilderType.PROFILE; user: UserExtended; mode: Mode }

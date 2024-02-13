@@ -9,7 +9,20 @@ import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, E
 import type { Mode, ProfileInfo, ScoresInfo } from "../types/osu";
 import type { UserBestScore, UserScore } from "osu-web.js";
 
-export async function playBuilder({ user, mode, includeFails = true, index, type, mods, initiatorId, isMultiple, page, sortByDate }: PlaysBuilderOptions): Promise<Array<EmbedStructure>> {
+export async function playBuilder({
+    user,
+    mode,
+    includeFails = true,
+    index,
+    type,
+    mods,
+    initiatorId,
+    isMultiple,
+    page,
+    sortByDate,
+    isMaxValue,
+    isMinValue
+}: PlaysBuilderOptions): Promise<Array<EmbedStructure>> {
     if (typeof page === "undefined" && typeof index === "undefined") {
         if (isMultiple)
             page = 0;

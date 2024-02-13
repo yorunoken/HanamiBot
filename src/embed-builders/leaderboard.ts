@@ -9,7 +9,7 @@ import type { EmbedStructure } from "lilybird";
 import type { Beatmap, LeaderboardScores, Mode, ScoresInfo } from "../types/osu";
 import type { Mod } from "osu-web.js";
 
-export async function leaderboardBuilder({ type, beatmapId, mods, page = 0 }: LeaderboardBuilderOptions): Promise<Array<EmbedStructure>> {
+export async function leaderboardBuilder({ type, beatmapId, mods, page = 0, isMaxValue, isMinValue }: LeaderboardBuilderOptions): Promise<Array<EmbedStructure>> {
     const beatmap: Beatmap = await client.beatmaps.getBeatmap(beatmapId);
     if (!beatmap.id) {
         return [
