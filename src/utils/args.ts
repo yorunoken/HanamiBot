@@ -7,8 +7,64 @@ import type { CommandArgs, Mods, ParsedArgs, User } from "../types/commandArgs";
 import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, Interaction, Message } from "lilybird";
 
-function linkMatcher(link: string): RegExpExecArray | null {
-    return (/^https:\/\/osu\.ppy\.sh\/(beatmapsets|b)\/(?:\d+\/)?(\d+)$/).exec(link);
+interface BeatMapSetURL {
+    url: string;
+    setId: string;
+    gameMode: string | null;
+    difficultyId: string | null;
+}
+
+interface BeatMapURL {
+    url: string;
+    id: string;
+}
+
+const init = "https://osu.ppy.sh/";
+const index = init.length;
+const name = "beatmapsets";
+const nameLength = name.length;
+
+function parseURL(url: string): BeatMapSetURL | BeatMapURL | null {
+    if (!url.startsWith(init)) return null;
+    if (url[index] !== "b") return null;
+
+    if (url[index + 1] === "/") {
+        return {
+            url,
+            id: url.substring(index + 2)
+        } satisfies BeatMapURL;
+    }
+
+    if (!url.startsWith(name, index)) return null;
+    const subUrl = url.substring(index + nameLength + 1);
+
+    const slash = subUrl.indexOf("/");
+    const hash = subUrl.indexOf("#");
+
+    if (slash === -1) {
+        if (hash === -1) {
+            return {
+                url,
+                setId: subUrl,
+                gameMode: null,
+                difficultyId: null
+            } satisfies BeatMapSetURL;
+        }
+
+        return {
+            url,
+            setId: subUrl.substring(0, hash),
+            gameMode: subUrl.substring(hash + 1),
+            difficultyId: null
+        } satisfies BeatMapSetURL;
+    }
+
+    return {
+        url,
+        setId: subUrl.substring(0, hash),
+        gameMode: subUrl.substring(hash + 1, slash),
+        difficultyId: subUrl.substring(slash + 1)
+    } satisfies BeatMapSetURL;
 }
 
 function linkCommand(): string | undefined {
@@ -42,8 +98,12 @@ export function getCommandArgs(interaction: Interaction<ApplicationCommandData>)
         };
     }
 
-    const urlMatch = linkMatcher(interaction.data.getString("map") ?? "");
-    const beatmapId = urlMatch?.[2] ?? null;
+    const urlMatch = parseURL(interaction.data.getString("map") ?? "");
+    let beatmapId: string | null = null;
+    if (urlMatch && "id" in urlMatch)
+        beatmapId = urlMatch.id;
+    else if (urlMatch && "setId" in urlMatch)
+        beatmapId = urlMatch.difficultyId;
 
     const user: User = discordUserId
         ? discordUser
@@ -79,14 +139,23 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
         }
     };
 
-    const mapLinkMatch = linkMatcher(args.join(" "));
-    if (mapLinkMatch) {
+    const mapLinkMatches: Array<BeatMapSetURL | BeatMapURL> = [];
+    for (let i = 0; i < args.length; i++) {
+        const parsedUrl = parseURL(args[i]);
+        if (parsedUrl !== null)
+            mapLinkMatches.push(parsedUrl);
+    }
+
+    if (mapLinkMatches.length > 0) {
+        // Get the first array of `mapLinkMatches`
+        const [firstMatch] = mapLinkMatches;
+
         // Extract beatmap ID from link
-        const beatmapId = mapLinkMatch[mapLinkMatch.length - 1];
+        const beatmapId = "id" in firstMatch ? firstMatch.id : firstMatch.difficultyId;
         result.user.beatmapId = beatmapId;
 
         // Remove the map link from args array
-        const indexToRemove = args.findIndex((link) => link === mapLinkMatch[0]);
+        const indexToRemove = args.findIndex((link) => link === firstMatch.url);
         args.splice(indexToRemove, 1);
     }
 
