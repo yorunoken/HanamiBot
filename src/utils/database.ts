@@ -1,5 +1,5 @@
 import db from "../data.db" with { type: "sqlite" };
-import type { DatabaseMap, DatabaseGuild, DatabaseUser } from "../types/database";
+import type { DatabaseMap, DatabaseGuild, DatabaseUser, DatabaseCommands } from "../types/database";
 
 export function getUser(id: string | number): DatabaseUser | null {
     const data: DatabaseUser | null = db.prepare("SELECT * FROM users WHERE id = ?").get(id) as DatabaseUser | null;
@@ -23,8 +23,8 @@ export function getMap(id: string | number): DatabaseMap | undefined {
     return db.prepare("SELECT * FROM maps WHERE id = ?").get(id) as DatabaseMap;
 }
 
-export function getCommand(id: string | number): DatabaseMap | undefined {
-    return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DatabaseMap;
+export function getCommand(id: string | number): DatabaseCommands | undefined {
+    return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DatabaseCommands;
 }
 
 export function insertData({ table, id, data }: { table: string, id: string | number, data: Array<{ name: string, value: string | number | null }> }): void {
