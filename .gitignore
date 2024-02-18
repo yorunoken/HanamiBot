@@ -1,6 +1,13 @@
+<<<<<<< HEAD
+=======
 .env.local
 .env
+>>>>>>> origin/main
 node_modules/
-data.db
 tests/
+logs/
 package-lock.json
+.env.*
+*.db
+*.tsbuildinfo
+hanami/

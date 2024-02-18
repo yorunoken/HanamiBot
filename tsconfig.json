@@ -12,11 +12,13 @@
     "downlevelIteration": true,
     "skipLibCheck": true,
     "jsx": "react-jsx",
+    "jsxImportSource": "@lilybird/jsx",
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
     "types": [
-      "bun-types" // add Bun global
+        "bun-types", // add Bun global
+        "./globals"
     ]
   }
 }

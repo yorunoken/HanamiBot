@@ -1,0 +1,121 @@
+import { parseOsuArguments } from "../../utils/args";
+import { client } from "../../utils/initalize";
+import { compareBuilder } from "../../embed-builders/compare";
+import { Mode } from "../../types/osu";
+import { UserType } from "../../types/commandArgs";
+import { getBeatmapIdFromContext } from "../../utils/osu";
+import { EmbedBuilderType } from "../../types/embedBuilders";
+import { EmbedType } from "lilybird";
+import type { Message } from "lilybird";
+import type { MessageCommand } from "../../types/commands";
+
+const modeAliases: Record<string, { mode: Mode }> = {
+    c: { mode: Mode.OSU },
+    gap: { mode: Mode.OSU },
+    compare: { mode: Mode.OSU },
+    compareosu: { mode: Mode.OSU },
+    comparetaiko: { mode: Mode.TAIKO },
+    comparemania: { mode: Mode.MANIA },
+    comparecatch: { mode: Mode.FRUITS }
+};
+
+export default {
+    name: "compare",
+    aliases: Object.keys(modeAliases),
+    description: "Display play(s) of a user on a beatmap.",
+    cooldown: 1000,
+    run
+} satisfies MessageCommand;
+
+async function run({
+    message,
+    args,
+    commandName
+}: {
+    message: Message,
+    args: Array<string>,
+    commandName: string
+}): Promise<void> {
+    const channel = await message.fetchChannel();
+
+    const { user, mods } = parseOsuArguments(message, args, modeAliases[commandName].mode);
+    if (user.type === UserType.FAIL) {
+        await channel.send(user.failMessage);
+        return;
+    }
+
+    const osuUser = await client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } });
+    if (!osuUser.id) {
+        await channel.send("This user does not exist.");
+        return;
+    }
+
+    const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ message, client: message.client });
+    if (typeof beatmapId === "undefined" || beatmapId === null) {
+        await channel.send({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: "It seems like the beatmap ID couldn't be found :(\n"
+                }
+            ]
+        });
+        return;
+    }
+
+    const beatmap = await client.beatmaps.getBeatmap(Number(beatmapId));
+    if (!beatmap.id) {
+        await channel.send({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: "It seems like this beatmap doesn't exist! :("
+                }
+            ]
+        });
+        return;
+    }
+
+    if (beatmap.status === "pending" || beatmap.status === "wip" || beatmap.status === "graveyard") {
+        await channel.send({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: "It seems like this beatmap's leaderboard doesn't exist! :("
+                }
+            ]
+        });
+        return;
+    }
+
+    const plays = (await client.beatmaps.getBeatmapUserScores(beatmap.id, osuUser.id, { query: { mode: user.mode } })).sort((a, b) => b.pp - a.pp).map((item, idx) => {
+        return { ...item, position: idx + 1 };
+    });
+
+    if (plays.length === 0) {
+        await channel.send({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: `It seems like \`${osuUser.username}\` has no plays on that beatmap!`
+                }
+            ]
+        });
+        return;
+    }
+
+    const embeds = await compareBuilder({
+        type: EmbedBuilderType.COMPARE,
+        user: osuUser,
+        mode: user.mode,
+        beatmap,
+        plays,
+        mods
+    });
+    await channel.send({ embeds });
+}
+

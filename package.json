@@ -1,23 +1,29 @@
 {
-  "name": "hanami",
   "version": "1.0.0",
-  "module": "src/index.ts",
+  "private": true,
+  "name": "hanamibot",
   "type": "module",
   "scripts": {
-    "start": "bun ."
+    "check": "tsc && eslint",
+    "start": "bun src/index.ts",
+    "db": "bun tools/database.ts"
+  },
+  "trustedDependencies": [
+    "rosu-pp"
+  ],
+  "dependencies": {
+    "@lilybird/handlers": "^0.3.1",
+    "lilybird": "^0.5.2",
+    "osu-downloader": "^0.8.1",
+    "osu-web.js": "^2.1.0",
+    "rosu-pp": "^0.9.4"
   },
   "devDependencies": {
-    "@types/ms": "^0.7.32",
-    "bun-types": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "dependencies": {
-    "discord.js": "^14.14.1",
-    "ms": "^2.1.3",
-    "osu-api-extended": "^2.7.67",
-    "osu-downloader": "^0.8.1",
-    "rosu-pp": "^0.9.4"
+    "@stylistic/eslint-plugin": "^1.6.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "bun-types": "^1.0.26",
+    "eslint": "^8.56.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1"
   }
 }
