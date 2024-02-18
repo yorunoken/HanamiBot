@@ -15,7 +15,7 @@
     "@lilybird/handlers": "^0.3.1",
     "lilybird": "^0.5.2",
     "osu-downloader": "^0.8.1",
-    "osu-web.js": "^2.0.2",
+    "osu-web.js": "^2.1.0",
     "rosu-pp": "^0.9.4"
   },
   "devDependencies": {
