@@ -1,27 +1,22 @@
 import { getProfile } from "../cleaners/profile";
-import { client } from "../utils/initalize";
 import { getScore } from "../cleaners/scores";
 import { SPACE } from "../utils/constants";
 import { getUser } from "../utils/database";
 import { EmbedType } from "lilybird";
+import type { UserScore, Mode, ProfileInfo, ScoresInfo, UserBestScore } from "../types/osu";
 import type { PlaysBuilderOptions } from "../types/embedBuilders";
 import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, EmbedImageStructure, EmbedStructure, EmbedThumbnailStructure } from "lilybird";
-import type { Mode, ProfileInfo, ScoresInfo } from "../types/osu";
-import type { UserBestScore, UserScore } from "osu-web.js";
 
 export async function playBuilder({
+    plays,
     user,
     mode,
-    includeFails = true,
     index,
-    type,
     mods,
     initiatorId,
     isMultiple,
     page,
-    sortByDate,
-    isMaxValue,
-    isMinValue
+    sortByDate
 }: PlaysBuilderOptions): Promise<Array<EmbedStructure>> {
     if (typeof page === "undefined" && typeof index === "undefined") {
         if (isMultiple)
@@ -30,10 +25,6 @@ export async function playBuilder({
     }
 
     const profile = getProfile(user, mode);
-
-    let plays = (await client.users.getUserScores(user.id, type, { query: { mode, limit: 100, include_fails: includeFails } })).map((item, idx) => {
-        return { ...item, position: idx + 1 };
-    });
 
     if (mods?.name) {
         const { exclude, forceInclude, include, name } = mods;
@@ -88,19 +79,20 @@ async function getSinglePlay({ mode, index, plays, profile, initiatorId, isMulti
         icon_url: profile.avatarUrl
     } satisfies EmbedAuthorStructure;
 
-    const line1 = `${play.grade} ${SPACE} ${play.score === "0" ? "140,000" : play.score} ${SPACE} **${play.accuracy}%** ${SPACE} ${play.playSubmitted}\n`;
+    const line1 = `${play.grade} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%** ${SPACE} ${play.playSubmitted}\n`;
     const line2 = `${play.ppFormatted} ${SPACE} ${play.comboValues} ${SPACE} ${play.hitValues}\n`;
     const line3 = `${play.ifFcValues ?? ""}\n`;
 
     const fields = [
         {
-            name: `${play.rulesetEmote} ${play.difficultyName} **+${play.mods.join("")}** [${play.stars}] ${isMultiple ? `${SPACE} Top **__#${play.position}__**` : ""}`,
-            value: line1 + line2 + line3,
+            name: `${play.rulesetEmote} ${play.difficultyName} **+${play.mods.join("")}** [${play.stars}] ${isMultiple ? `${SPACE} Top **__#${play.position}__** of ${plays.length}` : ""}`,
+            value: line1 + line2,
             inline: false
         }
     ] satisfies Array<EmbedFieldStructure>;
 
     if (maximized === 1) {
+        fields[0].value += line3;
         fields.push({
             name: "Beatmap Info:",
             value: `**BPM:** \`${mapValues.bpm.toFixed().toLocaleString()}\` ${SPACE} **Length:** \`${play.drainLength}\`
@@ -113,7 +105,7 @@ async function getSinglePlay({ mode, index, plays, profile, initiatorId, isMulti
     const thumbnail = maximized === 0 ? { url: play.listLink } satisfies EmbedThumbnailStructure : undefined;
     const title = play.songTitle;
     const url = play.mapLink;
-    const footer: EmbedFooterStructure = { text: `${play.mapStatus} mapset by ${play.mapAuthor}` };
+    const footer: EmbedFooterStructure = { text: `${play.mapStatus} mapset by ${play.mapAuthor}${maximized === 1 && !isMultiple ? `Play ${index + 1} of ${plays.length}` : ""}` };
 
     return [ { type: EmbedType.Rich, author, fields, image, thumbnail, footer, url, title } ] satisfies Array<EmbedStructure>;
 }

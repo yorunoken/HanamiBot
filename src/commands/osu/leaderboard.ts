@@ -1,44 +1,15 @@
 import { getCommandArgs } from "../../utils/args";
-import { getBeatmapIdFromContext } from "../../utils/osu";
+import { getBeatmapIdFromContext, getBeatmapTopScores } from "../../utils/osu";
 import { leaderboardBuilder } from "../../embed-builders/leaderboard";
 import { EmbedBuilderType } from "../../types/embedBuilders";
+import { client } from "../../utils/initalize";
+import { createActionRow, calculateButtonState } from "../../utils/buttons";
+import { mesageDataForButtons } from "../../utils/cache";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
-import type { Leaderboard } from "../../types/osu";
+import type { LeaderboardBuilderOptions } from "../../types/embedBuilders";
+import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, Interaction } from "lilybird";
 import type { SlashCommand } from "@lilybird/handlers";
-
-async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
-    if (!interaction.inGuild()) return;
-    await interaction.deferReply();
-
-    const args = getCommandArgs(interaction);
-
-    if (typeof args === "undefined") return;
-    const { user, mods } = args;
-
-    const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ channelId: interaction.channelId, client: interaction.client });
-    if (typeof beatmapId === "undefined" || beatmapId === null) {
-        await interaction.editReply({
-            embeds: [
-                {
-                    type: EmbedType.Rich,
-                    title: "Uh oh! :x:",
-                    description: "It seems like the beatmap ID couldn't be found :(\n"
-                }
-            ]
-        });
-        return;
-    }
-
-    const embeds = await leaderboardBuilder({
-        builderType: EmbedBuilderType.LEADERBOARD,
-        beatmapId: Number(beatmapId),
-        page: interaction.data.getNumber("page"),
-        type: <Leaderboard>(interaction.data.getString("type") ?? "global"),
-        mods
-    });
-    await interaction.editReply({ embeds });
-}
 
 export default {
     post: "GLOBAL",
@@ -72,3 +43,97 @@ export default {
     },
     run
 } satisfies SlashCommand;
+
+async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
+    if (!interaction.inGuild()) return;
+    await interaction.deferReply();
+
+    const args = getCommandArgs(interaction);
+
+    if (typeof args === "undefined") return;
+    const { user, mods } = args;
+
+    const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ channelId: interaction.channelId, client: interaction.client });
+    if (typeof beatmapId === "undefined" || beatmapId === null) {
+        await interaction.editReply({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: "It seems like the beatmap ID couldn't be found :(\n"
+                }
+            ]
+        });
+        return;
+    }
+
+    const beatmap = await client.beatmaps.getBeatmap(Number(beatmapId));
+    if (!beatmap.id) {
+        await interaction.editReply({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: "It seems like this beatmap doesn't exist! :("
+                }
+            ]
+        });
+        return;
+    }
+
+    if (beatmap.status === "pending" || beatmap.status === "wip" || beatmap.status === "graveyard") {
+        await interaction.editReply({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: "It seems like this beatmap's leaderboard doesn't exist! :("
+                }
+            ]
+        });
+        return;
+    }
+
+    const isGlobal = interaction.data.getString("type") === "global";
+    const { scores } = await getBeatmapTopScores({ beatmapId: Number(beatmapId), mode: beatmap.mode, isGlobal, mods: mods.name ? <Array<Mod>>mods.name.match(/.{1,2}/g) : undefined });
+    if (scores.length === 0) {
+        await interaction.editReply({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: "It seems like this beatmap's leaderboard doesn't exist! :("
+                }
+            ]
+        });
+        return;
+    }
+
+    const page = (interaction.data.getNumber("page") ?? 1) - 1;
+    const totalPages = Math.ceil(scores.length / 5);
+
+    const embedOptions: LeaderboardBuilderOptions = {
+        type: EmbedBuilderType.LEADERBOARD,
+        page,
+        beatmap,
+        scores
+    };
+
+    const embeds = await leaderboardBuilder(embedOptions);
+
+    const sentInteraction = await interaction.editReply({
+        embeds,
+        components: createActionRow({
+            isPage: true,
+            disabledStates: [
+                page === 0,
+                calculateButtonState(false, page, totalPages),
+                calculateButtonState(true, page, totalPages),
+                page === totalPages - 1
+            ]
+        })
+    });
+
+    // ??
+    mesageDataForButtons.set(sentInteraction.id, embedOptions);
+}

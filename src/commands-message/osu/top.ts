@@ -1,11 +1,15 @@
 import { parseOsuArguments } from "../../utils/args";
 import { client } from "../../utils/initalize";
 import { playBuilder } from "../../embed-builders/plays";
-import { Mode } from "../../types/osu";
+import { Mode, PlayType } from "../../types/osu";
 import { UserType } from "../../types/commandArgs";
 import { EmbedBuilderType } from "../../types/embedBuilders";
-import type { MessageCommand } from "../../types/commands";
+import { calculateButtonState, createActionRow } from "../../utils/buttons";
+import { mesageDataForButtons } from "../../utils/cache";
+import { EmbedType } from "lilybird";
 import type { Message } from "lilybird";
+import type { PlaysBuilderOptions } from "../../types/embedBuilders";
+import type { MessageCommand } from "../../types/commands";
 
 const modeAliases: Record<string, { mode: Mode }> = {
     top: { mode: Mode.OSU },
@@ -39,18 +43,68 @@ async function run({ message, args, commandName, index }: { message: Message, ar
         return;
     }
 
-    const embeds = await playBuilder({
-        builderType: EmbedBuilderType.PLAYS,
+    const plays = (await client.users.getUserScores(osuUser.id, PlayType.BEST, { query: { mode, limit: 100 } })).map((item, idx) => {
+        return { ...item, position: idx + 1 };
+    });
+
+    if (plays.length === 0) {
+        await channel.send({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: `It seems like \`${osuUser.username}\` doesn't have any plays, maybe they should go set some :)`
+                }
+            ]
+        });
+        return;
+    }
+
+    let page = Number(flags.p ?? flags.page) || undefined;
+
+    if (typeof page === "undefined" && typeof index === "undefined")
+        page = 0;
+
+    const isPage = typeof page !== "undefined";
+    const totalPages = isPage ? Math.ceil(plays.length / 5) : plays.length;
+
+    const embedOptions: PlaysBuilderOptions = {
+        type: EmbedBuilderType.PLAYS,
         user: osuUser,
         mode: user.mode,
         initiatorId: message.author.id,
-        type: "best",
-        page: Number(flags.p ?? flags.page) || undefined,
+        isMultiple: true,
+        page,
+        isPage,
         index,
         mods,
-        isMultiple: true
+        plays
+    };
+
+    const embeds = await playBuilder(embedOptions);
+
+    console.info(createActionRow({
+        isPage,
+        disabledStates: [
+            isPage ? page === 0 : index === 0,
+            calculateButtonState(false, index ?? 0, totalPages),
+            calculateButtonState(true, index ?? 0, totalPages),
+            isPage ? page === totalPages - 1 : index === totalPages - 1
+        ]
+    })[0]);
+    const sentMessage = await channel.send({
+        embeds,
+        components: createActionRow({
+            isPage,
+            disabledStates: [
+                isPage ? page === 0 : index === 0,
+                calculateButtonState(false, index ?? 0, totalPages),
+                calculateButtonState(true, index ?? 0, totalPages),
+                isPage ? page === totalPages - 1 : index === totalPages - 1
+            ]
+        })
     });
-    await channel.send({ embeds });
+    mesageDataForButtons.set(sentMessage.id, embedOptions);
 }
 
 export default {

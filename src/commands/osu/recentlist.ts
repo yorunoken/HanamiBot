@@ -15,8 +15,8 @@ import type { SlashCommand } from "@lilybird/handlers";
 export default {
     post: "GLOBAL",
     data: {
-        name: "recentbest",
-        description: "Display most recent top play(s) of a user.",
+        name: "recentlist",
+        description: "Display a list of recent play(s) of a user.",
         options: [
             {
                 type: ApplicationCommandOptionType.STRING,
@@ -32,7 +32,7 @@ export default {
             {
                 type: ApplicationCommandOptionType.INTEGER,
                 name: "index",
-                description: "Specify an index.",
+                description: "Specify an index, defaults to 1.",
                 min_value: 1,
                 max_value: 100
             },
@@ -75,6 +75,11 @@ export default {
                 choices: ["SS", "S", "A", "B", "C", "D"].map((grade) => ({ name: grade, value: grade }))
             },
             {
+                type: ApplicationCommandOptionType.BOOLEAN,
+                name: "passes",
+                description: "Whether or not only passes should be considered."
+            },
+            {
                 type: ApplicationCommandOptionType.USER,
                 name: "discord",
                 description: "Specify a linked Discord user"
@@ -92,6 +97,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     if (typeof args === "undefined") return;
     const { user } = args;
 
+    const includeFails = !(interaction.data.getBoolean("passes") ?? false);
     let index = interaction.data.getInteger("index");
     let page = interaction.data.getInteger("page");
 
@@ -130,7 +136,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    const plays = (await client.users.getUserScores(osuUser.id, PlayType.BEST, { query: { mode: user.mode, limit: 100 } })).map((item, idx) => {
+    const plays = (await client.users.getUserScores(osuUser.id, PlayType.RECENT, { query: { mode: user.mode, limit: 100, include_fails: includeFails } })).map((item, idx) => {
         return { ...item, position: idx + 1 };
     });
 
@@ -140,7 +146,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like \`${osuUser.username}\` doesn't have any plays, maybe they should go set some :)`
+                    description: `It seems like \`${osuUser.username}\` hasn't had any recent plays in the last 24 hours!`
                 }
             ]
         });
@@ -153,13 +159,12 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         type: EmbedBuilderType.PLAYS,
         user: osuUser,
         mode: user.mode,
-        initiatorId: interaction.member.user.id,
         isMultiple: true,
-        sortByDate: true,
-        isPage,
+        initiatorId: interaction.member.user.id,
+        mods: { exclude: false, forceInclude: false, include: true, name: mod },
         page,
         index,
-        mods,
+        isPage,
         plays
     };
 
@@ -182,4 +187,3 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
 
     mesageDataForButtons.set(sentInteraction.id, embedOptions);
 }
-

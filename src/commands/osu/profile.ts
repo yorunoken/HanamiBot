@@ -7,31 +7,6 @@ import { ApplicationCommandOptionType } from "lilybird";
 import type { ApplicationCommandData, Interaction } from "lilybird";
 import type { SlashCommand } from "@lilybird/handlers";
 
-async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
-    if (!interaction.inGuild()) return;
-    await interaction.deferReply();
-
-    const args = getCommandArgs(interaction);
-
-    if (typeof args === "undefined") return;
-    const { user } = args;
-
-    if (user.type === UserType.FAIL) {
-        await interaction.editReply(user.failMessage);
-        return;
-    }
-
-    const osuUser = await client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } });
-    if (!osuUser.id) {
-        await interaction.editReply("This user does not exist.");
-        return;
-    }
-
-    const embeds = profileBuilder({ builderType: EmbedBuilderType.PROFILE, user: osuUser, mode: user.mode });
-
-    await interaction.editReply({ embeds });
-}
-
 export default {
     post: "GLOBAL",
     data: {
@@ -58,3 +33,28 @@ export default {
     },
     run
 } satisfies SlashCommand;
+
+async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
+    if (!interaction.inGuild()) return;
+    await interaction.deferReply();
+
+    const args = getCommandArgs(interaction);
+
+    if (typeof args === "undefined") return;
+    const { user } = args;
+
+    if (user.type === UserType.FAIL) {
+        await interaction.editReply(user.failMessage);
+        return;
+    }
+
+    const osuUser = await client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } });
+    if (!osuUser.id) {
+        await interaction.editReply("This user does not exist.");
+        return;
+    }
+
+    const embeds = profileBuilder({ type: EmbedBuilderType.PROFILE, user: osuUser, mode: user.mode });
+
+    await interaction.editReply({ embeds });
+}

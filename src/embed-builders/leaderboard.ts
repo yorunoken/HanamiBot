@@ -1,38 +1,17 @@
-import { client } from "../utils/initalize";
 import { getScore } from "../cleaners/scores";
 import { SPACE } from "../utils/constants";
 import { getMap } from "../utils/database";
-import { downloadBeatmap, getBeatmapTopScores } from "../utils/osu";
+import { downloadBeatmap } from "../utils/osu";
 import { EmbedType } from "lilybird";
 import type { LeaderboardBuilderOptions } from "../types/embedBuilders";
 import type { EmbedStructure } from "lilybird";
 import type { Beatmap, LeaderboardScores, Mode, ScoresInfo } from "../types/osu";
-import type { Mod } from "osu-web.js";
 
-export async function leaderboardBuilder({ type, beatmapId, mods, page = 0, isMaxValue, isMinValue }: LeaderboardBuilderOptions): Promise<Array<EmbedStructure>> {
-    const beatmap: Beatmap = await client.beatmaps.getBeatmap(beatmapId);
-    if (!beatmap.id) {
-        return [
-            {
-                type: EmbedType.Rich,
-                title: "Uh oh! :x:",
-                description: "It seems like this beatmap doesn't exist! :("
-            }
-        ] satisfies Array<EmbedStructure>;
-    }
-
-    if (["pending", "wip", "graveyard"].some((g) => g === beatmap.status)) {
-        return [
-            {
-                type: EmbedType.Rich,
-                title: "Uh oh! :x:",
-                description: "It seems like this beatmap's leaderboard doesn't exist! :("
-            }
-        ] satisfies Array<EmbedStructure>;
-    }
-
-    const { scores } = await getBeatmapTopScores({ beatmapId, mode: beatmap.mode, type, mods: mods ? mods.name?.match(/.{1,2}/g) as Array<Mod> : undefined });
-
+export async function leaderboardBuilder({
+    scores,
+    beatmap,
+    page = 0
+}: LeaderboardBuilderOptions): Promise<Array<EmbedStructure>> {
     if (scores.length === 0) {
         return [
             {
@@ -48,7 +27,7 @@ export async function leaderboardBuilder({ type, beatmapId, mods, page = 0, isMa
 
 async function getPlays(plays: LeaderboardScores, beatmap: Beatmap, page: number): Promise<Array<EmbedStructure>> {
     const beatmapId = beatmap.id;
-    const mode: Mode = beatmap.mode as Mode;
+    const mode = <Mode>beatmap.mode;
     const mapData = getMap(beatmapId)?.data ?? (await downloadBeatmap([beatmapId]))[0].contents;
 
     const pageStart = page * 5;

@@ -3,61 +3,14 @@ import { playBuilder } from "../../embed-builders/plays";
 import { client } from "../../utils/initalize";
 import { UserType } from "../../types/commandArgs";
 import { EmbedBuilderType } from "../../types/embedBuilders";
-import { ApplicationCommandOptionType } from "lilybird";
+import { PlayType } from "../../types/osu";
+import { createActionRow, calculateButtonState } from "../../utils/buttons";
+import { mesageDataForButtons } from "../../utils/cache";
+import { ApplicationCommandOptionType, EmbedType } from "lilybird";
+import type { PlaysBuilderOptions } from "../../types/embedBuilders";
 import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, Interaction } from "lilybird";
 import type { SlashCommand } from "@lilybird/handlers";
-
-async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
-    if (!interaction.inGuild()) return;
-    await interaction.deferReply();
-
-    const args = getCommandArgs(interaction);
-    if (typeof args === "undefined") return;
-    const { user } = args;
-
-    const index = interaction.data.getInteger("index") ?? 0;
-    const page = interaction.data.getInteger("page");
-
-    const mod = interaction.data.getString("mods") as Mod;
-    const modsAction = interaction.data.getString("mods_action");
-
-    const mods = { exclude: false, forceInclude: false, include: false, name: mod };
-    switch (modsAction) {
-        case "include":
-            mods.include = true; break;
-        case "force_include":
-            mods.forceInclude = true; break;
-        case "exclude":
-            mods.exclude = true; break;
-        default:
-            mods.include = true;
-    }
-
-    if (user.type === UserType.FAIL) {
-        await interaction.editReply(user.failMessage);
-        return;
-    }
-
-    const osuUser = await client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } });
-    if (!osuUser.id) {
-        await interaction.editReply("This user does not exist.");
-        return;
-    }
-
-    const embeds = await playBuilder({
-        builderType: EmbedBuilderType.PLAYS,
-        user: osuUser,
-        mode: user.mode,
-        initiatorId: interaction.member.user.id,
-        type: "best",
-        page,
-        index,
-        mods,
-        isMultiple: true
-    });
-    await interaction.editReply({ embeds });
-}
 
 export default {
     post: "GLOBAL",
@@ -86,9 +39,9 @@ export default {
             {
                 type: ApplicationCommandOptionType.INTEGER,
                 name: "page",
-                description: "Specify an index, defaults to 1.",
+                description: "Specify a page, defaults to 1.",
                 min_value: 1,
-                max_value: 100
+                max_value: 20
             },
             {
                 type: ApplicationCommandOptionType.STRING,
@@ -130,3 +83,103 @@ export default {
     },
     run
 } satisfies SlashCommand;
+
+async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
+    if (!interaction.inGuild()) return;
+    await interaction.deferReply();
+    console.info(interaction);
+
+    const args = getCommandArgs(interaction);
+    if (typeof args === "undefined") return;
+    const { user } = args;
+
+    let index = interaction.data.getInteger("index");
+    let page = interaction.data.getInteger("page");
+
+    if (typeof page === "undefined" && typeof index === "undefined")
+        page = 1;
+
+    if (page)
+        page -= 1;
+
+    if (index)
+        index -= 1;
+
+    const mod = interaction.data.getString("mods") as Mod;
+    const modsAction = interaction.data.getString("mods_action");
+
+    const mods = { exclude: false, forceInclude: false, include: false, name: mod };
+    switch (modsAction) {
+        case "include":
+            mods.include = true; break;
+        case "force_include":
+            mods.forceInclude = true; break;
+        case "exclude":
+            mods.exclude = true; break;
+        default:
+            mods.include = true;
+    }
+
+    if (user.type === UserType.FAIL) {
+        await interaction.editReply(user.failMessage);
+        return;
+    }
+
+    const osuUser = await client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } });
+    if (!osuUser.id) {
+        await interaction.editReply("This user does not exist.");
+        return;
+    }
+
+    const plays = (await client.users.getUserScores(osuUser.id, PlayType.BEST, { query: { mode: user.mode, limit: 100 } })).map((item, idx) => {
+        return { ...item, position: idx + 1 };
+    });
+
+    if (plays.length === 0) {
+        await interaction.editReply({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: `It seems like \`${osuUser.username}\` doesn't have any plays, maybe they should go set some :)`
+                }
+            ]
+        });
+        return;
+    }
+
+    const isPage = typeof page !== "undefined";
+
+    const embedOptions: PlaysBuilderOptions = {
+        type: EmbedBuilderType.PLAYS,
+        user: osuUser,
+        mode: user.mode,
+        initiatorId: interaction.member.user.id,
+        isMultiple: true,
+        plays,
+        page,
+        isPage,
+        index,
+        mods
+    };
+
+    const embeds = await playBuilder(embedOptions);
+
+    const totalPages = Math.ceil(plays.length / 5);
+
+    const sentInteraction = await interaction.editReply({
+        embeds,
+        components: createActionRow({
+            isPage,
+            disabledStates: [
+                isPage ? page === 0 : index === 0,
+                calculateButtonState(false, index ?? 0, totalPages),
+                calculateButtonState(true, index ?? 0, totalPages),
+                isPage ? page === totalPages - 1 : index === totalPages - 1
+            ]
+        })
+    });
+
+    mesageDataForButtons.set(sentInteraction.id, embedOptions);
+}
+

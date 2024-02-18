@@ -1,5 +1,4 @@
 import { getProfile } from "../cleaners/profile";
-import { client } from "../utils/initalize";
 import { getScore } from "../cleaners/scores";
 import { SPACE } from "../utils/constants";
 import { getMap } from "../utils/database";
@@ -7,34 +6,16 @@ import { downloadBeatmap } from "../utils/osu";
 import { EmbedType } from "lilybird";
 import type { CompareBuilderOptions } from "../types/embedBuilders";
 import type { EmbedStructure } from "lilybird";
-import type { Beatmap, Mode, ProfileInfo, ScoresInfo } from "../types/osu";
-import type { Score } from "osu-web.js";
+import type { Beatmap, Mode, ProfileInfo, ScoresInfo, Score } from "../types/osu";
 
-export async function compareBuilder({ beatmap, plays, user, mode, beatmapId, mods }: CompareBuilderOptions): Promise<Array<EmbedStructure>> {
+export async function compareBuilder({
+    beatmap,
+    plays,
+    user,
+    mode,
+    mods
+}: CompareBuilderOptions): Promise<Array<EmbedStructure>> {
     const profile = getProfile(user, mode);
-
-    const beatmap: Beatmap = await client.beatmaps.getBeatmap(beatmapId);
-    if (!beatmap.id) {
-        return [
-            {
-                type: EmbedType.Rich,
-                title: "Uh oh! :x:",
-                description: "It seems like this beatmap doesn't exist! :("
-            }
-        ] satisfies Array<EmbedStructure>;
-    }
-
-    if (["pending", "wip", "graveyard"].some((g) => g === beatmap.status)) {
-        return [
-            {
-                type: EmbedType.Rich,
-                title: "Uh oh! :x:",
-                description: "It seems like this beatmap's leaderboard doesn't exist! :("
-            }
-        ] satisfies Array<EmbedStructure>;
-    }
-
-    let plays = (await client.beatmaps.getBeatmapUserScores(beatmapId, user.id, { query: { mode } })).sort((a, b) => b.pp - a.pp);
 
     if (mods?.name) {
         const { exclude, forceInclude, include, name } = mods;

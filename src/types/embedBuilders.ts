@@ -1,5 +1,5 @@
-import type { Leaderboard, Mode } from "./osu";
-import type { UserExtended, Mod, Score, Beatmap } from "osu-web.js";
+import type { UserScore, UserBestScore, Beatmap, LeaderboardScores, Mode, Score } from "./osu";
+import type { UserExtended, Mod } from "osu-web.js";
 
 export const enum EmbedBuilderType {
     COMPARE = "compareBuilder",
@@ -9,59 +9,62 @@ export const enum EmbedBuilderType {
     PROFILE = "profileBuilder"
 }
 
-export interface CompareBuilderOptions {
-    builderType: EmbedBuilderType.COMPARE;
+interface ModStructure {
+    exclude: null | boolean;
+    include: null | boolean;
+    forceInclude: null | boolean;
+    name: null | Mod;
+}
+
+export interface BuilderOptions {
+    type: EmbedBuilderType;
+}
+
+export interface CompareBuilderOptions extends BuilderOptions {
+    type: EmbedBuilderType.COMPARE;
     beatmap: Beatmap;
     plays: Array<Score>;
     user: UserExtended;
     mode: Mode;
-    beatmapId: number;
-    mods?: {
-        exclude: null | boolean,
-        include: null | boolean,
-        forceInclude: null | boolean,
-        name: null | Mod
-    };
+    mods?: ModStructure;
+
 }
 
-export interface LeaderboardBuilderOptions {
-    builderType: EmbedBuilderType.LEADERBOARD;
-    type: Leaderboard;
-    beatmapId: number;
-    mods?: {
-        exclude: null | boolean,
-        include: null | boolean,
-        forceInclude: null | boolean,
-        name: null | Mod
-    };
+export interface LeaderboardBuilderOptions extends BuilderOptions {
+    type: EmbedBuilderType.LEADERBOARD;
+    scores: LeaderboardScores;
+    beatmap: Beatmap;
     page: number | undefined;
-    isMaxValue?: boolean;
-    isMinValue?: boolean;
 }
 
-export interface MapBuilderOptions { builderType: EmbedBuilderType.MAP; beatmapId: number; mods: Array<Mod> | null }
+export interface MapBuilderOptions extends BuilderOptions {
+    type: EmbedBuilderType.MAP;
+    beatmapId: number;
+    mods: Array<Mod> | null;
+}
 
-export interface PlaysBuilderOptions {
-    builderType: EmbedBuilderType.PLAYS;
+export interface PlaysBuilderOptions extends BuilderOptions {
+    plays: Array<UserBestScore> | Array<UserScore>;
+    type: EmbedBuilderType.PLAYS;
     user: UserExtended;
     mode: Mode;
-    type: "best" | "firsts" | "recent";
     index?: number;
     initiatorId: string;
-    includeFails?: boolean;
-    mods?: {
-        exclude: null | boolean,
-        include: null | boolean,
-        forceInclude: null | boolean,
-        name: null | Mod
-    };
     isMultiple?: boolean;
     sortByDate?: boolean;
     page?: number;
-    isMaxValue?: boolean;
-    isMinValue?: boolean;
+    isPage?: boolean;
+    mods?: ModStructure;
 }
 
-export interface ProfileBuilderOptions { builderType: EmbedBuilderType.PROFILE; user: UserExtended; mode: Mode }
+export interface ProfileBuilderOptions extends BuilderOptions {
+    type: EmbedBuilderType.PROFILE;
+    user: UserExtended;
+    mode: Mode;
+}
 
-export type EmbedBuilderOptions = CompareBuilderOptions | LeaderboardBuilderOptions | MapBuilderOptions | PlaysBuilderOptions | ProfileBuilderOptions;
+export type EmbedBuilderOptions = CompareBuilderOptions
+    | LeaderboardBuilderOptions
+    | MapBuilderOptions
+    | PlaysBuilderOptions
+    | ProfileBuilderOptions;

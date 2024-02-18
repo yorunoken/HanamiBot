@@ -1,11 +1,15 @@
 import { parseOsuArguments } from "../../utils/args";
 import { client } from "../../utils/initalize";
 import { playBuilder } from "../../embed-builders/plays";
-import { Mode } from "../../types/osu";
+import { Mode, PlayType } from "../../types/osu";
 import { UserType } from "../../types/commandArgs";
 import { EmbedBuilderType } from "../../types/embedBuilders";
-import type { MessageCommand } from "../../types/commands";
+import { createActionRow, calculateButtonState } from "../../utils/buttons";
+import { mesageDataForButtons } from "../../utils/cache";
+import { EmbedType } from "lilybird";
 import type { Message } from "lilybird";
+import type { PlaysBuilderOptions } from "../../types/embedBuilders";
+import type { MessageCommand } from "../../types/commands";
 
 const modeAliases: Record<string, { mode: Mode, includeFails: boolean }> = {
     r: { mode: Mode.OSU, includeFails: true },
@@ -45,8 +49,50 @@ async function run({ message, args, commandName, index = 0 }: { message: Message
         return;
     }
 
-    const embeds = await playBuilder({ builderType: EmbedBuilderType.PLAYS, user: osuUser, mode: user.mode, initiatorId: message.author.id, type: "recent", includeFails, index, mods });
-    await channel.send({ embeds });
+    const plays = (await client.users.getUserScores(osuUser.id, PlayType.RECENT, { query: { mode, limit: 100, include_fails: includeFails } })).map((item, idx) => {
+        return { ...item, position: idx + 1 };
+    });
+
+    if (plays.length === 0) {
+        await channel.send({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: `It seems like \`${osuUser.username}\` hasn't had any recent plays in the last 24 hours!`
+                }
+            ]
+        });
+        return;
+    }
+
+    const embedOptions: PlaysBuilderOptions = {
+        type: EmbedBuilderType.PLAYS,
+        user: osuUser,
+        mode: user.mode,
+        initiatorId: message.author.id,
+        plays,
+        index,
+        mods
+    };
+
+    const embeds = await playBuilder(embedOptions);
+
+    const totalPages = plays.length;
+    const sentMessage = await channel.send({
+        embeds,
+        components: createActionRow({
+            isPage: false,
+            disabledStates: [
+                index === 0,
+                calculateButtonState(false, index, totalPages),
+                calculateButtonState(true, index, totalPages),
+                index === totalPages - 1
+            ]
+        })
+    });
+
+    mesageDataForButtons.set(sentMessage.id, embedOptions);
 }
 
 export default {

@@ -7,6 +7,28 @@ import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, Interaction } from "lilybird";
 import type { SlashCommand } from "@lilybird/handlers";
 
+export default {
+    post: "GLOBAL",
+    data: {
+        name: "map",
+        description: "Display statistics of a beatmap.",
+        options: [
+            {
+                type: ApplicationCommandOptionType.STRING,
+                name: "map",
+                description: "Specify a beatmap link (eg: https://osu.ppy.sh/b/72727)"
+            },
+            {
+                type: ApplicationCommandOptionType.STRING,
+                name: "mods",
+                description: "Specify a mods combination.",
+                min_length: 2
+            }
+        ]
+    },
+    run
+} satisfies SlashCommand;
+
 async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
     if (!interaction.inGuild()) return;
     await interaction.deferReply();
@@ -30,28 +52,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    const embeds = await mapBuilder({ builderType: EmbedBuilderType.MAP, beatmapId: Number(beatmapId), mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null });
+    const embeds = await mapBuilder({ type: EmbedBuilderType.MAP, beatmapId: Number(beatmapId), mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null });
     await interaction.editReply({ embeds });
 }
 
-export default {
-    post: "GLOBAL",
-    data: {
-        name: "map",
-        description: "Display statistics of a beatmap.",
-        options: [
-            {
-                type: ApplicationCommandOptionType.STRING,
-                name: "map",
-                description: "Specify a beatmap link (eg: https://osu.ppy.sh/b/72727)"
-            },
-            {
-                type: ApplicationCommandOptionType.STRING,
-                name: "mods",
-                description: "Specify a mods combination.",
-                min_length: 2
-            }
-        ]
-    },
-    run
-} satisfies SlashCommand;

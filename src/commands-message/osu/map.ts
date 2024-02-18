@@ -8,6 +8,14 @@ import type { Mod } from "osu-web.js";
 import type { Message } from "lilybird";
 import type { MessageCommand } from "../../types/commands";
 
+export default {
+    name: "beatmap",
+    aliases: ["beatmap", "map", "m"],
+    description: "Display statistics of a beatmap.",
+    cooldown: 1000,
+    run
+} satisfies MessageCommand;
+
 async function run({ message, args }: { message: Message, args: Array<string> }): Promise<void> {
     const channel = await message.fetchChannel();
 
@@ -27,14 +35,10 @@ async function run({ message, args }: { message: Message, args: Array<string> })
         return;
     }
 
-    const embeds = await mapBuilder({ builderType: EmbedBuilderType.MAP, beatmapId: Number(beatmapId), mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null });
+    const embeds = await mapBuilder({
+        type: EmbedBuilderType.MAP,
+        beatmapId: Number(beatmapId),
+        mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null
+    });
     await channel.send({ embeds });
 }
-
-export default {
-    name: "beatmap",
-    aliases: ["beatmap", "map", "m"],
-    description: "Display statistics of a beatmap.",
-    cooldown: 1000,
-    run
-} satisfies MessageCommand;

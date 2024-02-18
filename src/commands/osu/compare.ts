@@ -8,44 +8,6 @@ import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { ApplicationCommandData, Interaction } from "lilybird";
 import type { SlashCommand } from "@lilybird/handlers";
 
-async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
-    if (!interaction.inGuild()) return;
-    await interaction.deferReply();
-
-    const args = getCommandArgs(interaction);
-
-    if (typeof args === "undefined") return;
-    const { user, mods } = args;
-
-    if (user.type === UserType.FAIL) {
-        await interaction.editReply(user.failMessage);
-        return;
-    }
-
-    const osuUser = await client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } });
-    if (!osuUser.id) {
-        await interaction.editReply("This user does not exist.");
-        return;
-    }
-
-    const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ channelId: interaction.channelId, client: interaction.client });
-    if (typeof beatmapId === "undefined" || beatmapId === null) {
-        await interaction.editReply({
-            embeds: [
-                {
-                    type: EmbedType.Rich,
-                    title: "Uh oh! :x:",
-                    description: "It seems like the beatmap ID couldn't be found :(\n"
-                }
-            ]
-        });
-        return;
-    }
-
-    const embeds = await compareBuilder({ builderType: EmbedBuilderType.COMPARE, beatmapId: Number(beatmapId), mode: user.mode, user: osuUser, mods });
-    await interaction.editReply({ embeds });
-}
-
 export default {
     post: "GLOBAL",
     data: {
@@ -108,3 +70,92 @@ export default {
     },
     run
 } satisfies SlashCommand;
+
+async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
+    if (!interaction.inGuild()) return;
+    await interaction.deferReply();
+
+    const args = getCommandArgs(interaction);
+
+    if (typeof args === "undefined") return;
+    const { user, mods } = args;
+
+    if (user.type === UserType.FAIL) {
+        await interaction.editReply(user.failMessage);
+        return;
+    }
+
+    const osuUser = await client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } });
+    if (!osuUser.id) {
+        await interaction.editReply("This user does not exist.");
+        return;
+    }
+
+    const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ channelId: interaction.channelId, client: interaction.client });
+    if (typeof beatmapId === "undefined" || beatmapId === null) {
+        await interaction.editReply({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: "It seems like the beatmap ID couldn't be found :(\n"
+                }
+            ]
+        });
+        return;
+    }
+
+    const beatmap = await client.beatmaps.getBeatmap(Number(beatmapId));
+    if (!beatmap.id) {
+        await interaction.editReply({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: "It seems like this beatmap doesn't exist! :("
+                }
+            ]
+        });
+        return;
+    }
+
+    if (beatmap.status === "pending" || beatmap.status === "wip" || beatmap.status === "graveyard") {
+        await interaction.editReply({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: "It seems like this beatmap's leaderboard doesn't exist! :("
+                }
+            ]
+        });
+        return;
+    }
+
+    const plays = (await client.beatmaps.getBeatmapUserScores(beatmap.id, osuUser.id, { query: { mode: user.mode } })).sort((a, b) => b.pp - a.pp).map((item, idx) => {
+        return { ...item, position: idx + 1 };
+    });
+
+    if (plays.length === 0) {
+        await interaction.editReply({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: `It seems like \`${osuUser.username}\` has no plays on that beatmap!`
+                }
+            ]
+        });
+        return;
+    }
+
+    const embeds = await compareBuilder({
+        type: EmbedBuilderType.COMPARE,
+        mode: user.mode,
+        user: osuUser,
+        beatmap,
+        plays,
+        mods
+    });
+    await interaction.editReply({ embeds });
+}

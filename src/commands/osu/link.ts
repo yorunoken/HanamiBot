@@ -4,11 +4,11 @@ import type { AuthScope } from "../../types/osu";
 import type { SlashCommand } from "@lilybird/handlers";
 import type { ApplicationCommandData, Interaction } from "lilybird";
 
-function redirectPage(discordId: string): string {
-    const scoreList: Array<AuthScope> = ["public"];
-
-    return buildAuthUrl(+process.env.CLIENT_ID, process.env.CALLBACK_URL, scoreList, discordId);
-}
+export default {
+    post: "GLOBAL",
+    data: { name: "link", description: "Link your osu! account to the bot." },
+    run
+} satisfies SlashCommand;
 
 async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
     if (!interaction.inGuild()) return;
@@ -16,12 +16,12 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
 
     const encryptedDiscordId = `${encrypt.update(interaction.member.user.id, "utf-8", "hex")}${encrypt.final("hex")}`;
 
-    const authUrl = redirectPage(encryptedDiscordId);
+    const authUrl = buildRedirectPage(encryptedDiscordId);
     await interaction.editReply(`You can [click here](<${authUrl}>) to link your osu! account to the bot!`);
 }
 
-export default {
-    post: "GLOBAL",
-    data: { name: "link", description: "Link your osu! account to the bot." },
-    run
-} satisfies SlashCommand;
+function buildRedirectPage(discordId: string): string {
+    const scoreList: Array<AuthScope> = ["public"];
+
+    return buildAuthUrl(+process.env.CLIENT_ID, process.env.CALLBACK_URL, scoreList, discordId);
+}

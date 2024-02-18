@@ -1,6 +1,6 @@
 import { getServer, insertData } from "../../utils/database";
 import { DEFAULT_PREFIX, MAX_AMOUNT_OF_PREFIXES } from "../../utils/constants";
-import { updatePrefixCache } from "../../listeners/guildCreate";
+import { prefixesCache } from "../../listeners/guildCreate";
 import { ApplicationCommandOptionType, EmbedType, PermissionFlags } from "lilybird";
 import type { ApplicationCommandData, GuildInteraction, Interaction } from "lilybird";
 import type { SlashCommand } from "@lilybird/handlers";
@@ -10,6 +10,43 @@ const commands: Record<string, ({ prefix, interaction, guildId }: { prefix?: str
     remove,
     list
 };
+
+const PermissionNames: Record<number, string> = {};
+Object.entries(PermissionFlags).forEach(([name, value]) => {
+    PermissionNames[Number(value)] = name;
+});
+
+const PERMISSIONS_NEEDED_INT = PermissionFlags.MANAGE_GUILD;
+const PERMISSIONS_NEEDED = PermissionNames[Number(PERMISSIONS_NEEDED_INT)];
+const PERMISSION_NEEDED_STRING = `Looks like you don't have the necessary permissions for this command. Permission(s) needed: \`${PERMISSIONS_NEEDED}\``;
+
+export default {
+    post: "GLOBAL",
+    data: {
+        name: "prefix",
+        description: "Set, remove and list the bot's prefixes",
+        options: [
+            {
+                type: ApplicationCommandOptionType.SUB_COMMAND,
+                name: "add",
+                description: "Add a prefix",
+                options: [ { name: "prefix", description: "The prefix", type: ApplicationCommandOptionType.STRING, required: true } ]
+            },
+            {
+                type: ApplicationCommandOptionType.SUB_COMMAND,
+                name: "remove",
+                description: "Remove a prefix",
+                options: [ { name: "prefix", description: "The prefix", type: ApplicationCommandOptionType.STRING, required: true } ]
+            },
+            {
+                type: ApplicationCommandOptionType.SUB_COMMAND,
+                name: "list",
+                description: "Get a list of the current prefixes"
+            }
+        ]
+    },
+    run
+} satisfies SlashCommand;
 
 async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
     await interaction.deferReply();
@@ -21,15 +58,6 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
 
     await commands[subcommand]({ prefix, interaction, guildId: interaction.guildId });
 }
-
-const PermissionNames: Record<number, string> = {};
-Object.entries(PermissionFlags).forEach(([name, value]) => {
-    PermissionNames[Number(value)] = name;
-});
-
-const PERMISSIONS_NEEDED_INT = PermissionFlags.MANAGE_GUILD;
-const PERMISSIONS_NEEDED = PermissionNames[Number(PERMISSIONS_NEEDED_INT)];
-const PERMISSION_NEEDED_STRING = `Looks like you don't have the necessary permissions for this command. Permission(s) needed: \`${PERMISSIONS_NEEDED}\``;
 
 async function checkForPermissions(interaction: GuildInteraction<ApplicationCommandData>): Promise<false | undefined> {
     const { member } = interaction;
@@ -69,7 +97,7 @@ async function add({ prefix, interaction, guildId }: { prefix?: string, interact
     const newPrefixes = prefixes === null ? [prefix] : [...prefixes, prefix];
 
     insertData({ table: "servers", id: guildId, data: [ { name: "prefixes", value: JSON.stringify(newPrefixes) } ] });
-    updatePrefixCache(guildId, newPrefixes);
+    prefixesCache.set(guildId, newPrefixes);
 
     await interaction.editReply(`**The prefix \`${prefix}\` has been added to the list.**`);
     return;
@@ -97,7 +125,7 @@ async function remove({ prefix, interaction, guildId }: { prefix?: string, inter
 
     const newPrefixes = prefixes.filter((item) => item !== prefix);
     insertData({ table: "servers", id: guildId, data: [ { name: "prefixes", value: JSON.stringify(newPrefixes) } ] });
-    updatePrefixCache(guildId, newPrefixes);
+    prefixesCache.set(guildId, newPrefixes);
 
     let message = `**The prefix \`${prefix}\` has been removed from the list.**`;
     if (newPrefixes.length === 0)
@@ -121,31 +149,3 @@ async function list({ interaction, guildId }: { interaction: GuildInteraction<Ap
 
     await interaction.editReply({ embeds: [ { type: EmbedType.Rich, title: "Success!", description: `Below are the current prefixes of this server. \n- \`${prefixes.join("`\n- `")}\`` } ] });
 }
-
-export default {
-    post: "GLOBAL",
-    data: {
-        name: "prefix",
-        description: "Set, remove and list the bot's prefixes",
-        options: [
-            {
-                type: ApplicationCommandOptionType.SUB_COMMAND,
-                name: "add",
-                description: "Add a prefix",
-                options: [ { name: "prefix", description: "The prefix", type: ApplicationCommandOptionType.STRING, required: true } ]
-            },
-            {
-                type: ApplicationCommandOptionType.SUB_COMMAND,
-                name: "remove",
-                description: "Remove a prefix",
-                options: [ { name: "prefix", description: "The prefix", type: ApplicationCommandOptionType.STRING, required: true } ]
-            },
-            {
-                type: ApplicationCommandOptionType.SUB_COMMAND,
-                name: "list",
-                description: "Get a list of the current prefixes"
-            }
-        ]
-    },
-    run
-} satisfies SlashCommand;

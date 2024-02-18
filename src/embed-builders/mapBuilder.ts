@@ -6,7 +6,10 @@ import { EmbedType } from "lilybird";
 import type { MapBuilderOptions } from "../types/embedBuilders";
 import type { EmbedStructure } from "lilybird";
 
-export async function mapBuilder({ beatmapId, mods }: MapBuilderOptions): Promise<Array<EmbedStructure>> {
+export async function mapBuilder({
+    beatmapId,
+    mods
+}: MapBuilderOptions): Promise<Array<EmbedStructure>> {
     const map = await client.beatmaps.getBeatmap(beatmapId);
     if (!map.id) {
         return [

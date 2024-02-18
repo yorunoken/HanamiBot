@@ -1,7 +1,7 @@
 import { accuracyCalculator, getPerformanceResults } from "../utils/osu";
 import { grades, rulesets } from "../utils/emotes";
-import type { Beatmap, LeaderboardScores, Mode, PlayStatistics, ScoresInfo } from "../types/osu";
-import type { ISOTimestamp, Mod, Score, UserBestScore, UserScore } from "osu-web.js";
+import type { UserScore, Beatmap, LeaderboardScores, Mode, PlayStatistics, ScoresInfo, Score, UserBestScore } from "../types/osu";
+import type { ISOTimestamp, Mod } from "osu-web.js";
 
 // We won't be needing this either!
 // interface HitValues {
