@@ -1,5 +1,5 @@
+import type { UserScore as UserScore_, Beatmapset, Score as Score_, Fails, Beatmap as BeatmapWeb, Country, Cover, UserCompact, Rank, ISOTimestamp, UserBestScore as UserBestScore_ } from "osu-web.js";
 import type { MapAttributes, PerformanceAttributes } from "rosu-pp";
-import type { Beatmapset, Fails, Beatmap as BeatmapWeb, Country, Cover, UserCompact, Rank, ISOTimestamp } from "osu-web.js";
 
 export const enum Mode {
     OSU = "osu",
@@ -8,9 +8,10 @@ export const enum Mode {
     FRUITS = "fruits"
 }
 
-export const enum Leaderboard {
-    COUNTRY = "country",
-    GLOBAL = "global"
+export const enum PlayType {
+    BEST = "best",
+    RECENT = "recent",
+    FIRSTS = "firsts"
 }
 
 export interface ProfileInfo {
@@ -92,11 +93,11 @@ export interface AccessTokenJSON {
 }
 
 export interface PlayStatistics {
-    count_100: number | undefined;
-    count_300: number | undefined;
-    count_50: number | undefined;
-    count_geki: number | undefined;
-    count_katu: number | undefined;
+    count_100: number | null;
+    count_300: number | null;
+    count_50: number | null;
+    count_geki: number | null;
+    count_katu: number | null;
     count_miss: number;
 }
 
@@ -162,4 +163,16 @@ export type LeaderboardScores = Array<LeaderboardScore & {
 
 export interface LeaderboardScoresRaw {
     scores: LeaderboardScores;
+}
+
+export interface UserScore extends UserScore_ {
+    position: number;
+}
+
+export interface UserBestScore extends UserBestScore_ {
+    position: number;
+}
+
+export interface Score extends Score_ {
+    position: number;
 }
