@@ -12,7 +12,7 @@ export interface DatabaseGuild {
 
 export interface DatabaseMap {
     id: string;
-    count: string;
+    data: string;
 }
 
 export interface DatabaseCommands {
