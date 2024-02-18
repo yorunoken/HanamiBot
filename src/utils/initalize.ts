@@ -158,7 +158,7 @@ export function initializeDatabase(): void {
         db.run(`CREATE TABLE IF NOT EXISTS ${table.name} (${table.columns.join(", ")});`);
 
         //  Get all of the existing databases
-        const existingColumns = db.prepare(`PRAGMA table_info(${table.name});`).all() as Array<Columns>;
+        const existingColumns = <Array<Columns>>db.prepare(`PRAGMA table_info(${table.name});`).all();
 
         // Loop through Columns and add/remove them
         for (const columnNameType of table.columns) {

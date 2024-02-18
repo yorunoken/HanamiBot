@@ -87,7 +87,6 @@ export default {
 async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
     if (!interaction.inGuild()) return;
     await interaction.deferReply();
-    console.info(interaction);
 
     const args = getCommandArgs(interaction);
     if (typeof args === "undefined") return;

@@ -83,15 +83,6 @@ async function run({ message, args, commandName, index }: { message: Message, ar
 
     const embeds = await playBuilder(embedOptions);
 
-    console.info(createActionRow({
-        isPage,
-        disabledStates: [
-            isPage ? page === 0 : index === 0,
-            calculateButtonState(false, index ?? 0, totalPages),
-            calculateButtonState(true, index ?? 0, totalPages),
-            isPage ? page === totalPages - 1 : index === totalPages - 1
-        ]
-    })[0]);
     const sentMessage = await channel.send({
         embeds,
         components: createActionRow({
