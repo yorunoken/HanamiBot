@@ -5,9 +5,9 @@ import { Beatmap, Calculator } from "rosu-pp";
 import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
 import { ModsEnum } from "osu-web.js";
 import { ChannelType } from "lilybird";
+import type { UserScore, UserBestScore, AccessTokenJSON, AuthScope, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo, Score } from "../types/osu";
 import type { Client, EmbedStructure, Message } from "lilybird";
-import type { AccessTokenJSON, AuthScope, Leaderboard, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo } from "../types/osu";
-import type { GameMode, Mod, Score, UserBestScore, UserScore } from "osu-web.js";
+import type { GameMode, Mod } from "osu-web.js";
 import type { Score as ScoreData } from "rosu-pp";
 
 /**
@@ -120,9 +120,14 @@ export function getModsEnum(mods: Array<Mod>, derivativeModsWithOriginal?: boole
     }, 0);
 }
 
-export async function getBeatmapTopScores({ beatmapId, type, mode, mods }: { beatmapId: number, type: Leaderboard, mode: GameMode, mods: Array<Mod> | undefined }): Promise<LeaderboardScoresRaw> {
+export async function getBeatmapTopScores({
+    beatmapId,
+    isGlobal,
+    mode,
+    mods
+}: { beatmapId: number, isGlobal: boolean, mode: GameMode, mods: Array<Mod> | undefined }): Promise<LeaderboardScoresRaw> {
     return fetch(
-        `https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${mode}&type=${type}${mods ? mods.map((mod) => `&mods[]=${mod}`).join("") : ""}`,
+        `https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${mode}&type=${isGlobal ? "global" : "country"}${mods ? mods.map((mod) => `&mods[]=${mod}`).join("") : ""}`,
         {
             headers: {
                 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -140,7 +145,7 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
     beatmapId: number,
     maxCombo?: number,
     accuracy?: number,
-    hitValues?: { count_100?: number, count_300?: number, count_50?: number, count_geki?: number, count_katu?: number, count_miss?: number },
+    hitValues?: { count_100: number | null, count_300: number | null, count_50: number | null, count_geki: number | null, count_katu: number | null, count_miss: number | null },
     mods: Array<Mod> | number,
     mapData?: string
 }): Promise<PerformanceInfo | null> {
@@ -165,7 +170,21 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
     const mapValues = calculator.mapAttributes(beatmap);
     const perfectPerformance = calculator.performance(beatmap);
 
-    let { count_100: count100 = 0, count_300: count300 = 0, count_50: count50 = 0, count_geki: countGeki = 0, count_katu: countKatu = 0, count_miss: countMiss = 0 } = hitValues ?? {};
+    let {
+        count_100: count100,
+        count_300: count300,
+        count_50: count50,
+        count_geki: countGeki,
+        count_katu: countKatu,
+        count_miss: countMiss
+    } = hitValues ?? {};
+    count100 ??= 0;
+    count300 ??= 0;
+    count50 ??= 0;
+    countGeki ??= 0;
+    countKatu ??= 0;
+    countMiss ??= 0;
+
     countGeki = [2, 3].includes(rulesetId) ? countGeki : 0;
     countKatu = [2, 3].includes(rulesetId) ? countKatu : 0;
 
@@ -211,23 +230,35 @@ export async function downloadBeatmap(ids: Array<number>): Promise<Array<{
 }
 
 export function accuracyCalculator(mode: Mode, hits: {
-    count_300?: number,
-    count_100?: number,
-    count_50?: number,
-    count_miss?: number,
-    count_geki?: number,
-    count_katu?: number
+    count_300: number | null,
+    count_100: number | null,
+    count_50: number | null,
+    count_miss: number | null,
+    count_geki: number | null,
+    count_katu: number | null
 }): number {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { count_100 = 0, count_300 = 0, count_50 = 0, count_geki = 0, count_katu = 0, count_miss = 0 } = hits;
+    let {
+        count_100: count100,
+        count_300: count300,
+        count_50: count50,
+        count_geki: countGeki,
+        count_katu: countKatu,
+        count_miss: countMiss
+    } = hits;
+    count100 ??= 0;
+    count300 ??= 0;
+    count50 ??= 0;
+    countGeki ??= 0;
+    countKatu ??= 0;
+    countMiss ??= 0;
 
     let acc = 0.0;
 
     switch (mode) {
-        case Mode.OSU: acc = (6 * count_300 + 2 * count_100 + count_50) / (6 * (count_50 + count_100 + count_300 + count_miss)); break;
-        case Mode.TAIKO: acc = (2 * count_300 + count_100) / (2 * (count_300 + count_100 + count_miss)); break;
-        case Mode.FRUITS: acc = count_300 + count_100 + count_50 + count_katu + count_miss; break;
-        case Mode.MANIA: acc = (6 * count_geki + 6 * count_300 + 4 * count_katu + 2 * count_100 + count_50) / (6 * (count_50 + count_100 + count_300 + count_miss + count_geki + count_katu)); break;
+        case Mode.OSU: acc = (6 * count300 + 2 * count100 + count50) / (6 * (count50 + count100 + count300 + countMiss)); break;
+        case Mode.TAIKO: acc = (2 * count300 + count100) / (2 * (count300 + count100 + countMiss)); break;
+        case Mode.FRUITS: acc = count300 + count100 + count50 + countKatu + countMiss; break;
+        case Mode.MANIA: acc = (6 * countGeki + 6 * count300 + 4 * countKatu + 2 * count100 + count50) / (6 * (count50 + count100 + count300 + countMiss + countGeki + countKatu)); break;
     }
 
     return 100 * acc;
