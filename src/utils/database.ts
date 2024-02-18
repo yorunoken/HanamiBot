@@ -23,6 +23,10 @@ export function getMap(id: string | number): DatabaseMap | undefined {
     return db.prepare("SELECT * FROM maps WHERE id = ?").get(id) as DatabaseMap;
 }
 
+export function getCommand(id: string | number): DatabaseMap | undefined {
+    return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DatabaseMap;
+}
+
 export function insertData({ table, id, data }: { table: string, id: string | number, data: Array<{ name: string, value: string | number | null }> }): void {
     const setClause = data.map((item) => `${item.name} = ?`).join(", ");
     const values: Array<string | number | null> = data.map((item) => item.value);

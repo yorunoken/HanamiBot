@@ -12,7 +12,12 @@ export interface DatabaseGuild {
 
 export interface DatabaseMap {
     id: string;
-    data: string;
+    count: string;
+}
+
+export interface DatabaseCommands {
+    id: string;
+    count: string;
 }
 
 export enum ScoreEmbed {

@@ -1,4 +1,4 @@
-import { insertData } from "../utils/database";
+import { getCommand, insertData } from "../utils/database";
 import { client, applicationCommands, loadLogs } from "../utils/initalize";
 import { mesageDataForButtons } from "../utils/cache";
 import { compareBuilder, leaderboardBuilder, mapBuilder, playBuilder, profileBuilder } from "../embed-builders";
@@ -21,12 +21,19 @@ export default {
 
             command.run(interaction).then(async () => {
                 await loadLogs(`INFO: [${server.name}] ${username} used slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}`);
+
+                const docs = getCommand(interaction.data.name);
+                if (docs)
+                    insertData({ table: "commands", data: [ { name: "count", value: docs.count + 1 } ], id: interaction.data.name });
             }).catch(async (error: Error) => {
                 console.log(error);
                 await loadLogs(
                     `ERROR: [${server.name}] ${username} had an error in slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}: ${error.stack}`,
                     true
                 );
+                const docs = getCommand(interaction.data.name);
+                if (docs)
+                    insertData({ table: "commands", data: [ { name: "count", value: docs.count + 1 } ], id: docs.id });
             });
         }
     }

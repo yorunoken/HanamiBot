@@ -1,6 +1,7 @@
 import { decrypt } from "..";
 import { DEFAULT_PREFIX } from "../utils/constants";
 import { commandAliases, loadLogs, messageCommands } from "../utils/initalize";
+import { getCommand, insertData } from "../utils/database";
 import { prefixesCache } from "./guildCreate";
 import { ButtonStyle, EmbedType, ComponentType } from "lilybird";
 import type { Client, EmbedStructure, Message } from "lilybird";
@@ -65,9 +66,15 @@ export default {
         await client.rest.triggerTypingIndicator(channel.id);
         command.run({ client: client, message, args, prefix, index, commandName }).then(async () => {
             await loadLogs(`INFO: [${server.name}] ${message.author.username} used prefix command \`${command.name}\``);
+            const docs = getCommand(commandName ?? "");
+            if (docs)
+                insertData({ table: "commands", data: [ { name: "count", value: docs.count + 1 } ], id: docs.id });
         }).catch(async (error: Error) => {
             console.log(error);
             await loadLogs(`ERROR: [${server.name}] ${message.author.username} had an error in prefix command \`${command.name}\`: ${error.stack}`, true);
+            const docs = getCommand(commandName ?? "");
+            if (docs)
+                insertData({ table: "commands", data: [ { name: "count", value: docs.count + 1 } ], id: docs.id });
         });
 
         cooldown.set(`${command.name}${message.author.id}`, Date.now() + command.cooldown);
