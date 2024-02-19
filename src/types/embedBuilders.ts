@@ -67,6 +67,10 @@ export interface AvatarBuilderOptions extends BuilderOptions {
     user: UserExtended;
 }
 
+export interface BackgroundBuilderOptions extends BuilderOptions {
+    beatmap: Beatmap;
+}
+
 export type EmbedBuilderOptions = CompareBuilderOptions
     | LeaderboardBuilderOptions
     | MapBuilderOptions
