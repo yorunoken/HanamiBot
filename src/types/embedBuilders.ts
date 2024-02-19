@@ -63,8 +63,13 @@ export interface ProfileBuilderOptions extends BuilderOptions {
     mode: Mode;
 }
 
+export interface AvatarBuilderOptions extends BuilderOptions {
+    user: UserExtended;
+}
+
 export type EmbedBuilderOptions = CompareBuilderOptions
     | LeaderboardBuilderOptions
     | MapBuilderOptions
     | PlaysBuilderOptions
-    | ProfileBuilderOptions;
+    | ProfileBuilderOptions
+    | AvatarBuilderOptions;
