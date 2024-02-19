@@ -15,11 +15,13 @@ export function profileBuilder({ user, mode }: ProfileBuilderOptions): Array<Emb
     const fields = [
         {
             name: "Statistics :abacus:",
-            value: `**Accuracy:** \`${profile.accuracy}\` • **Level:** \`${profile.level}%\`
-            **Playcount:** \`${profile.playCount}\` (\`${profile.playHours} hrs\`)
-            ${profile.peakGlobalRank.length > 0 ? `**Peak Rank:** #\`${profile.peakGlobalRank}\` • **Achieved:** <t:${profile.peakGlobalRankTime}:R>` : "**Peak Rank:** #`-`"}
-            **Followers:** \`${profile.followers}\` • **Max Combo:** \`${profile.maxCombo}\`
-            **Recommended Star Rating:** \`${profile.recommendedStarRating}\`★`,
+            value: [
+                `**Accuracy:** \`${profile.accuracy}\` • **Level:** \`${profile.level}%\``,
+                `**Playcount:** \`${profile.playCount}\` (\`${profile.playHours} hrs\`)`,
+                `${profile.peakGlobalRank.length > 0 ? `**Peak Rank:** #\`${profile.peakGlobalRank}\` • **Achieved:** <t:${profile.peakGlobalRankTime}:R>` : "**Peak Rank:** #`-`"}`,
+                `**Followers:** \`${profile.followers}\` • **Max Combo:** \`${profile.maxCombo}\``,
+                `**Recommended Star Rating:** \`${profile.recommendedStarRating}\`★`
+            ].join("\n"),
             inline: false
         },
         {
