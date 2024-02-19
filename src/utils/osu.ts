@@ -127,7 +127,7 @@ export async function getBeatmapTopScores({
     mods
 }: { beatmapId: number, isGlobal: boolean, mode: GameMode, mods: Array<Mod> | undefined }): Promise<LeaderboardScoresRaw> {
     return fetch(
-        `https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${mode}&type=${isGlobal ? "global" : "country"}${mods ? mods.map((mod) => `&mods[]=${mod}`).join("") : ""}`,
+        `https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${mode}&type=${isGlobal ? "global" : "country"}${mods ? mods.map((mod) => `&mods[]=${mod.toUpperCase()}`).join("") : ""}`,
         {
             headers: {
                 // eslint-disable-next-line @typescript-eslint/naming-convention
