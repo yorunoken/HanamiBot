@@ -44,6 +44,7 @@ async function run({ message, args, commandName }: { message: Message, args: Arr
 
     const embeds = profileBuilder({
         type: EmbedBuilderType.PROFILE,
+        initiatorId: message.author.id,
         user: osuUser,
         mode: user.mode
     });

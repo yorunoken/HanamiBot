@@ -151,6 +151,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
 
     const embeds = await compareBuilder({
         type: EmbedBuilderType.COMPARE,
+        initiatorId: interaction.member.user.id,
         mode: user.mode,
         user: osuUser,
         beatmap,

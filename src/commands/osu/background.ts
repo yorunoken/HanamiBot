@@ -60,7 +60,11 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    const embeds = backgroundBuilder({ type: EmbedBuilderType.MAP, beatmap });
+    const embeds = backgroundBuilder({
+        type: EmbedBuilderType.MAP,
+        initiatorId: interaction.member.user.id,
+        beatmap
+    });
     await interaction.editReply({ embeds });
 }
 

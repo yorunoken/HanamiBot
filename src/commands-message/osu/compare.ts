@@ -110,6 +110,7 @@ async function run({
 
     const embeds = await compareBuilder({
         type: EmbedBuilderType.COMPARE,
+        initiatorId: message.author.id,
         user: osuUser,
         mode: user.mode,
         beatmap,

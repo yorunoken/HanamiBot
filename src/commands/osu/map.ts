@@ -52,7 +52,12 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    const embeds = await mapBuilder({ type: EmbedBuilderType.MAP, beatmapId: Number(beatmapId), mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null });
+    const embeds = await mapBuilder({
+        type: EmbedBuilderType.MAP,
+        initiatorId: interaction.member.user.id,
+        beatmapId: Number(beatmapId),
+        mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null
+    });
     await interaction.editReply({ embeds });
 }
 

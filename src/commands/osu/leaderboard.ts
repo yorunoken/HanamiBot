@@ -114,6 +114,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
 
     const embedOptions: LeaderboardBuilderOptions = {
         type: EmbedBuilderType.LEADERBOARD,
+        initiatorId: interaction.member.user.id,
         page,
         beatmap,
         scores

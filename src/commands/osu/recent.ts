@@ -138,10 +138,10 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
 
     const embedOptions: PlaysBuilderOptions = {
         type: EmbedBuilderType.PLAYS,
+        initiatorId: interaction.member.user.id,
         user: osuUser,
         mode: user.mode,
         mods: { exclude: false, forceInclude: false, include: true, name: mod },
-        initiatorId: interaction.member.user.id,
         index,
         plays
     };

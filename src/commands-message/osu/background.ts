@@ -51,6 +51,7 @@ async function run({ message, args }: { message: Message, args: Array<string> })
 
     const embeds = backgroundBuilder({
         type: EmbedBuilderType.MAP,
+        initiatorId: message.author.id,
         beatmap
     });
     await channel.send({ embeds });
