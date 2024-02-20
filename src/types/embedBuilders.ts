@@ -6,7 +6,9 @@ export const enum EmbedBuilderType {
     LEADERBOARD = "leaderboardBuilder",
     MAP = "mapBuilder",
     PLAYS = "playBuilder",
-    PROFILE = "profileBuilder"
+    PROFILE = "profileBuilder",
+    AVATAR = "avatarBuilder",
+    BACKGROUND = "backgroundBuilder"
 }
 
 interface ModStructure {
@@ -18,6 +20,7 @@ interface ModStructure {
 
 export interface BuilderOptions {
     type: EmbedBuilderType;
+    initiatorId: string;
 }
 
 export interface CompareBuilderOptions extends BuilderOptions {
@@ -64,10 +67,12 @@ export interface ProfileBuilderOptions extends BuilderOptions {
 }
 
 export interface AvatarBuilderOptions extends BuilderOptions {
+    type: EmbedBuilderType.AVATAR;
     user: UserExtended;
 }
 
 export interface BackgroundBuilderOptions extends BuilderOptions {
+    type: EmbedBuilderType.BACKGROUND;
     beatmap: Beatmap;
 }
 
@@ -76,4 +81,5 @@ export type EmbedBuilderOptions = CompareBuilderOptions
     | MapBuilderOptions
     | PlaysBuilderOptions
     | ProfileBuilderOptions
-    | AvatarBuilderOptions;
+    | AvatarBuilderOptions
+    | BackgroundBuilderOptions;

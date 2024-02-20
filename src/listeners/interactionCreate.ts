@@ -4,6 +4,8 @@ import { mesageDataForButtons } from "../utils/cache";
 import { compareBuilder, leaderboardBuilder, mapBuilder, playBuilder, profileBuilder } from "../embed-builders";
 import { EmbedBuilderType } from "../types/embedBuilders";
 import { calculateButtonState, createActionRow } from "../utils/buttons";
+import { backgroundBuilder } from "../embed-builders/backgroundBuilder";
+import { avatarBuilder } from "../embed-builders/avatarBuilder";
 import type { DMInteraction, EmbedStructure, Interaction, InteractionReplyOptions, Message, MessageComponentData } from "lilybird";
 import type { Event } from "@lilybird/handlers";
 
@@ -42,15 +44,21 @@ export default {
 async function handleButton(interaction: Interaction): Promise<void> {
     if (!interaction.isMessageComponentInteraction() || !interaction.data.isButton()) return;
     if (interaction.inDM()) return handleVerify(interaction);
-
-    // This is hard-types like this because the buttons are not going to be clickable anyways.
-    await interaction.updateComponents({ components: createActionRow({ isPage: true, disabledStates: [true, true, true, true] }) });
+    if (!interaction.inGuild()) return;
 
     const builderOptions = mesageDataForButtons.get(interaction.message.id);
     if (typeof builderOptions === "undefined") {
         await interaction.reply({ ephemeral: true, content: "This button will not work because the message was created before a bot restart, so its data has been lost." });
         return;
     }
+
+    if (builderOptions.initiatorId !== interaction.member.user.id) {
+        await interaction.reply({ ephemeral: true, content: "You need to be the person who initialized the command to be able to click the buttons." });
+        return;
+    }
+
+    // This is hard-types like this because the buttons are not going to be clickable anyways.
+    await interaction.updateComponents({ components: createActionRow({ isPage: true, disabledStates: [true, true, true, true] }) });
 
     // Display an error message because I'm dumb and haven't programmed this yet.
     if (interaction.data.id === "wildcard-page" || interaction.data.id === "wildcard-index") {
@@ -70,6 +78,12 @@ async function handleButton(interaction: Interaction): Promise<void> {
 
     const options: InteractionReplyOptions = {};
     switch (builderOptions.type) {
+        case EmbedBuilderType.AVATAR:
+            options.embeds = avatarBuilder(builderOptions);
+            break;
+        case EmbedBuilderType.BACKGROUND:
+            options.embeds = backgroundBuilder(builderOptions);
+            break;
         case EmbedBuilderType.COMPARE:
             options.embeds = await compareBuilder(builderOptions);
             break;
