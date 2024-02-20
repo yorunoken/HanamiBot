@@ -188,13 +188,16 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
     countGeki = [2, 3].includes(rulesetId) ? countGeki : 0;
     countKatu = [2, 3].includes(rulesetId) ? countKatu : 0;
 
-    const currentPerformance = (!accuracy
-        ? calculator.n300(count300).n100(count100).n50(count50)
+    const currentPerformance = (typeof accuracy === "undefined"
+        ? calculator
+            .n300(count300)
+            .n100(count100)
+            .n50(count50)
+            .nGeki(countGeki)
+            .nKatu(countGeki)
         : calculator.acc(accuracy))
         .nMisses(countMiss)
         .combo(maxCombo ?? perfectPerformance.difficulty.maxCombo)
-        .nGeki(countGeki)
-        .nKatu(countKatu)
         .performance(beatmap);
 
     const fcPerformance = (!accuracy
