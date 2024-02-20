@@ -102,6 +102,7 @@ async function run({ message, args, commandName }: { message: Message, args: Arr
 
     const embedOptions: LeaderboardBuilderOptions = {
         type: EmbedBuilderType.LEADERBOARD,
+        initiatorId: message.author.id,
         page: page,
         beatmap,
         scores

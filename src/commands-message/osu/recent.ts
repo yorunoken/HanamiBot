@@ -68,9 +68,9 @@ async function run({ message, args, commandName, index = 0 }: { message: Message
 
     const embedOptions: PlaysBuilderOptions = {
         type: EmbedBuilderType.PLAYS,
+        initiatorId: message.author.id,
         user: osuUser,
         mode: user.mode,
-        initiatorId: message.author.id,
         plays,
         index,
         mods

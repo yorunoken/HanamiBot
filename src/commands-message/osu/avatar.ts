@@ -40,6 +40,7 @@ async function run({ message, args }: { message: Message, args: Array<string> })
 
     const embeds = avatarBuilder({
         type: EmbedBuilderType.PROFILE,
+        initiatorId: message.author.id,
         user: osuUser
     });
     await channel.send({ embeds });

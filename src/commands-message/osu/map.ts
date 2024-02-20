@@ -37,6 +37,7 @@ async function run({ message, args }: { message: Message, args: Array<string> })
 
     const embeds = await mapBuilder({
         type: EmbedBuilderType.MAP,
+        initiatorId: message.author.id,
         beatmapId: Number(beatmapId),
         mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null
     });

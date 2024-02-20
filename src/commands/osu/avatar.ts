@@ -48,7 +48,11 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    const embeds = avatarBuilder({ type: EmbedBuilderType.PROFILE, user: osuUser });
+    const embeds = avatarBuilder({
+        type: EmbedBuilderType.PROFILE,
+        initiatorId: interaction.member.user.id,
+        user: osuUser
+    });
 
     await interaction.editReply({ embeds });
 }
