@@ -86,6 +86,7 @@ export interface PerformanceInfo {
     currentPerformance: PerformanceAttributes;
     fcPerformance: PerformanceAttributes;
     mapId: number;
+    mods: Array<string>;
 }
 
 export type AuthScope = "public" | "chat.write" | "delegate" | "forum.write" | "friends.read" | "identify";

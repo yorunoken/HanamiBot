@@ -5,9 +5,10 @@ import { Beatmap, Calculator } from "rosu-pp";
 import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
 import { ModsEnum } from "osu-web.js";
 import { ChannelType } from "lilybird";
+import type { Mod } from "../types/mods";
 import type { UserScore, UserBestScore, AccessTokenJSON, AuthScope, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo, Score } from "../types/osu";
 import type { Client, EmbedStructure, Message } from "lilybird";
-import type { GameMode, Mod } from "osu-web.js";
+import type { GameMode, Mod as ModOsuWeb } from "osu-web.js";
 import type { Score as ScoreData } from "rosu-pp";
 
 /**
@@ -71,7 +72,7 @@ Promise<{
     return { accessToken: data.access_token, expiresIn: data.expires_in };
 }
 
-export function getModsEnum(mods: Array<Mod>, derivativeModsWithOriginal?: boolean): number {
+export function getModsEnum(mods: Array<ModOsuWeb>, derivativeModsWithOriginal?: boolean): number {
     return mods.reduce((count, mod) => {
         if (
             ![
@@ -125,7 +126,7 @@ export async function getBeatmapTopScores({
     isGlobal,
     mode,
     mods
-}: { beatmapId: number, isGlobal: boolean, mode: GameMode, mods: Array<Mod> | undefined }): Promise<LeaderboardScoresRaw> {
+}: { beatmapId: number, isGlobal: boolean, mode: GameMode, mods: Array<ModOsuWeb> | undefined }): Promise<LeaderboardScoresRaw> {
     return fetch(
         `https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${mode}&type=${isGlobal ? "global" : "country"}${mods ? mods.map((mod) => `&mods[]=${mod.toUpperCase()}`).join("") : ""}`,
         {
@@ -138,15 +139,20 @@ export async function getBeatmapTopScores({
     ).then((res) => { return <LeaderboardScoresRaw><unknown>res.json(); });
 }
 
-export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, accuracy, hitValues, mods, mapData }:
+export function isNewMods(mods: Array<Mod> | Array<ModOsuWeb>): mods is Array<Mod> {
+    return Array.isArray(mods) && mods.every((mod) => typeof mod === "object" && "acronym" in mod);
+}
+
+export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, accuracy, clockRate, hitValues, mods, mapData }:
 {
     play?: UserBestScore | UserScore | Score | LeaderboardScore,
     setId?: number,
     beatmapId: number,
     maxCombo?: number,
     accuracy?: number,
+    clockRate?: number,
     hitValues?: { count_100: number | null, count_300: number | null, count_50: number | null, count_geki: number | null, count_katu: number | null, count_miss: number | null },
-    mods: Array<Mod> | number,
+    mods: Array<ModOsuWeb> | Array<Mod> | number,
     mapData?: string
 }): Promise<PerformanceInfo | null> {
     let rulesetId: number;
@@ -159,9 +165,30 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
     mapData ??= getMap(beatmapId)?.data ?? (await downloadBeatmap([beatmapId]))[0].contents;
     if (!mapData) return null;
 
+    let modsStringArray: Array<string> = [];
+    let modsInt: number;
+    if (typeof mods === "number")
+        modsInt = mods;
+    else if (isNewMods(mods)) {
+        modsInt = getModsEnum(mods.map((x) => x.acronym), true);
+        for (let i = 0; i < mods.length; i++) {
+            const currMod = mods[i];
+            if (currMod.acronym === "DT" && currMod.settings?.speed_change) {
+                clockRate = currMod.settings.speed_change;
+                modsStringArray.push(`${currMod.acronym}(${clockRate}x)`);
+                continue;
+            }
+            modsStringArray.push(currMod.acronym);
+        }
+    } else {
+        modsInt = getModsEnum(mods, true);
+        modsStringArray = mods;
+    }
+
     const calculatorData: ScoreData = {
         mode: rulesetId,
-        mods: typeof mods === "number" ? mods : getModsEnum(mods, true)
+        mods: modsInt,
+        clockRate
     };
 
     const beatmap = new Beatmap({ content: mapData });
@@ -194,22 +221,28 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
             .n100(count100)
             .n50(count50)
             .nGeki(countGeki)
-            .nKatu(countGeki)
+            .nKatu(countKatu)
         : calculator.acc(accuracy))
         .nMisses(countMiss)
         .combo(maxCombo ?? perfectPerformance.difficulty.maxCombo)
         .performance(beatmap);
 
     const fcPerformance = (!accuracy
-        ? calculator.n300(count300).n100(count100).n50(count50)
+        ? calculator
+            .n300(count300)
+            .n100(count100)
+            .n50(count50)
+            .nGeki(countGeki)
+            .nKatu(countKatu)
         : calculator.acc(accuracy))
         .nMisses(0)
         .combo(perfectPerformance.difficulty.maxCombo)
-        .nGeki(countGeki)
-        .nKatu(countKatu)
         .performance(beatmap);
 
-    return { mapValues, perfectPerformance, currentPerformance, fcPerformance, mapId: beatmapId };
+    console.log(`clockRate: ${mapValues.clockRate}`);
+    console.log(currentPerformance);
+
+    return { mapValues, perfectPerformance, currentPerformance, fcPerformance, mapId: beatmapId, mods: modsStringArray.length > 0 ? modsStringArray : ["NM"] };
 }
 
 export async function downloadBeatmap(ids: Array<number>): Promise<Array<{
