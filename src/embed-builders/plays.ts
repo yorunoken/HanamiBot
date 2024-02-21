@@ -79,7 +79,7 @@ async function getSinglePlay({ mode, index, plays, profile, initiatorId, isMulti
         icon_url: profile.avatarUrl
     } satisfies EmbedAuthorStructure;
 
-    const line1 = `${play.grade} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%** ${SPACE} ${play.playSubmitted}\n`;
+    const line1 = `${play.grade} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%** ${SPACE} ${play.playSubmitted} **@${play.percentagePassed}%**\n`;
     const line2 = `${play.ppFormatted} ${SPACE} ${play.comboValues} ${SPACE} ${play.hitValues}\n`;
     const line3 = `${play.ifFcValues ?? ""}\n`;
 
@@ -108,7 +108,9 @@ async function getSinglePlay({ mode, index, plays, profile, initiatorId, isMulti
     const thumbnail = maximized === 0 ? { url: play.listLink } satisfies EmbedThumbnailStructure : undefined;
     const title = play.songTitle;
     const url = play.mapLink;
-    const footer: EmbedFooterStructure = { text: `${play.mapStatus} mapset by ${play.mapAuthor}${maximized === 1 && !isMultiple ? ` Play ${index + 1} of ${plays.length}` : ""}` };
+    const footer: EmbedFooterStructure = {
+        text: `${play.mapStatus} mapset by ${play.mapAuthor}${maximized === 1 && !isMultiple ? ` ${SPACE} - Play ${index + 1} of ${plays.length} ${SPACE} - Try ${play.retries}` : ""}`
+    };
 
     return [ { type: EmbedType.Rich, author, fields, image, thumbnail, footer, url, title } ] satisfies Array<EmbedStructure>;
 }

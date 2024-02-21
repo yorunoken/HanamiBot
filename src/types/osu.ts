@@ -54,6 +54,8 @@ export interface ScoresInfo {
     songTitle: string;
     songArtist: string;
     songName: string;
+    retries: number | undefined;
+    percentagePassed: string;
     difficultyName: string;
     score: string;
     accuracy: string;
