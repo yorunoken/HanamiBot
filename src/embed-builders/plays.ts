@@ -79,7 +79,7 @@ async function getSinglePlay({ mode, index, plays, profile, initiatorId, isMulti
         icon_url: profile.avatarUrl
     } satisfies EmbedAuthorStructure;
 
-    const line1 = `${play.grade} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%** ${SPACE} ${play.playSubmitted}\n`;
+    const line1 = `${play.grade} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%** ${SPACE} ${play.playSubmitted} **@${play.percentagePassed}%**\n`;
     const line2 = `${play.ppFormatted} ${SPACE} ${play.comboValues} ${SPACE} ${play.hitValues}\n`;
     const line3 = `${play.ifFcValues ?? ""}\n`;
 

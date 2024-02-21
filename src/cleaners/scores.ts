@@ -131,12 +131,17 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     // Instead of rounding it down to 40, it would make more sense to round it to 41.
     const drainSeconds = Math.ceil(drainLengthInSeconds % 60);
 
+    const objectshit = (scoreStatistics.count_300 ?? 0) + (scoreStatistics.count_100 ?? 0) + (scoreStatistics.count_50 ?? 0) + scoreStatistics.count_miss;
+    const objects = performance.mapValues.nCircles + performance.mapValues.nSliders + performance.mapValues.nSpinners;
+    const percentageNum = objectshit / objects * 100;
+
     const beatmapStatus = beatmapset.status;
     return {
         user,
         userId,
         retries,
         position: play.position ?? index + 1,
+        percentagePassed: percentageNum === 100 || play.passed ? "" : percentageNum.toFixed(1),
         songTitle: `${beatmapset.artist} - ${beatmapset.title}`,
         songArtist: beatmapset.artist,
         songName: beatmapset.title,
