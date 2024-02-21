@@ -16,7 +16,8 @@ const modeAliases: Record<string, { mode: Mode }> = {
     compareosu: { mode: Mode.OSU },
     comparetaiko: { mode: Mode.TAIKO },
     comparemania: { mode: Mode.MANIA },
-    comparecatch: { mode: Mode.FRUITS }
+    comparecatch: { mode: Mode.FRUITS },
+    mog: { mode: Mode.OSU }
 };
 
 export default {
