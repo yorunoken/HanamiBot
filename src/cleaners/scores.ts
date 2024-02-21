@@ -1,4 +1,4 @@
-import { accuracyCalculator, getPerformanceResults } from "../utils/osu";
+import { accuracyCalculator, getPerformanceResults, getRetryCount } from "../utils/osu";
 import { grades, rulesets } from "../utils/emotes";
 import type { UserScore, Beatmap, LeaderboardScores, Mode, PlayStatistics, ScoresInfo, Score, UserBestScore } from "../types/osu";
 import type { ISOTimestamp, Mod } from "osu-web.js";
@@ -35,6 +35,19 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     let scoreStatistics: PlayStatistics;
     let user: string | undefined;
     let userId: number | undefined;
+    let retries: number | undefined;
+
+    if ("beatmap" in play) {
+        retries = getRetryCount(
+            scores.map((x) => {
+                if ("beatmap" in x)
+                    return x.beatmap.id;
+                return 0;
+            }).splice(index, scores.length),
+            play.beatmap.id
+        );
+    }
+
     if ("score" in play) {
         totalScore = play.score;
         createdAt = play.created_at;
@@ -122,6 +135,7 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     return {
         user,
         userId,
+        retries,
         position: play.position ?? index + 1,
         songTitle: `${beatmapset.artist} - ${beatmapset.title}`,
         songArtist: beatmapset.artist,

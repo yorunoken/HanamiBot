@@ -108,7 +108,9 @@ async function getSinglePlay({ mode, index, plays, profile, initiatorId, isMulti
     const thumbnail = maximized === 0 ? { url: play.listLink } satisfies EmbedThumbnailStructure : undefined;
     const title = play.songTitle;
     const url = play.mapLink;
-    const footer: EmbedFooterStructure = { text: `${play.mapStatus} mapset by ${play.mapAuthor}${maximized === 1 && !isMultiple ? ` Play ${index + 1} of ${plays.length}` : ""}` };
+    const footer: EmbedFooterStructure = {
+        text: `${play.mapStatus} mapset by ${play.mapAuthor}${maximized === 1 && !isMultiple ? ` ${SPACE} - Play ${index + 1} of ${plays.length} ${SPACE} - Try ${play.retries}` : ""}`
+    };
 
     return [ { type: EmbedType.Rich, author, fields, image, thumbnail, footer, url, title } ] satisfies Array<EmbedStructure>;
 }

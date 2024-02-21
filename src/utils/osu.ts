@@ -303,3 +303,12 @@ async function cycleThroughEmbeds({ client, message, channelId }: { message?: Me
 export async function getBeatmapIdFromContext({ client, message, channelId }: { message?: Message, client: Client, channelId?: string }): Promise<number | null | undefined> {
     return typeof message?.referencedMessage !== "undefined" ? getEmbedFromReply(message) : cycleThroughEmbeds({ message, client, channelId });
 }
+
+export function getRetryCount(retryMap: Array<number>, mapId: number): number {
+    let retryCounter = 0;
+    for (let i = 0; i < retryMap.length; i++) {
+        if (retryMap[i] === mapId)
+            retryCounter++;
+    }
+    return retryCounter;
+}
