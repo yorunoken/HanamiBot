@@ -35,7 +35,7 @@ export interface CompareBuilderOptions extends BuilderOptions {
 
 export interface LeaderboardBuilderOptions extends BuilderOptions {
     type: EmbedBuilderType.LEADERBOARD;
-    scores: LeaderboardScores;
+    scores: Array<LeaderboardScores>;
     beatmap: Beatmap;
     page: number | undefined;
 }

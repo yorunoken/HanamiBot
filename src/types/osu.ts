@@ -1,3 +1,4 @@
+import type { Mod } from "./mods";
 import type { UserScore as UserScore_, Beatmapset, Score as Score_, Fails, Beatmap as BeatmapWeb, Country, Cover, UserCompact, Rank, ISOTimestamp, UserBestScore as UserBestScore_ } from "osu-web.js";
 import type { MapAttributes, PerformanceAttributes } from "rosu-pp";
 
@@ -111,7 +112,7 @@ export interface LeaderboardScore {
         great: number,
         legacy_combo_increase: number
     };
-    mods: Array<{ acronym: string }>;
+    mods: Array<Mod>;
     statistics: {
         ok?: number,
         great?: number,
@@ -156,12 +157,12 @@ export type Beatmap = BeatmapWeb & {
     max_combo: number
 };
 
-export type LeaderboardScores = Array<LeaderboardScore & {
+export type LeaderboardScores = LeaderboardScore & {
     user: UserCompact & {
         country: Country,
         cover: Cover
     }
-}>;
+};
 
 export interface LeaderboardScoresRaw {
     scores: LeaderboardScores;

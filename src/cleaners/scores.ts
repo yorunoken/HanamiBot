@@ -14,7 +14,7 @@ import type { ISOTimestamp, Mod } from "osu-web.js";
 // }
 
 export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
-{ scores: Array<UserBestScore> | Array<UserScore> | Array<Score> | LeaderboardScores, beatmap?: Beatmap, index: number, mode: Mode, mapData?: string }): Promise<ScoresInfo> {
+{ scores: Array<UserBestScore> | Array<UserScore> | Array<Score> | Array<LeaderboardScores>, beatmap?: Beatmap, index: number, mode: Mode, mapData?: string }): Promise<ScoresInfo> {
     const play = scores[index];
 
     let beatmap;
@@ -58,7 +58,7 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
         userId = play.user_id;
         totalScore = play.total_score;
         createdAt = play.ended_at;
-        modsArr = play.mods.map((x) => <Mod>x.acronym);
+        modsArr = play.mods.map((x) => x.acronym);
         scoreStatistics = {
             count_50: play.statistics.meh ?? 0,
             count_100: play.statistics.good ?? 0,
