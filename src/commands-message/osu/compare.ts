@@ -10,14 +10,14 @@ import type { Message } from "lilybird";
 import type { MessageCommand } from "../../types/commands";
 
 const modeAliases: Record<string, { mode: Mode }> = {
-    c: { mode: Mode.OSU },
+    mog: { mode: Mode.OSU },
     gap: { mode: Mode.OSU },
+    c: { mode: Mode.OSU },
     compare: { mode: Mode.OSU },
     compareosu: { mode: Mode.OSU },
     comparetaiko: { mode: Mode.TAIKO },
     comparemania: { mode: Mode.MANIA },
-    comparecatch: { mode: Mode.FRUITS },
-    mog: { mode: Mode.OSU }
+    comparecatch: { mode: Mode.FRUITS }
 };
 
 export default {
