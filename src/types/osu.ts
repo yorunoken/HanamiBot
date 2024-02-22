@@ -166,7 +166,7 @@ export type LeaderboardScores = LeaderboardScore & {
 };
 
 export interface LeaderboardScoresRaw {
-    scores: LeaderboardScores;
+    scores: Array<LeaderboardScores>;
 }
 
 export interface UserScore extends UserScore_ {

@@ -51,7 +51,7 @@ async function getPlays(plays: Array<LeaderboardScores>, beatmap: Beatmap, page:
                 return line1 + line2 + line3;
             })
             .join("\n"),
-        footer: { text: `${beatmap.status.charAt(0).toUpperCase()}${beatmap.status.slice(1)} beatmapset by ${beatmap.beatmapset.creator}` }
+        footer: { text: `${beatmap.status.charAt(0).toUpperCase()}${beatmap.status.slice(1)} beatmapset by ${beatmap.beatmapset.creator} ${SPACE} - ${SPACE} Page ${page + 1} of ${Math.ceil(plays.length / 5)}` }
     };
 
     return [embed] satisfies Array<EmbedStructure>;

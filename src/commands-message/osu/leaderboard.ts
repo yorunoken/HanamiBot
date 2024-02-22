@@ -97,7 +97,7 @@ async function run({ message, args, commandName }: { message: Message, args: Arr
         return;
     }
 
-    const page = Number(flags.p ?? flags.page) || 0;
+    const page = Number(flags.p ?? flags.page ?? 1) - 1;
     const totalPages = Math.ceil(scores.length / 5);
 
     const embedOptions: LeaderboardBuilderOptions = {
