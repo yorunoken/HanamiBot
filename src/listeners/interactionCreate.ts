@@ -204,7 +204,7 @@ async function handleVerify(interaction: DMInteraction<MessageComponentData, Mes
         thumbnail: { url: osuUser.avatar_url }
     };
 
-    interaction.editReply({ embeds: [embed] }).then(async () => {
+    interaction.editReply({ embeds: [embed], components: [] }).then(async () => {
         await loadLogs(`INFO: [Private Messages] ${username} linked their osu! account, \`${osuId}\``);
     }).catch(async (error: Error) => {
         console.log(error);
