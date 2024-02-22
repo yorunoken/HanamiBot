@@ -1,7 +1,7 @@
 import { accuracyCalculator, getPerformanceResults, getRetryCount } from "../utils/osu";
 import { grades, rulesets } from "../utils/emotes";
 import type { UserScore, Beatmap, LeaderboardScores, Mode, PlayStatistics, ScoresInfo, Score, UserBestScore } from "../types/osu";
-import type { ISOTimestamp, Mod } from "osu-web.js";
+import type { ISOTimestamp } from "osu-web.js";
 
 // We won't be needing this either!
 // interface HitValues {
@@ -14,7 +14,7 @@ import type { ISOTimestamp, Mod } from "osu-web.js";
 // }
 
 export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
-{ scores: Array<UserBestScore> | Array<UserScore> | Array<Score> | LeaderboardScores, beatmap?: Beatmap, index: number, mode: Mode, mapData?: string }): Promise<ScoresInfo> {
+{ scores: Array<UserBestScore> | Array<UserScore> | Array<Score> | Array<LeaderboardScores>, beatmap?: Beatmap, index: number, mode: Mode, mapData?: string }): Promise<ScoresInfo> {
     const play = scores[index];
 
     let beatmap;
@@ -31,7 +31,6 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
 
     let totalScore: number;
     let createdAt: ISOTimestamp;
-    let modsArr: Array<Mod>;
     let scoreStatistics: PlayStatistics;
     let user: string | undefined;
     let userId: number | undefined;
@@ -51,14 +50,12 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     if ("score" in play) {
         totalScore = play.score;
         createdAt = play.created_at;
-        modsArr = play.mods;
         scoreStatistics = play.statistics;
     } else {
         user = play.user.username;
         userId = play.user_id;
         totalScore = play.total_score;
         createdAt = play.ended_at;
-        modsArr = play.mods.map((x) => <Mod>x.acronym);
         scoreStatistics = {
             count_50: play.statistics.meh ?? 0,
             count_100: play.statistics.good ?? 0,
@@ -69,7 +66,7 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
         };
     }
 
-    const performance = await getPerformanceResults({ hitValues: scoreStatistics, beatmapId: beatmap.id, play, maxCombo: play.max_combo, mods: modsArr, mapData });
+    const performance = await getPerformanceResults({ hitValues: scoreStatistics, beatmapId: beatmap.id, play, maxCombo: play.max_combo, mods: play.mods, mapData });
 
     // Throw an error if performance doesn't exist.
     // This can only mean one thing, and it's because the map couldn't be downloaded for some reason.
@@ -136,6 +133,7 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     const percentageNum = objectshit / objects * 100;
 
     const beatmapStatus = beatmapset.status;
+
     return {
         user,
         userId,
@@ -153,7 +151,7 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
         listLink: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/list.jpg`,
         grade: grades[play.rank],
         hitValues: `{ ${hitValues} }`, // Returns the value in this format: { 433/12/2/4 }
-        mods: modsArr.length > 0 ? modsArr : ["NM"],
+        mods: performance.mods,
         mapAuthor: beatmapset.creator,
         mapStatus: beatmapStatus.charAt(0).toUpperCase() + beatmapStatus.slice(1),
         drainLength: `${drainMinutes}:${drainSeconds}`,
