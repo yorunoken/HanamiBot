@@ -1,6 +1,6 @@
 import { getCommandArgs } from "../../utils/args";
 import { getBeatmapIdFromContext } from "../../utils/osu";
-import { mapBuilder } from "../../embed-builders/mapBuilder";
+import { mapBuilder } from "../../embed-builders/map";
 import { EmbedBuilderType } from "../../types/embedBuilders";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { Mod } from "osu-web.js";

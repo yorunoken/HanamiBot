@@ -10,7 +10,7 @@ export function getProfile(user: UserExtended, mode: Mode): ProfileInfo {
         userCover: user.cover.url,
         avatarUrl: user.avatar_url,
         userUrl: `https://osu.ppy.sh/users/${user.id}/${mode}`,
-        coverUrl: user.cover.url,
+        bannerUrl: user.cover.url,
         flagUrl: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
         countryCode: user.country.code,
         globalRank: statistics.global_rank?.toLocaleString() ?? "-",

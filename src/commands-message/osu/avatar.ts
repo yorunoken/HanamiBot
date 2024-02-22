@@ -3,7 +3,7 @@ import { client } from "../../utils/initalize";
 import { UserType } from "../../types/commandArgs";
 import { EmbedBuilderType } from "../../types/embedBuilders";
 import { Mode } from "../../types/osu";
-import { avatarBuilder } from "../../embed-builders/avatarBuilder";
+import { avatarBuilder } from "../../embed-builders/avatar";
 import { EmbedType } from "lilybird";
 import type { Message } from "lilybird";
 import type { MessageCommand } from "../../types/commands";
@@ -39,7 +39,7 @@ async function run({ message, args }: { message: Message, args: Array<string> })
     }
 
     const embeds = avatarBuilder({
-        type: EmbedBuilderType.PROFILE,
+        type: EmbedBuilderType.AVATAR,
         initiatorId: message.author.id,
         user: osuUser
     });

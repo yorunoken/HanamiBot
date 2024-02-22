@@ -33,7 +33,7 @@ export function profileBuilder({ user, mode }: ProfileBuilderOptions): Array<Emb
 
     const footer = { text: `Joined osu! on ${profile.joinedAt} (${profile.joinedAgo} yrs ago)` } satisfies EmbedFooterStructure;
     const thumbnail = { url: profile.avatarUrl } satisfies EmbedThumbnailStructure;
-    const image = { url: profile.coverUrl } satisfies EmbedImageStructure;
+    const image = { url: profile.bannerUrl } satisfies EmbedImageStructure;
 
     return [ { type: EmbedType.Rich, author, fields, footer, thumbnail, image } ] satisfies Array<EmbedStructure>;
 }

@@ -1,5 +1,5 @@
 import { parseOsuArguments } from "../../utils/args";
-import { mapBuilder } from "../../embed-builders/mapBuilder";
+import { mapBuilder } from "../../embed-builders/map";
 import { getBeatmapIdFromContext } from "../../utils/osu";
 import { Mode } from "../../types/osu";
 import { EmbedBuilderType } from "../../types/embedBuilders";
