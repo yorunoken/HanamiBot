@@ -139,7 +139,7 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
         userId,
         retries,
         position: play.position ?? index + 1,
-        percentagePassed: percentageNum === 100 || play.passed ? "" : percentageNum.toFixed(1),
+        percentagePassed: percentageNum === 100 || play.passed ? null : percentageNum.toFixed(1),
         songTitle: `${beatmapset.artist} - ${beatmapset.title}`,
         songArtist: beatmapset.artist,
         songName: beatmapset.title,
