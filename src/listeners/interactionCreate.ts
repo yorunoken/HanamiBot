@@ -4,8 +4,8 @@ import { mesageDataForButtons } from "../utils/cache";
 import { compareBuilder, leaderboardBuilder, mapBuilder, playBuilder, profileBuilder } from "../embed-builders";
 import { EmbedBuilderType } from "../types/embedBuilders";
 import { calculateButtonState, createActionRow } from "../utils/buttons";
-import { backgroundBuilder } from "../embed-builders/backgroundBuilder";
-import { avatarBuilder } from "../embed-builders/avatarBuilder";
+import { backgroundBuilder } from "../embed-builders/background";
+import { avatarBuilder } from "../embed-builders/avatar";
 import type { DMInteraction, EmbedStructure, Interaction, InteractionReplyOptions, Message, MessageComponentData } from "lilybird";
 import type { Event } from "@lilybird/handlers";
 

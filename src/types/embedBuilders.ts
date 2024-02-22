@@ -8,7 +8,8 @@ export const enum EmbedBuilderType {
     PLAYS = "playBuilder",
     PROFILE = "profileBuilder",
     AVATAR = "avatarBuilder",
-    BACKGROUND = "backgroundBuilder"
+    BACKGROUND = "backgroundBuilder",
+    BANNER = "bannerBuilder"
 }
 
 interface ModStructure {
@@ -74,6 +75,12 @@ export interface AvatarBuilderOptions extends BuilderOptions {
 export interface BackgroundBuilderOptions extends BuilderOptions {
     type: EmbedBuilderType.BACKGROUND;
     beatmap: Beatmap;
+}
+
+export interface BannerBuilderOptions extends BuilderOptions {
+    type: EmbedBuilderType.BANNER;
+    user: UserExtended;
+    mode: Mode;
 }
 
 export type EmbedBuilderOptions = CompareBuilderOptions

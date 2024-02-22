@@ -1,7 +1,7 @@
 import { getCommandArgs } from "../../utils/args";
 import { getBeatmapIdFromContext } from "../../utils/osu";
 import { EmbedBuilderType } from "../../types/embedBuilders";
-import { backgroundBuilder } from "../../embed-builders/backgroundBuilder";
+import { backgroundBuilder } from "../../embed-builders/background";
 import { client } from "../../utils/initalize";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { ApplicationCommandData, Interaction } from "lilybird";
@@ -61,7 +61,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     }
 
     const embeds = backgroundBuilder({
-        type: EmbedBuilderType.MAP,
+        type: EmbedBuilderType.BACKGROUND,
         initiatorId: interaction.member.user.id,
         beatmap
     });

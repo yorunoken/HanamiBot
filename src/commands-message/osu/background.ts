@@ -3,7 +3,7 @@ import { getBeatmapIdFromContext } from "../../utils/osu";
 import { Mode } from "../../types/osu";
 import { EmbedBuilderType } from "../../types/embedBuilders";
 import { client } from "../../utils/initalize";
-import { backgroundBuilder } from "../../embed-builders/backgroundBuilder";
+import { backgroundBuilder } from "../../embed-builders/background";
 import { EmbedType } from "lilybird";
 import type { Message } from "lilybird";
 import type { MessageCommand } from "../../types/commands";
@@ -50,7 +50,7 @@ async function run({ message, args }: { message: Message, args: Array<string> })
     }
 
     const embeds = backgroundBuilder({
-        type: EmbedBuilderType.MAP,
+        type: EmbedBuilderType.BACKGROUND,
         initiatorId: message.author.id,
         beatmap
     });

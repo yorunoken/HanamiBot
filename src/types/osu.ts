@@ -20,7 +20,7 @@ export interface ProfileInfo {
     userCover: string;
     avatarUrl: string;
     userUrl: string;
-    coverUrl: string;
+    bannerUrl: string;
     flagUrl: string;
     countryCode: string;
     globalRank: string;

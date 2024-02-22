@@ -1,8 +1,8 @@
 import { getCommandArgs } from "../../utils/args";
 import { client } from "../../utils/initalize";
 import { UserType } from "../../types/commandArgs";
+import { bannerBuilder } from "../../embed-builders/banner";
 import { EmbedBuilderType } from "../../types/embedBuilders";
-import { avatarBuilder } from "../../embed-builders/avatar";
 import { ApplicationCommandOptionType } from "lilybird";
 import type { ApplicationCommandData, Interaction } from "lilybird";
 import type { SlashCommand } from "@lilybird/handlers";
@@ -10,8 +10,8 @@ import type { SlashCommand } from "@lilybird/handlers";
 export default {
     post: "GLOBAL",
     data: {
-        name: "avatar",
-        description: "Display the avatar of a user.",
+        name: "banner",
+        description: "Display the banner of a user.",
         options: [
             {
                 type: ApplicationCommandOptionType.STRING,
@@ -48,10 +48,11 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    const embeds = avatarBuilder({
-        type: EmbedBuilderType.AVATAR,
+    const embeds = bannerBuilder({
+        type: EmbedBuilderType.BANNER,
         initiatorId: interaction.member.user.id,
-        user: osuUser
+        user: osuUser,
+        mode: user.mode
     });
 
     await interaction.editReply({ embeds });

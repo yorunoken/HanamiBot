@@ -3,14 +3,14 @@ import { client } from "../../utils/initalize";
 import { UserType } from "../../types/commandArgs";
 import { EmbedBuilderType } from "../../types/embedBuilders";
 import { Mode } from "../../types/osu";
-import { avatarBuilder } from "../../embed-builders/avatar";
+import { bannerBuilder } from "../../embed-builders/banner";
 import { EmbedType } from "lilybird";
 import type { Message } from "lilybird";
 import type { MessageCommand } from "../../types/commands";
 
 export default {
-    name: "avatar",
-    description: "Display the profile of a user.",
+    name: "banner",
+    description: "Display the banner of a user.",
     cooldown: 1000,
     run
 } satisfies MessageCommand;
@@ -38,10 +38,11 @@ async function run({ message, args }: { message: Message, args: Array<string> })
         return;
     }
 
-    const embeds = avatarBuilder({
-        type: EmbedBuilderType.AVATAR,
+    const embeds = bannerBuilder({
+        type: EmbedBuilderType.BANNER,
         initiatorId: message.author.id,
-        user: osuUser
+        user: osuUser,
+        mode: user.mode
     });
     await channel.send({ embeds });
 }
