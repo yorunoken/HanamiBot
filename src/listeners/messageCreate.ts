@@ -17,8 +17,8 @@ export default {
             return;
         }
 
-        const { content, guildId, client } = message;
-        if (!content || !guildId) return;
+        const { content, guildId, client, author } = message;
+        if (!content || !guildId || author.bot) return;
         const server = await client.rest.getGuild(guildId);
 
         const channel = await message.fetchChannel();
@@ -54,32 +54,32 @@ export default {
         if (!commandDefault) return;
         const { default: command } = commandDefault;
 
-        if (cooldown.has(`${command.name}${message.author.id}`)) {
+        if (cooldown.has(`${command.name}${author.id}`)) {
             await message
                 .reply({
-                    content: `${cooldown.get(`${command.name}${message.author.id}`)}ms`
+                    content: `${cooldown.get(`${command.name}${author.id}`)}ms`
                 })
-                .then((msg) => setTimeout(async () => msg.delete(), cooldown.get(`${command.name}${message.author.id}`) - Date.now()));
+                .then((msg) => setTimeout(async () => msg.delete(), cooldown.get(`${command.name}${author.id}`) - Date.now()));
             return;
         }
 
         await client.rest.triggerTypingIndicator(channel.id);
         command.run({ client: client, message, args, prefix, index, commandName }).then(async () => {
-            await loadLogs(`INFO: [${server.name}] ${message.author.username} used prefix command \`${command.name}\``);
+            await loadLogs(`INFO: [${server.name}] ${author.username} used prefix command \`${command.name}\``);
             const docs = getCommand(commandName ?? "");
             if (docs)
                 insertData({ table: "commands", data: [ { name: "count", value: docs.count + 1 } ], id: docs.id });
         }).catch(async (error: Error) => {
             console.log(error);
-            await loadLogs(`ERROR: [${server.name}] ${message.author.username} had an error in prefix command \`${command.name}\`: ${error.stack}`, true);
+            await loadLogs(`ERROR: [${server.name}] ${author.username} had an error in prefix command \`${command.name}\`: ${error.stack}`, true);
             const docs = getCommand(commandName ?? "");
             if (docs)
                 insertData({ table: "commands", data: [ { name: "count", value: docs.count + 1 } ], id: docs.id });
         });
 
-        cooldown.set(`${command.name}${message.author.id}`, Date.now() + command.cooldown);
+        cooldown.set(`${command.name}${author.id}`, Date.now() + command.cooldown);
         setTimeout(() => {
-            cooldown.delete(`${command.name}${message.author.id}`);
+            cooldown.delete(`${command.name}${author.id}`);
         }, command.cooldown);
 
         return;
