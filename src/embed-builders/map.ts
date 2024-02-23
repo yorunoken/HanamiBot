@@ -10,16 +10,17 @@ export async function mapBuilder({
     beatmapId,
     mods
 }: MapBuilderOptions): Promise<Array<EmbedStructure>> {
-    const map = await client.beatmaps.getBeatmap(beatmapId);
-    if (!map.id) {
+    const beatmapRequest = await client.safeParse(client.beatmaps.getBeatmap(Number(beatmapId)));
+    if (!beatmapRequest.success) {
         return [
             {
                 type: EmbedType.Rich,
                 title: "Uh oh! :x:",
-                description: "It seems like this beatmap couldn't be found :("
+                description: `It seems like this beatmap couldn't be found :(`
             }
         ];
     }
+    const map = beatmapRequest.data;
 
     const { beatmapset: mapset, mode, version } = map;
 

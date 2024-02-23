@@ -67,19 +67,20 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    const beatmap = await client.beatmaps.getBeatmap(Number(beatmapId));
-    if (!beatmap.id) {
+    const beatmapRequest = await client.safeParse(client.beatmaps.getBeatmap(Number(beatmapId)));
+    if (!beatmapRequest.success) {
         await interaction.editReply({
             embeds: [
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like this beatmap doesn't exist! :("
+                    description: `It seems like this beatmap doesn't exist! :(`
                 }
             ]
         });
         return;
     }
+    const beatmap = beatmapRequest.data;
 
     if (beatmap.status === "pending" || beatmap.status === "wip" || beatmap.status === "graveyard") {
         await interaction.editReply({

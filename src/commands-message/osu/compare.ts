@@ -45,11 +45,20 @@ async function run({
         return;
     }
 
-    const osuUser = await client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } });
-    if (!osuUser.id) {
-        await channel.send("This user does not exist.");
+    const osuUserRequest = await client.safeParse(client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } }));
+    if (!osuUserRequest.success) {
+        await channel.send({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: "It seems like this user doesn't exist! :("
+                }
+            ]
+        });
         return;
     }
+    const osuUser = osuUserRequest.data;
 
     const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ message, client: message.client });
     if (typeof beatmapId === "undefined" || beatmapId === null) {
@@ -65,8 +74,8 @@ async function run({
         return;
     }
 
-    const beatmap = await client.beatmaps.getBeatmap(Number(beatmapId));
-    if (!beatmap.id) {
+    const beatmapRequest = await client.safeParse(client.beatmaps.getBeatmap(Number(beatmapId)));
+    if (!beatmapRequest.success) {
         await channel.send({
             embeds: [
                 {
@@ -78,6 +87,7 @@ async function run({
         });
         return;
     }
+    const beatmap = beatmapRequest.data;
 
     if (beatmap.status === "pending" || beatmap.status === "wip" || beatmap.status === "graveyard") {
         await channel.send({

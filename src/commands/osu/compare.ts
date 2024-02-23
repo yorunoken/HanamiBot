@@ -85,11 +85,20 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    const osuUser = await client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } });
-    if (!osuUser.id) {
-        await interaction.editReply("This user does not exist.");
+    const osuUserRequest = await client.safeParse(client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } }));
+    if (!osuUserRequest.success) {
+        await interaction.editReply({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: `It seems like this user doesn't exist! :(`
+                }
+            ]
+        });
         return;
     }
+    const osuUser = osuUserRequest.data;
 
     const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ channelId: interaction.channelId, client: interaction.client });
     if (typeof beatmapId === "undefined" || beatmapId === null) {
@@ -105,19 +114,20 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    const beatmap = await client.beatmaps.getBeatmap(Number(beatmapId));
-    if (!beatmap.id) {
+    const beatmapRequest = await client.safeParse(client.beatmaps.getBeatmap(Number(beatmapId)));
+    if (!beatmapRequest.success) {
         await interaction.editReply({
             embeds: [
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like this beatmap doesn't exist! :("
+                    description: `It seems like this beatmap doesn't exist! :(`
                 }
             ]
         });
         return;
     }
+    const beatmap = beatmapRequest.data;
 
     if (beatmap.status === "pending" || beatmap.status === "wip" || beatmap.status === "graveyard") {
         await interaction.editReply({

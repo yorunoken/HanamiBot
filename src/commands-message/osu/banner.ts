@@ -24,19 +24,20 @@ async function run({ message, args }: { message: Message, args: Array<string> })
         return;
     }
 
-    const osuUser = await client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } });
-    if (!osuUser.id) {
+    const osuUserRequest = await client.safeParse(client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } }));
+    if (!osuUserRequest.success) {
         await channel.send({
             embeds: [
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like \`${user.banchoId}\` doesn't exist!`
+                    description: `It seems like this user doesn't exist! :(`
                 }
             ]
         });
         return;
     }
+    const osuUser = osuUserRequest.data;
 
     const embeds = bannerBuilder({
         type: EmbedBuilderType.BANNER,
