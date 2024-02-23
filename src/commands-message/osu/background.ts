@@ -35,19 +35,20 @@ async function run({ message, args }: { message: Message, args: Array<string> })
         return;
     }
 
-    const beatmap = await client.beatmaps.getBeatmap(Number(beatmapId));
-    if (!beatmap.id) {
+    const beatmapRequest = await client.safeParse(client.beatmaps.getBeatmap(Number(beatmapId)));
+    if (!beatmapRequest.success) {
         await channel.send({
             embeds: [
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like this beatmap doesn't exist! :("
+                    description: `It seems like this beatmap doesn't exist! :(`
                 }
             ]
         });
         return;
     }
+    const beatmap = beatmapRequest.data;
 
     const embeds = backgroundBuilder({
         type: EmbedBuilderType.BACKGROUND,

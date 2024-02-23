@@ -28,19 +28,21 @@ async function run({ message, args, commandName }: { message: Message, args: Arr
         return;
     }
 
-    const osuUser = await client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } });
-    if (!osuUser.id) {
+    const osuUserRequest = await client.safeParse(client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } }));
+    if (!osuUserRequest.success) {
+        console.log(osuUserRequest);
         await channel.send({
             embeds: [
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like \`${user.banchoId}\` doesn't exist!`
+                    description: "It seems like this user doesn't exist! :("
                 }
             ]
         });
         return;
     }
+    const osuUser = osuUserRequest.data;
 
     const embeds = profileBuilder({
         type: EmbedBuilderType.PROFILE,

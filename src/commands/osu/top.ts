@@ -124,11 +124,20 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    const osuUser = await client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } });
-    if (!osuUser.id) {
-        await interaction.editReply("This user does not exist.");
+    const osuUserRequest = await client.safeParse(client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } }));
+    if (!osuUserRequest.success) {
+        await interaction.editReply({
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: "Uh oh! :x:",
+                    description: `It seems like this user doesn't exist! :(`
+                }
+            ]
+        });
         return;
     }
+    const osuUser = osuUserRequest.data;
 
     const plays = (await client.users.getUserScores(osuUser.id, PlayType.BEST, { query: { mode: user.mode, limit: 100 } })).map((item, idx) => {
         return { ...item, position: idx + 1 };
