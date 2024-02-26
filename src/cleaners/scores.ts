@@ -111,7 +111,7 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
 
     const playMaxCombo = play.max_combo;
     const { maxCombo } = performance.currentPerformance.difficulty;
-    const isFc = scoreStatistics.count_miss === 0 || playMaxCombo + 7 >= maxCombo;
+    const isFc = scoreStatistics.count_miss === 0 && playMaxCombo + 7 >= maxCombo;
 
     // set fcValues to null because we won't always need it.
     let ifFcValues = null;
