@@ -124,7 +124,7 @@ export function getCommandArgs(interaction: Interaction<ApplicationCommandData>)
 
 export function parseOsuArguments(message: Message, args: Array<string>, mode: Mode): ParsedArgs {
     const result: ParsedArgs = {
-        tempUserDoNotUse: null,
+        tempUser: null,
         user: {
             beatmapId: null,
             type: UserType.FAIL,
@@ -159,12 +159,16 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
         args.splice(indexToRemove, 1);
     }
 
-    // Counter to keep track of double-quote and flag occurrences
-    let quoteCounts = 0;
+    const newArgs = args.join(" ").match(/(".*?"|\S+)/g) ?? [];
+    for (let i = 0; i < newArgs.length; i++) {
+        const arg = newArgs[i];
 
-    for (const arg of args) {
+        if (arg.includes('"')) {
+            (result.tempUser ??= []).push(arg.replace(/"/g, ""));
+            continue;
+        }
+
         const [key, value] = arg.split("=");
-
         const [, modType, mod, force] = (/^([+-])([A-Za-z]+)(!)?$/).exec(arg) ?? [];
 
         if (mod) {
@@ -183,13 +187,9 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
             }
         }
 
-        // Check if it's a username (key without value) and within quote limits
-        if (key && !value && quoteCounts < 2) {
-            // Increase quote count if the key includes double-quotes
-            // This is to select the first username in quotes
-            if (key.includes('"')) quoteCounts++;
-
-            (result.tempUserDoNotUse ??= []).push(key.replace(/"/g, ""));
+        // Check if it's a username
+        if (key && !value) {
+            (result.tempUser ??= []).push(key);
             continue;
         }
 
@@ -200,15 +200,17 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
 
     const userId = getUser(message.author.id)?.banchoId;
 
-    if (!result.tempUserDoNotUse && userId) {
+    if (!result.tempUser && userId) {
         result.user = {
             beatmapId: result.user.beatmapId,
             type: UserType.SUCCESS,
             banchoId: userId,
             mode
         };
-    } else if (result.tempUserDoNotUse) {
-        const discordUserId = (/<@(\d+)>/).exec(result.tempUserDoNotUse.join(" "))?.[1];
+    } else if (result.tempUser) {
+        const [userArg] = result.tempUser;
+
+        const discordUserId = (/<@(\d+)>/).exec(userArg)?.[1];
         const user = discordUserId ? getUser(discordUserId)?.banchoId : null;
 
         if (discordUserId && !user) {
@@ -221,7 +223,7 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
             result.user = {
                 beatmapId: result.user.beatmapId,
                 type: UserType.SUCCESS,
-                banchoId: user ?? result.tempUserDoNotUse.join(" "),
+                banchoId: user ?? userArg,
                 mode
             };
         }

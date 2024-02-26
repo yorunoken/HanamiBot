@@ -50,7 +50,7 @@ async function run({ message, args, commandName, index = 0 }: { message: Message
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like this user doesn't exist! :(`
+                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`
                 }
             ]
         });

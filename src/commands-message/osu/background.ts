@@ -42,7 +42,7 @@ async function run({ message, args }: { message: Message, args: Array<string> })
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like this beatmap doesn't exist! :(`
+                    description: "It seems like this beatmap doesn't exist! :("
                 }
             ]
         });
