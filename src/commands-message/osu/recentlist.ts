@@ -81,7 +81,7 @@ async function run({ message, args, commandName, index }: { message: Message, ar
         return;
     }
 
-    let page = Number(flags.p ?? flags.page) || undefined;
+    let page = Number(flags.p ?? flags.page) - 1 || undefined;
 
     if (typeof page === "undefined" && typeof index === "undefined")
         page = 0;
@@ -110,8 +110,8 @@ async function run({ message, args, commandName, index }: { message: Message, ar
             isPage,
             disabledStates: [
                 isPage ? page === 0 : index === 0,
-                calculateButtonState(false, index ?? 0, totalPages),
-                calculateButtonState(true, index ?? 0, totalPages),
+                calculateButtonState(false, isPage ? page ?? 0 : index ?? 0, totalPages),
+                calculateButtonState(true, isPage ? page ?? 0 : index ?? 0, totalPages),
                 isPage ? page === totalPages - 1 : index === totalPages - 1
             ]
         })

@@ -52,7 +52,7 @@ async function run({
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like the user **\`${user.banchoId}\`** doesn't exist! :("
+                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :("`
                 }
             ]
         });
