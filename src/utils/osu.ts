@@ -239,9 +239,6 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
         .combo(perfectPerformance.difficulty.maxCombo)
         .performance(beatmap);
 
-    console.log(`clockRate: ${mapValues.clockRate}`);
-    console.log(currentPerformance);
-
     return { mapValues, perfectPerformance, currentPerformance, fcPerformance, mapId: beatmapId, mods: modsStringArray.length > 0 ? modsStringArray : ["NM"] };
 }
 

@@ -30,7 +30,6 @@ async function run({ message, args, commandName }: { message: Message, args: Arr
 
     const osuUserRequest = await client.safeParse(client.users.getUser(user.banchoId, { urlParams: { mode: user.mode } }));
     if (!osuUserRequest.success) {
-        console.log(osuUserRequest);
         await channel.send({
             embeds: [
                 {
