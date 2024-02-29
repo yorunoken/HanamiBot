@@ -82,7 +82,7 @@ async function list(interaction: GuildInteraction<ApplicationCommandData>): Prom
         insertData({ table: "users", id: userId, data: [ { name: "banchoId", value: null } ] });
         user = { banchoId: null, mode: null, score_embeds: null, id: userId };
     }
-    const embeds: EmbedStructure = { fields: [] };
+    const embeds: EmbedStructure = { fields: [], title: `Config settings of ${interaction.member.user.username}` };
 
     for (const [key, v] of Object.entries(user)) {
         const value = v as string | number | null;
