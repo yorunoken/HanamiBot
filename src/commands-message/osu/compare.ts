@@ -10,6 +10,7 @@ import type { Message } from "lilybird";
 import type { MessageCommand } from "../../types/commands";
 
 const modeAliases: Record<string, { mode: Mode }> = {
+    შედარება: { mode: Mode.OSU},
     mog: { mode: Mode.OSU },
     gap: { mode: Mode.OSU },
     c: { mode: Mode.OSU },
