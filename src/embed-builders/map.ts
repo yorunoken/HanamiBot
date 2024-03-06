@@ -16,7 +16,7 @@ export async function mapBuilder({
             {
                 type: EmbedType.Rich,
                 title: "Uh oh! :x:",
-                description: `It seems like this beatmap couldn't be found :(`
+                description: "It seems like this beatmap couldn't be found :("
             }
         ];
     }
