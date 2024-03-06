@@ -18,10 +18,17 @@
     Hope you have fun with whatever you're doing!
 */
 
-import { initializeDatabase, loadLogs } from "./utils/initalize";
+import { initializeDatabase, loadLogs, client } from "./utils/initalize";
+import { getAccessToken } from "./utils/osu";
 import { createHandler } from "@lilybird/handlers";
 import { createClient, Intents } from "lilybird";
 import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
+
+// refresh token every 4 hours
+setInterval(async () => {
+    const { accessToken } = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
+    client.setAccessToken(accessToken);
+}, 1000 * 60 * 60 * 4);
 
 const key = randomBytes(32);
 const iv = randomBytes(16);
@@ -57,3 +64,4 @@ await createClient({
     ],
     ...listeners
 });
+

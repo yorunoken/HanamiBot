@@ -66,7 +66,11 @@ Promise<{
         },
         body
     });
-    if (!request.ok) throw new Error("Couldn't GET access token");
+    if (!request.ok) {
+        console.log(request);
+        throw new Error("Couldn't GET access token");
+    }
+
     const data = await request.json() as AccessTokenJSON;
 
     return { accessToken: data.access_token, expiresIn: data.expires_in };
