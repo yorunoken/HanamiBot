@@ -56,6 +56,7 @@ const listeners = await createHandler({
 
 await createClient({
     token: process.env.DISCORD_BOT_TOKEN,
+    attachDebugListener: true,
     intents: [
         Intents.GUILDS,
         Intents.GUILD_MESSAGES,
