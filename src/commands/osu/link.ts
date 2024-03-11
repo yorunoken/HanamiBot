@@ -2,7 +2,7 @@ import { encrypt } from "../..";
 import { buildAuthUrl } from "../../utils/osu";
 import type { AuthScope } from "../../types/osu";
 import type { SlashCommand } from "@lilybird/handlers";
-import type { ApplicationCommandData, Interaction } from "lilybird";
+import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
 
 export default {
     post: "GLOBAL",

@@ -1,7 +1,7 @@
 import { getUser, removeUser } from "../../utils/database";
 import { slashCommandsIds } from "../../utils/cache";
 import type { SlashCommand } from "@lilybird/handlers";
-import type { ApplicationCommandData, Interaction } from "lilybird";
+import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
 
 export default {
     post: "GLOBAL",

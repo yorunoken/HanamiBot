@@ -1,4 +1,5 @@
-import type { ApplicationCommandData, Client, Interaction, Message, POSTApplicationCommandStructure } from "lilybird";
+import type { ApplicationCommandData, Interaction, Message } from "@lilybird/transformers";
+import type { Client, POSTApplicationCommandStructure } from "lilybird";
 
 export interface MessageCommand {
     name: string;

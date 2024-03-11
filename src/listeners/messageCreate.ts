@@ -4,7 +4,8 @@ import { commandAliases, loadLogs, messageCommands } from "../utils/initalize";
 import { getCommand, insertData } from "../utils/database";
 import { prefixesCache } from "./guildCreate";
 import { ButtonStyle, EmbedType, ComponentType } from "lilybird";
-import type { Client, EmbedStructure, Message } from "lilybird";
+import type { Message } from "@lilybird/transformers";
+import type { Client, EmbedStructure } from "lilybird";
 import type { Event } from "@lilybird/handlers";
 
 const cooldown = new Map();

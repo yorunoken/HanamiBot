@@ -4,7 +4,7 @@ import { EmbedBuilderType } from "../../types/embedBuilders";
 import { backgroundBuilder } from "../../embed-builders/background";
 import { client } from "../../utils/initalize";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
-import type { ApplicationCommandData, Interaction } from "lilybird";
+import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
 import type { SlashCommand } from "@lilybird/handlers";
 
 export default {

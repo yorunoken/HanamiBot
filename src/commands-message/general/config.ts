@@ -1,6 +1,6 @@
 import { slashCommandsIds } from "../../utils/cache";
 import type { MessageCommand } from "../../types/commands";
-import type { Message } from "lilybird";
+import type { Message } from "@lilybird/transformers";
 
 export default {
     name: "config",

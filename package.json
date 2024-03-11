@@ -9,8 +9,8 @@
     "db": "bun tools/database.ts"
   },
   "dependencies": {
-    "@lilybird/handlers": "^0.4.0-alpha.1",
-    "@lilybird/transformers": "^0.2.0-alpha.0",
+    "@lilybird/handlers": "alpha",
+    "@lilybird/transformers": "alpha",
     "@types/bun": "^1.0.8",
     "lilybird": "alpha",
     "osu-downloader": "^0.8.1",

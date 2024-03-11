@@ -6,7 +6,8 @@ import { EmbedBuilderType } from "../types/embedBuilders";
 import { calculateButtonState, createActionRow } from "../utils/buttons";
 import { backgroundBuilder } from "../embed-builders/background";
 import { avatarBuilder } from "../embed-builders/avatar";
-import type { DMInteraction, EmbedStructure, Interaction, InteractionReplyOptions, Message, MessageComponentData } from "lilybird";
+import type { DMInteraction, Interaction, InteractionReplyOptions, Message, MessageComponentData } from "@lilybird/transformers";
+import type { EmbedStructure } from "lilybird";
 import type { Event } from "@lilybird/handlers";
 
 export default {

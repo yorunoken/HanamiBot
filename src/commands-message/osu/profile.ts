@@ -5,7 +5,7 @@ import { UserType } from "../../types/commandArgs";
 import { EmbedBuilderType } from "../../types/embedBuilders";
 import { Mode } from "../../types/osu";
 import { EmbedType } from "lilybird";
-import type { Message } from "lilybird";
+import type { Message } from "@lilybird/transformers";
 import type { MessageCommand } from "../../types/commands";
 
 export default {

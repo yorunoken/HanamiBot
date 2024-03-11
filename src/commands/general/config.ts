@@ -1,7 +1,8 @@
 import { getUser, insertData } from "../../utils/database";
 import { ScoreEmbed } from "../../types/database";
 import { ApplicationCommandOptionType } from "lilybird";
-import type { ApplicationCommandData, EmbedStructure, GuildInteraction, Interaction } from "lilybird";
+import type { ApplicationCommandData, GuildInteraction, Interaction } from "@lilybird/transformers";
+import type { EmbedStructure } from "lilybird";
 import type { SlashCommand } from "@lilybird/handlers";
 
 export default {

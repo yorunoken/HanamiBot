@@ -5,7 +5,7 @@ import { compareBuilder } from "../../embed-builders/compare";
 import { getBeatmapIdFromContext } from "../../utils/osu";
 import { EmbedBuilderType } from "../../types/embedBuilders";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
-import type { ApplicationCommandData, Interaction } from "lilybird";
+import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
 import type { SlashCommand } from "@lilybird/handlers";
 
 export default {
@@ -121,7 +121,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like this beatmap doesn't exist! :(`
+                    description: "It seems like this beatmap doesn't exist! :("
                 }
             ]
         });

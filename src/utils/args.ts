@@ -5,7 +5,7 @@ import { slashCommandsIds } from "./cache";
 import { ModsEnum } from "osu-web.js";
 import type { CommandArgs, Mods, ParsedArgs, User } from "../types/commandArgs";
 import type { Mod } from "osu-web.js";
-import type { ApplicationCommandData, Interaction, Message } from "lilybird";
+import type { ApplicationCommandData, Interaction, Message } from "@lilybird/transformers";
 
 interface BeatMapSetURL {
     url: string;

@@ -5,9 +5,10 @@ import { Beatmap, Calculator } from "rosu-pp";
 import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
 import { ModsEnum } from "osu-web.js";
 import { ChannelType } from "lilybird";
+import type { Message } from "@lilybird/transformers";
 import type { Mod } from "../types/mods";
 import type { UserScore, UserBestScore, AccessTokenJSON, AuthScope, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo, Score } from "../types/osu";
-import type { Client, EmbedStructure, Message } from "lilybird";
+import type { Client, EmbedStructure } from "lilybird";
 import type { GameMode, Mod as ModOsuWeb } from "osu-web.js";
 import type { Score as ScoreData } from "rosu-pp";
 

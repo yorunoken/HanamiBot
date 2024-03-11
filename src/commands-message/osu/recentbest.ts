@@ -7,7 +7,7 @@ import { EmbedBuilderType } from "../../types/embedBuilders";
 import { createActionRow, calculateButtonState } from "../../utils/buttons";
 import { mesageDataForButtons } from "../../utils/cache";
 import { EmbedType } from "lilybird";
-import type { Message } from "lilybird";
+import type { Message } from "@lilybird/transformers";
 import type { PlaysBuilderOptions } from "../../types/embedBuilders";
 import type { MessageCommand } from "../../types/commands";
 

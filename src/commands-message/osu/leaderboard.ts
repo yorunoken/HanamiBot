@@ -9,7 +9,7 @@ import { calculateButtonState, createActionRow } from "../../utils/buttons";
 import { EmbedType } from "lilybird";
 import type { Mod } from "osu-web.js";
 import type { LeaderboardBuilderOptions } from "../../types/embedBuilders";
-import type { Message } from "lilybird";
+import type { Message } from "@lilybird/transformers";
 import type { MessageCommand } from "../../types/commands";
 
 const modeAliases: Record<string, { isGlobal: boolean }> = {

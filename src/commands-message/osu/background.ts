@@ -5,7 +5,7 @@ import { EmbedBuilderType } from "../../types/embedBuilders";
 import { client } from "../../utils/initalize";
 import { backgroundBuilder } from "../../embed-builders/background";
 import { EmbedType } from "lilybird";
-import type { Message } from "lilybird";
+import type { Message } from "@lilybird/transformers";
 import type { MessageCommand } from "../../types/commands";
 
 export default {

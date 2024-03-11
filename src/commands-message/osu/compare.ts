@@ -6,11 +6,11 @@ import { UserType } from "../../types/commandArgs";
 import { getBeatmapIdFromContext } from "../../utils/osu";
 import { EmbedBuilderType } from "../../types/embedBuilders";
 import { EmbedType } from "lilybird";
-import type { Message } from "lilybird";
+import type { Message } from "@lilybird/transformers";
 import type { MessageCommand } from "../../types/commands";
 
 const modeAliases: Record<string, { mode: Mode }> = {
-    შედარება: { mode: Mode.OSU},
+    შედარება: { mode: Mode.OSU },
     mog: { mode: Mode.OSU },
     gap: { mode: Mode.OSU },
     c: { mode: Mode.OSU },

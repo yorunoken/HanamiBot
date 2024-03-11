@@ -5,7 +5,7 @@ import { Mode } from "../../types/osu";
 import { EmbedBuilderType } from "../../types/embedBuilders";
 import { EmbedType } from "lilybird";
 import type { Mod } from "osu-web.js";
-import type { Message } from "lilybird";
+import type { Message } from "@lilybird/transformers";
 import type { MessageCommand } from "../../types/commands";
 
 export default {

@@ -2,7 +2,7 @@ import { getServer, insertData } from "../../utils/database";
 import { DEFAULT_PREFIX, MAX_AMOUNT_OF_PREFIXES } from "../../utils/constants";
 import { prefixesCache } from "../../listeners/guildCreate";
 import { ApplicationCommandOptionType, EmbedType, PermissionFlags } from "lilybird";
-import type { ApplicationCommandData, GuildInteraction, Interaction } from "lilybird";
+import type { ApplicationCommandData, GuildInteraction, Interaction } from "@lilybird/transformers";
 import type { SlashCommand } from "@lilybird/handlers";
 
 const commands: Record<string, ({ prefix, interaction, guildId }: { prefix?: string, interaction: GuildInteraction<ApplicationCommandData>, guildId: string }) => Promise<void>> = {

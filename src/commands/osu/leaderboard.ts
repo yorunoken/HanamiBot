@@ -8,7 +8,7 @@ import { mesageDataForButtons } from "../../utils/cache";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { LeaderboardBuilderOptions } from "../../types/embedBuilders";
 import type { Mod } from "osu-web.js";
-import type { ApplicationCommandData, Interaction } from "lilybird";
+import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
 import type { SlashCommand } from "@lilybird/handlers";
 
 export default {
@@ -74,7 +74,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like this beatmap doesn't exist! :(`
+                    description: "It seems like this beatmap doesn't exist! :("
                 }
             ]
         });
