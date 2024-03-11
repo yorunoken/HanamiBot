@@ -34,11 +34,12 @@ export function insertData({ table, id, data }: { table: string, id: string | nu
     const existingRow = db.prepare(`SELECT * FROM ${table} WHERE id = ?`).get(id);
     if (!existingRow) {
         const fields: Array<string> = data.map((item) => item.name);
+        const placeholders = fields.map(() => "?").join(", ");
 
-        db.prepare(`INSERT OR REPLACE INTO ${table} (id, ${fields.join(", ")}) values (?, ${fields.map(() => "?").join(", ")})`)
+        db.prepare(`INSERT OR REPLACE INTO ${table} (id, ${fields.join(", ")}) values (?, ${placeholders});`)
             .run(id, ...values);
     }
 
-    db.prepare(`UPDATE ${table} SET ${setClause} WHERE id = ?`)
+    db.prepare(`UPDATE ${table} SET ${setClause} WHERE id = ?;`)
         .run(...values, id);
 }

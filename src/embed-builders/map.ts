@@ -24,7 +24,7 @@ export async function mapBuilder({
 
     const { beatmapset: mapset, mode, version } = map;
 
-    const mapData = getMap(beatmapId)?.data ?? (await downloadBeatmap([beatmapId]))[0].contents;
+    const mapData = getMap(beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
     const performances = await Promise.all([98, 97, 95].map(async (accuracy) => getPerformanceResults({ beatmapId, setId: map.mode_int, mapData, accuracy, mods: mods ?? 0 })));
     const [a98, a97, a95] = performances;
 

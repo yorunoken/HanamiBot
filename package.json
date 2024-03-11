@@ -13,7 +13,6 @@
     "@lilybird/transformers": "alpha",
     "@types/bun": "^1.0.8",
     "lilybird": "alpha",
-    "osu-downloader": "^0.8.1",
     "osu-web.js": "^2.3.0",
     "rosu-pp": "^0.9.4"
   },

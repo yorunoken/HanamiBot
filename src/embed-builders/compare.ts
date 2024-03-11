@@ -55,7 +55,7 @@ async function getMultiplePlays({ plays, profile, beatmap, mode }:
     mode: Mode
 }): Promise<Array<EmbedStructure>> {
     const beatmapId = beatmap.id;
-    const mapData = getMap(beatmapId)?.data ?? (await downloadBeatmap([beatmapId]))[0].contents;
+    const mapData = getMap(beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
 
     const playsTemp: Array<Promise<ScoresInfo>> = [];
     for (let i = 0; i < plays.length; i++) playsTemp.push(getScore({ scores: plays, index: i, mode, beatmap, mapData }));

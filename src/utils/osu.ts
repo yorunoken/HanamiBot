@@ -2,9 +2,9 @@
 import { Mode } from "../types/osu";
 import { getMap, insertData } from "./database";
 import { Beatmap, Calculator } from "rosu-pp";
-import { DownloadEntry, DownloadStatus, Downloader } from "osu-downloader";
 import { ModsEnum } from "osu-web.js";
 import { ChannelType } from "lilybird";
+import https from "https";
 import type { Message } from "@lilybird/transformers";
 import type { Mod } from "../types/mods";
 import type { UserScore, UserBestScore, AccessTokenJSON, AuthScope, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo, Score } from "../types/osu";
@@ -167,7 +167,7 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     else rulesetId = setId!;
 
-    mapData ??= getMap(beatmapId)?.data ?? (await downloadBeatmap([beatmapId]))[0].contents;
+    mapData ??= getMap(beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
     if (!mapData) return null;
 
     let modsStringArray: Array<string> = [];
@@ -247,24 +247,32 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
     return { mapValues, perfectPerformance, currentPerformance, fcPerformance, mapId: beatmapId, mods: modsStringArray.length > 0 ? modsStringArray : ["NM"] };
 }
 
-export async function downloadBeatmap(ids: Array<number>): Promise<Array<{
-    id: string | number | undefined,
-    contents: string | undefined
-}>> {
-    const downloader = new Downloader({
-        rootPath: "./cache",
-        filesPerSecond: 0,
-        synchronous: true
+export async function downloadBeatmap(id: string | number, timeoutMs = 6000): Promise<{
+    id: string | number,
+    contents: string
+}> {
+    const url = `https://osu.ppy.sh/osu/${id}`;
+
+    return new Promise(function (resolve, reject) {
+        const req = https.request(url, { method: "GET" }, function (response) {
+            const chunks: Array<Uint8Array> = [];
+
+            response.on("data", function (chunk: Uint8Array) { chunks.push(chunk); });
+            response.on("end", function () {
+                const data = Buffer.concat(chunks).toString();
+                // console.log(data);
+                insertData({ table: "maps", id, data: [ { name: "data", value: data } ] });
+                resolve({ id, contents: data });
+            });
+        }).on("error", reject);
+
+        req.setTimeout(timeoutMs, function () {
+            req.destroy();
+            reject(new Error(`Request to ${url} timed out after ${timeoutMs}ms`));
+        });
+
+        req.end();
     });
-    downloader.addMultipleEntries(ids.map((id) => new DownloadEntry({ id, save: false })));
-
-    const downloaderResponse = await downloader.downloadAll();
-    if (downloaderResponse.some((item) => item.status === DownloadStatus.FailedToDownload))
-        throw new Error("ERROR CODE 409, ABORTING TASK");
-
-    for (const downloaded of downloaderResponse) insertData({ table: "maps", id: downloaded.id ?? 0, data: [ { name: "data", value: downloaded.buffer?.toString() ?? "" } ] });
-
-    return downloaderResponse.map((response) => ({ id: response.id, contents: response.buffer?.toString() }));
 }
 
 export function accuracyCalculator(mode: Mode, hits: {
