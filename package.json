@@ -6,7 +6,7 @@
   "scripts": {
     "check": "tsc && eslint",
     "start": "bun src/index.ts",
-    "db": "bun tools/database.ts"
+    "build": "rm -rf node_modules && rm -rf package-lock.json && npm install -D && bun check"
   },
   "dependencies": {
     "@lilybird/handlers": "alpha",

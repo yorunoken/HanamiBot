@@ -6,3 +6,4 @@ package-lock.json
 *.db
 *.tsbuildinfo
 hanami/
+bun.lockb
