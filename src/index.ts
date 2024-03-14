@@ -32,9 +32,21 @@ setInterval(async () => {
 
 const key = randomBytes(32);
 const iv = randomBytes(16);
+const algorithm = "aes-256-cbc";
 
-export const encrypt = createCipheriv("aes256", key, iv);
-export const decrypt = createDecipheriv("aes256", key, iv);
+export function encrypt(text: string): string {
+    const cipher = createCipheriv(algorithm, key, iv);
+    let encrypted = cipher.update(text, "utf8", "hex");
+    encrypted += cipher.final("hex");
+    return encrypted;
+}
+
+export function decrypt(encryptedData: string): string {
+    const decipher = createDecipheriv(algorithm, key, iv);
+    let decrypted = decipher.update(encryptedData, "hex", "utf8");
+    decrypted += decipher.final("utf8");
+    return decrypted;
+}
 
 // process.on("unhandledRejection", async (error: Error) => {
 //     await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);

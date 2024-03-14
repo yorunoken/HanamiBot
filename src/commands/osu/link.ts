@@ -14,7 +14,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     if (!interaction.inGuild()) return;
     await interaction.deferReply(true);
 
-    const encryptedDiscordId = `${encrypt.update(interaction.member.user.id, "utf-8", "hex")}${encrypt.final("hex")}`;
+    const encryptedDiscordId = `${encrypt(interaction.member.user.id)}`;
 
     const authUrl = buildRedirectPage(encryptedDiscordId);
     await interaction.editReply(`You can [click here](<${authUrl}>) to link your osu! account to the bot!`);
