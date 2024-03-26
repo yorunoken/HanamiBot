@@ -24,11 +24,11 @@ import { createHandler } from "@lilybird/handlers";
 import { createClient, Intents } from "lilybird";
 import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
 
-// refresh token every 4 hours
+// refresh token every hour
 setInterval(async () => {
     const { accessToken } = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
     client.setAccessToken(accessToken);
-}, 1000 * 60 * 60 * 4);
+}, 1000 * 60 * 60);
 
 const key = randomBytes(32);
 const iv = randomBytes(16);
