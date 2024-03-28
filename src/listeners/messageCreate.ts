@@ -1,11 +1,8 @@
-import { decrypt } from "..";
 import { DEFAULT_PREFIX } from "../utils/constants";
 import { commandAliases, loadLogs, messageCommands } from "../utils/initalize";
 import { getCommand, insertData } from "../utils/database";
 import { prefixesCache } from "./guildCreate";
-import { ButtonStyle, EmbedType, ComponentType } from "lilybird";
 import type { Message } from "@lilybird/transformers";
-import type { Client, EmbedStructure } from "lilybird";
 import type { Event } from "@lilybird/handlers";
 
 const cooldown = new Map();
@@ -14,7 +11,7 @@ export default {
     event: "messageCreate",
     run: async (message) => {
         if (message.channelId === "1193529619907891331") {
-            await verifyUser(message.client, message);
+            verifyUser(message);
             return;
         }
 
@@ -88,33 +85,10 @@ export default {
 
 } satisfies Event<"messageCreate">;
 
-async function verifyUser(client: Client, message: Message): Promise<void> {
+function verifyUser(message: Message): void {
     const { content } = message;
     if (!content) return;
 
-    const [cryptedDiscordId, osuId] = content.split("\n");
-    const discordId = `${decrypt(cryptedDiscordId)}`;
-
-    const memberDm = await client.rest.createDM(discordId);
-
-    const embed = {
-        type: EmbedType.Rich,
-        title: "Welcome to the osu! verifier!",
-        description: "Your Discord account is being linked to an osu! user. Please confirm it by pressing the `confirm` button below.\n\nIf you did not mean for this to happen, you can ignore this message.",
-        fields: [
-            { name: "disordId", value: discordId },
-            { name: "osuId", value: osuId }
-        ]
-
-    } as EmbedStructure;
-
-    await client.rest.createMessage(memberDm.id, {
-        embeds: [embed],
-        components: [
-            {
-                type: ComponentType.ActionRow,
-                components: [ { style: ButtonStyle.Primary, custom_id: "verify", label: "Confirm", type: ComponentType.Button } ]
-            }
-        ]
-    });
+    const [discordId, osuId] = content.split("\n");
+    insertData({ table: "users", id: discordId, data: [ { name: "banchoId", value: osuId } ] });
 }

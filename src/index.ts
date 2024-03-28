@@ -22,7 +22,7 @@ import { initializeDatabase, loadLogs, client } from "./utils/initalize";
 import { getAccessToken } from "./utils/osu";
 import { createHandler } from "@lilybird/handlers";
 import { createClient, Intents } from "lilybird";
-import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
+import { createCipheriv } from "node:crypto";
 
 // refresh token every hour
 setInterval(async () => {
@@ -30,8 +30,11 @@ setInterval(async () => {
     client.setAccessToken(accessToken);
 }, 1000 * 60 * 60);
 
-const key = randomBytes(32);
-const iv = randomBytes(16);
+const keyString = process.env.KEY ?? "";
+const ivString = process.env.IV ?? "";
+
+const key = Buffer.from(keyString.split(",").map(Number));
+const iv = Buffer.from(ivString.split(",").map(Number));
 const algorithm = "aes-256-cbc";
 
 export function encrypt(text: string): string {
@@ -39,13 +42,6 @@ export function encrypt(text: string): string {
     let encrypted = cipher.update(text, "utf8", "hex");
     encrypted += cipher.final("hex");
     return encrypted;
-}
-
-export function decrypt(encryptedData: string): string {
-    const decipher = createDecipheriv(algorithm, key, iv);
-    let decrypted = decipher.update(encryptedData, "hex", "utf8");
-    decrypted += decipher.final("utf8");
-    return decrypted;
 }
 
 // process.on("unhandledRejection", async (error: Error) => {
