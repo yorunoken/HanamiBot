@@ -24,6 +24,6 @@
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
-    "eslit": "^6.0.0"
+    "eslint": "^6.0.0"
   }
 }
