@@ -9,7 +9,7 @@ import { calculateButtonState, createActionRow } from "../../utils/buttons";
 import { EmbedType } from "lilybird";
 import type { Mod } from "osu-web.js";
 import type { LeaderboardBuilderOptions } from "../../types/embedBuilders";
-import type { Message } from "@lilybird/transformers";
+import type { GuildTextChannel, Message } from "@lilybird/transformers";
 import type { MessageCommand } from "../../types/commands";
 
 const modeAliases: Record<string, { isGlobal: boolean }> = {
@@ -30,9 +30,7 @@ export default {
     run
 } satisfies MessageCommand;
 
-async function run({ message, args, commandName }: { message: Message, args: Array<string>, commandName: string }): Promise<void> {
-    const channel = await message.fetchChannel();
-
+async function run({ message, args, commandName, channel }: { message: Message, args: Array<string>, commandName: string, channel: GuildTextChannel }): Promise<void> {
     const { isGlobal } = modeAliases[commandName];
     const { user, mods, flags } = parseOsuArguments(message, args, Mode.OSU);
 

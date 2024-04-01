@@ -5,7 +5,7 @@ import { EmbedBuilderType } from "../../types/embedBuilders";
 import { Mode } from "../../types/osu";
 import { avatarBuilder } from "../../embed-builders/avatar";
 import { EmbedType } from "lilybird";
-import type { Message } from "@lilybird/transformers";
+import type { GuildTextChannel, Message } from "@lilybird/transformers";
 import type { MessageCommand } from "../../types/commands";
 
 export default {
@@ -15,9 +15,7 @@ export default {
     run
 } satisfies MessageCommand;
 
-async function run({ message, args }: { message: Message, args: Array<string> }): Promise<void> {
-    const channel = await message.fetchChannel();
-
+async function run({ message, args, channel }: { message: Message, args: Array<string>, channel: GuildTextChannel }): Promise<void> {
     const { user } = parseOsuArguments(message, args, Mode.OSU);
     if (user.type === UserType.FAIL) {
         await channel.send(user.failMessage);

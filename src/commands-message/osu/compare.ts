@@ -6,7 +6,7 @@ import { UserType } from "../../types/commandArgs";
 import { getBeatmapIdFromContext } from "../../utils/osu";
 import { EmbedBuilderType } from "../../types/embedBuilders";
 import { EmbedType } from "lilybird";
-import type { Message } from "@lilybird/transformers";
+import type { GuildTextChannel, Message } from "@lilybird/transformers";
 import type { MessageCommand } from "../../types/commands";
 
 const modeAliases: Record<string, { mode: Mode }> = {
@@ -32,14 +32,14 @@ export default {
 async function run({
     message,
     args,
-    commandName
+    commandName,
+    channel
 }: {
     message: Message,
     args: Array<string>,
-    commandName: string
+    commandName: string,
+    channel: GuildTextChannel
 }): Promise<void> {
-    const channel = await message.fetchChannel();
-
     const { user, mods } = parseOsuArguments(message, args, modeAliases[commandName].mode);
     if (user.type === UserType.FAIL) {
         await channel.send(user.failMessage);

@@ -7,7 +7,7 @@ import { EmbedBuilderType } from "../../types/embedBuilders";
 import { createActionRow, calculateButtonState } from "../../utils/buttons";
 import { mesageDataForButtons } from "../../utils/cache";
 import { EmbedType } from "lilybird";
-import type { Message } from "@lilybird/transformers";
+import type { GuildTextChannel, Message } from "@lilybird/transformers";
 import type { PlaysBuilderOptions } from "../../types/embedBuilders";
 import type { MessageCommand } from "../../types/commands";
 
@@ -39,9 +39,7 @@ export default {
     run
 } satisfies MessageCommand;
 
-async function run({ message, args, commandName, index }: { message: Message, args: Array<string>, commandName: string, index: number | undefined }): Promise<void> {
-    const channel = await message.fetchChannel();
-
+async function run({ message, args, commandName, index, channel }: { message: Message, args: Array<string>, commandName: string, index: number | undefined, channel: GuildTextChannel }): Promise<void> {
     const { mode, includeFails } = modeAliases[commandName];
     const { user, mods, flags } = parseOsuArguments(message, args, mode);
     if (user.type === UserType.FAIL) {

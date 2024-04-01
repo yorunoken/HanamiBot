@@ -12,7 +12,5 @@ export default {
         console.log("Loaded message commands ✅");
         await loadApplicationCommands(client);
         console.log("Loaded application commands ✅");
-        console.log("Put prefixes ✅");
-        console.log("Checked for new servers ✅");
     }
 } satisfies Event<"ready">;

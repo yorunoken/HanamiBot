@@ -5,7 +5,7 @@ import { UserType } from "../../types/commandArgs";
 import { EmbedBuilderType } from "../../types/embedBuilders";
 import { Mode } from "../../types/osu";
 import { EmbedType } from "lilybird";
-import type { Message } from "@lilybird/transformers";
+import type { GuildTextChannel, Message } from "@lilybird/transformers";
 import type { MessageCommand } from "../../types/commands";
 
 export default {
@@ -16,9 +16,7 @@ export default {
     run
 } satisfies MessageCommand;
 
-async function run({ message, args, commandName }: { message: Message, args: Array<string>, commandName: string }): Promise<void> {
-    const channel = await message.fetchChannel();
-
+async function run({ message, args, commandName, channel }: { message: Message, args: Array<string>, commandName: string, channel: GuildTextChannel }): Promise<void> {
     if (commandName === "profile")
         commandName = Mode.OSU;
 
