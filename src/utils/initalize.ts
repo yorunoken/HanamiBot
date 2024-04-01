@@ -2,8 +2,7 @@ import db from "../data.db" with { type: "sqlite" };
 import { getAccessToken } from "./osu";
 import { slashCommandsIds } from "./cache";
 import { Client as OsuClient } from "osu-web.js";
-import { readdir } from "fs/promises";
-import { mkdir, access, readFile, writeFile } from "node:fs/promises";
+import { mkdir, access, readFile, writeFile, readdir } from "node:fs/promises";
 import type { Client as LilybirdClient, POSTApplicationCommandStructure } from "lilybird";
 import type { DefaultMessageCommand, DefaultSlashCommand } from "@type/commands";
 
@@ -19,8 +18,9 @@ export async function loadMessageCommands(): Promise<void> {
     const temp: Array<Promise<DefaultMessageCommand>> = [];
 
     const items = await readdir("./src/commands-message", { recursive: true });
-    for (const item of items) {
-        const [category, cmd] = item.split("/");
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const [category, cmd] = item.split(process.platform === "win32" ? "\\" : "/");
         if (!category || !cmd) continue;
 
         const command = import(`../commands-message/${category}/${cmd}`) as Promise<DefaultMessageCommand>;
@@ -48,8 +48,9 @@ export async function loadApplicationCommands(clnt: LilybirdClient): Promise<voi
     const temp: Array<Promise<DefaultSlashCommand>> = [];
 
     const items = await readdir("./src/commands", { recursive: true });
-    for (const item of items) {
-        const [category, cmd] = item.split("/");
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const [category, cmd] = item.split(process.platform === "win32" ? "\\" : "/");
         if (!category || !cmd) continue;
         if (category === "data") continue;
 
