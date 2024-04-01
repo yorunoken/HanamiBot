@@ -19,19 +19,21 @@ export async function compareBuilder({
 
     if (mods?.name) {
         const { exclude, forceInclude, include, name } = mods;
-        plays = plays.filter((play) => {
+        const filteredPlays = [];
+        for (let i = 0; i < plays.length; i++) {
+            const play = plays[i];
             const modsStr = play.mods.join("").toUpperCase() || "NM";
 
-            if (exclude)
-                return !modsStr.includes(name.toUpperCase());
-            else if (forceInclude)
-                return modsStr === name.toUpperCase();
-            else if (include)
-                return modsStr.includes(name.toUpperCase());
-
-            // If none of the conditions match, return normal plays array
-            return true;
-        });
+            if (exclude && !modsStr.includes(name.toUpperCase()))
+                filteredPlays.push(play);
+            else if (forceInclude && modsStr === name.toUpperCase())
+                filteredPlays.push(play);
+            else if (include && modsStr.includes(name.toUpperCase()))
+                filteredPlays.push(play);
+            else if (!exclude && !forceInclude && !include)
+                filteredPlays.push(play);
+        }
+        plays = filteredPlays;
     }
 
     if (plays.length === 0) {
@@ -61,6 +63,17 @@ async function getMultiplePlays({ plays, profile, beatmap, mode }:
     for (let i = 0; i < plays.length; i++) playsTemp.push(getScore({ scores: plays, index: i, mode, beatmap, mapData }));
 
     const { beatmapset } = beatmap;
+
+    let description = "";
+    // Create an array of promises to await
+    const playResults = await Promise.all(playsTemp);
+    for (let i = 0; i < playResults.length; i++) {
+        const play = playResults[i];
+        const line1 = `${play.grade} **[${play.stars}]** ${SPACE}  ${play.ppFormatted} ${SPACE} **${play.accuracy}% ${SPACE} +${play.mods.join("")}**\n`;
+        const line2 = `${play.score} ${SPACE} ${play.hitValues} ${SPACE} ${play.comboValues} ${SPACE} ${play.playSubmitted}`;
+        description += `${line1 + line2}\n`;
+    }
+
     const embed: EmbedStructure = {
         type: EmbedType.Rich,
         author: {
@@ -71,14 +84,7 @@ async function getMultiplePlays({ plays, profile, beatmap, mode }:
         title: `${beatmapset.artist} - ${beatmapset.title} [${beatmap.version}]`,
         url: `https://osu.ppy.sh/b/${beatmap.id}`,
         thumbnail: { url: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/list.jpg` },
-        description: (await Promise.all(playsTemp))
-            .map((play) => {
-                const line1 = `${play.grade} **[${play.stars}]** ${SPACE}  ${play.ppFormatted} ${SPACE} **${play.accuracy}% ${SPACE} +${play.mods.join("")}**\n`;
-                const line2 = `${play.score} ${SPACE} ${play.hitValues} ${SPACE} ${play.comboValues} ${SPACE} ${play.playSubmitted}`;
-
-                return line1 + line2;
-            })
-            .join("\n"),
+        description,
         footer: { text: `${beatmap.status.charAt(0).toUpperCase()}${beatmap.status.slice(1)} beatmapset by ${beatmap.beatmapset.creator}` }
     };
 

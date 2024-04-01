@@ -28,19 +28,25 @@ export async function playBuilder({
 
     if (mods?.name) {
         const { exclude, forceInclude, include, name } = mods;
-        plays = plays.filter((play) => {
+        const filteredPlays = [];
+        for (let i = 0; i < plays.length; i++) {
+            const play = plays[i];
             const modsStr = play.mods.join("").toUpperCase() || "NM";
 
-            if (exclude)
-                return !modsStr.includes(name.toUpperCase());
-            else if (forceInclude)
-                return modsStr === name.toUpperCase();
-            else if (include)
-                return modsStr.includes(name.toUpperCase());
+            if (exclude) {
+                if (!modsStr.includes(name.toUpperCase()))
+                    filteredPlays.push(play);
+            } else if (forceInclude) {
+                if (modsStr === name.toUpperCase())
+                    filteredPlays.push(play);
+            } else if (include) {
+                if (modsStr.includes(name.toUpperCase()))
+                    filteredPlays.push(play);
+            } else
+                filteredPlays.push(play);
+        }
 
-            // If none of the conditions match, return normal plays array
-            return true;
-        });
+        plays = filteredPlays;
     }
 
     if (sortByDate)
@@ -128,6 +134,18 @@ async function getMultiplePlays({ plays, page, mode, profile }:
     const playsTemp: Array<Promise<ScoresInfo>> = [];
     for (let i = pageStart; pageEnd > i && i < plays.length; i++) playsTemp.push(getScore({ scores: plays, index: i, mode }));
 
+    let description = "";
+    // Create an array of promises to await
+    const playResults = await Promise.all(playsTemp);
+    for (let i = 0; i < playResults.length; i++) {
+        const play = playResults[i];
+        const line1 = `**#${play.position} [${play.songName} [${play.difficultyName}]](${play.mapLink}) +${play.mods.join("")} ${play.stars}**\n`;
+        const line2 = `${play.grade} ${play.ppFormatted} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%**\n`;
+        const line3 = `${play.hitValues} ${SPACE} ${play.comboValues} ${SPACE} ${play.playSubmitted}`;
+
+        description += `${line1 + line2 + line3}\n`;
+    }
+
     const embed: EmbedStructure = {
         type: EmbedType.Rich,
         author: {
@@ -136,15 +154,7 @@ async function getMultiplePlays({ plays, page, mode, profile }:
             icon_url: profile.flagUrl
         },
         thumbnail: { url: profile.avatarUrl },
-        description: (await Promise.all(playsTemp))
-            .map((play) => {
-                const line1 = `**#${play.position} [${play.songName} [${play.difficultyName}]](${play.mapLink}) +${play.mods.join("")} ${play.stars}**\n`;
-                const line2 = `${play.grade} ${play.ppFormatted} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%**\n`;
-                const line3 = `${play.hitValues} ${SPACE} ${play.comboValues} ${SPACE} ${play.playSubmitted}`;
-
-                return line1 + line2 + line3;
-            })
-            .join("\n"),
+        description,
         footer: { text: `Page ${page + 1} of ${Math.ceil(plays.length / 5)}` }
     };
 

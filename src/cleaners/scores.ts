@@ -37,14 +37,13 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     let retries: number | undefined;
 
     if ("beatmap" in play) {
-        retries = getRetryCount(
-            scores.map((x) => {
-                if ("beatmap" in x)
-                    return x.beatmap.id;
-                return 0;
-            }).splice(index, scores.length),
-            play.beatmap.id
-        );
+        const beatmapIds = [];
+        for (let i = index; i < scores.length; i++) {
+            const score = scores[i];
+            if ("beatmap" in score)
+                beatmapIds.push(score.beatmap.id);
+        }
+        retries = getRetryCount(beatmapIds, play.beatmap.id);
     }
 
     if ("score" in play) {
@@ -99,15 +98,18 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     // The order of hit values
     const order = ["count_geki", "count_300", "count_katu", "count_100", "count_50", "count_miss"];
     // Map over the keys of the order object
-    const hitValues = order
-        .map((count) => {
-            // Cast the count key to a keyof typeof statistics to ensure type safety
-            const countKey = count as keyof typeof scoreStatistics;
-            return scoreStatistics[countKey] ?? null;
-        })
-        // Filter the null values
-        .filter((count) => count !== null)
-        .join("/");
+    let hitValues = "";
+    for (let i = 0; i < order.length; i++) {
+        const count = order[i];
+        const countKey = count as keyof typeof scoreStatistics;
+        const countValue = scoreStatistics[countKey];
+        if (countValue !== null) {
+            if (hitValues.length > 0)
+                hitValues += "/";
+
+            hitValues += countValue;
+        }
+    }
 
     const playMaxCombo = play.max_combo;
     const { maxCombo } = performance.currentPerformance.difficulty;
