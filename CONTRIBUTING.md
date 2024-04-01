@@ -1,9 +1,11 @@
 # Contributing
 
-To start contributing, you either need to be on a UNIX operating system (Linux, MacOS, etc.) or you need to use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)(Windows Subsystem for Linux) to install [Bun](https://bun.sh/)
+To start contributing, you either need to install [Bun](https://bun.sh/)
 
 1. Install Bun using curl
    - `curl -fsSL https://bun.sh/install | bash`
+   or if you're on Windows:
+   - `powershell -c "irm bun.sh/install.ps1 | iex"`
 
 2. Install npm.
 
@@ -23,7 +25,7 @@ To start contributing, you either need to be on a UNIX operating system (Linux, 
 
 You need to fill `.env.local` with the approriate API keys to make the bot work. Here's how:
 
-1. DISCORD_BOT_TOKEN (your bot's token):
+### DISCORD_BOT_TOKEN (your bot's token):
 
    1. Go to [Discord's developer portal](https://discord.com/developers/applications) and create a new application.
 
@@ -33,7 +35,7 @@ You need to fill `.env.local` with the approriate API keys to make the bot work.
 
    4. You should also enable all 3 of the privilaged intents for the bot to function.
 
-2. ACCESS_TOKEN (osu! key to make leaderboard commands function):
+### ACCESS_TOKEN (osu! key to make leaderboard commands function):
 
    1. Go to [osu!s home page](https://osu.ppy.sh/home) and press f12 to open up developer page.
 
@@ -45,7 +47,7 @@ You need to fill `.env.local` with the approriate API keys to make the bot work.
 
    5. Copy its value, that's your `OSU_SESSION` key.
 
-3. CLIENT_SECRET and CLIENT_ID (osu! Auth):
+### CLIENT_SECRET and CLIENT_ID (osu! Auth):
 
    1. Go to [osu! account settings](https://osu.ppy.sh/home/account/edit) and scroll until you see `OAuth` section.
 
@@ -55,16 +57,14 @@ You need to fill `.env.local` with the approriate API keys to make the bot work.
 
    4. Copy its Client ID and Client secret and you're good to go.
 
-4. CALLBACK_URL (callback URL for /link command):
+### CALLBACK_URL (callback URL for /link command):
 
-    This one is a little tricky, because you will need to host a website.
+   This one is a little tricky, because you will need to host a website.
 
-    1. Hosting websites are free using [Vercel](https://vercel.com).
+1. Hosting websites are free using [Vercel](https://vercel.com).
 
-    2. Create a new project in the free hosting platform, [Vercel](https://vercel.com) and select the `Import Third-Party Git Repository` option.
+2. Create a new project in the free hosting platform, [Vercel](https://vercel.com) and select the `Import Third-Party Git Repository` option.
 
-    3. Input my template repo <https://github.com/YoruNoKen/hanamiVerifier> and build the website.
+3. Input my template repo <https://github.com/YoruNoKen/hanamiVerifier> and build the website.
 
-    4. Copy the URL, add it to `Application Callback URLs` in your osu! Application.
-
-    Do not forget to add it to your .env.local file as well.
+4. Copy the URL, add it to `Application Callback URLs` in your osu! Application and your .env.local file.
