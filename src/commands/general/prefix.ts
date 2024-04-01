@@ -110,13 +110,12 @@ async function remove({ prefix, interaction, guildId }: { prefix?: string, inter
 
     const server = getServer(guildId);
     if (!prefix || !server) return;
-    let { prefixes } = server;
+    const { prefixes } = server;
 
     if (prefixes === null) {
         await interaction.editReply("**There aren't any prefixes on this server. You can add a new prefixes by using `/prefix add`**");
         return;
     }
-    prefixes = JSON.parse(prefixes.toString()) as Array<string>;
 
     if (!prefixes.some((pref) => pref === prefix)) {
         await interaction.editReply(`**The prefix \`${prefix}\` is not in the prefixes list. You can look at current prefixes by using \`/prefix list\`**`);
@@ -139,13 +138,13 @@ async function list({ interaction, guildId }: { interaction: GuildInteraction<Ap
     const server = getServer(guildId);
     if (!server) return;
 
-    let { prefixes } = server;
+    const { prefixes } = server;
 
     if (prefixes === null) {
         await interaction.editReply(`**There aren't any custom prefixes on this server. The default is \`${DEFAULT_PREFIX.join("")}\`**`);
         return;
     }
-    prefixes = JSON.parse(prefixes.toString()) as Array<string>;
+    console.log(prefixes);
 
-    await interaction.editReply({ embeds: [ { type: EmbedType.Rich, title: "Success!", description: `Below are the current prefixes of this server. \n- \`${prefixes.join("`\n- `")}\`` } ] });
+    await interaction.editReply({ embeds: [ { type: EmbedType.Rich, title: "Prefixes!", description: `- \`${prefixes.join("`\n- `")}\`` } ] });
 }
