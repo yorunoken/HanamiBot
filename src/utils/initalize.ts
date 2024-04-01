@@ -28,17 +28,20 @@ export async function loadMessageCommands(): Promise<void> {
     }
 
     const commands = await Promise.all(temp);
-    for (const command of commands) {
+    for (let i = 0; i < commands.length; i++) {
+        const command = commands[i];
         const { default: cmd } = command;
 
         // Add the command to the command map
         messageCommands.set(cmd.name, command);
 
+        const { aliases } = cmd;
         // Check if the command has aliases and add them to the command map
-        if (cmd.aliases && cmd.aliases.length > 0 && Array.isArray(cmd.aliases)) {
-            cmd.aliases.forEach((alias) => {
+        if (aliases && aliases.length > 0 && Array.isArray(aliases)) {
+            for (let idx = 0; idx < aliases.length; idx++) {
+                const alias = aliases[idx];
                 commandAliases.set(alias, cmd.name);
-            });
+            }
         }
     }
 }
@@ -59,15 +62,16 @@ export async function loadApplicationCommands(clnt: LilybirdClient): Promise<voi
     }
 
     const commands = await Promise.all(temp);
-    for (const command of commands) {
+    for (let i = 0; i < commands.length; i++) {
+        const command = commands[i];
         const { default: cmd } = command;
         slashCommands.push(cmd.data);
         applicationCommands.set(cmd.data.name, command);
     }
 
     const commandsIds = await clnt.rest.bulkOverwriteGlobalApplicationCommand(clnt.user.id, slashCommands);
-    for (const command of commandsIds) {
-        const { name, id } = command;
+    for (let i = 0; i < commandsIds.length; i++) {
+        const { name, id } = commandsIds[i];
         slashCommandsIds.set(name, `</${name}:${id}>`);
     }
 }
@@ -156,15 +160,19 @@ export function initializeDatabase(): void {
         { name: "commands_slash", columns: ["id TEXT PRIMARY KEY", "count TEXT"] }
     ];
 
-    for (const table of tables) {
+    for (let i = 0; i < tables.length; i++) {
+        const table = tables[i];
+        const { columns } = table;
+
         // Create the Databases if they don't exist
-        db.run(`CREATE TABLE IF NOT EXISTS ${table.name} (${table.columns.join(", ")});`);
+        db.run(`CREATE TABLE IF NOT EXISTS ${table.name} (${columns.join(", ")});`);
 
         //  Get all of the existing databases
         const existingColumns = <Array<Columns>>db.prepare(`PRAGMA table_info(${table.name});`).all();
 
         // Loop through Columns and add/remove them
-        for (const columnNameType of table.columns) {
+        for (let idx = 0; idx < columns.length; idx++) {
+            const columnNameType = columns[i];
             const [columnName] = columnNameType.split(" ");
 
             const columnExists = existingColumns.some((col) => col.name === columnName);
@@ -175,9 +183,10 @@ export function initializeDatabase(): void {
             }
         }
 
-        for (const col of existingColumns) {
-            const columnName = col.name;
-            const columnNotInTables = !table.columns.some((colType) => colType.startsWith(columnName));
+        for (let idx = 0; idx < existingColumns.length; idx++) {
+            const column = existingColumns[i];
+            const columnName = column.name;
+            const columnNotInTables = !columns.some((colType) => colType.startsWith(columnName));
 
             if (columnNotInTables) {
                 db.run(`ALTER TABLE ${table.name} DROP COLUMN ${columnName};`);

@@ -1,6 +1,6 @@
 /* eslint-disable @stylistic/no-mixed-operators */
-import { Mode } from "@type/osu";
 import { getMap, insertData } from "./database";
+import { Mode } from "@type/osu";
 import { Beatmap, Calculator } from "rosu-pp";
 import { ModsEnum } from "osu-web.js";
 import { ChannelType } from "lilybird";
@@ -33,8 +33,13 @@ export function buildAuthUrl(clientId: string | number, callbackUri: string, sco
         state: state ?? ""
     };
 
-    // Append parameters to URL.
-    for (const [key, value] of Object.entries(params)) url.searchParams.append(key, value);
+    // Append parameters to URL using a standard for loop.
+    const paramKeys = Object.keys(params);
+    for (let i = 0; i < paramKeys.length; i++) {
+        const key = paramKeys[i];
+        const value = params[key];
+        url.searchParams.append(key, value);
+    }
 
     return url.href;
 }
