@@ -23,57 +23,48 @@ To start contributing, you either need to be on a UNIX operating system (Linux, 
 
 You need to fill `.env.local` with the approriate API keys to make the bot work. Here's how:
 
-1. TOKEN (your bot's token):
+1. DISCORD_BOT_TOKEN (your bot's token):
 
-   - Go to [Discord's developer portal](https://discord.com/developers/applications) and create a new application.
+   1. Go to [Discord's developer portal](https://discord.com/developers/applications) and create a new application.
 
-   - Navigate to the `Bot` tab, seen on the left.
+   2. Navigate to the `Bot` tab, seen on the left.
 
-   - Reset its token and get the new one.
+   3. Reset its token and get the new one.
 
-   - You should also enable all 3 of the privilaged intents for the bot to function.
+   4. You should also enable all 3 of the privilaged intents for the bot to function.
 
-2. OSU_SESSION (osu! key to make leaderboard commands function):
+2. ACCESS_TOKEN (osu! key to make leaderboard commands function):
 
-   - Go to [osu!s home page](https://osu.ppy.sh/home) and press f12 to open up developer page.
+   1. Go to [osu!s home page](https://osu.ppy.sh/home) and press f12 to open up developer page.
 
-   - Navigate to the `Storage` tab. If you don't see it, click on the arrow and reveal the dropout box.
+   2. Navigate to the `Storage` tab. If you don't see it, click on the arrow and reveal the dropout box.
 
-   - Inside `Storage` tab, click on `cookies` and `https://osu.ppy.sh`
+   3. Inside `Storage` tab, click on `cookies` and `https://osu.ppy.sh`
 
-   - Search for an item named `osu_session`
+   4. Search for an item named `osu_session`
 
-   - Copy its value, that's your `OSU_SESSION` key.
+   5. Copy its value, that's your `OSU_SESSION` key.
 
 3. CLIENT_SECRET and CLIENT_ID (osu! Auth):
 
-   - Go to [osu! account settings](https://osu.ppy.sh/home/account/edit) and scroll until you see `OAuth` section.
+   1. Go to [osu! account settings](https://osu.ppy.sh/home/account/edit) and scroll until you see `OAuth` section.
 
-   - Create a new OAuth application, give it a name (you can leave Callback URL part blank) and register it.
+   2. Create a new OAuth application, give it a name (you can leave Callback URL part blank) and register it.
 
-   - Edit your newly made application.
+   3. Edit your newly made application.
 
-   - Copy its Client ID and Client secret and you're good to go.
+   4. Copy its Client ID and Client secret and you're good to go.
 
-4. OSU_DAILY_API (API for a lot of commands):
+4. CALLBACK_URL (callback URL for /link command):
 
-   - Go to [osu!daily API page](https://osudaily.net/api.php)
+    This one is a little tricky, because you will need to host a website.
 
-   - Log into the website and create a new API key
+    1. Hosting websites are free using [Vercel](https://vercel.com).
 
-5. DEV_SERVERID, DEV_CHANNELID, OWNER_DISCORDID, and ERRORS_CHANNELID:
+    2. Create a new project in the free hosting platform, [Vercel](https://vercel.com) and select the `Import Third-Party Git Repository` option.
 
-   - DEV_SERVERID:
+    3. Input my template repo <https://github.com/YoruNoKen/hanamiVerifier> and build the website.
 
-     - The server ID of your dev server
+    4. Copy the URL, add it to `Application Callback URLs` in your osu! Application.
 
-   - DEV_CHANNELID:
-
-     - The channel ID of where the messages from `/feedback` are sent
-
-   - OWNER_DISCORDID:
-
-     - Discord user ID of yourself.
-
-   - ERRORS_CHANNELID:
-     - The channel ID where error messages are sent to
+    Do not forget to add it to your .env.local file as well.

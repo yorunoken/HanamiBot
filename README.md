@@ -22,13 +22,11 @@ Probably wasn't needed, but this project is liscenced with [Apache version 2.0](
 
 You can look at all of the libraries I use by going to `package.json` in the main branch, but mainly:
 
-- I use [Lilybird](https://github.com/Didas-git/lilybird) to communicate with Discord's API.
+- [Lilybird](https://github.com/Didas-git/lilybird) to communicate with Discord's API.
 
-  - It's a Discord API wrapper my friend coded, and it's quite good.
+- [osu-web.js](https://github.com/L-Mario564/osu.js) to communicate with osu!s servers.
 
-- I use a mixture of [osu-api-extended](https://github.com/cyperdark/osu-api-extended), and [osu-web.js](https://github.com/L-Mario564/osu.js) to communicate with osu!s servers.
-
-- I use [rosu-pp's JavaScript bind](https://github.com/MaxOhn/rosu-pp-js) to calculate pp, bpm values, and so on!
+- [rosu-pp's JavaScript bind](https://github.com/MaxOhn/rosu-pp-js) to calculate pp, bpm values, other technical stuff of osu!
 
 Invite the bot to your server using [this link](https://discord.com/api/oauth2/authorize?client_id=995999045157916763&permissions=330752&scope=bot)
 

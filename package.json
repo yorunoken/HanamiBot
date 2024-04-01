@@ -14,7 +14,8 @@
     "@types/bun": "latest",
     "lilybird": "alpha",
     "osu-web.js": "^2.3.0",
-    "rosu-pp": "^0.9.4"
+    "rosu-pp": "^0.9.4",
+    "tasai": "^1.0.0"
   },
   "trustedDependencies": [
     "rosu-pp"
