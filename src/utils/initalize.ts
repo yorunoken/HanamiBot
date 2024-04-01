@@ -172,7 +172,7 @@ export function initializeDatabase(): void {
 
         // Loop through Columns and add/remove them
         for (let idx = 0; idx < columns.length; idx++) {
-            const columnNameType = columns[i];
+            const columnNameType = columns[idx];
             const [columnName] = columnNameType.split(" ");
 
             const columnExists = existingColumns.some((col) => col.name === columnName);
@@ -184,7 +184,7 @@ export function initializeDatabase(): void {
         }
 
         for (let idx = 0; idx < existingColumns.length; idx++) {
-            const column = existingColumns[i];
+            const column = existingColumns[idx];
             const columnName = column.name;
             const columnNotInTables = !columns.some((colType) => colType.startsWith(columnName));
 
