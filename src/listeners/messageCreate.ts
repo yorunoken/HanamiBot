@@ -1,7 +1,7 @@
-import { DEFAULT_PREFIX } from "../utils/constants";
-import { commandAliases, loadLogs, messageCommands } from "../utils/initalize";
-import { getCommand, insertData } from "../utils/database";
 import { prefixesCache } from "./guildCreate";
+import { DEFAULT_PREFIX } from "@utils/constants";
+import { commandAliases, loadLogs, messageCommands } from "@utils/initalize";
+import { getCommand, insertData } from "@utils/database";
 import type { Message } from "@lilybird/transformers";
 import type { Event } from "@lilybird/handlers";
 

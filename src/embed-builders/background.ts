@@ -1,5 +1,5 @@
 import type { EmbedStructure } from "lilybird";
-import type { BackgroundBuilderOptions } from "../types/embedBuilders";
+import type { BackgroundBuilderOptions } from "@type/embedBuilders";
 
 export function backgroundBuilder({ beatmap }: BackgroundBuilderOptions): Array<EmbedStructure> {
     const { beatmapset } = beatmap;

@@ -1,11 +1,11 @@
-import { getScore } from "../cleaners/scores";
-import { SPACE } from "../utils/constants";
-import { getMap } from "../utils/database";
-import { downloadBeatmap } from "../utils/osu";
+import { getScore } from "@cleaners/scores";
+import { SPACE } from "@utils/constants";
+import { getMap } from "@utils/database";
+import { downloadBeatmap } from "@utils/osu";
 import { EmbedType } from "lilybird";
-import type { LeaderboardBuilderOptions } from "../types/embedBuilders";
+import type { LeaderboardBuilderOptions } from "@type/embedBuilders";
 import type { EmbedStructure } from "lilybird";
-import type { Beatmap, LeaderboardScores, Mode, ScoresInfo } from "../types/osu";
+import type { Beatmap, LeaderboardScores, Mode, ScoresInfo } from "@type/osu";
 
 export async function leaderboardBuilder({
     scores,

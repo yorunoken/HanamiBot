@@ -1,6 +1,6 @@
-import { slashCommandsIds } from "../../utils/cache";
+import { slashCommandsIds } from "@utils/cache";
 import type { Message } from "@lilybird/transformers";
-import type { MessageCommand } from "../../types/commands";
+import type { MessageCommand } from "@type/commands";
 
 export default {
     name: "link",

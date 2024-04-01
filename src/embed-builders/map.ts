@@ -1,9 +1,9 @@
-import { client } from "../utils/initalize";
-import { downloadBeatmap, getPerformanceResults } from "../utils/osu";
-import { getMap } from "../utils/database";
-import { rulesets } from "../utils/emotes";
+import { client } from "@utils/initalize";
+import { downloadBeatmap, getPerformanceResults } from "@utils/osu";
+import { getMap } from "@utils/database";
+import { rulesets } from "@utils/emotes";
 import { EmbedType } from "lilybird";
-import type { MapBuilderOptions } from "../types/embedBuilders";
+import type { MapBuilderOptions } from "@type/embedBuilders";
 import type { EmbedStructure } from "lilybird";
 
 export async function mapBuilder({

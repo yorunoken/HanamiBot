@@ -1,11 +1,11 @@
-import { getCommand, insertData } from "../utils/database";
-import { client, applicationCommands, loadLogs } from "../utils/initalize";
-import { mesageDataForButtons } from "../utils/cache";
 import { compareBuilder, leaderboardBuilder, mapBuilder, playBuilder, profileBuilder } from "../embed-builders";
-import { EmbedBuilderType } from "../types/embedBuilders";
-import { calculateButtonState, createActionRow } from "../utils/buttons";
-import { backgroundBuilder } from "../embed-builders/background";
-import { avatarBuilder } from "../embed-builders/avatar";
+import { getCommand, insertData } from "@utils/database";
+import { client, applicationCommands, loadLogs } from "@utils/initalize";
+import { mesageDataForButtons } from "@utils/cache";
+import { EmbedBuilderType } from "@type/embedBuilders";
+import { calculateButtonState, createActionRow } from "@utils/buttons";
+import { backgroundBuilder } from "@builders/background";
+import { avatarBuilder } from "@builders/avatar";
 import type { DMInteraction, Interaction, InteractionReplyOptions, Message, MessageComponentData } from "@lilybird/transformers";
 import type { EmbedStructure } from "lilybird";
 import type { Event } from "@lilybird/handlers";

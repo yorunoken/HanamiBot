@@ -1,13 +1,13 @@
-import { parseOsuArguments } from "../../utils/args";
-import { client } from "../../utils/initalize";
-import { compareBuilder } from "../../embed-builders/compare";
-import { Mode } from "../../types/osu";
-import { UserType } from "../../types/commandArgs";
-import { getBeatmapIdFromContext } from "../../utils/osu";
-import { EmbedBuilderType } from "../../types/embedBuilders";
+import { parseOsuArguments } from "@utils/args";
+import { client } from "@utils/initalize";
+import { compareBuilder } from "@builders/compare";
+import { Mode } from "@type/osu";
+import { UserType } from "@type/commandArgs";
+import { getBeatmapIdFromContext } from "@utils/osu";
+import { EmbedBuilderType } from "@type/embedBuilders";
 import { EmbedType } from "lilybird";
 import type { GuildTextChannel, Message } from "@lilybird/transformers";
-import type { MessageCommand } from "../../types/commands";
+import type { MessageCommand } from "@type/commands";
 
 const modeAliases: Record<string, { mode: Mode }> = {
     შედარება: { mode: Mode.OSU },

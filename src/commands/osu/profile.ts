@@ -1,8 +1,8 @@
-import { getCommandArgs } from "../../utils/args";
-import { profileBuilder } from "../../embed-builders/profile";
-import { client } from "../../utils/initalize";
-import { UserType } from "../../types/commandArgs";
-import { EmbedBuilderType } from "../../types/embedBuilders";
+import { getCommandArgs } from "@utils/args";
+import { profileBuilder } from "@builders/profile";
+import { client } from "@utils/initalize";
+import { UserType } from "@type/commandArgs";
+import { EmbedBuilderType } from "@type/embedBuilders";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
 import type { SlashCommand } from "@lilybird/handlers";

@@ -16,6 +16,14 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
+    "baseUrl": "./src",
+    "paths": {
+        "@type/*": ["types/*"],
+        "@utils/*": ["utils/*"],
+        "@listeners/*": ["listeners/*"],
+        "@builders/*": ["embed-builders/*"],
+        "@cleaners/*": ["cleaners/*"],
+    },
     "types": [
         "bun-types", // add Bun global
         "./globals"

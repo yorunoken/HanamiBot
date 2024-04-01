@@ -1,7 +1,7 @@
-import { getProfile } from "../cleaners/profile";
-import { grades } from "../utils/emotes";
+import { getProfile } from "@cleaners/profile";
+import { grades } from "@utils/emotes";
 import { EmbedType } from "lilybird";
-import type { ProfileBuilderOptions } from "../types/embedBuilders";
+import type { ProfileBuilderOptions } from "@type/embedBuilders";
 import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, EmbedImageStructure, EmbedStructure, EmbedThumbnailStructure } from "lilybird";
 
 export function profileBuilder({ user, mode }: ProfileBuilderOptions): Array<EmbedStructure> {

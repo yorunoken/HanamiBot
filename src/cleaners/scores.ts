@@ -1,6 +1,6 @@
-import { accuracyCalculator, getPerformanceResults, getRetryCount } from "../utils/osu";
-import { grades, rulesets } from "../utils/emotes";
-import type { UserScore, Beatmap, LeaderboardScores, Mode, PlayStatistics, ScoresInfo, Score, UserBestScore } from "../types/osu";
+import { accuracyCalculator, getPerformanceResults, getRetryCount } from "@utils/osu";
+import { grades, rulesets } from "@utils/emotes";
+import type { UserScore, Beatmap, LeaderboardScores, Mode, PlayStatistics, ScoresInfo, Score, UserBestScore } from "@type/osu";
 import type { ISOTimestamp } from "osu-web.js";
 
 // We won't be needing this either!

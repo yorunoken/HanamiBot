@@ -1,5 +1,5 @@
 import db from "../data.db" with { type: "sqlite" };
-import type { DatabaseMap, DatabaseGuild, DatabaseUser, DatabaseCommands } from "../types/database";
+import type { DatabaseMap, DatabaseGuild, DatabaseUser, DatabaseCommands } from "@type/database";
 
 export function getUser(id: string | number): DatabaseUser | null {
     const data: DatabaseUser | null = db.prepare("SELECT * FROM users WHERE id = ?").get(id) as DatabaseUser | null;

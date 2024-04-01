@@ -1,15 +1,15 @@
-import { parseOsuArguments } from "../../utils/args";
-import { client } from "../../utils/initalize";
-import { playBuilder } from "../../embed-builders/plays";
-import { Mode, PlayType } from "../../types/osu";
-import { UserType } from "../../types/commandArgs";
-import { EmbedBuilderType } from "../../types/embedBuilders";
-import { createActionRow, calculateButtonState } from "../../utils/buttons";
-import { mesageDataForButtons } from "../../utils/cache";
+import { parseOsuArguments } from "@utils/args";
+import { client } from "@utils/initalize";
+import { playBuilder } from "@builders/plays";
+import { Mode, PlayType } from "@type/osu";
+import { UserType } from "@type/commandArgs";
+import { EmbedBuilderType } from "@type/embedBuilders";
+import { createActionRow, calculateButtonState } from "@utils/buttons";
+import { mesageDataForButtons } from "@utils/cache";
 import { EmbedType } from "lilybird";
 import type { GuildTextChannel, Message } from "@lilybird/transformers";
-import type { PlaysBuilderOptions } from "../../types/embedBuilders";
-import type { MessageCommand } from "../../types/commands";
+import type { PlaysBuilderOptions } from "@type/embedBuilders";
+import type { MessageCommand } from "@type/commands";
 
 const modeAliases: Record<string, { mode: Mode, includeFails: boolean }> = {
     rl: { mode: Mode.OSU, includeFails: true },

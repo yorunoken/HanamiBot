@@ -5,7 +5,7 @@ import { Client as OsuClient } from "osu-web.js";
 import { readdir } from "fs/promises";
 import { mkdir, access, readFile, writeFile } from "node:fs/promises";
 import type { Client as LilybirdClient, POSTApplicationCommandStructure } from "lilybird";
-import type { DefaultMessageCommand, DefaultSlashCommand } from "../types/commands";
+import type { DefaultMessageCommand, DefaultSlashCommand } from "@type/commands";
 
 const { accessToken } = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
 export const client = new OsuClient(accessToken);

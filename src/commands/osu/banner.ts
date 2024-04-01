@@ -1,8 +1,8 @@
-import { getCommandArgs } from "../../utils/args";
-import { client } from "../../utils/initalize";
-import { UserType } from "../../types/commandArgs";
-import { bannerBuilder } from "../../embed-builders/banner";
-import { EmbedBuilderType } from "../../types/embedBuilders";
+import { bannerBuilder } from "@builders/banner";
+import { getCommandArgs } from "@utils/args";
+import { client } from "@utils/initalize";
+import { UserType } from "@type/commandArgs";
+import { EmbedBuilderType } from "@type/embedBuilders";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
 import type { SlashCommand } from "@lilybird/handlers";

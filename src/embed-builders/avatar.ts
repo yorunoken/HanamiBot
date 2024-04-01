@@ -1,7 +1,7 @@
-import { getProfile } from "../cleaners/profile";
-import { Mode } from "../types/osu";
+import { Mode } from "@type/osu";
+import { getProfile } from "@cleaners/profile";
 import type { EmbedStructure } from "lilybird";
-import type { AvatarBuilderOptions } from "../types/embedBuilders";
+import type { AvatarBuilderOptions } from "@type/embedBuilders";
 
 export function avatarBuilder({ user }: AvatarBuilderOptions): Array<EmbedStructure> {
     const profile = getProfile(user, Mode.OSU);

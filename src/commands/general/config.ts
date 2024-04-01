@@ -1,5 +1,5 @@
-import { getUser, insertData } from "../../utils/database";
-import { ScoreEmbed } from "../../types/database";
+import { getUser, insertData } from "@utils/database";
+import { ScoreEmbed } from "@type/database";
 import { ApplicationCommandOptionType } from "lilybird";
 import type { ApplicationCommandData, GuildInteraction, Interaction } from "@lilybird/transformers";
 import type { EmbedStructure } from "lilybird";

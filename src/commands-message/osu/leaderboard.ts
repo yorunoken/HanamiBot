@@ -1,16 +1,16 @@
-import { parseOsuArguments } from "../../utils/args";
-import { Mode } from "../../types/osu";
-import { getBeatmapIdFromContext, getBeatmapTopScores } from "../../utils/osu";
-import { leaderboardBuilder } from "../../embed-builders/leaderboard";
-import { EmbedBuilderType } from "../../types/embedBuilders";
-import { mesageDataForButtons } from "../../utils/cache";
-import { client } from "../../utils/initalize";
-import { calculateButtonState, createActionRow } from "../../utils/buttons";
+import { parseOsuArguments } from "@utils/args";
+import { Mode } from "@type/osu";
+import { getBeatmapIdFromContext, getBeatmapTopScores } from "@utils/osu";
+import { leaderboardBuilder } from "@builders/leaderboard";
+import { EmbedBuilderType } from "@type/embedBuilders";
+import { mesageDataForButtons } from "@utils/cache";
+import { client } from "@utils/initalize";
+import { calculateButtonState, createActionRow } from "@utils/buttons";
 import { EmbedType } from "lilybird";
 import type { Mod } from "osu-web.js";
-import type { LeaderboardBuilderOptions } from "../../types/embedBuilders";
+import type { LeaderboardBuilderOptions } from "@type/embedBuilders";
 import type { GuildTextChannel, Message } from "@lilybird/transformers";
-import type { MessageCommand } from "../../types/commands";
+import type { MessageCommand } from "@type/commands";
 
 const modeAliases: Record<string, { isGlobal: boolean }> = {
     leaderboard: { isGlobal: true },

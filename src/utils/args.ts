@@ -1,9 +1,9 @@
-import { Mode } from "../types/osu";
-import { UserType } from "../types/commandArgs";
+import { Mode } from "@type/osu";
+import { UserType } from "@type/commandArgs";
 import { getUser } from "./database";
 import { slashCommandsIds } from "./cache";
 import { ModsEnum } from "osu-web.js";
-import type { CommandArgs, Mods, ParsedArgs, User } from "../types/commandArgs";
+import type { CommandArgs, Mods, ParsedArgs, User } from "@type/commandArgs";
 import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, Interaction, Message } from "@lilybird/transformers";
 

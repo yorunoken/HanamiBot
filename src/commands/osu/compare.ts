@@ -1,9 +1,9 @@
-import { getCommandArgs } from "../../utils/args";
-import { client } from "../../utils/initalize";
-import { UserType } from "../../types/commandArgs";
-import { compareBuilder } from "../../embed-builders/compare";
-import { getBeatmapIdFromContext } from "../../utils/osu";
-import { EmbedBuilderType } from "../../types/embedBuilders";
+import { getCommandArgs } from "@utils/args";
+import { client } from "@utils/initalize";
+import { UserType } from "@type/commandArgs";
+import { compareBuilder } from "@builders/compare";
+import { getBeatmapIdFromContext } from "@utils/osu";
+import { EmbedBuilderType } from "@type/embedBuilders";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
 import type { SlashCommand } from "@lilybird/handlers";

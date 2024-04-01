@@ -1,12 +1,12 @@
-import { parseOsuArguments } from "../../utils/args";
-import { mapBuilder } from "../../embed-builders/map";
-import { getBeatmapIdFromContext } from "../../utils/osu";
-import { Mode } from "../../types/osu";
-import { EmbedBuilderType } from "../../types/embedBuilders";
+import { parseOsuArguments } from "@utils/args";
+import { mapBuilder } from "@builders/map";
+import { getBeatmapIdFromContext } from "@utils/osu";
+import { Mode } from "@type/osu";
+import { EmbedBuilderType } from "@type/embedBuilders";
 import { EmbedType } from "lilybird";
 import type { Mod } from "osu-web.js";
 import type { GuildTextChannel, Message } from "@lilybird/transformers";
-import type { MessageCommand } from "../../types/commands";
+import type { MessageCommand } from "@type/commands";
 
 export default {
     name: "beatmap",

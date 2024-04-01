@@ -1,12 +1,12 @@
-import { parseOsuArguments } from "../../utils/args";
-import { profileBuilder } from "../../embed-builders/profile";
-import { client } from "../../utils/initalize";
-import { UserType } from "../../types/commandArgs";
-import { EmbedBuilderType } from "../../types/embedBuilders";
-import { Mode } from "../../types/osu";
+import { parseOsuArguments } from "@utils/args";
+import { profileBuilder } from "@builders/profile";
+import { client } from "@utils/initalize";
+import { UserType } from "@type/commandArgs";
+import { EmbedBuilderType } from "@type/embedBuilders";
+import { Mode } from "@type/osu";
 import { EmbedType } from "lilybird";
 import type { GuildTextChannel, Message } from "@lilybird/transformers";
-import type { MessageCommand } from "../../types/commands";
+import type { MessageCommand } from "@type/commands";
 
 export default {
     name: "profile",

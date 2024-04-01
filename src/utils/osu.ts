@@ -1,13 +1,13 @@
 /* eslint-disable @stylistic/no-mixed-operators */
-import { Mode } from "../types/osu";
+import { Mode } from "@type/osu";
 import { getMap, insertData } from "./database";
 import { Beatmap, Calculator } from "rosu-pp";
 import { ModsEnum } from "osu-web.js";
 import { ChannelType } from "lilybird";
 import https from "https";
 import type { Message } from "@lilybird/transformers";
-import type { Mod } from "../types/mods";
-import type { UserScore, UserBestScore, AccessTokenJSON, AuthScope, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo, Score } from "../types/osu";
+import type { Mod } from "@type/mods";
+import type { UserScore, UserBestScore, AccessTokenJSON, AuthScope, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo, Score } from "@type/osu";
 import type { Client, EmbedStructure } from "lilybird";
 import type { GameMode, Mod as ModOsuWeb } from "osu-web.js";
 import type { Score as ScoreData } from "rosu-pp";

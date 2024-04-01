@@ -1,5 +1,5 @@
 import type { UserExtended } from "osu-web.js";
-import type { Mode, ProfileInfo } from "../types/osu";
+import type { Mode, ProfileInfo } from "@type/osu";
 
 export function getProfile(user: UserExtended, mode: Mode): ProfileInfo {
     const { statistics } = user;

@@ -1,12 +1,12 @@
-import { getProfile } from "../cleaners/profile";
-import { getScore } from "../cleaners/scores";
-import { SPACE } from "../utils/constants";
-import { getMap } from "../utils/database";
-import { downloadBeatmap } from "../utils/osu";
+import { getProfile } from "@cleaners/profile";
+import { getScore } from "@cleaners/scores";
+import { SPACE } from "@utils/constants";
+import { getMap } from "@utils/database";
+import { downloadBeatmap } from "@utils/osu";
 import { EmbedType } from "lilybird";
-import type { CompareBuilderOptions } from "../types/embedBuilders";
+import type { CompareBuilderOptions } from "@type/embedBuilders";
 import type { EmbedStructure } from "lilybird";
-import type { Beatmap, Mode, ProfileInfo, ScoresInfo, Score } from "../types/osu";
+import type { Beatmap, Mode, ProfileInfo, ScoresInfo, Score } from "@type/osu";
 
 export async function compareBuilder({
     beatmap,

@@ -1,10 +1,10 @@
-import { getProfile } from "../cleaners/profile";
-import { getScore } from "../cleaners/scores";
-import { SPACE } from "../utils/constants";
-import { getUser } from "../utils/database";
+import { getProfile } from "@cleaners/profile";
+import { getScore } from "@cleaners/scores";
+import { SPACE } from "@utils/constants";
+import { getUser } from "@utils/database";
 import { EmbedType } from "lilybird";
-import type { UserScore, Mode, ProfileInfo, ScoresInfo, UserBestScore } from "../types/osu";
-import type { PlaysBuilderOptions } from "../types/embedBuilders";
+import type { UserScore, Mode, ProfileInfo, ScoresInfo, UserBestScore } from "@type/osu";
+import type { PlaysBuilderOptions } from "@type/embedBuilders";
 import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, EmbedImageStructure, EmbedStructure, EmbedThumbnailStructure } from "lilybird";
 
 export async function playBuilder({

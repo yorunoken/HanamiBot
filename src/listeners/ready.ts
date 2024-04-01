@@ -1,4 +1,4 @@
-import { loadApplicationCommands, loadLogs, loadMessageCommands } from "../utils/initalize";
+import { loadApplicationCommands, loadLogs, loadMessageCommands } from "@utils/initalize";
 import type { Event } from "@lilybird/handlers";
 
 export default {
