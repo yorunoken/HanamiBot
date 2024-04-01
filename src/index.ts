@@ -26,7 +26,7 @@ setInterval(async () => {
 const keyString = process.env.KEY ?? randomBytes(32);
 const ivString = process.env.IV ?? randomBytes(16);
 
-if (typeof keyString !== "undefined" || typeof ivString !== "undefined")
+if (typeof process.env.KEY === "undefined" || typeof process.env.IV === "undefined")
     console.log(c.yellow("WARNING: you are going to be using random KEY and IV. This means you won't be able to sync your encryption/decryption with your linking website."));
 
 const key = typeof keyString === "string" ? Buffer.from(keyString.split(",").map(Number)) : keyString;
