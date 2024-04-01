@@ -11,8 +11,8 @@
   "dependencies": {
     "@lilybird/handlers": "alpha",
     "@lilybird/transformers": "alpha",
-    "@types/bun": "^1.0.8",
-    "lilybird": "v0.6.0-alpha.10",
+    "@types/bun": "latest",
+    "lilybird": "alpha",
     "osu-web.js": "^2.3.0",
     "rosu-pp": "^0.9.4"
   },
