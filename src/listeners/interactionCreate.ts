@@ -12,35 +12,44 @@ import type { Event } from "@lilybird/handlers";
 
 export default {
     event: "interactionCreate",
-    run: async (interaction) => {
-        await handleButton(interaction);
-        if (interaction.isApplicationCommandInteraction() && interaction.inGuild()) {
-            const server = await interaction.client.rest.getGuild(interaction.guildId);
-            const { username } = interaction.member.user;
+    run
+} satisfies Event<"interactionCreate">;
 
-            const commandDefault = applicationCommands.get(interaction.data.name);
-            if (!commandDefault) return;
-            const { default: command } = commandDefault;
+async function run(interaction: Interaction): Promise<void> {
+    await handleButton(interaction);
+    if (interaction.isApplicationCommandInteraction() && interaction.inGuild()) {
+        const server = await interaction.client.rest.getGuild(interaction.guildId);
+        const { username } = interaction.member.user;
 
-            command.run(interaction).then(async () => {
-                await loadLogs(`INFO: [${server.name}] ${username} used slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}`);
+        const commandDefault = applicationCommands.get(interaction.data.name);
+        if (!commandDefault) return;
+        const { default: command } = commandDefault;
 
-                const docs = getCommand(interaction.data.name);
-                if (docs)
-                    insertData({ table: "commands", data: [ { name: "count", value: docs.count + 1 } ], id: interaction.data.name });
-            }).catch(async (error: Error) => {
-                console.log(error);
-                await loadLogs(
-                    `ERROR: [${server.name}] ${username} had an error in slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}: ${error.stack}`,
-                    true
-                );
-                const docs = getCommand(interaction.data.name);
-                if (docs)
-                    insertData({ table: "commands", data: [ { name: "count", value: docs.count + 1 } ], id: docs.id });
-            });
+        try {
+            await command.run(interaction);
+            await loadLogs(`INFO: [${server.name}] ${username} used slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}`);
+
+            const docs = getCommand(interaction.data.name);
+            if (docs === null)
+                insertData({ table: "commands_slash", data: [ { name: "count", value: 1 } ], id: command.data.name });
+            else
+                insertData({ table: "commands_slash", data: [ { name: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
+        } catch (error) {
+            const err = error as Error;
+            console.log(error);
+            await loadLogs(
+                `ERROR: [${server.name}] ${username} had an error in slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}: ${err.stack}`,
+                true
+            );
+
+            const docs = getCommand(interaction.data.name);
+            if (docs === null)
+                insertData({ table: "commands_slash", data: [ { name: "count", value: 1 } ], id: command.data.name });
+            else
+                insertData({ table: "commands_slash", data: [ { name: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
         }
     }
-} satisfies Event<"interactionCreate">;
+}
 
 async function handleButton(interaction: Interaction): Promise<void> {
     if (!interaction.isMessageComponentInteraction() || !interaction.data.isButton()) return;

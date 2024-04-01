@@ -17,7 +17,7 @@ export interface DatabaseMap {
 
 export interface DatabaseCommands {
     id: string;
-    count: string;
+    count: string | null;
 }
 
 export enum ScoreEmbed {
