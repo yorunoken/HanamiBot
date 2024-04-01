@@ -25,10 +25,19 @@ export async function mapBuilder({
     const { beatmapset: mapset, mode, version } = map;
 
     const mapData = getMap(beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
-    const performances = await Promise.all([98, 97, 95].map(async (accuracy) => getPerformanceResults({ beatmapId, setId: map.mode_int, mapData, accuracy, mods: mods ?? 0 })));
+
+    const performancesAsync = [];
+    const accuracyList = [98, 97, 95];
+    for (let i = 0; i < accuracyList.length; i++) {
+        const accuracy = accuracyList[i];
+        const performance = getPerformanceResults({ beatmapId, setId: map.mode_int, mapData, accuracy, mods: mods ?? 0 });
+        performancesAsync.push(performance);
+    }
+    const performances = await Promise.all(performancesAsync);
+
     const [a98, a97, a95] = performances;
 
-    const drainLengthInSeconds = map.total_length / (a98?.mapValues.clockRate ?? 1);
+    const drainLengthInSeconds = map.total_length / (a98.mapValues.clockRate ?? 1);
     const drainMinutes = Math.floor(drainLengthInSeconds / 60);
     const drainSeconds = Math.ceil(drainLengthInSeconds % 60);
 
@@ -36,18 +45,18 @@ export async function mapBuilder({
 
     const infoField = [
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        `**Stars:** **\`${a98?.currentPerformance.difficulty.stars.toFixed(2)}\`** **Mods:** \`+${mods ?? "NM"}\` **BPM:** \`${a98?.mapValues.bpm.toFixed(0)}\``,
-        `**Length:** \`${drainMinutes}:${drainSeconds}\` **Max Combo:** \`${a98?.currentPerformance.difficulty.maxCombo}\` **Objects:** \`${objects.toLocaleString()}\``,
-        `**AR:** \`${a98?.mapValues.ar.toFixed(1)}\` **OD:** \`${a98?.mapValues.od.toFixed(1)}\` **CS:** \`${a98?.mapValues.cs.toFixed(1)}\` **HP:** \`${a98?.mapValues.hp.toFixed(1)}\``,
+        `**Stars:** **\`${a98.currentPerformance.difficulty.stars.toFixed(2)}\`** **Mods:** \`+${mods ?? "NM"}\` **BPM:** \`${a98.mapValues.bpm.toFixed(0)}\``,
+        `**Length:** \`${drainMinutes}:${drainSeconds}\` **Max Combo:** \`${a98.currentPerformance.difficulty.maxCombo}\` **Objects:** \`${objects.toLocaleString()}\``,
+        `**AR:** \`${a98.mapValues.ar.toFixed(1)}\` **OD:** \`${a98.mapValues.od.toFixed(1)}\` **CS:** \`${a98.mapValues.cs.toFixed(1)}\` **HP:** \`${a98.mapValues.hp.toFixed(1)}\``,
         `\n:heart: **${mapset.favourite_count.toLocaleString()}** :play_pause: **${mapset.play_count.toLocaleString()}**`
     ];
 
     const ppField = [
         "```Acc  |  PP",
-        `100% ${a98?.perfectPerformance.pp.toFixed(2)}`,
-        `98%  ${a98?.currentPerformance.pp.toFixed(2)}`,
-        `97%  ${a97?.currentPerformance.pp.toFixed(2)}`,
-        `95%  ${a95?.currentPerformance.pp.toFixed(2)}\`\`\``
+        `100% ${a98.perfectPerformance.pp.toFixed(2)}`,
+        `98%  ${a98.currentPerformance.pp.toFixed(2)}`,
+        `97%  ${a97.currentPerformance.pp.toFixed(2)}`,
+        `95%  ${a95.currentPerformance.pp.toFixed(2)}\`\`\``
     ];
 
     const linksField = [

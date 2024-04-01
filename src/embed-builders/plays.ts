@@ -28,19 +28,25 @@ export async function playBuilder({
 
     if (mods?.name) {
         const { exclude, forceInclude, include, name } = mods;
-        plays = plays.filter((play) => {
+        const filteredPlays = [];
+        for (let i = 0; i < plays.length; i++) {
+            const play = plays[i];
             const modsStr = play.mods.join("").toUpperCase() || "NM";
 
-            if (exclude)
-                return !modsStr.includes(name.toUpperCase());
-            else if (forceInclude)
-                return modsStr === name.toUpperCase();
-            else if (include)
-                return modsStr.includes(name.toUpperCase());
+            if (exclude) {
+                if (!modsStr.includes(name.toUpperCase()))
+                    filteredPlays.push(play);
+            } else if (forceInclude) {
+                if (modsStr === name.toUpperCase())
+                    filteredPlays.push(play);
+            } else if (include) {
+                if (modsStr.includes(name.toUpperCase()))
+                    filteredPlays.push(play);
+            } else
+                filteredPlays.push(play);
+        }
 
-            // If none of the conditions match, return normal plays array
-            return true;
-        });
+        plays = filteredPlays;
     }
 
     if (sortByDate)
