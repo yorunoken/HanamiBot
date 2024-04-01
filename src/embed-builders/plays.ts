@@ -134,6 +134,18 @@ async function getMultiplePlays({ plays, page, mode, profile }:
     const playsTemp: Array<Promise<ScoresInfo>> = [];
     for (let i = pageStart; pageEnd > i && i < plays.length; i++) playsTemp.push(getScore({ scores: plays, index: i, mode }));
 
+    let description = "";
+    // Create an array of promises to await
+    const playResults = await Promise.all(playsTemp);
+    for (let i = 0; i < playResults.length; i++) {
+        const play = playResults[i];
+        const line1 = `**#${play.position} [${play.songName} [${play.difficultyName}]](${play.mapLink}) +${play.mods.join("")} ${play.stars}**\n`;
+        const line2 = `${play.grade} ${play.ppFormatted} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%**\n`;
+        const line3 = `${play.hitValues} ${SPACE} ${play.comboValues} ${SPACE} ${play.playSubmitted}`;
+
+        description += `${line1 + line2 + line3}\n`;
+    }
+
     const embed: EmbedStructure = {
         type: EmbedType.Rich,
         author: {
@@ -142,15 +154,7 @@ async function getMultiplePlays({ plays, page, mode, profile }:
             icon_url: profile.flagUrl
         },
         thumbnail: { url: profile.avatarUrl },
-        description: (await Promise.all(playsTemp))
-            .map((play) => {
-                const line1 = `**#${play.position} [${play.songName} [${play.difficultyName}]](${play.mapLink}) +${play.mods.join("")} ${play.stars}**\n`;
-                const line2 = `${play.grade} ${play.ppFormatted} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%**\n`;
-                const line3 = `${play.hitValues} ${SPACE} ${play.comboValues} ${SPACE} ${play.playSubmitted}`;
-
-                return line1 + line2 + line3;
-            })
-            .join("\n"),
+        description,
         footer: { text: `Page ${page + 1} of ${Math.ceil(plays.length / 5)}` }
     };
 

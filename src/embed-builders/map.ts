@@ -36,8 +36,16 @@ export async function mapBuilder({
     const performances = await Promise.all(performancesAsync);
 
     const [a98, a97, a95] = performances;
+    if (a98 === null || a97 === null || a95 === null) {
+        return [
+            {
+                title: "ERROR",
+                description: "Oops, sorry about that, it seems there was an error. Maybe try again?\n\nPERFORMANCES IS NULL"
+            }
+        ];
+    }
 
-    const drainLengthInSeconds = map.total_length / (a98.mapValues.clockRate ?? 1);
+    const drainLengthInSeconds = map.total_length / a98.mapValues.clockRate;
     const drainMinutes = Math.floor(drainLengthInSeconds / 60);
     const drainSeconds = Math.ceil(drainLengthInSeconds % 60);
 
