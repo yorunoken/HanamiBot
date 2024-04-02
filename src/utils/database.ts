@@ -23,7 +23,7 @@ export function getMap(id: string | number): DatabaseMap | null {
     return db.prepare("SELECT * FROM maps WHERE id = ?").get(id) as DatabaseMap;
 }
 
-export function getCommand(id: string | number): DatabaseCommands | null  {
+export function getCommand(id: string | number): DatabaseCommands | null {
     return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DatabaseCommands;
 }
 

@@ -23,8 +23,8 @@
   "devDependencies": {
     "@stylistic/eslint-plugin": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
+    "eslint": "latest",
     "eslint-import-resolver-typescript": "latest",
-    "eslint-plugin-import": "latest",
-    "eslint": "latest"
+    "eslint-plugin-import": "latest"
   }
 }

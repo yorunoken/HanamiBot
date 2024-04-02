@@ -123,8 +123,8 @@ async function remove({ prefix, interaction, guildId }: { prefix?: string, inter
     }
 
     const newPrefixes = prefixes.filter((item) => item !== prefix);
-    insertData({ table: "servers", id: guildId, data: [ { name: "prefixes", value: JSON.stringify(newPrefixes) } ] });
-    prefixesCache.set(guildId, newPrefixes);
+    insertData({ table: "servers", id: guildId, data: [ { name: "prefixes", value: newPrefixes.length > 0 ? JSON.stringify(newPrefixes) : null } ] });
+    prefixesCache.set(guildId, newPrefixes.length > 0 ? newPrefixes : DEFAULT_PREFIX);
 
     let message = `**The prefix \`${prefix}\` has been removed from the list.**`;
     if (newPrefixes.length === 0)
