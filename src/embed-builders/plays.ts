@@ -2,7 +2,9 @@ import { getProfile } from "@cleaners/profile";
 import { getScore } from "@cleaners/scores";
 import { SPACE } from "@utils/constants";
 import { getUser } from "@utils/database";
+import { EmbedScoreType } from "@type/database";
 import { EmbedType } from "lilybird";
+import type { DatabaseUser } from "@type/database";
 import type { UserScore, Mode, ProfileInfo, ScoresInfo, UserBestScore } from "@type/osu";
 import type { PlaysBuilderOptions } from "@type/embedBuilders";
 import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, EmbedImageStructure, EmbedStructure, EmbedThumbnailStructure } from "lilybird";
@@ -62,63 +64,99 @@ export async function playBuilder({
         ] satisfies Array<EmbedStructure>;
     }
 
-    return typeof page !== "undefined" ? getMultiplePlays({ plays, page, mode, profile }) : getSinglePlay({ mode, index: index ?? 0, plays, profile, initiatorId, isMultiple });
+    const userDb = getUser(initiatorId);
+
+    return typeof page !== "undefined" ? getMultiplePlays({ plays, page, mode, profile, userDb }) : getSinglePlay({ mode, index: index ?? 0, plays, profile, userDb, isMultiple });
 }
 
-async function getSinglePlay({ mode, index, plays, profile, initiatorId, isMultiple }:
+async function getSinglePlay({ mode, index, plays, profile, userDb, isMultiple }:
 {
     plays: Array<UserBestScore> | Array<UserScore>,
     mode: Mode,
     profile: ProfileInfo,
     index: number,
-    initiatorId: string,
+    userDb: DatabaseUser | null,
     isMultiple?: boolean
 }): Promise<Array<EmbedStructure>> {
-    const maximized = getUser(initiatorId)?.score_embeds ?? 1;
+    const isMaximized = userDb?.score_embeds ?? 1;
+    const embedType = userDb?.embed_type ?? EmbedScoreType.Hanami;
 
     const play = await getScore({ scores: plays, index, mode });
     const { mapValues } = play.performance;
 
-    const author = {
-        name: `${profile.username} ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}#${profile.countryRank})`,
-        url: profile.userUrl,
-        icon_url: profile.avatarUrl
-    } satisfies EmbedAuthorStructure;
+    if (embedType === EmbedScoreType.Hanami) {
+        const author = {
+            name: `${profile.username} ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}#${profile.countryRank})`,
+            url: profile.userUrl,
+            icon_url: profile.avatarUrl
+        } satisfies EmbedAuthorStructure;
 
-    const line1 = `${play.grade} ${play.percentagePassed !== null ? `**@${play.percentagePassed}%**` : ""} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%** ${SPACE} ${play.playSubmitted}\n`;
-    const line2 = `${play.ppFormatted} ${SPACE} ${play.comboValues} ${SPACE} ${play.hitValues}\n`;
-    const line3 = `${play.ifFcValues ?? ""}\n`;
+        const line1 = `${play.grade} ${play.percentagePassed !== null ? `**@${play.percentagePassed}%**` : ""} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%** ${SPACE} ${play.playSubmitted}\n`;
+        const line2 = `${play.ppFormatted} ${SPACE} ${play.comboValues} ${SPACE} ${play.hitValues}\n`;
+        const line3 = `${play.ifFcValues ?? ""}\n`;
 
-    const fields = [
-        {
-            name: `${play.rulesetEmote} ${play.difficultyName} **+${play.mods.join("")}** [${play.stars}] ${isMultiple ? `${SPACE} Top **__#${play.position}__** of ${plays.length}` : ""}`,
-            value: line1 + line2,
-            inline: false
+        const fields = [
+            {
+                name: `${play.rulesetEmote} ${play.difficultyName} **+${play.mods.join("")}** [${play.stars}] ${isMultiple ? `${SPACE} Top **__#${play.position}__** of ${plays.length}` : ""}`,
+                value: line1 + line2,
+                inline: false
+            }
+        ] satisfies Array<EmbedFieldStructure>;
+
+        if (isMaximized === 1) {
+            fields[0].value += line3;
+            const beatmapInfoField = [
+                `**BPM:** \`${mapValues.bpm.toFixed().toLocaleString()}\` ${SPACE} **Length:** \`${play.drainLength}\``,
+                `**AR:** \`${mapValues.ar.toFixed(1)}\` ${SPACE} **OD:** \`${mapValues.od.toFixed(1)}\` ${SPACE} **CS:** \`${mapValues.cs.toFixed(1)}\` ${SPACE} **HP:** \`${mapValues.hp.toFixed(1)}\``
+            ];
+            fields.push({
+                name: "Beatmap Info:",
+                value: beatmapInfoField.join("\n"),
+                inline: false
+            });
         }
-    ] satisfies Array<EmbedFieldStructure>;
 
-    if (maximized === 1) {
-        fields[0].value += line3;
-        const beatmapInfoField = [
-            `**BPM:** \`${mapValues.bpm.toFixed().toLocaleString()}\` ${SPACE} **Length:** \`${play.drainLength}\``,
-            `**AR:** \`${mapValues.ar.toFixed(1)}\` ${SPACE} **OD:** \`${mapValues.od.toFixed(1)}\` ${SPACE} **CS:** \`${mapValues.cs.toFixed(1)}\` ${SPACE} **HP:** \`${mapValues.hp.toFixed(1)}\``
-        ];
-        fields.push({
-            name: "Beatmap Info:",
-            value: beatmapInfoField.join("\n"),
-            inline: false
-        });
+        const image = isMaximized === 1 ? { url: play.coverLink } satisfies EmbedImageStructure : undefined;
+        const thumbnail = isMaximized === 0 ? { url: play.listLink } satisfies EmbedThumbnailStructure : undefined;
+        const title = play.songTitle;
+        const url = play.mapLink;
+        const footer: EmbedFooterStructure = {
+            text: `${play.mapStatus} mapset by ${play.mapAuthor}${isMaximized === 1 && !isMultiple ? ` ${SPACE} - Play ${index + 1} of ${plays.length} ${SPACE} - Try ${play.retries}` : ""}`
+        };
+
+        return [ { type: EmbedType.Rich, author, fields, image, thumbnail, footer, url, title } ];
     }
 
-    const image = maximized === 1 ? { url: play.coverLink } satisfies EmbedImageStructure : undefined;
-    const thumbnail = maximized === 0 ? { url: play.listLink } satisfies EmbedThumbnailStructure : undefined;
-    const title = play.songTitle;
-    const url = play.mapLink;
-    const footer: EmbedFooterStructure = {
-        text: `${play.mapStatus} mapset by ${play.mapAuthor}${maximized === 1 && !isMultiple ? ` ${SPACE} - Play ${index + 1} of ${plays.length} ${SPACE} - Try ${play.retries}` : ""}`
-    };
+    if (embedType === EmbedScoreType.Bathbot) {
+        const beatmapInfoField = [
+            `**Length:** \`${play.drainLength}\` ${SPACE} **BPM:** \`${mapValues.bpm.toFixed().toLocaleString()}\` ${SPACE} **Objects** \`${mapValues.nObjects}\``,
+            `**AR:** \`${mapValues.ar.toFixed(1)}\` ${SPACE} **OD:** \`${mapValues.od
+                .toFixed(1)}\` ${SPACE} **CS:** \`${mapValues.cs.toFixed(1)}\` ${SPACE} **HP:** \`${mapValues.hp.toFixed(1)}\` **Stars:** ${play.stars}`
+        ];
 
-    return [ { type: EmbedType.Rich, author, fields, image, thumbnail, footer, url, title } ] satisfies Array<EmbedStructure>;
+        return [
+            {
+                type: EmbedType.Rich,
+                author: {
+                    name: `${profile.username} ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}${profile.countryRank})`,
+                    url: profile.userUrl,
+                    icon_url: profile.flagUrl
+                },
+                title: `${play.songTitle} [${play.difficultyName}]`,
+                url: play.mapLink,
+                image: { url: play.coverLink },
+                fields: [
+                    { name: "Grade", value: `${play.grade} @${play.percentagePassed}%`, inline: true },
+                    { name: "Score", value: play.score, inline: true },
+                    { name: "Acc", value: `${play.accuracy}%`, inline: true },
+                    { name: "PP", value: `${play.ppFormatted}`, inline: true },
+                    { name: "Combo", value: `${play.comboValues}`, inline: true },
+                    { name: "Hits", value: `${play.hitValues}`, inline: true },
+                    { name: "Map Info", value: beatmapInfoField.join("\n"), inline: false }
+                ]
+            }
+        ];
+    }
 }
 
 async function getMultiplePlays({ plays, page, mode, profile }:
@@ -126,7 +164,8 @@ async function getMultiplePlays({ plays, page, mode, profile }:
     plays: Array<UserBestScore> | Array<UserScore>,
     page: number,
     mode: Mode,
-    profile: ProfileInfo
+    profile: ProfileInfo,
+    userDb: DatabaseUser | null
 }): Promise<Array<EmbedStructure>> {
     const pageStart = page * 5;
     const pageEnd = pageStart + 5;
