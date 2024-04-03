@@ -45,7 +45,7 @@ export async function mapBuilder({
         ];
     }
 
-    const drainLengthInSeconds = map.total_length / a98.mapValues.clockRate;
+    const drainLengthInSeconds = map.total_length / a98.difficultyAttrs.clockRate;
     const drainMinutes = Math.floor(drainLengthInSeconds / 60);
     const drainSeconds = Math.ceil(drainLengthInSeconds % 60);
 

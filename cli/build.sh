@@ -1,1 +1,1 @@
-rm -rf node_modules && rm -rf package-lock.json && npm install -D && bun check
+rm -rf node_modules && rm -rf package-lock.json && bun install -D && bun check

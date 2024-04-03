@@ -1,7 +1,7 @@
 /* eslint-disable @stylistic/no-mixed-operators */
 import { getMap, insertData } from "./database";
 import { Mode } from "@type/osu";
-import { Beatmap, Calculator } from "rosu-pp";
+import { Beatmap, BeatmapAttributesBuilder, Performance } from "rosu-pp-js";
 import { ModsEnum } from "osu-web.js";
 import { ChannelType } from "lilybird";
 import https from "https";
@@ -10,7 +10,6 @@ import type { Mod } from "@type/mods";
 import type { UserScore, UserBestScore, AccessTokenJSON, AuthScope, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo, Score } from "@type/osu";
 import type { Client, EmbedStructure } from "lilybird";
 import type { GameMode, Mod as ModOsuWeb } from "osu-web.js";
-import type { Score as ScoreData } from "rosu-pp";
 
 /**
  * Build OAuth authorization URL for osu! using the provided parameters.
@@ -195,61 +194,43 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
         modsStringArray = mods;
     }
 
-    const calculatorData: ScoreData = {
-        mode: rulesetId,
-        mods: modsInt,
-        clockRate
-    };
+    const beatmap = new Beatmap(mapData);
+    beatmap.convert(rulesetId);
 
-    const beatmap = new Beatmap({ content: mapData });
-    const calculator = new Calculator(calculatorData);
+    const difficultyAttrs = new BeatmapAttributesBuilder({ map: beatmap }).build();
 
-    const mapValues = calculator.mapAttributes(beatmap);
-    const perfectPerformance = calculator.performance(beatmap);
+    const maxAttrs = new Performance({ mods: modsInt }).calculate(beatmap);
 
     let {
-        count_100: count100,
-        count_300: count300,
-        count_50: count50,
-        count_geki: countGeki,
-        count_katu: countKatu,
-        count_miss: countMiss
+        count_100: n100,
+        count_300: n300,
+        count_50: n50,
+        count_geki: nGeki,
+        count_katu: nKatu,
+        count_miss: misses
     } = hitValues ?? {};
-    count100 ??= 0;
-    count300 ??= 0;
-    count50 ??= 0;
-    countGeki ??= 0;
-    countKatu ??= 0;
-    countMiss ??= 0;
+    n100 ??= 0;
+    n300 ??= 0;
+    n50 ??= 0;
+    nGeki ??= 0;
+    nKatu ??= 0;
+    misses ??= 0;
 
-    countGeki = [2, 3].includes(rulesetId) ? countGeki : 0;
-    countKatu = [2, 3].includes(rulesetId) ? countKatu : 0;
+    nGeki = [2, 3].includes(rulesetId) ? nGeki : 0;
+    nKatu = [2, 3].includes(rulesetId) ? nKatu : 0;
 
-    const currentPerformance = (typeof accuracy === "undefined"
-        ? calculator
-            .n300(count300)
-            .n100(count100)
-            .n50(count50)
-            .nGeki(countGeki)
-            .nKatu(countKatu)
-        : calculator.acc(accuracy))
-        .nMisses(countMiss)
-        .combo(maxCombo ?? perfectPerformance.difficulty.maxCombo)
-        .performance(beatmap);
+    const currAttrs = new Performance({ mods: modsInt, n100, n300, n50, nGeki, nKatu, misses, accuracy, combo: maxCombo ?? maxAttrs.difficulty.maxCombo }).calculate(maxAttrs);
+    const fcAttrs = new Performance({ mods: modsInt, n100, n300: n300 + misses, n50, nGeki, nKatu, misses: 0, accuracy, combo: maxAttrs.difficulty.maxCombo }).calculate(maxAttrs);
 
-    const fcPerformance = (!accuracy
-        ? calculator
-            .n300(count300)
-            .n100(count100)
-            .n50(count50)
-            .nGeki(countGeki)
-            .nKatu(countKatu)
-        : calculator.acc(accuracy))
-        .nMisses(0)
-        .combo(perfectPerformance.difficulty.maxCombo)
-        .performance(beatmap);
-
-    return { mapValues, perfectPerformance, currentPerformance, fcPerformance, mapId: beatmapId, mods: modsStringArray.length > 0 ? modsStringArray : ["NM"] };
+    return {
+        mapValues: beatmap,
+        difficultyAttrs,
+        perfectPerformance: maxAttrs,
+        currentPerformance: fcAttrs,
+        fcPerformance: currAttrs,
+        mapId: beatmapId,
+        mods: modsStringArray.length > 0 ? modsStringArray : ["NM"]
+    };
 }
 
 export async function downloadBeatmap(id: string | number, timeoutMs = 6000): Promise<{

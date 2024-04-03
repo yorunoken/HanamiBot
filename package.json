@@ -7,19 +7,16 @@
     "check": "tsc && eslint",
     "start": "bun src/index.ts",
     "build": "sh ./cli/build.sh"
-  }, 
+  },
   "dependencies": {
     "@lilybird/handlers": "alpha",
     "@lilybird/transformers": "alpha",
     "@types/bun": "latest",
     "lilybird": "alpha",
     "osu-web.js": "^2.4.0",
-    "rosu-pp": "^0.9.4",
+    "rosu-pp-js": "^1.0.0",
     "tasai": "^1.0.0"
   },
-  "trustedDependencies": [
-    "rosu-pp"
-  ],
   "devDependencies": {
     "@stylistic/eslint-plugin": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
