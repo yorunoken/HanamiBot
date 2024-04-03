@@ -24,6 +24,13 @@ export default {
                 description: "Specify an osu! mode (none defaults to osu)",
                 choices: [ { name: "None", value: "osu" }, { name: "osu", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "ctb", value: "fruits" } ],
                 required: false
+            },
+            {
+                type: ApplicationCommandOptionType.STRING,
+                name: "embed_type",
+                description: "Specify an osu! embed type. Default: Hanami",
+                choices: [ { name: "Bathbot", value: "bathbot" }, { name: "owo", value: "owobot" }, { name: "Hanami", value: "hanami" } ],
+                required: false
             }
         ]
     },
@@ -37,8 +44,9 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     const { member } = interaction;
     const scoreEmbedData = interaction.data.getNumber("score_embeds");
     const modeData = interaction.data.getString("mode");
+    const embedTypeData = interaction.data.getString("embed_type");
 
-    if (typeof modeData === "undefined" && typeof scoreEmbedData === "undefined") {
+    if (typeof modeData === "undefined" && typeof scoreEmbedData === "undefined" && typeof embedTypeData === "undefined") {
         await list(interaction);
         return;
     }
@@ -52,6 +60,11 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     if (typeof scoreEmbedData !== "undefined") {
         scoreEmbed(member.user.id, scoreEmbedData);
         changes.push({ type: "mode", data: ScoreEmbed[scoreEmbedData] });
+    }
+
+    if (typeof embedTypeData !== "undefined") {
+        embedType(member.user.id, embedTypeData);
+        changes.push({ type: "mode", data: embedTypeData });
     }
 
     let changesText = "";
@@ -81,7 +94,7 @@ async function list(interaction: GuildInteraction<ApplicationCommandData>): Prom
     let user = getUser(userId);
     if (!user) {
         insertData({ table: "users", id: userId, data: [ { name: "banchoId", value: null } ] });
-        user = { banchoId: null, mode: null, score_embeds: null, id: userId };
+        user = { banchoId: null, mode: null, score_embeds: null, embed_type: null, id: userId };
     }
     const embeds: EmbedStructure = { fields: [], title: `Config settings of ${interaction.member.user.username}` };
 
@@ -104,4 +117,8 @@ function mode(memberId: string, choice: string): void {
 
 function scoreEmbed(memberId: string, choice: number): void {
     insertData({ table: "users", id: memberId, data: [ { name: "score_embeds", value: choice } ] });
+}
+
+function embedType(memberId: string, choice: string): void {
+    insertData({ table: "users", id: memberId, data: [ { name: "embed_type", value: choice } ] });
 }
