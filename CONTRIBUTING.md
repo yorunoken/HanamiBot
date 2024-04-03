@@ -25,7 +25,7 @@ To start contributing, you either need to install [Bun](https://bun.sh/)
 
 You need to fill `.env.local` with the approriate API keys to make the bot work. Here's how:
 
-### DISCORD_BOT_TOKEN (your bot's token):
+### DISCORD_BOT_TOKEN (your bot's token)
 
    1. Go to [Discord's developer portal](https://discord.com/developers/applications) and create a new application.
 
@@ -35,9 +35,9 @@ You need to fill `.env.local` with the approriate API keys to make the bot work.
 
    4. You should also enable all 3 of the privilaged intents for the bot to function.
 
-### ACCESS_TOKEN (osu! key to make leaderboard commands function):
+### ACCESS_TOKEN (osu! key to make leaderboard commands function)
 
-   1. Go to [osu!s home page](https://osu.ppy.sh/home) and press f12 to open up developer page.
+   1. Go to [osu!s home page](https://osu.ppy.sh/home) and press f12 to open up the developer page.
 
    2. Navigate to the `Storage` tab. If you don't see it, click on the arrow and reveal the dropout box.
 
@@ -47,7 +47,19 @@ You need to fill `.env.local` with the approriate API keys to make the bot work.
 
    5. Copy its value, that's your `OSU_SESSION` key.
 
-### CLIENT_SECRET and CLIENT_ID (osu! Auth):
+### OSU_CAPITAL_ACCESS_TOKEN (osu! Capital key to fetch stock values)
+
+   1. Go to [osu! Capital's home page](https://www.osucapital.com) and press f12 to open up the the developer page.
+
+   2. Navigate to the `Storage` tab. If you don't see it, click on the arrow and reveal the dropout box.
+
+   3. Inside `Storage` tab, click on `cookies` and `https://www.osucapital.com`
+
+   4. Search for an item named `userSession`
+
+   5. Copy its value, that's your `OSU_CAPITAL_ACCESS_TOKEN` key.
+
+### CLIENT_SECRET and CLIENT_ID (osu! Auth)
 
    1. Go to [osu! account settings](https://osu.ppy.sh/home/account/edit) and scroll until you see `OAuth` section.
 
@@ -57,7 +69,7 @@ You need to fill `.env.local` with the approriate API keys to make the bot work.
 
    4. Copy its Client ID and Client secret and you're good to go.
 
-### CALLBACK_URL (callback URL for /link command):
+### CALLBACK_URL (callback URL for /link command)
 
    This one is a little tricky, because you will need to host a website.
 
