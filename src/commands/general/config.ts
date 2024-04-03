@@ -12,42 +12,17 @@ export default {
         description: "Set your account configurations",
         options: [
             {
-                type: ApplicationCommandOptionType.SUB_COMMAND,
+                type: ApplicationCommandOptionType.NUMBER,
                 name: "score_embeds",
                 description: "Specify what size score embeds should be. (compare, recent...)",
-                options: [
-                    {
-                        type: ApplicationCommandOptionType.NUMBER,
-                        name: "score_embeds",
-                        description: "Specify what size score embeds should be. (compare, recent...)",
-                        choices: [ { name: "Maximized", value: 1 }, { name: "Minimized", value: 0 } ],
-                        required: true
-                    }
-
-                ],
+                choices: [ { name: "Maximized", value: 1 }, { name: "Minimized", value: 0 } ],
                 required: false
             },
             {
-                type: ApplicationCommandOptionType.SUB_COMMAND,
+                type: ApplicationCommandOptionType.STRING,
                 name: "mode",
-                description: "Specify an osu! mode",
-                options: [
-                    {
-                        type: ApplicationCommandOptionType.STRING,
-                        name: "mode",
-                        description: "Specify an osu! mode (none defaults to osu)",
-                        choices: [ { name: "None", value: "osu" }, { name: "osu", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "ctb", value: "fruits" } ],
-                        required: true
-
-                    }
-                ],
-                required: false
-
-            },
-            {
-                type: ApplicationCommandOptionType.SUB_COMMAND,
-                name: "list",
-                description: "Get a list of your configs.",
+                description: "Specify an osu! mode (none defaults to osu)",
+                choices: [ { name: "None", value: "osu" }, { name: "osu", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "ctb", value: "fruits" } ],
                 required: false
             }
         ]
@@ -55,19 +30,44 @@ export default {
     run
 } satisfies SlashCommand;
 
-const commands: Record<string, (interaction: GuildInteraction<ApplicationCommandData>) => Promise<void>> = {
-    score_embeds: scoreEmbed,
-    mode,
-    list
-};
-
 async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
     await interaction.deferReply();
     if (!interaction.inGuild()) return;
 
-    const subcommand = interaction.data.subCommand ?? "list";
+    const { member } = interaction;
+    const scoreEmbedData = interaction.data.getNumber("score_embeds");
+    const modeData = interaction.data.getString("mode");
 
-    await commands[subcommand](interaction);
+    if (typeof modeData === "undefined" && typeof scoreEmbedData === "undefined") {
+        await list(interaction);
+        return;
+    }
+
+    const changes = [];
+    if (typeof modeData !== "undefined") {
+        mode(member.user.id, modeData);
+        changes.push({ type: "mode", data: modeData });
+    }
+
+    if (typeof scoreEmbedData !== "undefined") {
+        scoreEmbed(member.user.id, scoreEmbedData);
+        changes.push({ type: "mode", data: ScoreEmbed[scoreEmbedData] });
+    }
+
+    let changesText = "";
+    for (let i = 0; i < changes.length; i++) {
+        const change = changes[i];
+        changesText += `${change.type}: ${change.data}\n`;
+    }
+
+    await interaction.editReply({
+        embeds: [
+            {
+                title: `Successfully changes configs for ${interaction.member.user.username}`,
+                description: `Changed configs:\n${changesText}`
+            }
+        ]
+    });
 }
 
 async function list(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
@@ -98,14 +98,10 @@ async function list(interaction: GuildInteraction<ApplicationCommandData>): Prom
     await interaction.editReply({ embeds: [embeds] });
 }
 
-async function mode(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
-    const choice = interaction.data.getString("mode", true);
-    insertData({ table: "users", id: interaction.member.user.id, data: [ { name: "mode", value: choice } ] });
-    await interaction.editReply(`Successfully set \`mode\` to: \`${choice}\``);
+function mode(memberId: string, choice: string): void {
+    insertData({ table: "users", id: memberId, data: [ { name: "mode", value: choice } ] });
 }
 
-async function scoreEmbed(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
-    const choice = interaction.data.getNumber("score_embeds", true);
-    insertData({ table: "users", id: interaction.member.user.id, data: [ { name: "score_embeds", value: choice } ] });
-    await interaction.editReply(`Successfully set \`score_embeds\` to: \`${ScoreEmbed[choice]}\``);
+function scoreEmbed(memberId: string, choice: number): void {
+    insertData({ table: "users", id: memberId, data: [ { name: "score_embeds", value: choice } ] });
 }
