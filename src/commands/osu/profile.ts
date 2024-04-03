@@ -3,6 +3,7 @@ import { profileBuilder } from "@builders/profile";
 import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/embedBuilders";
+import { getStockProfile } from "@utils/osuCapital";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
 import type { SlashCommand } from "@lilybird/handlers";
@@ -61,12 +62,16 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         });
         return;
     }
+
     const osuUser = osuUserRequest.data;
+    const { pageProps: capitalUser } = await getStockProfile(osuUser.id);
+
     const embeds = profileBuilder({
         type: EmbedBuilderType.PROFILE,
         initiatorId: interaction.member.user.id,
         user: osuUser,
-        mode: user.mode
+        mode: user.mode,
+        capitalUser
     });
 
     await interaction.editReply({ embeds });

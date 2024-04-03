@@ -69,11 +69,11 @@ export async function loadApplicationCommands(clnt: LilybirdClient): Promise<voi
         applicationCommands.set(cmd.data.name, command);
     }
 
-    const commandsIds = await clnt.rest.bulkOverwriteGlobalApplicationCommand(clnt.user.id, slashCommands);
-    for (let i = 0; i < commandsIds.length; i++) {
-        const { name, id } = commandsIds[i];
-        slashCommandsIds.set(name, `</${name}:${id}>`);
-    }
+    // const commandsIds = await clnt.rest.bulkOverwriteGlobalApplicationCommand(clnt.user.id, slashCommands);
+    // for (let i = 0; i < commandsIds.length; i++) {
+    //     const { name, id } = commandsIds[i];
+    //     slashCommandsIds.set(name, `</${name}:${id}>`);
+    // }
 }
 
 async function exists(path: string): Promise<boolean> {
