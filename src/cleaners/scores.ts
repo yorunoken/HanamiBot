@@ -57,12 +57,14 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
         createdAt = play.ended_at;
         scoreStatistics = {
             count_50: play.statistics.meh ?? 0,
-            count_100: play.statistics.good ?? 0,
+            count_100: play.statistics.ok ?? 0,
             count_300: play.statistics.great ?? 0,
             count_geki: play.statistics.perfect ?? 0,
-            count_katu: play.statistics.ok ?? 0,
+            count_katu: play.statistics.good ?? 0,
             count_miss: play.statistics.miss ?? 0
         };
+        console.log(play.statistics);
+        console.log(scoreStatistics);
     }
 
     const performance = await getPerformanceResults({ hitValues: scoreStatistics, beatmapId: beatmap.id, play, maxCombo: play.max_combo, mods: play.mods, mapData });
