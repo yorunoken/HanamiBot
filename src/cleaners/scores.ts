@@ -63,8 +63,6 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
             count_katu: play.statistics.good ?? 0,
             count_miss: play.statistics.miss ?? 0
         };
-        console.log(play.statistics);
-        console.log(scoreStatistics);
     }
 
     const performance = await getPerformanceResults({ hitValues: scoreStatistics, beatmapId: beatmap.id, play, maxCombo: play.max_combo, mods: play.mods, mapData });
@@ -120,7 +118,8 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     // set fcValues to null because we won't always need it.
     let ifFcValues = null;
     if (!isFc) {
-        const fcAccuracy = accuracyCalculator(mode, scoreStatistics);
+        const fcStatistics = { ...scoreStatistics, count_300: (scoreStatistics.count_300 ?? 0) + scoreStatistics.count_miss, count_miss: 0 };
+        const fcAccuracy = accuracyCalculator(mode, fcStatistics);
         ifFcValues = `FC: **${performance.fcPerformance.pp.toFixed(2).toLocaleString()}pp** for **${fcAccuracy.toFixed(2)}%**`;
     }
 

@@ -144,7 +144,6 @@ async function list({ interaction, guildId }: { interaction: GuildInteraction<Ap
         await interaction.editReply(`**There aren't any custom prefixes on this server. The default is \`${DEFAULT_PREFIX.join("")}\`**`);
         return;
     }
-    console.log(prefixes);
 
     await interaction.editReply({ embeds: [ { type: EmbedType.Rich, title: "Prefixes!", description: `- \`${prefixes.join("`\n- `")}\`` } ] });
 }
