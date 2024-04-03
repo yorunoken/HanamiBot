@@ -4,6 +4,7 @@ import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { Mode } from "@type/osu";
+import { getStockProfile } from "@utils/osuCapital";
 import { EmbedType } from "lilybird";
 import type { GuildTextChannel, Message } from "@lilybird/transformers";
 import type { MessageCommand } from "@type/commands";
@@ -41,11 +42,14 @@ async function run({ message, args, commandName, channel }: { message: Message, 
     }
     const osuUser = osuUserRequest.data;
 
+    const { pageProps: capitalUser } = await getStockProfile(osuUser.id);
+
     const embeds = profileBuilder({
         type: EmbedBuilderType.PROFILE,
         initiatorId: message.author.id,
         user: osuUser,
-        mode: user.mode
+        mode: user.mode,
+        capitalUser
     });
     await channel.send({ embeds });
 }

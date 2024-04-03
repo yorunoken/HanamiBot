@@ -1,7 +1,8 @@
+import type { CapitalUser } from "@type/osuCapital";
 import type { UserExtended } from "osu-web.js";
 import type { Mode, ProfileInfo } from "@type/osu";
 
-export function getProfile(user: UserExtended, mode: Mode): ProfileInfo {
+export function getProfile(user: UserExtended, mode: Mode, capitalUser?: CapitalUser): ProfileInfo {
     const { statistics } = user;
     const userJoinDate = new Date(user.join_date);
 
@@ -18,6 +19,8 @@ export function getProfile(user: UserExtended, mode: Mode): ProfileInfo {
         peakGlobalRank: user.rank_highest?.rank.toLocaleString() ?? "",
         peakGlobalRankTime: new Date(user.rank_highest?.updated_at ?? 0).getTime() / 1000,
         pp: statistics.pp.toLocaleString(),
+        stockValue: capitalUser?.stock.share_price,
+        stockUpdated: Math.ceil(new Date(capitalUser?.stock.last_updated ?? 0).getTime() / 1000),
         accuracy: statistics.hit_accuracy.toFixed(2),
         level: `${user.statistics.level.current}.${statistics.level.progress.toString(10).padStart(2, "0")}`,
         playCount: statistics.play_count.toLocaleString(),
