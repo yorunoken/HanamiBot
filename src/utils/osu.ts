@@ -199,7 +199,7 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
 
     const difficultyAttrs = new BeatmapAttributesBuilder({ map: beatmap }).build();
 
-    const maxAttrs = new Performance({ mods: modsInt }).calculate(beatmap);
+    const maxAttrs = new Performance({ mods: modsInt, clockRate }).calculate(beatmap);
 
     let {
         count_100: n100,
@@ -219,8 +219,8 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
     nGeki = [2, 3].includes(rulesetId) ? nGeki : 0;
     nKatu = [2, 3].includes(rulesetId) ? nKatu : 0;
 
-    const currAttrs = new Performance({ mods: modsInt, n100, n300, n50, nGeki, nKatu, misses, accuracy, combo: maxCombo ?? maxAttrs.difficulty.maxCombo }).calculate(maxAttrs);
-    const fcAttrs = new Performance({ mods: modsInt, n100, n300: n300 + misses, n50, nGeki, nKatu, misses: 0, accuracy, combo: maxAttrs.difficulty.maxCombo }).calculate(maxAttrs);
+    const currAttrs = new Performance({ mods: modsInt, n100, n300, n50, nGeki, nKatu, misses, accuracy, combo: maxCombo ?? maxAttrs.difficulty.maxCombo, clockRate }).calculate(maxAttrs);
+    const fcAttrs = new Performance({ mods: modsInt, n100, n300: n300 + misses, n50, nGeki, nKatu, misses: 0, accuracy, combo: maxAttrs.difficulty.maxCombo, clockRate }).calculate(maxAttrs);
 
     return {
         mapValues: beatmap,
