@@ -1,6 +1,6 @@
 import type { Mod } from "./mods";
 import type { UserScore as UserScore_, Beatmapset, Score as Score_, Fails, Beatmap as BeatmapWeb, Country, Cover, UserCompact, Rank, ISOTimestamp, UserBestScore as UserBestScore_ } from "osu-web.js";
-import type { MapAttributes, PerformanceAttributes } from "rosu-pp";
+import type { Beatmap as BeatmapRosu, BeatmapAttributes, PerformanceAttributes } from "rosu-pp-js";
 
 export const enum Mode {
     OSU = "osu",
@@ -83,7 +83,8 @@ export interface ScoresInfo {
 }
 
 export interface PerformanceInfo {
-    mapValues: MapAttributes;
+    mapValues: BeatmapRosu;
+    difficultyAttrs: BeatmapAttributes;
     perfectPerformance: PerformanceAttributes;
     currentPerformance: PerformanceAttributes;
     fcPerformance: PerformanceAttributes;

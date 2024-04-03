@@ -124,7 +124,7 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     }
 
     // Get beatmap's drain length
-    const drainLengthInSeconds = beatmap.total_length / performance.mapValues.clockRate;
+    const drainLengthInSeconds = beatmap.total_length / performance.difficultyAttrs.clockRate;
     const drainMinutes = Math.floor(drainLengthInSeconds / 60);
 
     // I thought Math.ceil would do a better job here since if the seconds is gonna be like, 40.88,
