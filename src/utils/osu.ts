@@ -224,6 +224,10 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
 
     return {
         mapValues: beatmap,
+        difficultyAttrs,
+        perfectPerformance: maxAttrs,
+        currentPerformance: currAttrs,
+        fcPerformance: fcAttrs,
         mapId: beatmapId,
         mods: modsStringArray.length > 0 ? modsStringArray : ["NM"],
         difficultyAttrs,
