@@ -91,8 +91,8 @@ async function getSinglePlay({ mode, index, plays, profile, userDb, isMultiple }
         } satisfies EmbedAuthorStructure;
 
         const line1 = `${play.grade} ${play.percentagePassed !== null ? `**@${play.percentagePassed}%**` : ""} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%** ${SPACE} ${play.playSubmitted}\n`;
-        const line2 = `${play.ppFormatted} ${SPACE} ${play.comboValues} ${SPACE} ${play.hitValues}\n`;
-        const line3 = `${play.ifFcValues ?? ""}\n`;
+        const line2 = `${play.ppFormatted} ${SPACE} [${play.comboValues}] ${SPACE} {${play.hitValues}}\n`;
+        const line3 = `${play.ifFcHanami ?? ""}\n`;
 
         const fields = [
             {

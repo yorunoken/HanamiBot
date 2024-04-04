@@ -70,7 +70,7 @@ async function getMultiplePlays({ plays, profile, beatmap, mode }:
     for (let i = 0; i < playResults.length; i++) {
         const play = playResults[i];
         const line1 = `${play.grade} **[${play.stars}]** ${SPACE}  ${play.ppFormatted} ${SPACE} **${play.accuracy}% ${SPACE} +${play.mods.join("")}**\n`;
-        const line2 = `${play.score} ${SPACE} ${play.hitValues} ${SPACE} ${play.comboValues} ${SPACE} ${play.playSubmitted}`;
+        const line2 = `${play.score} ${SPACE} {${play.hitValues}} ${SPACE} [${play.comboValues}] ${SPACE} ${play.playSubmitted}`;
         description += `${line1 + line2}\n`;
     }
 

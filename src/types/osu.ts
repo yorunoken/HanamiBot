@@ -75,7 +75,7 @@ export interface ScoresInfo {
     rulesetEmote: string;
     ppFormatted: string;
     playSubmitted: string;
-    ifFcValues: string | null;
+    ifFcHanami: string | null;
     comboValues: string;
     performance: PerformanceInfo;
     user: string | undefined;
