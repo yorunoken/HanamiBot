@@ -112,7 +112,7 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     }
 
     const playMaxCombo = play.max_combo;
-    const { maxCombo } = performance.currentPerformance.difficulty;
+    const { maxCombo } = performance.current.difficulty;
     const isFc = scoreStatistics.count_miss === 0 && playMaxCombo + 7 >= maxCombo;
 
     // set fcValues to null because we won't always need it.
@@ -122,8 +122,8 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     if (!isFc) {
         const fcStatistics = { ...scoreStatistics, count_300: (scoreStatistics.count_300 ?? 0) + scoreStatistics.count_miss, count_miss: 0 };
         fcAccuracy = accuracyCalculator(mode, fcStatistics);
-        ifFcHanami = `FC: **${performance.fcPerformance.pp.toFixed(2).toLocaleString()}pp** for **${fcAccuracy.toFixed(2)}%**`;
-        ifFcBathbot = `**${performance.currentPerformance.pp.toFixed(2).toLocaleString()}**/${performance.fcPerformance.pp.toFixed(2).toLocaleString()}PP`;
+        ifFcHanami = `FC: **${performance.fc.pp.toFixed(2).toLocaleString()}pp** for **${fcAccuracy.toFixed(2)}%**`;
+        ifFcBathbot = `**${performance.current.pp.toFixed(2).toLocaleString()}**/${performance.fc.pp.toFixed(2).toLocaleString()}PP`;
     }
 
     let fcHitValues = "";
@@ -177,9 +177,9 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
         mapAuthor: beatmapset.creator,
         mapStatus: beatmapStatus.charAt(0).toUpperCase() + beatmapStatus.slice(1),
         drainLength: `${drainMinutes}:${drainSeconds}`,
-        stars: `${performance.currentPerformance.difficulty.stars.toFixed(2).toLocaleString()}★`,
+        stars: `${performance.current.difficulty.stars.toFixed(2).toLocaleString()}★`,
         rulesetEmote: rulesets[mode],
-        ppFormatted: `**${performance.currentPerformance.pp.toFixed(2).toLocaleString()}**/${performance.perfectPerformance.pp.toFixed(2).toLocaleLowerCase()}pp`,
+        ppFormatted: `**${performance.current.pp.toFixed(2).toLocaleString()}**/${performance.perfect.pp.toFixed(2).toLocaleLowerCase()}pp`,
         playSubmitted: `<t:${new Date(createdAt).getTime() / 1000}:R>`,
         ifFcHanami,
         ifFcBathbot,

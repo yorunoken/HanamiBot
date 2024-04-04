@@ -89,9 +89,9 @@ export interface ScoresInfo {
 export interface PerformanceInfo {
     mapValues: BeatmapRosu;
     difficultyAttrs: BeatmapAttributes;
-    perfectPerformance: PerformanceAttributes;
-    currentPerformance: PerformanceAttributes;
-    fcPerformance: PerformanceAttributes;
+    perfect: PerformanceAttributes;
+    current: PerformanceAttributes;
+    fc: PerformanceAttributes;
     mapId: number;
     mods: Array<string>;
 }

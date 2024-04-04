@@ -164,6 +164,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         mode: user.mode,
         isMultiple: true,
         sortByDate: true,
+        userDb: user.userDb,
         isPage,
         page,
         index,

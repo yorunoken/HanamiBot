@@ -80,6 +80,7 @@ async function run({ message, args, commandName, index, channel }: { message: Me
         user: osuUser,
         mode: user.mode,
         isMultiple: true,
+        userDb: user.userDb,
         page,
         isPage,
         index,
