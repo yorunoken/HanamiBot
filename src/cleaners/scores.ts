@@ -124,7 +124,7 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
         const fcStatistics = { ...scoreStatistics, count_300: (scoreStatistics.count_300 ?? 0) + scoreStatistics.count_miss, count_miss: 0 };
         fcAccuracy = accuracyCalculator(mode, fcStatistics);
         ifFcHanami = `FC: **${performance.fc.pp.toFixed(2).toLocaleString()}pp** for **${fcAccuracy.toFixed(2)}%**`;
-        ifFcBathbot = `**${performance.current.pp.toFixed(2).toLocaleString()}**/${performance.fc.pp.toFixed(2).toLocaleString()}PP`;
+        ifFcBathbot = `**${performance.fc.pp.toFixed(2).toLocaleString()}**/${performance.perfect.pp.toFixed(2).toLocaleString()}PP`;
         ifFcOwo = `(${performance.fc.pp.toFixed(2).toLocaleString()}PP for ${fcAccuracy.toFixed(2)}% FC)`;
     }
 
