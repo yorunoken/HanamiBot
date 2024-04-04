@@ -18,6 +18,7 @@ export async function playBuilder({
     initiatorId,
     isMultiple,
     page,
+    userDb,
     sortByDate
 }: PlaysBuilderOptions): Promise<Array<EmbedStructure>> {
     if (typeof page === "undefined" && typeof index === "undefined") {
@@ -63,8 +64,6 @@ export async function playBuilder({
             }
         ] satisfies Array<EmbedStructure>;
     }
-
-    const userDb = getUser(initiatorId);
 
     return typeof page !== "undefined" ? getMultiplePlays({ plays, page, mode, profile, userDb }) : getSinglePlay({ mode, index: index ?? 0, plays, profile, userDb, isMultiple });
 }

@@ -4,7 +4,9 @@ import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { getStockProfile } from "@utils/osuCapital";
+import { EmbedScoreType } from "@type/database";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
+import type { CapitalUser } from "@type/osuCapital";
 import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
 import type { SlashCommand } from "@lilybird/handlers";
 
@@ -64,7 +66,12 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     }
 
     const osuUser = osuUserRequest.data;
-    const { pageProps: capitalUser } = await getStockProfile(osuUser.id);
+
+    let capitalUser: CapitalUser | undefined;
+    if (user.userDb?.embed_type === EmbedScoreType.Hanami) {
+        const { pageProps } = await getStockProfile(osuUser.id);
+        capitalUser = pageProps;
+    }
 
     const embeds = profileBuilder({
         type: EmbedBuilderType.PROFILE,

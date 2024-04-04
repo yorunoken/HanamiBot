@@ -1,3 +1,4 @@
+import type { DatabaseUser } from "./database";
 import type { CapitalUser } from "./osuCapital";
 import type { UserScore, UserBestScore, Beatmap, LeaderboardScores, Mode, Score } from "./osu";
 import type { UserExtended, Mod } from "osu-web.js";
@@ -53,6 +54,7 @@ export interface PlaysBuilderOptions extends BuilderOptions {
     type: EmbedBuilderType.PLAYS;
     user: UserExtended;
     mode: Mode;
+    userDb: DatabaseUser | null;
     index?: number;
     initiatorId: string;
     isMultiple?: boolean;
