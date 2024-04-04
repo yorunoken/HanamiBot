@@ -1,7 +1,6 @@
 import { getProfile } from "@cleaners/profile";
 import { getScore } from "@cleaners/scores";
 import { SPACE } from "@utils/constants";
-import { getUser } from "@utils/database";
 import { EmbedScoreType } from "@type/database";
 import { EmbedType } from "lilybird";
 import type { DatabaseUser } from "@type/database";
@@ -15,7 +14,6 @@ export async function playBuilder({
     mode,
     index,
     mods,
-    initiatorId,
     isMultiple,
     page,
     userDb,
@@ -133,6 +131,22 @@ async function getSinglePlay({ mode, index, plays, profile, userDb, isMultiple }
                 .toFixed(1)}\` ${SPACE} **CS:** \`${mapValues.cs.toFixed(1)}\` ${SPACE} **HP:** \`${mapValues.hp.toFixed(1)}\` **Stars:** ${play.stars}`
         ];
 
+        const fields = [
+            { name: "Grade", value: `${play.grade} @${play.percentagePassed}%`, inline: true },
+            { name: "Score", value: play.score, inline: true },
+            { name: "Acc", value: `${play.accuracy}%`, inline: true },
+            { name: "PP", value: `${play.ppFormatted}`, inline: true },
+            { name: "Combo", value: `${play.comboValues}`, inline: true },
+            { name: "Hits", value: `${play.hitValues}`, inline: true }
+        ];
+
+        if (!play.isFc) {
+            fields.push({ name: "If FC: PP", value: play.ifFcBathbot ?? "", inline: true });
+            fields.push({ name: "Acc", value: `${play.fcAccuracy}%`, inline: true });
+            fields.push({ name: "Hits", value: play.fcHitValues, inline: true });
+        }
+
+        fields.push({ name: "Map Info", value: beatmapInfoField.join("\n"), inline: false });
         return [
             {
                 type: EmbedType.Rich,
@@ -144,15 +158,7 @@ async function getSinglePlay({ mode, index, plays, profile, userDb, isMultiple }
                 title: `${play.songTitle} [${play.difficultyName}]`,
                 url: play.mapLink,
                 image: { url: play.coverLink },
-                fields: [
-                    { name: "Grade", value: `${play.grade} @${play.percentagePassed}%`, inline: true },
-                    { name: "Score", value: play.score, inline: true },
-                    { name: "Acc", value: `${play.accuracy}%`, inline: true },
-                    { name: "PP", value: `${play.ppFormatted}`, inline: true },
-                    { name: "Combo", value: `${play.comboValues}`, inline: true },
-                    { name: "Hits", value: `${play.hitValues}`, inline: true },
-                    { name: "Map Info", value: beatmapInfoField.join("\n"), inline: false }
-                ]
+                fields
             }
         ];
     }

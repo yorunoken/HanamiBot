@@ -67,6 +67,9 @@ export interface ScoresInfo {
     listLink: string;
     grade: string;
     hitValues: string;
+    fcHitValues: string;
+    fcAccuracy: string | undefined;
+    isFc: boolean;
     mapAuthor: string;
     mapStatus: string;
     mods: Array<string>;
@@ -76,6 +79,7 @@ export interface ScoresInfo {
     ppFormatted: string;
     playSubmitted: string;
     ifFcHanami: string | null;
+    ifFcBathbot: string | null;
     comboValues: string;
     performance: PerformanceInfo;
     user: string | undefined;

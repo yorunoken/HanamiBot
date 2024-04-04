@@ -116,11 +116,27 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     const isFc = scoreStatistics.count_miss === 0 && playMaxCombo + 7 >= maxCombo;
 
     // set fcValues to null because we won't always need it.
-    let ifFcHanami = null;
+    let ifFcHanami: string | null = null;
+    let ifFcBathbot: string | null = null;
+    let fcAccuracy: number | null = null;
     if (!isFc) {
         const fcStatistics = { ...scoreStatistics, count_300: (scoreStatistics.count_300 ?? 0) + scoreStatistics.count_miss, count_miss: 0 };
-        const fcAccuracy = accuracyCalculator(mode, fcStatistics);
+        fcAccuracy = accuracyCalculator(mode, fcStatistics);
         ifFcHanami = `FC: **${performance.fcPerformance.pp.toFixed(2).toLocaleString()}pp** for **${fcAccuracy.toFixed(2)}%**`;
+        ifFcBathbot = `**${performance.currentPerformance.pp.toFixed(2).toLocaleString()}**/${performance.fcPerformance.pp.toFixed(2).toLocaleString()}PP`;
+    }
+
+    let fcHitValues = "";
+    for (let i = 0; i < order.length; i++) {
+        const count = order[i];
+        const countKey = count as keyof typeof scoreStatistics;
+        const countValue = scoreStatistics[countKey];
+        if (countValue !== null) {
+            if (fcHitValues.length > 0)
+                fcHitValues += "/";
+
+            fcHitValues += countValue;
+        }
     }
 
     // Get beatmap's drain length
@@ -153,7 +169,10 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
         coverLink: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/cover.jpg`,
         listLink: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/list.jpg`,
         grade: grades[play.rank],
-        hitValues: hitValues, // Returns the value in this format: { 433/12/2/4 }
+        hitValues, // Returns the value in this format: { 433/12/2/4 }
+        fcHitValues,
+        fcAccuracy: fcAccuracy?.toFixed(2),
+        isFc,
         mods: performance.mods,
         mapAuthor: beatmapset.creator,
         mapStatus: beatmapStatus.charAt(0).toUpperCase() + beatmapStatus.slice(1),
@@ -163,6 +182,7 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
         ppFormatted: `**${performance.currentPerformance.pp.toFixed(2).toLocaleString()}**/${performance.perfectPerformance.pp.toFixed(2).toLocaleLowerCase()}pp`,
         playSubmitted: `<t:${new Date(createdAt).getTime() / 1000}:R>`,
         ifFcHanami,
+        ifFcBathbot,
         comboValues: `**${playMaxCombo.toLocaleString()}**/${maxCombo.toLocaleString()}x`,
         performance
     };

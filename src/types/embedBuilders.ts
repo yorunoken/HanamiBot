@@ -56,7 +56,6 @@ export interface PlaysBuilderOptions extends BuilderOptions {
     mode: Mode;
     userDb: DatabaseUser | null;
     index?: number;
-    initiatorId: string;
     isMultiple?: boolean;
     sortByDate?: boolean;
     page?: number;
