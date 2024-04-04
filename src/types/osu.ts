@@ -54,7 +54,7 @@ export interface ProfileInfo {
 
 export interface ScoresInfo {
     position: number;
-    songTitle: string;
+    songNameFormatted: string;
     songArtist: string;
     songName: string;
     retries: number | undefined;
@@ -65,6 +65,7 @@ export interface ScoresInfo {
     mapLink: string;
     coverLink: string;
     listLink: string;
+    thumbLink: string;
     grade: string;
     hitValues: string;
     fcHitValues: string;
@@ -80,6 +81,7 @@ export interface ScoresInfo {
     playSubmitted: string;
     ifFcHanami: string | null;
     ifFcBathbot: string | null;
+    ifFcOwo: string | null;
     comboValues: string;
     performance: PerformanceInfo;
     user: string | undefined;
