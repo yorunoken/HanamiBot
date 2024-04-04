@@ -179,7 +179,7 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
         mods: performance.mods,
         mapAuthor: beatmapset.creator,
         mapStatus: beatmapStatus.charAt(0).toUpperCase() + beatmapStatus.slice(1),
-        drainLength: `${drainMinutes}:${drainSeconds}`,
+        drainLength: `${drainMinutes}:${drainSeconds < 10 ? `0${drainSeconds}` : drainSeconds}`,
         stars: `${performance.current.difficulty.stars.toFixed(2).toLocaleString()}★`,
         rulesetEmote: rulesets[mode],
         ppFormatted: `**${performance.current.pp.toFixed(2).toLocaleString()}**/${performance.perfect.pp.toFixed(2).toLocaleLowerCase()}pp`,
