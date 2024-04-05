@@ -1,5 +1,4 @@
 import type { DatabaseUser } from "./database";
-import type { CapitalUser } from "./osuCapital";
 import type { UserScore, UserBestScore, Beatmap, LeaderboardScores, Mode, Score } from "./osu";
 import type { UserExtended, Mod } from "osu-web.js";
 
@@ -67,7 +66,6 @@ export interface ProfileBuilderOptions extends BuilderOptions {
     type: EmbedBuilderType.PROFILE;
     user: UserExtended;
     mode: Mode;
-    capitalUser?: CapitalUser;
 }
 
 export interface AvatarBuilderOptions extends BuilderOptions {

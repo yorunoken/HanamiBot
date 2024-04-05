@@ -28,8 +28,6 @@ export interface ProfileInfo {
     peakGlobalRank: string;
     peakGlobalRankTime: number;
     pp: string;
-    stockValue: number | undefined;
-    stockUpdated: number | undefined;
     rankedScore: string;
     totalScore: string;
     objectsHit: string;

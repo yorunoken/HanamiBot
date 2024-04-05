@@ -4,8 +4,8 @@ import { EmbedType } from "lilybird";
 import type { ProfileBuilderOptions } from "@type/embedBuilders";
 import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, EmbedImageStructure, EmbedStructure, EmbedThumbnailStructure } from "lilybird";
 
-export function profileBuilder({ user, mode, capitalUser }: ProfileBuilderOptions): Array<EmbedStructure> {
-    const profile = getProfile(user, mode, capitalUser);
+export function profileBuilder({ user, mode }: ProfileBuilderOptions): Array<EmbedStructure> {
+    const profile = getProfile(user, mode);
     const author = {
         name: `${user.username}: ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}#${profile.countryRank})`,
         icon_url: profile.flagUrl,
@@ -18,7 +18,6 @@ export function profileBuilder({ user, mode, capitalUser }: ProfileBuilderOption
             value: [
                 `**Accuracy:** \`${profile.accuracy}\` • **Level:** \`${profile.level}%\``,
                 `**Playcount:** \`${profile.playCount}\` (\`${profile.playHours} hrs\`)`,
-                `[**Stock Value:**](https://www.osucapital.com/stock/${user.id} "These values were gotten from osucapital.com") \`${profile.stockValue}\` • **Updated:** <t:${profile.stockUpdated}:R>`,
                 `${profile.peakGlobalRank.length > 0 ? `**Peak Rank:** #\`${profile.peakGlobalRank}\` • **Achieved:** <t:${profile.peakGlobalRankTime}:R>` : "**Peak Rank:** #`-`"}`,
                 `**Followers:** \`${profile.followers}\` • **Max Combo:** \`${profile.maxCombo}\``,
                 `**Recommended Star Rating:** \`${profile.recommendedStarRating}\`★`

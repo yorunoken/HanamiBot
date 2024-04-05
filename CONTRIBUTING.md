@@ -47,18 +47,6 @@ You need to fill `.env.local` with the approriate API keys to make the bot work.
 
    5. Copy its value, that's your `OSU_SESSION` key.
 
-### OSU_CAPITAL_ACCESS_TOKEN (osu! Capital key to fetch stock values)
-
-   1. Go to [osu! Capital's home page](https://www.osucapital.com) and press f12 to open up the the developer page.
-
-   2. Navigate to the `Storage` tab. If you don't see it, click on the arrow and reveal the dropout box.
-
-   3. Inside `Storage` tab, click on `cookies` and `https://www.osucapital.com`
-
-   4. Search for an item named `userSession`
-
-   5. Copy its value, that's your `OSU_CAPITAL_ACCESS_TOKEN` key.
-
 ### CLIENT_SECRET and CLIENT_ID (osu! Auth)
 
    1. Go to [osu! account settings](https://osu.ppy.sh/home/account/edit) and scroll until you see `OAuth` section.

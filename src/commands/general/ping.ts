@@ -1,5 +1,4 @@
 import { client } from "@utils/initalize";
-import { getStockProfile } from "@utils/osuCapital";
 import type { SlashCommand } from "@lilybird/handlers";
 
 export default {
@@ -17,13 +16,8 @@ export default {
         const osuEnd = new Date().getTime();
         const osuDuration = osuEnd - osuStart;
 
-        const capitalStart = new Date().getTime();
-        await getStockProfile(userId);
-        const capitalEnd = new Date().getTime();
-        const capitalDuration = capitalStart - capitalEnd;
-
         await interaction.editReply({
-            content: `🏓 WebSocket: \`${ws}ms\` | Rest: \`${rest}ms\`\nosu! API: \`${osuDuration}ms\` | osu!Capital API: ${capitalDuration}ms`
+            content: `🏓 WebSocket: \`${ws}ms\` | Rest: \`${rest}ms\`\nosu! API: \`${osuDuration}ms\``
         });
     }
 } satisfies SlashCommand;

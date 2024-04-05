@@ -219,7 +219,6 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
     nGeki = [2, 3].includes(rulesetId) ? nGeki : 0;
     nKatu = [2, 3].includes(rulesetId) ? nKatu : 0;
 
-    console.log({ mods: modsInt, n100, n300, n50, nGeki, nKatu, misses, accuracy, combo: maxCombo ?? perfect.difficulty.maxCombo, clockRate });
     const current = typeof accuracy === "undefined" ?
         new Performance({ mods: modsInt, n100, n300, n50, nGeki, nKatu, misses, combo: maxCombo ?? perfect.difficulty.maxCombo, clockRate }).calculate(perfect) :
         new Performance({ mods: modsInt, accuracy, misses, combo: maxCombo ?? perfect.difficulty.maxCombo, clockRate }).calculate(perfect);

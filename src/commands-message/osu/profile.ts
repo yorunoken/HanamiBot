@@ -4,10 +4,7 @@ import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { Mode } from "@type/osu";
-import { getStockProfile } from "@utils/osuCapital";
-import { EmbedScoreType } from "@type/database";
 import { EmbedType } from "lilybird";
-import type { CapitalUser } from "@type/osuCapital";
 import type { GuildTextChannel, Message } from "@lilybird/transformers";
 import type { MessageCommand } from "@type/commands";
 
@@ -44,18 +41,11 @@ async function run({ message, args, commandName, channel }: { message: Message, 
     }
     const osuUser = osuUserRequest.data;
 
-    let capitalUser: CapitalUser | undefined;
-    if (user.userDb?.embed_type === EmbedScoreType.Hanami) {
-        const { pageProps } = await getStockProfile(osuUser.id);
-        capitalUser = pageProps;
-    }
-
     const embeds = profileBuilder({
         type: EmbedBuilderType.PROFILE,
         initiatorId: message.author.id,
         user: osuUser,
-        mode: user.mode,
-        capitalUser
+        mode: user.mode
     });
     await channel.send({ embeds });
 }
