@@ -2,6 +2,7 @@ import { prefixesCache } from "./guildCreate";
 import { DEFAULT_PREFIX } from "@utils/constants";
 import { commandAliases, loadLogs, messageCommands } from "@utils/initalize";
 import { getCommand, insertData } from "@utils/database";
+import { fuzzySearch } from "@utils/fuzzy";
 import type { Message } from "@lilybird/transformers";
 import type { Event } from "@lilybird/handlers";
 
@@ -59,7 +60,24 @@ async function run(message: Message): Promise<void> {
     const alias = commandAliases.get(commandName);
     const commandDefault = alias ? messageCommands.get(alias) : messageCommands.get(commandName);
 
-    if (!commandDefault) return;
+    if (!commandDefault) {
+        const possibleCommands = Array.from(messageCommands.values()).map((command) => command.default.name);
+        console.log(possibleCommands);
+        const options = fuzzySearch(commandName, possibleCommands);
+
+        let nearResults = "";
+        for (let i = 0; i < options.length; i++) {
+            const option = options[i];
+            if (option.distance <= 2)
+                nearResults += `${i > 0 ? ", " : ""}${option.option}`;
+        }
+
+        if (nearResults === "")
+            return;
+
+        await message.reply(`It seems like ${commandName} is not a command. Did you mean: \`${nearResults}\`?`);
+        return;
+    }
     const { default: command } = commandDefault;
 
     if (cooldown.has(`${command.name}${author.id}`)) {
