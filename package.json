@@ -9,7 +9,7 @@
     "build": "sh ./cli/build.sh"
   },
   "dependencies": {
-    "@lilybird/handlers": "beta",
+    "@lilybird/handlers": "alpha",
     "@lilybird/transformers": "alpha",
     "@types/bun": "latest",
     "lilybird": "beta",
