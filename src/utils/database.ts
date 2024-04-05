@@ -19,6 +19,11 @@ export function getServer(id: string | number): DatabaseGuild | null {
     return data;
 }
 
+export function getRowCount(table: string): number {
+    const count = db.prepare(`SELECT COUNT(*) FROM ${table};`).get(table) as Record<"COUNT(*)", number>;
+    return count["COUNT(*)"];
+}
+
 export function getMap(id: string | number): DatabaseMap | null {
     return db.prepare("SELECT * FROM maps WHERE id = ?").get(id) as DatabaseMap;
 }
