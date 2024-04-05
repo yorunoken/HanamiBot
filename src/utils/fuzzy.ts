@@ -3,7 +3,8 @@ type SearchResult = { option: string, distance: number };
 export function fuzzySearch(target: string, options: Array<string>): Array<SearchResult> {
     const results: Array<SearchResult> = [];
 
-    for (const option of options) {
+    for (let i = 0; i < options.length; i++) {
+        const option = options[i];
         const distance = levenshteinDistance(target, option);
         results.push({ option, distance });
     }
