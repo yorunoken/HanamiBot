@@ -9,10 +9,10 @@
     "build": "sh ./cli/build.sh"
   },
   "dependencies": {
-    "@lilybird/handlers": "alpha",
+    "@lilybird/handlers": "beta",
     "@lilybird/transformers": "alpha",
     "@types/bun": "latest",
-    "lilybird": "alpha",
+    "lilybird": "beta",
     "osu-web.js": "^2.4.0",
     "rosu-pp-js": "^1.0.1",
     "tasai": "^1.0.0"
