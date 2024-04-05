@@ -88,8 +88,8 @@ export function getCommandArgs(interaction: Interaction<ApplicationCommandData>)
     };
 
     const modsValue = interaction.data.getString("mods");
-    const modSections = modsValue?.match(/.{1,2}/g);
-    if (modSections && !modSections.every((selectedMod) => selectedMod.toUpperCase() in ModsEnum || modsValue?.toUpperCase() === "NM")) {
+    const modSections = modsValue?.toUpperCase().match(/.{1,2}/g);
+    if (modSections && !modSections.every((selectedMod) => selectedMod in ModsEnum || modsValue === "NM")) {
         mods = {
             exclude: interaction.data.getBoolean("exclude") ?? null,
             include: interaction.data.getBoolean("include") ?? null,
@@ -184,7 +184,7 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
             result.mods.exclude = modType === "-" && typeof force !== "undefined";
             result.mods.forceInclude = modType === "+" && typeof force !== "undefined";
             if (result.mods.include || result.mods.exclude || result.mods.forceInclude) {
-                result.mods.name = mod.replaceAll(/\+|!|-/g, "") as Mod;
+                result.mods.name = mod.replaceAll(/\+|!|-/g, "").toUpperCase() as Mod;
                 continue;
             }
         }
