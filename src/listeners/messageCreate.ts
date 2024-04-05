@@ -62,7 +62,6 @@ async function run(message: Message): Promise<void> {
 
     if (!commandDefault) {
         const possibleCommands = Array.from(messageCommands.values()).map((command) => command.default.name);
-        console.log(possibleCommands);
         const options = fuzzySearch(commandName, possibleCommands);
 
         let nearResults = "";
