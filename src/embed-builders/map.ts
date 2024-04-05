@@ -61,10 +61,10 @@ export async function mapBuilder({
 
     const ppField = [
         "```Acc  |  PP",
-        `100% ${a98.perfect.pp.toFixed(2)}`,
-        `98%  ${a98.current.pp.toFixed(2)}`,
-        `97%  ${a97.current.pp.toFixed(2)}`,
-        `95%  ${a95.current.pp.toFixed(2)}\`\`\``
+        `100%   ${a98.perfect.pp.toFixed(2)}`,
+        `98%    ${a98.current.pp.toFixed(2)}`,
+        `97%    ${a97.current.pp.toFixed(2)}`,
+        `95%    ${a95.current.pp.toFixed(2)}\`\`\``
     ];
 
     const linksField = [
