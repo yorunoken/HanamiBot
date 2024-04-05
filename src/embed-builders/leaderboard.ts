@@ -44,7 +44,7 @@ async function getPlays(plays: Array<LeaderboardScores>, beatmap: Beatmap, page:
 
         const line1 = `${play.grade} ${SPACE} **[${play.user}](https://osu.ppy.sh/u/${play.userId}) ${SPACE} [${play.stars}]** ${SPACE} +${play.mods.join("")}\n`;
         const line2 = `${play.ppFormatted} ${SPACE} **${play.accuracy}% ${SPACE} ${play.score}**\n`;
-        const line3 = `${play.hitValues} ${SPACE} ${play.comboValues} ${SPACE} ${play.playSubmitted}`;
+        const line3 = `{${play.hitValues}} ${SPACE} [${play.comboValues}] ${SPACE} ${play.playSubmitted}`;
 
         description += `${line1 + line2 + line3}\n`;
     }

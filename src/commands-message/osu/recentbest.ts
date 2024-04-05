@@ -84,6 +84,7 @@ async function run({ message, args, commandName, index, channel }: { message: Me
         mode: user.mode,
         isMultiple: true,
         sortByDate: true,
+        userDb: user.userDb,
         page,
         isPage,
         plays,

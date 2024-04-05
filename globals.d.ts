@@ -6,8 +6,8 @@ declare module "bun" {
         CLIENT_ID: string;
         CALLBACK_URL: string;
         OSU_CAPITAL_ACCESS_TOKEN: string;
-        KEY: string;
-        IV: string;
+        KEY?: string;
+        IV?: string;
     }
 }
 

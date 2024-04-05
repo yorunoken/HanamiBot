@@ -75,9 +75,9 @@ export function getCommandArgs(interaction: Interaction<ApplicationCommandData>)
     if (!interaction.isApplicationCommandInteraction() || !interaction.inGuild()) return;
 
     const userArg = interaction.data.getString("username");
-    const userId = getUser(interaction.member.user.id)?.banchoId;
+    const userAuthor = getUser(interaction.member.user.id);
     const discordUserId = interaction.data.getUser("discord");
-    const discordUser = getUser(discordUserId ?? "")?.banchoId;
+    const discordUser = getUser(discordUserId ?? "");
     const mode = <Mode | undefined>interaction.data.getString("mode") ?? Mode.OSU;
 
     let mods: Mods = {
@@ -106,18 +106,19 @@ export function getCommandArgs(interaction: Interaction<ApplicationCommandData>)
         beatmapId = urlMatch.difficultyId;
 
     const user: User = discordUserId
-        ? discordUser
-            ? { type: UserType.SUCCESS, banchoId: discordUser, mode, beatmapId }
+        ? discordUser?.banchoId
+            ? { type: UserType.SUCCESS, banchoId: discordUser.banchoId, userDb: discordUser, mode, beatmapId }
             : {
                 type: UserType.FAIL,
                 beatmapId,
+                userDb: discordUser,
                 failMessage: discordUserId ? `The user <@${discordUserId}> hasn't linked their account to the bot yet!` : `Please link your account to the bot using ${linkCommand()}!`
             }
         : userArg
-            ? { type: UserType.SUCCESS, banchoId: userArg, mode, beatmapId }
-            : userId
-                ? { type: UserType.SUCCESS, banchoId: userId, mode, beatmapId }
-                : { type: UserType.FAIL, beatmapId, failMessage: "Please link your account to the bot using /link!" };
+            ? { type: UserType.SUCCESS, banchoId: userArg, mode, beatmapId, userDb: userAuthor }
+            : userAuthor?.banchoId
+                ? { type: UserType.SUCCESS, banchoId: userAuthor.banchoId, mode, beatmapId, userDb: userAuthor }
+                : { type: UserType.FAIL, beatmapId, userDb: userAuthor, failMessage: "Please link your account to the bot using /link!" };
 
     return { user, mods };
 }
@@ -128,7 +129,8 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
         user: {
             beatmapId: null,
             type: UserType.FAIL,
-            failMessage: `Please link your account to the bot using ${linkCommand()}!`
+            failMessage: `Please link your account to the bot using ${linkCommand()}!`,
+            userDb: null
         },
         flags: {},
         mods: {
@@ -198,32 +200,36 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
             result.flags[key] = value;
     }
 
-    const userId = getUser(message.author.id)?.banchoId;
+    const userAuthor = getUser(message.author.id);
 
-    if (!result.tempUser && userId) {
+    if (!result.tempUser && userAuthor?.banchoId) {
         result.user = {
             beatmapId: result.user.beatmapId,
             type: UserType.SUCCESS,
-            banchoId: userId,
+            banchoId: userAuthor.banchoId,
+            userDb: userAuthor,
             mode
         };
     } else if (result.tempUser) {
         const [userArg] = result.tempUser;
 
         const discordUserId = (/<@(\d+)>/).exec(userArg)?.[1];
-        const user = discordUserId ? getUser(discordUserId)?.banchoId : null;
+        const discordUser = discordUserId ? getUser(discordUserId) : null;
+        const discordId = discordUserId ? discordUser?.banchoId : null;
 
-        if (discordUserId && !user) {
+        if (discordUserId && !discordId) {
             result.user = {
                 beatmapId: result.user.beatmapId,
                 type: UserType.FAIL,
+                userDb: discordUser,
                 failMessage: `The user <@${discordUserId}> hasn't linked their account to the bot yet!`
             };
         } else {
             result.user = {
                 beatmapId: result.user.beatmapId,
                 type: UserType.SUCCESS,
-                banchoId: user ?? userArg,
+                banchoId: discordId ?? userArg,
+                userDb: discordUser,
                 mode
             };
         }

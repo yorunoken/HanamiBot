@@ -1,7 +1,14 @@
+export enum EmbedScoreType {
+    Hanami = "hanami",
+    Bathbot = "bathbot",
+    Owo = "owobot"
+}
+
 export interface DatabaseUser {
     id: string;
     banchoId: string | null;
     score_embeds: number | null;
+    embed_type: EmbedScoreType | null;
     mode: string | null;
 }
 

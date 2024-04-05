@@ -53,18 +53,18 @@ export async function mapBuilder({
 
     const infoField = [
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        `**Stars:** **\`${a98.currentPerformance.difficulty.stars.toFixed(2)}\`** **Mods:** \`+${mods ?? "NM"}\` **BPM:** \`${a98.mapValues.bpm.toFixed(0)}\``,
-        `**Length:** \`${drainMinutes}:${drainSeconds}\` **Max Combo:** \`${a98.currentPerformance.difficulty.maxCombo}\` **Objects:** \`${objects.toLocaleString()}\``,
+        `**Stars:** **\`${a98.current.difficulty.stars.toFixed(2)}\`** **Mods:** \`+${mods ?? "NM"}\` **BPM:** \`${a98.mapValues.bpm.toFixed(0)}\``,
+        `**Length:** \`${drainMinutes}:${drainSeconds < 10 ? `0${drainSeconds}` : drainSeconds}\` **Max Combo:** \`${a98.current.difficulty.maxCombo}\` **Objects:** \`${objects.toLocaleString()}\``,
         `**AR:** \`${a98.mapValues.ar.toFixed(1)}\` **OD:** \`${a98.mapValues.od.toFixed(1)}\` **CS:** \`${a98.mapValues.cs.toFixed(1)}\` **HP:** \`${a98.mapValues.hp.toFixed(1)}\``,
         `\n:heart: **${mapset.favourite_count.toLocaleString()}** :play_pause: **${mapset.play_count.toLocaleString()}**`
     ];
 
     const ppField = [
         "```Acc  |  PP",
-        `100% ${a98.perfectPerformance.pp.toFixed(2)}`,
-        `98%  ${a98.currentPerformance.pp.toFixed(2)}`,
-        `97%  ${a97.currentPerformance.pp.toFixed(2)}`,
-        `95%  ${a95.currentPerformance.pp.toFixed(2)}\`\`\``
+        `100%   ${a98.perfect.pp.toFixed(2)}`,
+        `98%    ${a98.current.pp.toFixed(2)}`,
+        `97%    ${a97.current.pp.toFixed(2)}`,
+        `95%    ${a95.current.pp.toFixed(2)}\`\`\``
     ];
 
     const linksField = [

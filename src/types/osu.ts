@@ -54,7 +54,7 @@ export interface ProfileInfo {
 
 export interface ScoresInfo {
     position: number;
-    songTitle: string;
+    songNameFormatted: string;
     songArtist: string;
     songName: string;
     retries: number | undefined;
@@ -65,8 +65,12 @@ export interface ScoresInfo {
     mapLink: string;
     coverLink: string;
     listLink: string;
+    thumbLink: string;
     grade: string;
     hitValues: string;
+    fcHitValues: string;
+    fcAccuracy: string | undefined;
+    isFc: boolean;
     mapAuthor: string;
     mapStatus: string;
     mods: Array<string>;
@@ -75,7 +79,9 @@ export interface ScoresInfo {
     rulesetEmote: string;
     ppFormatted: string;
     playSubmitted: string;
-    ifFcValues: string | null;
+    ifFcHanami: string | null;
+    ifFcBathbot: string | null;
+    ifFcOwo: string | null;
     comboValues: string;
     performance: PerformanceInfo;
     user: string | undefined;
@@ -85,9 +91,9 @@ export interface ScoresInfo {
 export interface PerformanceInfo {
     mapValues: BeatmapRosu;
     difficultyAttrs: BeatmapAttributes;
-    perfectPerformance: PerformanceAttributes;
-    currentPerformance: PerformanceAttributes;
-    fcPerformance: PerformanceAttributes;
+    perfect: PerformanceAttributes;
+    current: PerformanceAttributes;
+    fc: PerformanceAttributes;
     mapId: number;
     mods: Array<string>;
 }

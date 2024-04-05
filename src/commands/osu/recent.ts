@@ -151,6 +151,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         user: osuUser,
         mode: user.mode,
         mods: { exclude: false, forceInclude: false, include: true, name: mod },
+        userDb: user.userDb,
         index,
         plays
     };

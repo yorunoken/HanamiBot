@@ -112,15 +112,33 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     }
 
     const playMaxCombo = play.max_combo;
-    const { maxCombo } = performance.currentPerformance.difficulty;
+    const { maxCombo } = performance.current.difficulty;
     const isFc = scoreStatistics.count_miss === 0 && playMaxCombo + 7 >= maxCombo;
 
-    // set fcValues to null because we won't always need it.
-    let ifFcValues = null;
+    // set value to null because we won't always need it.
+    let ifFcHanami: string | null = null;
+    let ifFcBathbot: string | null = null;
+    let ifFcOwo: string | null = null;
+    let fcAccuracy: number | null = null;
     if (!isFc) {
         const fcStatistics = { ...scoreStatistics, count_300: (scoreStatistics.count_300 ?? 0) + scoreStatistics.count_miss, count_miss: 0 };
-        const fcAccuracy = accuracyCalculator(mode, fcStatistics);
-        ifFcValues = `FC: **${performance.fcPerformance.pp.toFixed(2).toLocaleString()}pp** for **${fcAccuracy.toFixed(2)}%**`;
+        fcAccuracy = accuracyCalculator(mode, fcStatistics);
+        ifFcHanami = `FC: **${performance.fc.pp.toFixed(2).toLocaleString()}pp** for **${fcAccuracy.toFixed(2)}%**`;
+        ifFcBathbot = `**${performance.fc.pp.toFixed(2).toLocaleString()}**/${performance.perfect.pp.toFixed(2).toLocaleString()}PP`;
+        ifFcOwo = `(${performance.fc.pp.toFixed(2).toLocaleString()}PP for ${fcAccuracy.toFixed(2)}% FC)`;
+    }
+
+    let fcHitValues = "";
+    for (let i = 0; i < order.length; i++) {
+        const count = order[i];
+        const countKey = count as keyof typeof scoreStatistics;
+        const countValue = scoreStatistics[countKey];
+        if (countValue !== null) {
+            if (fcHitValues.length > 0)
+                fcHitValues += "/";
+
+            fcHitValues += countValue;
+        }
     }
 
     // Get beatmap's drain length
@@ -143,7 +161,7 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
         retries,
         position: play.position ?? index + 1,
         percentagePassed: percentageNum === 100 || play.passed ? null : percentageNum.toFixed(1),
-        songTitle: `${beatmapset.artist} - ${beatmapset.title}`,
+        songNameFormatted: `${beatmapset.artist} - ${beatmapset.title}`,
         songArtist: beatmapset.artist,
         songName: beatmapset.title,
         difficultyName: beatmap.version,
@@ -152,18 +170,24 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
         mapLink: `https://osu.ppy.sh/b/${beatmap.id}`,
         coverLink: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/cover.jpg`,
         listLink: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/list.jpg`,
+        thumbLink: `https://b.ppy.sh/thumb/${beatmapset.id}l.jpg`,
         grade: grades[play.rank],
-        hitValues: `{ ${hitValues} }`, // Returns the value in this format: { 433/12/2/4 }
+        hitValues, // Returns the value in this format: { 433/12/2/4 }
+        fcHitValues,
+        fcAccuracy: fcAccuracy?.toFixed(2),
+        isFc,
         mods: performance.mods,
         mapAuthor: beatmapset.creator,
         mapStatus: beatmapStatus.charAt(0).toUpperCase() + beatmapStatus.slice(1),
-        drainLength: `${drainMinutes}:${drainSeconds}`,
-        stars: `${performance.currentPerformance.difficulty.stars.toFixed(2).toLocaleString()}★`,
+        drainLength: `${drainMinutes}:${drainSeconds < 10 ? `0${drainSeconds}` : drainSeconds}`,
+        stars: `${performance.current.difficulty.stars.toFixed(2).toLocaleString()}★`,
         rulesetEmote: rulesets[mode],
-        ppFormatted: `**${performance.currentPerformance.pp.toFixed(2).toLocaleString()}**/${performance.perfectPerformance.pp.toFixed(2).toLocaleLowerCase()}pp`,
+        ppFormatted: `**${performance.current.pp.toFixed(2).toLocaleString()}**/${performance.perfect.pp.toFixed(2).toLocaleLowerCase()}pp`,
         playSubmitted: `<t:${new Date(createdAt).getTime() / 1000}:R>`,
-        ifFcValues,
-        comboValues: `[ **${playMaxCombo.toLocaleString()}**/${maxCombo.toLocaleString()}x ]`,
+        ifFcHanami,
+        ifFcBathbot,
+        ifFcOwo,
+        comboValues: `**${playMaxCombo.toLocaleString()}**/${maxCombo.toLocaleString()}x`,
         performance
     };
 }

@@ -171,6 +171,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         mode: user.mode,
         isMultiple: true,
         mods: { exclude: false, forceInclude: false, include: true, name: mod },
+        userDb: user.userDb,
         page,
         index,
         isPage,
