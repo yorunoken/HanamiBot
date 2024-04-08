@@ -12,7 +12,7 @@
 
 import { initializeDatabase, loadLogs, client } from "./utils/initalize";
 import { getAccessToken } from "./utils/osu";
-import { createHandler } from "@lilybird/handlers";
+import { createHandler } from "@lilybird/handlers/simple";
 import { createClient, Intents } from "lilybird";
 import { c } from "tasai";
 import { createCipheriv, randomBytes } from "node:crypto";

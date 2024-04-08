@@ -9,19 +9,20 @@
     "build": "sh ./cli/build.sh"
   },
   "dependencies": {
-    "@lilybird/handlers": "alpha",
+    "@lilybird/handlers": "beta",
     "@lilybird/transformers": "alpha",
-    "@types/bun": "latest",
     "lilybird": "beta",
     "osu-web.js": "^2.4.0",
     "rosu-pp-js": "^1.0.1",
     "tasai": "^1.0.0"
-  },
-  "devDependencies": {
-    "@stylistic/eslint-plugin": "latest",
-    "@typescript-eslint/eslint-plugin": "latest",
-    "eslint": "latest",
-    "eslint-import-resolver-typescript": "latest",
-    "eslint-plugin-import": "latest"
+},
+"devDependencies": {
+    "@types/bun": "latest",
+    "eslint": "^8.55.0",
+    "@typescript-eslint/parser": "^6.13.2",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@stylistic/eslint-plugin": "^1.4.1",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-import-resolver-typescript": "^3.6.1"
   }
 }
