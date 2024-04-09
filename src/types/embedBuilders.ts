@@ -53,7 +53,7 @@ export interface PlaysBuilderOptions extends BuilderOptions {
     type: EmbedBuilderType.PLAYS;
     user: UserExtended;
     mode: Mode;
-    userDb: DatabaseUser | null;
+    authorDb: DatabaseUser | null;
     index?: number;
     isMultiple?: boolean;
     sortByDate?: boolean;

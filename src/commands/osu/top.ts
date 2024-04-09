@@ -164,7 +164,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         user: osuUser,
         mode: user.mode,
         isMultiple: true,
-        userDb: user.userDb,
+        authorDb: user.authorDb,
         plays,
         page,
         isPage,

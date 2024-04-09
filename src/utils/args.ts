@@ -107,18 +107,18 @@ export function getCommandArgs(interaction: Interaction<ApplicationCommandData>)
 
     const user: User = discordUserId
         ? discordUser?.banchoId
-            ? { type: UserType.SUCCESS, banchoId: discordUser.banchoId, userDb: discordUser, mode, beatmapId }
+            ? { type: UserType.SUCCESS, banchoId: discordUser.banchoId, authorDb: userAuthor, mode, beatmapId }
             : {
                 type: UserType.FAIL,
                 beatmapId,
-                userDb: discordUser,
+                authorDb: userAuthor,
                 failMessage: discordUserId ? `The user <@${discordUserId}> hasn't linked their account to the bot yet!` : `Please link your account to the bot using ${linkCommand()}!`
             }
         : userArg
-            ? { type: UserType.SUCCESS, banchoId: userArg, mode, beatmapId, userDb: userAuthor }
+            ? { type: UserType.SUCCESS, banchoId: userArg, mode, beatmapId, authorDb: userAuthor }
             : userAuthor?.banchoId
-                ? { type: UserType.SUCCESS, banchoId: userAuthor.banchoId, mode, beatmapId, userDb: userAuthor }
-                : { type: UserType.FAIL, beatmapId, userDb: userAuthor, failMessage: "Please link your account to the bot using /link!" };
+                ? { type: UserType.SUCCESS, banchoId: userAuthor.banchoId, mode, beatmapId, authorDb: userAuthor }
+                : { type: UserType.FAIL, beatmapId, authorDb: userAuthor, failMessage: "Please link your account to the bot using /link!" };
 
     return { user, mods };
 }
@@ -130,7 +130,7 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
             beatmapId: null,
             type: UserType.FAIL,
             failMessage: `Please link your account to the bot using ${linkCommand()}!`,
-            userDb: null
+            authorDb: null
         },
         flags: {},
         mods: {
@@ -207,7 +207,7 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
             beatmapId: result.user.beatmapId,
             type: UserType.SUCCESS,
             banchoId: userAuthor.banchoId,
-            userDb: userAuthor,
+            authorDb: userAuthor,
             mode
         };
     } else if (result.tempUser) {
@@ -221,7 +221,7 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
             result.user = {
                 beatmapId: result.user.beatmapId,
                 type: UserType.FAIL,
-                userDb: discordUser,
+                authorDb: userAuthor,
                 failMessage: `The user <@${discordUserId}> hasn't linked their account to the bot yet!`
             };
         } else {
@@ -229,7 +229,7 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
                 beatmapId: result.user.beatmapId,
                 type: UserType.SUCCESS,
                 banchoId: discordId ?? userArg,
-                userDb: discordUser,
+                authorDb: userAuthor,
                 mode
             };
         }

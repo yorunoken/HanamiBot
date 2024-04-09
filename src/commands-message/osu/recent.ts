@@ -77,7 +77,7 @@ async function run({ message, args, commandName, index = 0, channel }: { message
         initiatorId: message.author.id,
         user: osuUser,
         mode: user.mode,
-        userDb: user.userDb,
+        authorDb: user.authorDb,
         plays,
         index,
         mods

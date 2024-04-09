@@ -13,6 +13,13 @@ export const messageCommands = new Map<string, DefaultMessageCommand>();
 export const commandAliases = new Map<string, string>();
 export const applicationCommands = new Map<string, DefaultSlashCommand>();
 
+/**
+ * Loads all message commands from the `./src/commands-message` directory and adds them to the `messageCommands` and `commandAliases` maps.
+ *
+ * This function reads the contents of the `./src/commands-message` directory, imports each command module, and adds the command and its aliases to the respective maps.
+ *
+ * @returns {Promise<void>} A promise that resolves when all message commands have been loaded.
+ */
 export async function loadMessageCommands(): Promise<void> {
     // Temporary array to store promises of MessageCommands
     const temp: Array<Promise<DefaultMessageCommand>> = [];

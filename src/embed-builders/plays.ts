@@ -16,7 +16,7 @@ export async function playBuilder({
     mods,
     isMultiple,
     page,
-    userDb,
+    authorDb,
     sortByDate
 }: PlaysBuilderOptions): Promise<Array<EmbedStructure>> {
     if (typeof page === "undefined" && typeof index === "undefined") {
@@ -63,20 +63,20 @@ export async function playBuilder({
         ] satisfies Array<EmbedStructure>;
     }
 
-    return typeof page !== "undefined" ? getMultiplePlays({ plays, page, mode, profile, userDb }) : getSinglePlay({ mode, index: index ?? 0, plays, profile, userDb, isMultiple });
+    return typeof page !== "undefined" ? getMultiplePlays({ plays, page, mode, profile, authorDb }) : getSinglePlay({ mode, index: index ?? 0, plays, profile, authorDb, isMultiple });
 }
 
-async function getSinglePlay({ mode, index, plays, profile, userDb, isMultiple }:
+async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple }:
 {
     plays: Array<UserBestScore> | Array<UserScore>,
     mode: Mode,
     profile: ProfileInfo,
     index: number,
-    userDb: DatabaseUser | null,
+    authorDb: DatabaseUser | null,
     isMultiple?: boolean
 }): Promise<Array<EmbedStructure>> {
-    const isMaximized = (userDb?.score_embeds ?? 1) === 1;
-    const embedType = userDb?.embed_type ?? EmbedScoreType.Hanami;
+    const isMaximized = (authorDb?.score_embeds ?? 1) === 1;
+    const embedType = authorDb?.embed_type ?? EmbedScoreType.Hanami;
 
     const play = await getScore({ scores: plays, index, mode });
     const { performance } = play;
@@ -133,7 +133,7 @@ async function getSinglePlay({ mode, index, plays, profile, userDb, isMultiple }
         ];
 
         const fields = [
-            { name: "Grade", value: `${play.grade} @${play.percentagePassed}%`, inline: true },
+            { name: "Grade", value: `${play.grade} ${play.percentagePassed !== null ? `@${play.percentagePassed}%` : ""}`, inline: true },
             { name: "Score", value: play.score, inline: true },
             { name: "Acc", value: `${play.accuracy}%`, inline: true },
             { name: "PP", value: `${play.ppFormatted}`, inline: true },
@@ -176,7 +176,7 @@ async function getSinglePlay({ mode, index, plays, profile, userDb, isMultiple }
                 thumbnail: { url: play.listLink },
                 fields: [
                     {
-                        name: `${play.grade} @${play.percentagePassed}% ${SPACE} ${play.score} ${SPACE} (${play.accuracy}%) ${SPACE} ${play.playSubmitted}`,
+                        name: `${play.grade} ${play.percentagePassed !== null ? `@${play.percentagePassed}%` : ""} ${SPACE} ${play.score} ${SPACE} (${play.accuracy}%) ${SPACE} ${play.playSubmitted}`,
                         value: `${play.ppFormatted} [ ${play.comboValues} ] {${play.hitValues}}`
                     }
                 ]
@@ -186,7 +186,7 @@ async function getSinglePlay({ mode, index, plays, profile, userDb, isMultiple }
 
     // it's owo, so return owo embed.
     const desc = [
-        `▸ ${play.grade} (${play.percentagePassed}%) ▸ **${performance.current.pp.toFixed(2).toLocaleString()}PP** ${play.ifFcOwo} ▸ ${play.accuracy}%`,
+        `▸ ${play.grade} ${play.percentagePassed !== null ? `(${play.percentagePassed}%)` : ""} ▸ **${performance.current.pp.toFixed(2).toLocaleString()}PP** ${play.ifFcOwo} ▸ ${play.accuracy}%`,
         `▸ ${play.score} ▸ ${play.comboValues} ▸ [${play.hitValues}]`
     ];
 
@@ -205,15 +205,15 @@ async function getSinglePlay({ mode, index, plays, profile, userDb, isMultiple }
     ];
 }
 
-async function getMultiplePlays({ plays, page, mode, profile, userDb }:
+async function getMultiplePlays({ plays, page, mode, profile, authorDb }:
 {
     plays: Array<UserBestScore> | Array<UserScore>,
     page: number,
     mode: Mode,
     profile: ProfileInfo,
-    userDb: DatabaseUser | null
+    authorDb: DatabaseUser | null
 }): Promise<Array<EmbedStructure>> {
-    const embedType = userDb?.embed_type ?? EmbedScoreType.Hanami;
+    const embedType = authorDb?.embed_type ?? EmbedScoreType.Hanami;
 
     const pageStart = page * 5;
     const pageEnd = pageStart + 5;

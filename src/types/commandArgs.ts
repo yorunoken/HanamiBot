@@ -9,7 +9,8 @@ export const enum UserType {
 
 interface BaseUser {
     type: UserType;
-    userDb: DatabaseUser | null;
+    authorDb: DatabaseUser | null;
+    playerDb?: DatabaseUser | null;
     beatmapId: string | null;
 }
 
