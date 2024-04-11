@@ -120,8 +120,23 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     let ifFcBathbot: string | null = null;
     let ifFcOwo: string | null = null;
     let fcAccuracy: number | null = null;
+
+    let fcStatistics: null | {
+        count_300: number,
+        count_miss: number,
+        count_100: number | null,
+        count_50: number | null,
+        count_geki: number | null,
+        count_katu: number | null
+    } = null;
+
     if (!isFc) {
-        const fcStatistics = { ...scoreStatistics, count_300: (scoreStatistics.count_300 ?? 0) + scoreStatistics.count_miss, count_miss: 0 };
+        const hitsLeft = (scoreStatistics.count_100 ?? 0) + (scoreStatistics.count_50 ?? 0) + (scoreStatistics.count_geki ?? 0) + (scoreStatistics.count_katu ?? 0);
+        fcStatistics = {
+            ...scoreStatistics,
+            count_300: performance.mapValues.nObjects - hitsLeft,
+            count_miss: 0
+        };
         fcAccuracy = accuracyCalculator(mode, fcStatistics);
         ifFcHanami = `FC: **${performance.fc.pp.toFixed(2).toLocaleString()}pp** for **${fcAccuracy.toFixed(2)}%**`;
         ifFcBathbot = `**${performance.fc.pp.toFixed(2).toLocaleString()}**/${performance.perfect.pp.toFixed(2).toLocaleString()}PP`;
@@ -130,9 +145,12 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
 
     let fcHitValues = "";
     for (let i = 0; i < order.length; i++) {
+        if (fcStatistics === null)
+            break;
+
         const count = order[i];
-        const countKey = count as keyof typeof scoreStatistics;
-        const countValue = scoreStatistics[countKey];
+        const countKey = count as keyof typeof fcStatistics;
+        const countValue = fcStatistics[countKey];
         if (countValue !== null) {
             if (fcHitValues.length > 0)
                 fcHitValues += "/";
