@@ -127,24 +127,24 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
 
     if (embedType === EmbedScoreType.Bathbot && isMaximized) {
         const beatmapInfoField = [
-            `**Length:** \`${play.drainLength}\` ${SPACE} **BPM:** \`${mapValues.bpm.toFixed().toLocaleString()}\` ${SPACE} **Objects** \`${mapValues.nObjects}\``,
-            `**AR:** \`${mapValues.ar.toFixed(1)}\` ${SPACE} **OD:** \`${mapValues.od
-                .toFixed(1)}\` ${SPACE} **CS:** \`${mapValues.cs.toFixed(1)}\` ${SPACE} **HP:** \`${mapValues.hp.toFixed(1)}\` **Stars:** ${play.stars}`
+            `Length: \`${play.drainLength}\` ${SPACE} BPM: \`${mapValues.bpm.toFixed().toLocaleString()}\` ${SPACE} Objects \`${mapValues.nObjects}\``,
+            `AR: \`${mapValues.ar.toFixed(1)}\` ${SPACE} OD: \`${mapValues.od
+                .toFixed(1)}\` ${SPACE} CS: \`${mapValues.cs.toFixed(1)}\` ${SPACE} HP: \`${mapValues.hp.toFixed(1)}\` Stars: ${play.stars}`
         ];
 
         const fields = [
-            { name: "Grade", value: `${play.grade} ${play.percentagePassed !== null ? `@${play.percentagePassed}%` : ""}`, inline: true },
+            { name: "Grade", value: `${play.grade} ${play.percentagePassed !== null ? `@${play.percentagePassed}%` : ""} +${play.mods.join("")}`, inline: true },
             { name: "Score", value: play.score, inline: true },
             { name: "Acc", value: `${play.accuracy}%`, inline: true },
             { name: "PP", value: `${play.ppFormatted}`, inline: true },
             { name: "Combo", value: `${play.comboValues}`, inline: true },
-            { name: "Hits", value: `${play.hitValues}`, inline: true }
+            { name: "Hits", value: `{${play.hitValues}}`, inline: true }
         ];
 
         if (!play.isFc) {
             fields.push({ name: "If FC: PP", value: play.ifFcBathbot ?? "", inline: true });
             fields.push({ name: "Acc", value: `${play.fcAccuracy}%`, inline: true });
-            fields.push({ name: "Hits", value: play.fcHitValues, inline: true });
+            fields.push({ name: "Hits", value: `{${play.fcHitValues}}`, inline: true });
         }
 
         fields.push({ name: "Map Info", value: beatmapInfoField.join("\n"), inline: false });
