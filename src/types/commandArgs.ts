@@ -25,11 +25,28 @@ interface FailUser extends BaseUser {
     failMessage: string;
 }
 
+export interface DifficultyAttributes {
+    combo?: number;
+    acc?: number;
+    clock_rate?: number;
+    bpm?: number;
+    n300?: number;
+    n100?: number;
+    n50?: number;
+    nmisses?: number;
+    ngeki?: number;
+    nkatu?: number;
+    ar?: number;
+    od?: number;
+    cs?: number;
+}
+
 export type User = SuccessUser | FailUser;
 
 export interface CommandArgs {
     user: User;
     mods: Mods;
+    difficultySettings?: DifficultyAttributes;
 }
 
 export interface Mods {

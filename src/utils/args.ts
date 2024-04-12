@@ -3,7 +3,7 @@ import { slashCommandsIds } from "./cache";
 import { Mode } from "@type/osu";
 import { UserType } from "@type/commandArgs";
 import { ModsEnum } from "osu-web.js";
-import type { CommandArgs, Mods, ParsedArgs, User } from "@type/commandArgs";
+import type { CommandArgs, DifficultyAttributes, Mods, ParsedArgs, User } from "@type/commandArgs";
 import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, Interaction, Message } from "@lilybird/transformers";
 
@@ -71,14 +71,26 @@ function linkCommand(): string | undefined {
     return slashCommandsIds.get("link");
 }
 
-export function getCommandArgs(interaction: Interaction<ApplicationCommandData>): CommandArgs | undefined {
+export function getCommandArgs(interaction: Interaction<ApplicationCommandData>, getAttributes?: boolean): CommandArgs | undefined {
     if (!interaction.isApplicationCommandInteraction() || !interaction.inGuild()) return;
+    const { data } = interaction;
 
-    const userArg = interaction.data.getString("username");
+    let difficultySettings: DifficultyAttributes | undefined;
+    if (getAttributes) {
+        difficultySettings = {};
+        const attributesArray: Array<keyof DifficultyAttributes> = ["combo", "acc", "clock_rate", "bpm", "n300", "n100", "n50", "nmisses", "ngeki", "nkatu", "ar", "cs", "od"];
+
+        for (let i = 0; i < attributesArray.length; i++) {
+            const attribute = attributesArray[i];
+            difficultySettings[attribute] = data.getNumber(attribute);
+        }
+    }
+
+    const userArg = data.getString("username");
     const userAuthor = getUser(interaction.member.user.id);
-    const discordUserId = interaction.data.getUser("discord");
+    const discordUserId = data.getUser("discord");
     const discordUser = getUser(discordUserId ?? "");
-    const mode = <Mode | undefined>interaction.data.getString("mode") ?? Mode.OSU;
+    const mode = <Mode | undefined>data.getString("mode") ?? Mode.OSU;
 
     let mods: Mods = {
         exclude: null,
@@ -87,18 +99,18 @@ export function getCommandArgs(interaction: Interaction<ApplicationCommandData>)
         name: null
     };
 
-    const modsValue = interaction.data.getString("mods");
+    const modsValue = data.getString("mods");
     const modSections = modsValue?.toUpperCase().match(/.{1,2}/g);
     if (modSections && !modSections.every((selectedMod) => selectedMod in ModsEnum || modsValue === "NM")) {
         mods = {
-            exclude: interaction.data.getBoolean("exclude") ?? null,
-            include: interaction.data.getBoolean("include") ?? null,
-            forceInclude: interaction.data.getBoolean("force_include") ?? null,
+            exclude: data.getBoolean("exclude") ?? null,
+            include: data.getBoolean("include") ?? null,
+            forceInclude: data.getBoolean("force_include") ?? null,
             name: <Mod | undefined>modsValue ?? null
         };
     }
 
-    const urlMatch = parseURL(interaction.data.getString("map") ?? "");
+    const urlMatch = parseURL(data.getString("map") ?? "");
     let beatmapId: string | null = null;
     if (urlMatch && "id" in urlMatch)
         beatmapId = urlMatch.id;
@@ -120,7 +132,7 @@ export function getCommandArgs(interaction: Interaction<ApplicationCommandData>)
                 ? { type: UserType.SUCCESS, banchoId: userAuthor.banchoId, mode, beatmapId, authorDb: userAuthor }
                 : { type: UserType.FAIL, beatmapId, authorDb: userAuthor, failMessage: "Please link your account to the bot using /link!" };
 
-    return { user, mods };
+    return { user, mods, difficultySettings };
 }
 
 export function parseOsuArguments(message: Message, args: Array<string>, mode: Mode): ParsedArgs {
