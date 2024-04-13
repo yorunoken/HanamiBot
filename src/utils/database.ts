@@ -1,9 +1,12 @@
 import db from "../data.db" with { type: "sqlite" };
 import type { DatabaseMap, DatabaseGuild, DatabaseUser, DatabaseCommands } from "@type/database";
 
+export function getUsers(): Array<DatabaseUser | null> {
+    return db.prepare("SELECT * FROM users").all() as Array<DatabaseUser | null>;
+}
+
 export function getUser(id: string | number): DatabaseUser | null {
-    const data: DatabaseUser | null = db.prepare("SELECT * FROM users WHERE id = ?").get(id) as DatabaseUser | null;
-    if (typeof data?.score_embeds === "string") data.score_embeds = Number(data.score_embeds);
+    const data = db.prepare("SELECT * FROM users WHERE id = ?").get(id) as DatabaseUser | null;
 
     return data;
 }
