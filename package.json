@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@libsql/client": "^0.6.0",
-    "@lilybird/handlers": "beta",
-    "@lilybird/transformers": "alpha",
-    "lilybird": "beta",
+    "@lilybird/handlers": "^0.3.3",
+    "@lilybird/transformers": "^0.1.2",
+    "lilybird": "^0.6.0-beta.2",
     "osu-web.js": "^2.4.0",
     "rosu-pp-js": "^1.0.1",
     "tasai": "^1.0.0"
