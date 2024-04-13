@@ -2,12 +2,14 @@ import db from "../data.db" with { type: "sqlite" };
 import { getAccessToken } from "./osu";
 import { slashCommandsIds } from "./cache";
 import { Client as OsuClient } from "osu-web.js";
+import { createClient } from "@libsql/client";
 import { mkdir, access, readFile, writeFile, readdir } from "node:fs/promises";
 import type { Client as LilybirdClient, POSTApplicationCommandStructure } from "lilybird";
 import type { DefaultMessageCommand, DefaultSlashCommand } from "@type/commands";
 
 const { accessToken } = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
 export const client = new OsuClient(accessToken);
+export const tursoClient = createClient({ url: process.env.TURSO_URL, authToken: process.env.TURSO_TOKEN });
 
 export const messageCommands = new Map<string, DefaultMessageCommand>();
 export const commandAliases = new Map<string, string>();

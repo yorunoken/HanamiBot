@@ -5,7 +5,8 @@ declare module "bun" {
         CLIENT_SECRET: string;
         CLIENT_ID: string;
         CALLBACK_URL: string;
-        OSU_CAPITAL_ACCESS_TOKEN: string;
+        TURSO_URL: string;
+        TURSO_TOKEN: string;
         KEY?: string;
         IV?: string;
     }
