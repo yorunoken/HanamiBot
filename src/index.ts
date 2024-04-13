@@ -12,7 +12,6 @@
 
 import { initializeDatabase, loadLogs, client } from "./utils/initalize";
 import { getAccessToken } from "./utils/osu";
-import { syncUsersWithLocal } from "@utils/turso";
 import { createHandler } from "@lilybird/handlers/simple";
 import { createClient, Intents } from "lilybird";
 import { c } from "tasai";
@@ -23,11 +22,6 @@ setInterval(async () => {
     const { accessToken } = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
     client.setAccessToken(accessToken);
 }, 1000 * 60 * 60);
-
-// refresh database every 6 seconds
-setInterval(async () => {
-    await syncUsersWithLocal();
-}, 6);
 
 const keyString = process.env.KEY ?? randomBytes(32);
 const ivString = process.env.IV ?? randomBytes(16);

@@ -1,7 +1,5 @@
 import { encrypt } from "../..";
 import { buildAuthUrl } from "@utils/osu";
-import { getUser } from "@utils/database";
-import { slashCommandsIds } from "@utils/cache";
 import type { AuthScope } from "@type/osu";
 import type { SlashCommand } from "@lilybird/handlers";
 import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
@@ -16,15 +14,8 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     if (!interaction.inGuild()) return;
     await interaction.deferReply(true);
 
-    const userId = interaction.member.user.id;
-    const user = getUser(userId);
-    if (user?.banchoId) {
-        const unlinkCommand = slashCommandsIds.get("unlink");
-        await interaction.editReply(`You're already linked to the bot. You ${unlinkCommand} to unlink yourself!`);
-        return;
-    }
+    const encryptedDiscordId = `${encrypt(interaction.member.user.id)}`;
 
-    const encryptedDiscordId = `${encrypt(userId)}`;
     const authUrl = buildRedirectPage(encryptedDiscordId);
     await interaction.editReply(`You can [click here](<${authUrl}>) to link your osu! account to the bot!`);
 }

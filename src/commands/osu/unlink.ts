@@ -1,6 +1,5 @@
 import { getUser, removeUser } from "@utils/database";
 import { slashCommandsIds } from "@utils/cache";
-import { removeUserOnline } from "@utils/turso";
 import type { SlashCommand } from "@lilybird/handlers";
 import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
 
@@ -22,7 +21,6 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    await removeUserOnline(userId);
     removeUser(userId);
     await interaction.editReply(`Sad to see you go :(\nYou can always re-link yourself using ${linkCommand}!`);
 }
