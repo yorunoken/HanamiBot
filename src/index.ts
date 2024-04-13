@@ -24,10 +24,10 @@ setInterval(async () => {
     client.setAccessToken(accessToken);
 }, 1000 * 60 * 60);
 
-// refresh database every 3 seconds
+// refresh database every 6 seconds
 setInterval(async () => {
     await syncUsersWithLocal();
-}, 3);
+}, 6);
 
 const keyString = process.env.KEY ?? randomBytes(32);
 const ivString = process.env.IV ?? randomBytes(16);
