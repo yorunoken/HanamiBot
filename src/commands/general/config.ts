@@ -1,12 +1,11 @@
 import { getUser, insertData } from "@utils/database";
 import { ScoreEmbed } from "@type/database";
 import { ApplicationCommandOptionType } from "lilybird";
-import type { ApplicationCommandData, GuildInteraction, Interaction } from "@lilybird/transformers";
+import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
 import type { EmbedStructure } from "lilybird";
-import type { SlashCommand } from "@lilybird/handlers";
+import type { SlashCommand } from "@type/commands";
 
 export default {
-    post: "GLOBAL",
     data: {
         name: "config",
         description: "Set your account configurations",
@@ -37,7 +36,7 @@ export default {
     run
 } satisfies SlashCommand;
 
-async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
+async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
     await interaction.deferReply();
     if (!interaction.inGuild()) return;
 

@@ -1,8 +1,7 @@
 import { client } from "@utils/initalize";
-import type { SlashCommand } from "@lilybird/handlers";
+import type { SlashCommand } from "@type/commands";
 
 export default {
-    post: "GLOBAL",
     data: { name: "ping", description: "pong!!" },
     run: async (interaction) => {
         await interaction.deferReply();

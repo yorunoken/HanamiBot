@@ -1,4 +1,4 @@
-import type { ApplicationCommandData, GuildTextChannel, Interaction, Message } from "@lilybird/transformers";
+import type { ApplicationCommandData, GuildInteraction, GuildTextChannel, Message } from "@lilybird/transformers";
 import type { Client, POSTApplicationCommandStructure } from "lilybird";
 
 export interface MessageCommand {
@@ -12,9 +12,11 @@ export interface MessageCommand {
     { client: Client, message: Message, args: Array<string>, prefix: string, index: number | undefined, commandName: string, channel: GuildTextChannel }) => Promise<void>;
 }
 
+type Awaitable<T> = Promise<T> | T;
+
 export interface SlashCommand {
     data: POSTApplicationCommandStructure;
-    run: (interaction: Interaction<ApplicationCommandData>) => Promise<void>;
+    run: (interaction: GuildInteraction<ApplicationCommandData>) => Awaitable<any>;
 }
 
 export interface DefaultSlashCommand {

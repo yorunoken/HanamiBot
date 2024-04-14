@@ -1,16 +1,14 @@
 import { getUser, removeUser } from "@utils/database";
 import { slashCommandsIds } from "@utils/cache";
-import type { SlashCommand } from "@lilybird/handlers";
-import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
+import type { SlashCommand } from "@type/commands";
+import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
 
 export default {
-    post: "GLOBAL",
     data: { name: "unlink", description: "Unlink your osu! account from the bot." },
     run
 } satisfies SlashCommand;
 
-async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
-    if (!interaction.inGuild()) return;
+async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
     await interaction.deferReply(true);
 
     const linkCommand = slashCommandsIds.get("link");

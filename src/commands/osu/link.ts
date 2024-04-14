@@ -1,17 +1,15 @@
 import { encrypt } from "../..";
 import { buildAuthUrl } from "@utils/osu";
 import type { AuthScope } from "@type/osu";
-import type { SlashCommand } from "@lilybird/handlers";
-import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
+import type { SlashCommand } from "@type/commands";
+import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
 
 export default {
-    post: "GLOBAL",
     data: { name: "link", description: "Link your osu! account to the bot." },
     run
 } satisfies SlashCommand;
 
-async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
-    if (!interaction.inGuild()) return;
+async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
     await interaction.deferReply(true);
 
     const encryptedDiscordId = `${encrypt(interaction.member.user.id)}`;

@@ -4,11 +4,10 @@ import { EmbedBuilderType } from "@type/embedBuilders";
 import { backgroundBuilder } from "@builders/background";
 import { client } from "@utils/initalize";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
-import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
-import type { SlashCommand } from "@lilybird/handlers";
+import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
+import type { SlashCommand } from "@type/commands";
 
 export default {
-    post: "GLOBAL",
     data: {
         name: "background",
         description: "Display background of a beatmap.",
@@ -23,8 +22,7 @@ export default {
     run
 } satisfies SlashCommand;
 
-async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
-    if (!interaction.inGuild()) return;
+async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
     await interaction.deferReply();
 
     const args = getCommandArgs(interaction);
