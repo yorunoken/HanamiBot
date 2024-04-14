@@ -18,7 +18,6 @@ export default {
 async function run(interaction: Interaction): Promise<void> {
     await handleButton(interaction);
     if (interaction.isApplicationCommandInteraction() && interaction.inGuild()) {
-        const server = await interaction.client.rest.getGuild(interaction.guildId);
         const { username } = interaction.member.user;
 
         const commandDefault = applicationCommands.get(interaction.data.name);
@@ -27,6 +26,7 @@ async function run(interaction: Interaction): Promise<void> {
 
         try {
             await command.run(interaction);
+            const server = await interaction.client.rest.getGuild(interaction.guildId);
             await loadLogs(`INFO: [${server.name}] ${username} used slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}`);
 
             const docs = getCommand(interaction.data.name);
@@ -35,6 +35,7 @@ async function run(interaction: Interaction): Promise<void> {
             else
                 insertData({ table: "commands_slash", data: [ { name: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
         } catch (error) {
+            const server = await interaction.client.rest.getGuild(interaction.guildId);
             const err = error as Error;
             console.log(error);
             await loadLogs(
