@@ -14,6 +14,9 @@ export interface DatabaseUser {
 
 export interface DatabaseGuild {
     id: string;
+    name: string;
+    owner_id: string;
+    joined_at: string;
     prefixes: Array<string> | null;
 }
 
