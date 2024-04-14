@@ -1,6 +1,6 @@
 import { getCommandArgs } from "@utils/args";
 import { getBeatmapIdFromContext } from "@utils/osu";
-import { mapBuilder } from "@builders/map";
+import { simulateBuilder } from "@builders/simulate";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { Mod } from "osu-web.js";
@@ -119,10 +119,10 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     if (!interaction.inGuild()) return;
     await interaction.deferReply();
 
-    const args = getCommandArgs(interaction, true);
+    const args = getCommandArgs<true>(interaction);
 
     if (typeof args === "undefined") return;
-    const { user, mods } = args;
+    const { user, mods, difficultySettings } = args;
 
     const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ channelId: interaction.channelId, client: interaction.client });
     if (typeof beatmapId === "undefined" || beatmapId === null) {
@@ -138,9 +138,10 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
         return;
     }
 
-    const embeds = await mapBuilder({
+    const embeds = await simulateBuilder({
         type: EmbedBuilderType.MAP,
         initiatorId: interaction.member.user.id,
+        difficultySettings,
         beatmapId: Number(beatmapId),
         mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null
     });

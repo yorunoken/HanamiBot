@@ -25,7 +25,7 @@ interface FailUser extends BaseUser {
     failMessage: string;
 }
 
-export interface DifficultyAttributes {
+export interface DifficultyOptions {
     combo?: number;
     acc?: number;
     clock_rate?: number;
@@ -43,10 +43,10 @@ export interface DifficultyAttributes {
 
 export type User = SuccessUser | FailUser;
 
-export interface CommandArgs {
+export interface SlashCommandArgs<T extends boolean> {
     user: User;
     mods: Mods;
-    difficultySettings?: DifficultyAttributes;
+    difficultySettings: T extends true ? Required<DifficultyOptions> : DifficultyOptions;
 }
 
 export interface Mods {
@@ -56,7 +56,7 @@ export interface Mods {
     name: Mod | null;
 }
 
-export interface ParsedArgs {
+export interface PrefixCommandArgs {
     tempUser: Array<string> | null;
     user: User;
     flags: Record<string, string | undefined>;

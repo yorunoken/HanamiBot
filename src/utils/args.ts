@@ -3,7 +3,7 @@ import { slashCommandsIds } from "./cache";
 import { Mode } from "@type/osu";
 import { UserType } from "@type/commandArgs";
 import { ModsEnum } from "osu-web.js";
-import type { CommandArgs, DifficultyAttributes, Mods, ParsedArgs, User } from "@type/commandArgs";
+import type { SlashCommandArgs, DifficultyOptions, Mods, PrefixCommandArgs, User } from "@type/commandArgs";
 import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, Interaction, Message } from "@lilybird/transformers";
 
@@ -71,14 +71,14 @@ function linkCommand(): string | undefined {
     return slashCommandsIds.get("link");
 }
 
-export function getCommandArgs(interaction: Interaction<ApplicationCommandData>, getAttributes?: boolean): CommandArgs | undefined {
+export function getCommandArgs<T extends boolean>(interaction: Interaction<ApplicationCommandData>, getAttributes?: T): SlashCommandArgs<T> | undefined {
     if (!interaction.isApplicationCommandInteraction() || !interaction.inGuild()) return;
     const { data } = interaction;
 
-    let difficultySettings: DifficultyAttributes | undefined;
+    let difficultySettings: DifficultyOptions | undefined;
     if (getAttributes) {
-        difficultySettings = {};
-        const attributesArray: Array<keyof DifficultyAttributes> = ["combo", "acc", "clock_rate", "bpm", "n300", "n100", "n50", "nmisses", "ngeki", "nkatu", "ar", "cs", "od"];
+        difficultySettings = {} as DifficultyOptions;
+        const attributesArray: Array<keyof DifficultyOptions> = ["combo", "acc", "clock_rate", "bpm", "n300", "n100", "n50", "nmisses", "ngeki", "nkatu", "ar", "cs", "od"];
 
         for (let i = 0; i < attributesArray.length; i++) {
             const attribute = attributesArray[i];
@@ -112,10 +112,8 @@ export function getCommandArgs(interaction: Interaction<ApplicationCommandData>,
 
     const urlMatch = parseURL(data.getString("map") ?? "");
     let beatmapId: string | null = null;
-    if (urlMatch && "id" in urlMatch)
-        beatmapId = urlMatch.id;
-    else if (urlMatch && "setId" in urlMatch)
-        beatmapId = urlMatch.difficultyId;
+    if (urlMatch && "id" in urlMatch) beatmapId = urlMatch.id;
+    else if (urlMatch && "setId" in urlMatch) beatmapId = urlMatch.difficultyId;
 
     const user: User = discordUserId
         ? discordUser?.banchoId
@@ -135,8 +133,8 @@ export function getCommandArgs(interaction: Interaction<ApplicationCommandData>,
     return { user, mods, difficultySettings };
 }
 
-export function parseOsuArguments(message: Message, args: Array<string>, mode: Mode): ParsedArgs {
-    const result: ParsedArgs = {
+export function parseOsuArguments(message: Message, args: Array<string>, mode: Mode): PrefixCommandArgs {
+    const result: PrefixCommandArgs = {
         tempUser: null,
         user: {
             beatmapId: null,
