@@ -1,8 +1,7 @@
 import { helpBuilder } from "@builders/help";
-import type { SlashCommand } from "@lilybird/handlers";
+import type { SlashCommand } from "@type/commands";
 
 export default {
-    post: "GLOBAL",
     data: { name: "help", description: "Get info about the bot." },
     run: async (interaction) => {
         await interaction.deferReply();

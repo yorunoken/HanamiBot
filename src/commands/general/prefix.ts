@@ -2,8 +2,8 @@ import { getServer, insertData } from "@utils/database";
 import { DEFAULT_PREFIX, MAX_AMOUNT_OF_PREFIXES } from "@utils/constants";
 import { prefixesCache } from "@listeners/guildCreate";
 import { ApplicationCommandOptionType, EmbedType, PermissionFlags } from "lilybird";
-import type { ApplicationCommandData, GuildInteraction, Interaction } from "@lilybird/transformers";
-import type { SlashCommand } from "@lilybird/handlers";
+import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
+import type { SlashCommand } from "@type/commands";
 
 const commands: Record<string, ({ prefix, interaction, guildId }: { prefix?: string, interaction: GuildInteraction<ApplicationCommandData>, guildId: string }) => Promise<void>> = {
     add,
@@ -21,7 +21,6 @@ const PERMISSIONS_NEEDED = PermissionNames[Number(PERMISSIONS_NEEDED_INT)];
 const PERMISSION_NEEDED_STRING = `Looks like you don't have the necessary permissions for this command. Permission(s) needed: \`${PERMISSIONS_NEEDED}\``;
 
 export default {
-    post: "GLOBAL",
     data: {
         name: "prefix",
         description: "Set, remove and list the bot's prefixes",
@@ -48,7 +47,7 @@ export default {
     run
 } satisfies SlashCommand;
 
-async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
+async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
     await interaction.deferReply();
     if (!interaction.inGuild()) return;
 

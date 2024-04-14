@@ -5,11 +5,10 @@ import { compareBuilder } from "@builders/compare";
 import { getBeatmapIdFromContext } from "@utils/osu";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
-import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
-import type { SlashCommand } from "@lilybird/handlers";
+import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
+import type { SlashCommand } from "@type/commands";
 
 export default {
-    post: "GLOBAL",
     data: {
         name: "compare",
         description: "Display play(s) of a user on a beatmap.",
@@ -71,8 +70,7 @@ export default {
     run
 } satisfies SlashCommand;
 
-async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
-    if (!interaction.inGuild()) return;
+async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
     await interaction.deferReply();
 
     const args = getCommandArgs(interaction);

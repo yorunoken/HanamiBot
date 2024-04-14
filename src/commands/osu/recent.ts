@@ -9,11 +9,10 @@ import { mesageDataForButtons } from "@utils/cache";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { PlaysBuilderOptions } from "@type/embedBuilders";
 import type { Mod } from "osu-web.js";
-import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
-import type { SlashCommand } from "@lilybird/handlers";
+import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
+import type { SlashCommand } from "@type/commands";
 
 export default {
-    post: "GLOBAL",
     data: {
         name: "recent",
         description: "Display recent play(s) of a user.",
@@ -82,8 +81,7 @@ export default {
     run
 } satisfies SlashCommand;
 
-async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
-    if (!interaction.inGuild()) return;
+async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
     await interaction.deferReply();
 
     const args = getCommandArgs(interaction);
