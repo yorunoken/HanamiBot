@@ -31,7 +31,7 @@ const commands: Record<string, (interaction: GuildInteraction<ApplicationCommand
 };
 
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
-    await interaction.deferReply();
+    await interaction.deferReply(true);
     if (interaction.member.user.id !== process.env.OWNER_ID) {
         await interaction.editReply("secert!!!!!");
         return;
@@ -51,11 +51,21 @@ async function sql(interaction: GuildInteraction<ApplicationCommandData>): Promi
     const queryResponse = query(str);
 
     try {
-        await interaction.editReply(`SQL result:\ngit fetch origin
-        git checkout owner-commands\`\`\`json
-${JSON.stringify(queryResponse, null, 2)}
+        const response = JSON.stringify(queryResponse, null, 2);
+        if (response.length > 1500) {
+            const blob = new Blob([response], { type: "application/json" });
+
+            await interaction.editReply({
+                content: "*Text was too large to send*\n*Here is the file instead:*",
+                files: [ { file: blob, name: "sqlite_report.json" } ]
+            });
+        } else {
+            await interaction.editReply(`SQL result:\n\`\`\`json
+${response}
 \`\`\``);
+        }
     } catch (e) {
+        console.log(e);
         await interaction.editReply("*No response was given*");
     }
 }
