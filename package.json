@@ -9,14 +9,14 @@
     "build": "sh ./cli/build.sh"
   },
   "dependencies": {
-    "@lilybird/handlers": "beta",
-    "@lilybird/transformers": "alpha",
-    "lilybird": "beta",
+    "@lilybird/handlers": "0.4.0-alpha.2",
+    "@lilybird/transformers": "0.2.0-alpha.1",
+    "lilybird": "0.6.0-beta.3",
     "osu-web.js": "^2.4.0",
     "rosu-pp-js": "^1.0.1",
     "tasai": "^1.0.0"
-},
-"devDependencies": {
+  },
+  "devDependencies": {
     "@types/bun": "latest",
     "eslint": "^8.55.0",
     "@typescript-eslint/parser": "^6.13.2",
