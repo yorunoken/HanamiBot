@@ -13,8 +13,9 @@
 import { initializeDatabase, loadLogs, client } from "./utils/initalize";
 import { getAccessToken } from "./utils/osu";
 import { createHandler } from "@lilybird/handlers/simple";
-import { createClient, Intents } from "lilybird";
+import { CachingDelegationType, createClient, Intents } from "lilybird";
 import { c } from "tasai";
+import { Channel, Guild, GuildVoiceChannel } from "@lilybird/transformers";
 import { createCipheriv, randomBytes } from "node:crypto";
 
 // refresh token every hour
@@ -62,6 +63,12 @@ await createClient({
     useDebugRest: true,
     attachDebugListener: true,
     token: process.env.DISCORD_BOT_TOKEN,
+    caching: {
+        transformerTypes: { channel: Channel, guild: Guild, voiceState: GuildVoiceChannel },
+        delegate: CachingDelegationType.DEFAULT,
+        applyTransformers: true,
+        enabled: { channel: true }
+    },
     intents: [
         Intents.GUILDS,
         Intents.GUILD_MESSAGES,

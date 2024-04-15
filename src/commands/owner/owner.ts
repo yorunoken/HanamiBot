@@ -55,6 +55,7 @@ async function sql(interaction: GuildInteraction<ApplicationCommandData>): Promi
         if (response.length > 1500) {
             const blob = new Blob([response], { type: "application/json" });
 
+            // @ts-expect-error TypeScript thinks blob is incorrect type but it is.
             await interaction.editReply({
                 content: "*Text was too large to send*\n*Here is the file instead:*",
                 files: [ { file: blob, name: "sqlite_report.json" } ]
