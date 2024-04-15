@@ -45,7 +45,7 @@ export interface LeaderboardBuilderOptions extends BuilderOptions {
 }
 
 export interface SimulateBuilderOptions extends BuilderOptions {
-    type: EmbedBuilderType.MAP;
+    type: EmbedBuilderType.SIMULATE;
     beatmapId: number;
     mods: Array<Mod> | null;
     difficultyOptions: DifficultyOptions;

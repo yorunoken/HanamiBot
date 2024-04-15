@@ -3,12 +3,11 @@ import { getBeatmapIdFromContext } from "@utils/osu";
 import { simulateBuilder } from "@builders/simulate";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
+import type { SlashCommand } from "@type/commands";
 import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
-import type { SlashCommand } from "@lilybird/handlers";
 
 export default {
-    post: "GLOBAL",
     data: {
         name: "simulate",
         description: "Simulate a score on a beatmap..",
@@ -119,7 +118,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     if (!interaction.inGuild()) return;
     await interaction.deferReply();
 
-    const args = getCommandArgs<true>(interaction);
+    const args = getCommandArgs(interaction, true);
 
     if (typeof args === "undefined") return;
     const { user, mods, difficultySettings } = args;
@@ -139,9 +138,9 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     }
 
     const embeds = await simulateBuilder({
-        type: EmbedBuilderType.MAP,
+        type: EmbedBuilderType.SIMULATE,
         initiatorId: interaction.member.user.id,
-        difficultySettings,
+        difficultyOptions: difficultySettings ?? {},
         beatmapId: Number(beatmapId),
         mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null
     });

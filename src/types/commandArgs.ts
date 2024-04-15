@@ -43,10 +43,10 @@ export interface DifficultyOptions {
 
 export type User = SuccessUser | FailUser;
 
-export interface SlashCommandArgs<T extends boolean> {
+export interface SlashCommandArgs {
     user: User;
     mods: Mods;
-    difficultySettings: T extends true ? Required<DifficultyOptions> : DifficultyOptions;
+    difficultySettings?: DifficultyOptions;
 }
 
 export interface Mods {

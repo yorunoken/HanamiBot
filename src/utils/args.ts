@@ -71,14 +71,15 @@ function linkCommand(): string | undefined {
     return slashCommandsIds.get("link");
 }
 
-export function getCommandArgs<T extends boolean>(interaction: Interaction<ApplicationCommandData>, getAttributes?: T): SlashCommandArgs<T> | undefined {
+export function getCommandArgs(interaction: Interaction<ApplicationCommandData>, getAttributes?: boolean): SlashCommandArgs | undefined {
     if (!interaction.isApplicationCommandInteraction() || !interaction.inGuild()) return;
     const { data } = interaction;
 
-    let difficultySettings: DifficultyOptions | undefined;
-    if (getAttributes) {
-        difficultySettings = {} as DifficultyOptions;
+    // This is so fucking annoying holy shit I can't get it right
+    let difficultySettings = getAttributes ? {} as DifficultyOptions : undefined;
+    if (getAttributes === true) {
         const attributesArray: Array<keyof DifficultyOptions> = ["combo", "acc", "clock_rate", "bpm", "n300", "n100", "n50", "nmisses", "ngeki", "nkatu", "ar", "cs", "od"];
+        difficultySettings = {} as DifficultyOptions;
 
         for (let i = 0; i < attributesArray.length; i++) {
             const attribute = attributesArray[i];
