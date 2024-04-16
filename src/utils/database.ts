@@ -23,6 +23,10 @@ export function getServer(id: string | number): DatabaseGuild | null {
     return data;
 }
 
+export function removeServer(id: string | number): void {
+    db.prepare("DELETE FROM servers WHERE id = ?").run(id);
+}
+
 export function getRowCount(table: string): number {
     const count = db.prepare(`SELECT COUNT(*) FROM ${table};`).get() as Record<"COUNT(*)", number>;
     return count["COUNT(*)"];

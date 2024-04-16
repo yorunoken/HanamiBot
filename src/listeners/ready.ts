@@ -1,4 +1,4 @@
-import { loadApplicationCommands, loadLogs, loadMessageCommands } from "@utils/initalize";
+import { loadApplicationCommands, loadLogs, loadMessageCommands, refreshServersDatabase } from "@utils/initalize";
 import type { Event } from "@lilybird/handlers";
 
 export default {
@@ -12,5 +12,7 @@ export default {
         console.log("Loaded message commands ✅");
         await loadApplicationCommands(client);
         console.log("Loaded application commands ✅");
+        refreshServersDatabase();
+        console.log("Refreshed servers database ✅");
     }
 } satisfies Event<"ready">;
