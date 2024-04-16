@@ -48,7 +48,7 @@ export interface SimulateBuilderOptions extends BuilderOptions {
     type: EmbedBuilderType.SIMULATE;
     beatmapId: number;
     mods: Array<Mod> | null;
-    difficultyOptions: DifficultyOptions;
+    options: DifficultyOptions;
 }
 
 export interface MapBuilderOptions extends BuilderOptions {

@@ -20,7 +20,7 @@ export default {
 async function run({ message, args, channel }: { message: Message, args: Array<string>, channel: GuildTextChannel }): Promise<void> {
     const { user, mods, flags } = parseOsuArguments(message, args, Mode.OSU);
 
-    const difficultyOptions: DifficultyOptions = {
+    const options: DifficultyOptions = {
         acc: Number(flags.acc ?? flags.accuracy) || undefined,
         bpm: Number(flags.bpm) || undefined,
         clock_rate: Number(flags.clockrate ?? flags.clockRate ?? flags.clock_rate ?? flags.cr) || undefined,
@@ -54,7 +54,7 @@ async function run({ message, args, channel }: { message: Message, args: Array<s
         type: EmbedBuilderType.SIMULATE,
         initiatorId: message.author.id,
         beatmapId: Number(beatmapId),
-        difficultyOptions,
+        options,
         mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null
     });
     await channel.send({ embeds });

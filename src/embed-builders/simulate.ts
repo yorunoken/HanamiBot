@@ -1,17 +1,21 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { client } from "@utils/initalize";
-import { downloadBeatmap, getPerformanceResults } from "@utils/osu";
+import { accuracyCalculator, downloadBeatmap, getPerformanceResults } from "@utils/osu";
 import { getMap } from "@utils/database";
 import { rulesets } from "@utils/emotes";
+import { SPACE } from "@utils/constants";
 import { EmbedType } from "lilybird";
+import type { Mode } from "@type/osu";
 import type { SimulateBuilderOptions } from "@type/embedBuilders";
 import type { EmbedStructure } from "lilybird";
 
 export async function simulateBuilder({
     beatmapId,
     mods,
-    difficultyOptions
+    options
 }: SimulateBuilderOptions): Promise<Array<EmbedStructure>> {
-    const beatmapRequest = await client.safeParse(client.beatmaps.getBeatmap(Number(beatmapId)));
+    const beatmapRequest = await client.safeParse(client.beatmaps.getBeatmap(beatmapId));
     if (!beatmapRequest.success) {
         return [
             {
@@ -22,22 +26,25 @@ export async function simulateBuilder({
         ];
     }
     const map = beatmapRequest.data;
+    const { acc, ar, bpm, clock_rate: clockRate, combo, cs, n100, n300, n50, ngeki, nkatu, nmisses, od } = options;
 
     const { beatmapset: mapset, mode, version } = map;
 
     const mapData = getMap(beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
 
-    const performancesAsync = [];
-    const accuracyList = [98, 97, 95];
-    for (let i = 0; i < accuracyList.length; i++) {
-        const accuracy = accuracyList[i];
-        const performance = getPerformanceResults({ beatmapId, setId: map.mode_int, mapData, accuracy, mods: mods ?? 0 });
-        performancesAsync.push(performance);
-    }
-    const performances = await Promise.all(performancesAsync);
+    const performance = await getPerformanceResults({
+        beatmapId,
+        setId: map.mode_int,
+        mapData,
+        mapSettings: { ar, cs, od },
+        maxCombo: combo,
+        hitValues: { count_100: n100, count_300: n300, count_50: n50, count_geki: ngeki, count_katu: nkatu, count_miss: nmisses },
+        clockRate: clockRate ?? (bpm && map.bpm ? bpm / map.bpm : undefined),
+        accuracy: acc,
+        mods: mods ?? 0
+    });
 
-    const [a98, a97, a95] = performances;
-    if (a98 === null || a97 === null || a95 === null) {
+    if (performance === null) {
         return [
             {
                 title: "ERROR",
@@ -45,34 +52,62 @@ export async function simulateBuilder({
             }
         ];
     }
+    const { current, mapValues, difficultyAttrs, perfect, fc } = performance;
 
-    const drainLengthInSeconds = map.total_length / a98.difficultyAttrs.clockRate;
+    console.log(current.state);
+
+    const order = ["count_geki", "count_300", "count_katu", "count_100", "count_50", "count_miss"];
+
+    // rosu-pp exposes `state` as a Map and not an object, so you have to get them like this.
+    // will be fixed in the future and I will remove the eslint error things.
+    const hitValues = {
+        count_300: current.state?.get("n300"),
+        count_100: current.state?.get("n100"),
+        count_50: current.state?.get("n50"),
+        count_miss: current.state?.get("misses"),
+        count_geki: current.state?.get("nGeki"),
+        count_katu: current.state?.get("nKatu")
+    };
+
+    let hitValuesString = "";
+    for (let i = 0; i < order.length; i++) {
+        const count = order[i];
+        const countKey = count as keyof typeof hitValues;
+        const countValue = hitValues[countKey];
+        if (typeof countValue !== "undefined") {
+            if (hitValuesString.length > 0)
+                hitValuesString += "/";
+
+            hitValuesString += countValue;
+        }
+    }
+
+    // same thing here
+    const comboValue = current.state?.get("maxCombo");
+    const comboValues = `**${comboValue}**/${map.max_combo}x`;
+    const comboDifference = (comboValue ?? 0) / map.max_combo;
+    console.log(comboDifference);
+
+    const accuracy = accuracyCalculator(map.mode as Mode, hitValues);
+
+    const drainLengthInSeconds = map.total_length / difficultyAttrs.clockRate;
     const drainMinutes = Math.floor(drainLengthInSeconds / 60);
     const drainSeconds = Math.ceil(drainLengthInSeconds % 60);
 
     const objects = map.count_circles + map.count_sliders + map.count_spinners;
 
-    const infoField = [
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        `**Stars:** **\`${a98.current.difficulty.stars.toFixed(2)}\`** **Mods:** \`+${mods ?? "NM"}\` **BPM:** \`${a98.mapValues.bpm.toFixed(0)}\``,
-        `**Length:** \`${drainMinutes}:${drainSeconds < 10 ? `0${drainSeconds}` : drainSeconds}\` **Max Combo:** \`${a98.current.difficulty.maxCombo}\` **Objects:** \`${objects.toLocaleString()}\``,
-        `**AR:** \`${a98.mapValues.ar.toFixed(1)}\` **OD:** \`${a98.mapValues.od.toFixed(1)}\` **CS:** \`${a98.mapValues.cs.toFixed(1)}\` **HP:** \`${a98.mapValues.hp.toFixed(1)}\``,
-        `\n:heart: **${mapset.favourite_count.toLocaleString()}** :play_pause: **${mapset.play_count.toLocaleString()}**`
+    const newBpm = difficultyAttrs.clockRate * mapValues.bpm;
+    const statsField = [
+        `**Stars:** **\`${current.difficulty.stars.toFixed(2)}\`** **Mods:** \`+${mods ? mods.join("") : "NM"}\` **BPM:** \`${newBpm.toFixed(0)}\``,
+        `**Length:** \`${drainMinutes}:${drainSeconds < 10 ? `0${drainSeconds}` : drainSeconds}\` **Max Combo:** \`${current.difficulty.maxCombo}\` **Objects:** \`${objects.toLocaleString()}\``,
+        `**AR:** \`${difficultyAttrs.ar.toFixed(1)}\` **OD:** \`${difficultyAttrs.od.toFixed(1)}\` **CS:** \`${difficultyAttrs.cs.toFixed(1)}\` **HP:** \`${difficultyAttrs.hp.toFixed(1)}\``
     ];
 
-    const ppField = [
-        "```Acc  |  PP",
-        `100%   ${a98.perfect.pp.toFixed(2)}`,
-        `98%    ${a98.current.pp.toFixed(2)}`,
-        `97%    ${a97.current.pp.toFixed(2)}`,
-        `95%    ${a95.current.pp.toFixed(2)}\`\`\``
-    ];
-
-    const linksField = [
-        `<:chimu:1117792339549761576>[Chimu](https://chimu.moe/d/${map.beatmapset_id})`,
-        `<:beatconnect:1075915329512931469>[Beatconnect](https://beatconnect.io/b/${map.beatmapset_id})`,
-        `:notes:[Song Preview](https://b.ppy.sh/preview/${map.beatmapset_id}.mp3)`,
-        `🖼️[Full Background](https://assets.ppy.sh/beatmaps/${map.beatmapset_id}/covers/raw.jpg)`
+    const scoreField = [
+        `**${current.pp.toFixed(2)}**/${perfect.pp.toFixed(2)}pp ${typeof current.effectiveMissCount !== "undefined" && current.effectiveMissCount > 1 || comboDifference < 0.99
+            ? `~~[**${fc.pp.toFixed(2)}**]~~`
+            : ""} ${SPACE} ${accuracy.toFixed(2)}% `,
+        `[${comboValues}] ${SPACE} {${hitValuesString}}`
     ];
 
     return [
@@ -84,11 +119,14 @@ export async function simulateBuilder({
             fields: [
                 {
                     name: `${rulesets[mode]} ${version}`,
-                    value: infoField.join("\n"),
+                    value: scoreField.join("\n"),
                     inline: false
                 },
-                { name: "PP", value: ppField.join("\n"), inline: true },
-                { name: "Links", value: linksField.join("\n"), inline: true }
+                {
+                    name: "Stats",
+                    value: statsField.join("\n"),
+                    inline: false
+                }
             ]
         }
     ];

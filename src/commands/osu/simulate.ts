@@ -140,7 +140,7 @@ async function run(interaction: Interaction<ApplicationCommandData>): Promise<vo
     const embeds = await simulateBuilder({
         type: EmbedBuilderType.SIMULATE,
         initiatorId: interaction.member.user.id,
-        difficultyOptions: difficultySettings ?? {},
+        options: difficultySettings ?? {},
         beatmapId: Number(beatmapId),
         mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null
     });
