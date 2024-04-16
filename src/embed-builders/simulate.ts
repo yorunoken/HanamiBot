@@ -57,15 +57,13 @@ export async function simulateBuilder({
 
     const order = ["count_geki", "count_300", "count_katu", "count_100", "count_50", "count_miss"];
 
-    // rosu-pp exposes `state` as a Map and not an object, so you have to get them like this.
-    // will be fixed in the future and I will remove the eslint error things.
     const hitValues = {
-        count_300: current.state?.get("n300"),
-        count_100: current.state?.get("n100"),
-        count_50: current.state?.get("n50"),
-        count_miss: current.state?.get("misses"),
-        count_geki: current.state?.get("nGeki"),
-        count_katu: current.state?.get("nKatu")
+        count_300: current.state?.n300,
+        count_100: current.state?.n100,
+        count_50: current.state?.n50,
+        count_miss: current.state?.misses,
+        count_geki: current.state?.nGeki,
+        count_katu: current.state?.nKatu
     };
     const grade = grades[gradeCalculator(map.mode as Mode, hitValues, mods ?? [""])];
 
@@ -82,8 +80,7 @@ export async function simulateBuilder({
         }
     }
 
-    // same thing here
-    const comboValue = current.state?.get("maxCombo");
+    const comboValue = current.state?.maxCombo;
     const comboValues = `**${comboValue}**/${map.max_combo}x`;
     const comboDifference = (comboValue ?? 0) / map.max_combo;
     console.log(comboDifference);
