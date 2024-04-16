@@ -5,7 +5,7 @@ import { UserType } from "@type/commandArgs";
 import { ModsEnum } from "osu-web.js";
 import type { SlashCommandArgs, DifficultyOptions, Mods, PrefixCommandArgs, User } from "@type/commandArgs";
 import type { Mod } from "osu-web.js";
-import type { ApplicationCommandData, GuildInteraction, Message } from "@lilybird/transformers";
+import type { ApplicationCommandData, Interaction, Message } from "@lilybird/transformers";
 
 interface BeatMapSetURL {
     url: string;
@@ -71,7 +71,7 @@ function linkCommand(): string | undefined {
     return slashCommandsIds.get("link");
 }
 
-export function getCommandArgs(interaction: GuildInteraction<ApplicationCommandData>): CommandArgs | undefined {
+export function getCommandArgs(interaction: Interaction<ApplicationCommandData>, getAttributes?: boolean): SlashCommandArgs | undefined {
     if (!interaction.isApplicationCommandInteraction() || !interaction.inGuild()) return;
     const { data } = interaction;
 
@@ -90,9 +90,6 @@ export function getCommandArgs(interaction: GuildInteraction<ApplicationCommandD
     const userArg = data.getString("username");
     const userAuthor = getUser(interaction.member.user.id);
     const discordUserId = data.getUser("discord");
-    const username = interaction.data.getString("username");
-    const author = getUser(interaction.member.user.id);
-    const discordUserId = interaction.data.getUser("discord");
     const discordUser = getUser(discordUserId ?? "");
     const mode = <Mode | undefined>data.getString("mode") ?? Mode.OSU;
 
@@ -121,18 +118,18 @@ export function getCommandArgs(interaction: GuildInteraction<ApplicationCommandD
 
     const user: User = discordUserId
         ? discordUser?.banchoId
-            ? { type: UserType.SUCCESS, banchoId: discordUser.banchoId, authorDb: author, mode, beatmapId }
+            ? { type: UserType.SUCCESS, banchoId: discordUser.banchoId, authorDb: userAuthor, mode, beatmapId }
             : {
                 type: UserType.FAIL,
                 beatmapId,
-                authorDb: author,
+                authorDb: userAuthor,
                 failMessage: discordUserId ? `The user <@${discordUserId}> hasn't linked their account to the bot yet!` : `Please link your account to the bot using ${linkCommand()}!`
             }
-        : username
-            ? { type: UserType.SUCCESS, banchoId: username, mode, beatmapId, authorDb: author }
-            : author?.banchoId
-                ? { type: UserType.SUCCESS, banchoId: author.banchoId, mode, beatmapId, authorDb: author }
-                : { type: UserType.FAIL, beatmapId, authorDb: author, failMessage: "Please link your account to the bot using /link!" };
+        : userArg
+            ? { type: UserType.SUCCESS, banchoId: userArg, mode, beatmapId, authorDb: userAuthor }
+            : userAuthor?.banchoId
+                ? { type: UserType.SUCCESS, banchoId: userAuthor.banchoId, mode, beatmapId, authorDb: userAuthor }
+                : { type: UserType.FAIL, beatmapId, authorDb: userAuthor, failMessage: "Please link your account to the bot using /link!" };
 
     return { user, mods, difficultySettings };
 }
