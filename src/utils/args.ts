@@ -3,7 +3,7 @@ import { slashCommandsIds } from "./cache";
 import { Mode } from "@type/osu";
 import { UserType } from "@type/commandArgs";
 import { ModsEnum } from "osu-web.js";
-import type { CommandArgs, Mods, ParsedArgs, User } from "@type/commandArgs";
+import type { SlashCommandArgs, DifficultyOptions, Mods, PrefixCommandArgs, User } from "@type/commandArgs";
 import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, GuildInteraction, Message } from "@lilybird/transformers";
 
@@ -72,11 +72,29 @@ function linkCommand(): string | undefined {
 }
 
 export function getCommandArgs(interaction: GuildInteraction<ApplicationCommandData>): CommandArgs | undefined {
+    if (!interaction.isApplicationCommandInteraction() || !interaction.inGuild()) return;
+    const { data } = interaction;
+
+    // This is so fucking annoying holy shit I can't get it right
+    let difficultySettings = getAttributes ? {} as DifficultyOptions : undefined;
+    if (getAttributes === true) {
+        const attributesArray: Array<keyof DifficultyOptions> = ["combo", "acc", "clock_rate", "bpm", "n300", "n100", "n50", "nmisses", "ngeki", "nkatu", "ar", "cs", "od"];
+        difficultySettings = {} as DifficultyOptions;
+
+        for (let i = 0; i < attributesArray.length; i++) {
+            const attribute = attributesArray[i];
+            difficultySettings[attribute] = data.getNumber(attribute);
+        }
+    }
+
+    const userArg = data.getString("username");
+    const userAuthor = getUser(interaction.member.user.id);
+    const discordUserId = data.getUser("discord");
     const username = interaction.data.getString("username");
     const author = getUser(interaction.member.user.id);
     const discordUserId = interaction.data.getUser("discord");
     const discordUser = getUser(discordUserId ?? "");
-    const mode = <Mode | undefined>interaction.data.getString("mode") ?? Mode.OSU;
+    const mode = <Mode | undefined>data.getString("mode") ?? Mode.OSU;
 
     let mods: Mods = {
         exclude: null,
@@ -85,23 +103,21 @@ export function getCommandArgs(interaction: GuildInteraction<ApplicationCommandD
         name: null
     };
 
-    const modsValue = interaction.data.getString("mods");
+    const modsValue = data.getString("mods");
     const modSections = modsValue?.toUpperCase().match(/.{1,2}/g);
     if (modSections && !modSections.every((selectedMod) => selectedMod in ModsEnum || modsValue === "NM")) {
         mods = {
-            exclude: interaction.data.getBoolean("exclude") ?? null,
-            include: interaction.data.getBoolean("include") ?? null,
-            forceInclude: interaction.data.getBoolean("force_include") ?? null,
+            exclude: data.getBoolean("exclude") ?? null,
+            include: data.getBoolean("include") ?? null,
+            forceInclude: data.getBoolean("force_include") ?? null,
             name: <Mod | undefined>modsValue ?? null
         };
     }
 
-    const urlMatch = parseURL(interaction.data.getString("map") ?? "");
+    const urlMatch = parseURL(data.getString("map") ?? "");
     let beatmapId: string | null = null;
-    if (urlMatch && "id" in urlMatch)
-        beatmapId = urlMatch.id;
-    else if (urlMatch && "setId" in urlMatch)
-        beatmapId = urlMatch.difficultyId;
+    if (urlMatch && "id" in urlMatch) beatmapId = urlMatch.id;
+    else if (urlMatch && "setId" in urlMatch) beatmapId = urlMatch.difficultyId;
 
     const user: User = discordUserId
         ? discordUser?.banchoId
@@ -118,11 +134,11 @@ export function getCommandArgs(interaction: GuildInteraction<ApplicationCommandD
                 ? { type: UserType.SUCCESS, banchoId: author.banchoId, mode, beatmapId, authorDb: author }
                 : { type: UserType.FAIL, beatmapId, authorDb: author, failMessage: "Please link your account to the bot using /link!" };
 
-    return { user, mods };
+    return { user, mods, difficultySettings };
 }
 
-export function parseOsuArguments(message: Message, args: Array<string>, mode: Mode): ParsedArgs {
-    const result: ParsedArgs = {
+export function parseOsuArguments(message: Message, args: Array<string>, mode: Mode): PrefixCommandArgs {
+    const result: PrefixCommandArgs = {
         tempUser: null,
         user: {
             beatmapId: null,

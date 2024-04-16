@@ -1,3 +1,4 @@
+import type { DifficultyOptions } from "./commandArgs";
 import type { DatabaseUser } from "./database";
 import type { UserScore, UserBestScore, Beatmap, LeaderboardScores, Mode, Score } from "./osu";
 import type { UserExtended, Mod } from "osu-web.js";
@@ -10,7 +11,8 @@ export const enum EmbedBuilderType {
     PROFILE = "profileBuilder",
     AVATAR = "avatarBuilder",
     BACKGROUND = "backgroundBuilder",
-    BANNER = "bannerBuilder"
+    BANNER = "bannerBuilder",
+    SIMULATE = "simulateBuilder"
 }
 
 interface ModStructure {
@@ -40,6 +42,13 @@ export interface LeaderboardBuilderOptions extends BuilderOptions {
     scores: Array<LeaderboardScores>;
     beatmap: Beatmap;
     page: number | undefined;
+}
+
+export interface SimulateBuilderOptions extends BuilderOptions {
+    type: EmbedBuilderType.SIMULATE;
+    beatmapId: number;
+    mods: Array<Mod> | null;
+    options: DifficultyOptions;
 }
 
 export interface MapBuilderOptions extends BuilderOptions {
@@ -90,4 +99,5 @@ export type EmbedBuilderOptions = CompareBuilderOptions
     | PlaysBuilderOptions
     | ProfileBuilderOptions
     | AvatarBuilderOptions
-    | BackgroundBuilderOptions;
+    | BackgroundBuilderOptions
+    | SimulateBuilderOptions;

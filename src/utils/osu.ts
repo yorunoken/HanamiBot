@@ -152,7 +152,7 @@ export function isNewMods(mods: Array<Mod> | Array<ModOsuWeb>): mods is Array<Mo
     return Array.isArray(mods) && mods.every((mod) => typeof mod === "object" && "acronym" in mod);
 }
 
-export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, accuracy, clockRate, hitValues, mods, mapData }:
+export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, accuracy, clockRate, mapSettings, hitValues, mods, mapData }:
 {
     play?: UserBestScore | UserScore | Score | LeaderboardScore,
     setId?: number,
@@ -160,7 +160,8 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
     maxCombo?: number,
     accuracy?: number,
     clockRate?: number,
-    hitValues?: { count_100: number | null, count_300: number | null, count_50: number | null, count_geki: number | null, count_katu: number | null, count_miss: number | null },
+    mapSettings?: { ar?: number, od?: number, cs?: number },
+    hitValues?: { count_100?: number | null, count_300?: number | null, count_50?: number | null, count_geki?: number | null, count_katu?: number | null, count_miss?: number | null },
     mods: Array<ModOsuWeb> | Array<Mod> | number,
     mapData?: string
 }): Promise<PerformanceInfo | null> {
@@ -197,9 +198,22 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
     const beatmap = new Beatmap(mapData);
     beatmap.convert(rulesetId);
 
-    const difficultyAttrs = new BeatmapAttributesBuilder({ map: beatmap }).build();
+    const difficultyAttrs = new BeatmapAttributesBuilder({
+        map: beatmap,
+        ar: mapSettings?.ar,
+        cs: mapSettings?.cs,
+        od: mapSettings?.od,
+        mods: modsInt,
+        clockRate
+    }).build();
 
-    const perfect = new Performance({ mods: modsInt, clockRate }).calculate(beatmap);
+    const perfect = new Performance({
+        ar: mapSettings?.ar,
+        cs: mapSettings?.cs,
+        od: mapSettings?.od,
+        mods: modsInt,
+        clockRate
+    }).calculate(beatmap);
 
     let {
         count_100: n100,
@@ -266,12 +280,12 @@ export async function downloadBeatmap(id: string | number, timeoutMs = 6000): Pr
 }
 
 export function accuracyCalculator(mode: Mode, hits: {
-    count_300: number | null,
-    count_100: number | null,
-    count_50: number | null,
-    count_miss: number | null,
-    count_geki: number | null,
-    count_katu: number | null
+    count_300?: number | null,
+    count_100?: number | null,
+    count_50?: number | null,
+    count_miss?: number | null,
+    count_geki?: number | null,
+    count_katu?: number | null
 }): number {
     let {
         count_100: count100,
