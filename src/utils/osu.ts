@@ -9,7 +9,7 @@ import type { Message } from "@lilybird/transformers";
 import type { Mod } from "@type/mods";
 import type { UserScore, UserBestScore, AccessTokenJSON, AuthScope, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo, Score } from "@type/osu";
 import type { Client, EmbedStructure } from "lilybird";
-import type { GameMode, Mod as ModOsuWeb } from "osu-web.js";
+import type { GameMode, Mod as ModOsuWeb, Rank } from "osu-web.js";
 
 /**
  * Build OAuth authorization URL for osu! using the provided parameters.
@@ -312,6 +312,100 @@ export function accuracyCalculator(mode: Mode, hits: {
     }
 
     return 100 * acc;
+}
+
+export function gradeCalculator(mode: Mode, hits: {
+    count_300?: number | null,
+    count_100?: number | null,
+    count_50?: number | null,
+    count_miss?: number | null,
+    count_geki?: number | null,
+    count_katu?: number | null
+}, mods: Array<string>): Rank {
+    let {
+        count_100: n100,
+        count_300: n300,
+        count_50: n50,
+        count_geki: nGeki,
+        count_katu: nKatu,
+        count_miss: nMiss
+    } = hits;
+    n100 ??= 0;
+    n300 ??= 0;
+    n50 ??= 0;
+    nGeki ??= 0;
+    nKatu ??= 0;
+    nMiss ??= 0;
+
+    const silver = mods.includes("hd") || mods.includes("HD") || mods.includes("fl") || mods.includes("FL");
+
+    let total = 0;
+    let acc = 0.0;
+
+    let r300 = 0;
+    let r50 = 0;
+
+    let rank: Rank;
+
+    switch (mode) {
+        case Mode.OSU:
+            total = n300 + n100 + n50 + nMiss;
+
+            r300 = n300 / total;
+            r50 = n50 / total;
+
+            if (r300 === 1) rank = silver ? "SSH" : "SS";
+            else if (r300 > 0.9 && r50 < 0.01 && nMiss === 0) rank = silver ? "SH" : "S";
+            else if (r300 > 0.8 && nMiss === 0 || r300 > 0.9) rank = "A";
+            else if (r300 > 0.7 && nMiss === 0 || r300 > 0.8) rank = "B";
+            else if (r300 > 0.6) rank = "C";
+            else rank = "D";
+
+            break;
+
+        case Mode.TAIKO:
+            total = n300 + n100 + n50 + nMiss;
+
+            r300 = n300 / total;
+            r50 = n50 / total;
+
+            if (r300 === 1) rank = silver ? "SSH" : "SS";
+            else if (r300 > 0.9 && r50 < 0.01 && nMiss === 0) rank = silver ? "SH" : "S";
+            else if (r300 > 0.8 && nMiss === 0 || r300 > 0.9) rank = "A";
+            else if (r300 > 0.7 && nMiss === 0 || r300 > 0.8) rank = "B";
+            else if (r300 > 0.6) rank = "C";
+            else rank = "D";
+
+            break;
+
+        case Mode.FRUITS:
+            total = n300 + n100 + n50 + nMiss + nKatu;
+            acc = total > 0 ? (n50 + n100 + n300) / total : 1;
+
+            if (acc === 1) rank = silver ? "SSH" : "SS";
+            else if (acc > 0.98) rank = silver ? "SH" : "S";
+            else if (acc > 0.94) rank = "A";
+            else if (acc > 0.9) rank = "B";
+            else if (acc > 0.85) rank = "C";
+            else rank = "D";
+
+            break;
+
+        case Mode.MANIA:
+            total = n300 + n100 + n50 + nMiss + nGeki + nKatu;
+            acc = total > 0 ? (n50 * 50 + n100 * 100 + nKatu * 200 + (n300 + nGeki) * 300) / (total * 300) : 1;
+
+            if (acc === 1) rank = silver ? "SSH" : "SS";
+            else if (acc > 0.95) rank = silver ? "SH" : "S";
+            else if (acc > 0.9) rank = "A";
+            else if (acc > 0.8) rank = "B";
+            else if (acc > 0.7) rank = "C";
+            else rank = "D";
+
+            break;
+    }
+
+    return rank;
 }
 
 function findId(embed: EmbedStructure): number | null {

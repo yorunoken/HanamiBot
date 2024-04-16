@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { client } from "@utils/initalize";
-import { accuracyCalculator, downloadBeatmap, getPerformanceResults } from "@utils/osu";
+import { accuracyCalculator, downloadBeatmap, getPerformanceResults, gradeCalculator } from "@utils/osu";
 import { getMap } from "@utils/database";
-import { rulesets } from "@utils/emotes";
+import { grades, rulesets } from "@utils/emotes";
 import { SPACE } from "@utils/constants";
 import { EmbedType } from "lilybird";
 import type { Mode } from "@type/osu";
@@ -68,6 +68,7 @@ export async function simulateBuilder({
         count_geki: current.state?.get("nGeki"),
         count_katu: current.state?.get("nKatu")
     };
+    const grade = grades[gradeCalculator(map.mode as Mode, hitValues, mods ?? [""])];
 
     let hitValuesString = "";
     for (let i = 0; i < order.length; i++) {
@@ -104,7 +105,7 @@ export async function simulateBuilder({
     ];
 
     const scoreField = [
-        `**${current.pp.toFixed(2)}**/${perfect.pp.toFixed(2)}pp ${typeof current.effectiveMissCount !== "undefined" && current.effectiveMissCount > 1 || comboDifference < 0.99
+        `${grade} ${SPACE} **${current.pp.toFixed(2)}**/${perfect.pp.toFixed(2)}pp ${typeof current.effectiveMissCount !== "undefined" && current.effectiveMissCount > 1 || comboDifference < 0.99
             ? `~~[**${fc.pp.toFixed(2)}**]~~`
             : ""} ${SPACE} ${accuracy.toFixed(2)}% `,
         `[${comboValues}] ${SPACE} {${hitValuesString}}`
