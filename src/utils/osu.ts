@@ -161,7 +161,7 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
     accuracy?: number,
     clockRate?: number,
     mapSettings?: { ar?: number, od?: number, cs?: number },
-    hitValues?: { count_100?: number | null, count_300?: number | null, count_50?: number | null, count_geki?: number | null, count_katu?: number | null, count_miss?: number | null },
+    hitValues?: { count_100?: number, count_300?: number, count_50?: number, count_geki?: number, count_katu?: number, count_miss?: number },
     mods: Array<ModOsuWeb> | Array<Mod> | number,
     mapData?: string
 }): Promise<PerformanceInfo | null> {
@@ -215,7 +215,9 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
         clockRate
     }).calculate(beatmap);
 
-    let {
+    console.log(hitValues);
+
+    const {
         count_100: n100,
         count_300: n300,
         count_50: n50,
@@ -223,22 +225,65 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
         count_katu: nKatu,
         count_miss: misses
     } = hitValues ?? {};
-    n100 ??= 0;
-    n300 ??= 0;
-    n50 ??= 0;
-    nGeki ??= 0;
-    nKatu ??= 0;
-    misses ??= 0;
 
-    nGeki = [2, 3].includes(rulesetId) ? nGeki : 0;
-    nKatu = [2, 3].includes(rulesetId) ? nKatu : 0;
+    console.log(typeof accuracy === "undefined"
+        ? {
+            mods: modsInt,
+            n100,
+            n300,
+            n50,
+            nGeki: nGeki ?? undefined,
+            nKatu: nKatu ?? undefined,
+            misses,
+            combo: maxCombo ?? perfect.difficulty.maxCombo,
+            clockRate
+        }
+        : {
+            mods: modsInt,
+            accuracy,
+            misses,
+            combo: maxCombo ?? perfect.difficulty.maxCombo,
+            clockRate
+        });
+    const current = new Performance(typeof accuracy === "undefined"
+        ? {
+            mods: modsInt,
+            n100,
+            n300,
+            n50,
+            nGeki: nGeki ?? undefined,
+            nKatu: nKatu ?? undefined,
+            misses,
+            combo: maxCombo ?? perfect.difficulty.maxCombo,
+            clockRate
+        }
+        : {
+            mods: modsInt,
+            accuracy,
+            misses,
+            combo: maxCombo ?? perfect.difficulty.maxCombo,
+            clockRate
+        }).calculate(perfect);
 
-    const current = typeof accuracy === "undefined" ?
-        new Performance({ mods: modsInt, n100, n300, n50, nGeki, nKatu, misses, combo: maxCombo ?? perfect.difficulty.maxCombo, clockRate }).calculate(perfect) :
-        new Performance({ mods: modsInt, accuracy, misses, combo: maxCombo ?? perfect.difficulty.maxCombo, clockRate }).calculate(perfect);
-    const fc = typeof accuracy === "undefined" ?
-        new Performance({ mods: modsInt, n100, n300: n300 + misses, n50, nGeki, nKatu, misses: 0, accuracy, combo: perfect.difficulty.maxCombo, clockRate }).calculate(perfect) :
-        new Performance({ mods: modsInt, misses: 0, accuracy, combo: perfect.difficulty.maxCombo, clockRate }).calculate(perfect);
+    const fc = new Performance(typeof accuracy === "undefined"
+        ? {
+            mods: modsInt,
+            n100,
+            n50,
+            nGeki: nGeki ?? undefined,
+            nKatu: nKatu ?? undefined,
+            misses: 0,
+            accuracy,
+            combo: perfect.difficulty.maxCombo,
+            clockRate
+        }
+        : {
+            mods: modsInt,
+            misses: 0,
+            accuracy,
+            combo: perfect.difficulty.maxCombo,
+            clockRate
+        }).calculate(perfect);
 
     return {
         mapValues: beatmap,

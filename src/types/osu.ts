@@ -104,9 +104,9 @@ export interface AccessTokenJSON {
 }
 
 export interface PlayStatistics {
-    count_100: number | null;
-    count_300: number | null;
-    count_50: number | null;
+    count_100: number;
+    count_300: number;
+    count_50: number;
     count_geki: number | null;
     count_katu: number | null;
     count_miss: number;

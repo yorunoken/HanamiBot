@@ -25,6 +25,7 @@ export async function simulateBuilder({
             }
         ];
     }
+
     const map = beatmapRequest.data;
     const { acc, ar, bpm, clock_rate: clockRate, combo, cs, n100, n300, n50, ngeki, nkatu, nmisses, od } = options;
 
@@ -53,8 +54,6 @@ export async function simulateBuilder({
         ];
     }
     const { current, mapValues, difficultyAttrs, perfect, fc } = performance;
-
-    console.log(current.state);
 
     const order = ["count_geki", "count_300", "count_katu", "count_100", "count_50", "count_miss"];
 
