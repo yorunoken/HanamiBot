@@ -1,8 +1,10 @@
 import db from "../data.db" with { type: "sqlite" };
 import { getAccessToken } from "./osu";
 import { slashCommandsIds } from "./cache";
+import { removeServer } from "./database";
 import { Client as OsuClient } from "osu-web.js";
 import { mkdir, access, readFile, writeFile, readdir } from "node:fs/promises";
+import type { DatabaseGuild } from "@type/database";
 import type { Client as LilybirdClient, POSTApplicationCommandStructure } from "lilybird";
 import type { DefaultMessageCommand, DefaultSlashCommand } from "@type/commands";
 
@@ -80,6 +82,19 @@ export async function loadApplicationCommands(clnt: LilybirdClient): Promise<voi
     for (let i = 0; i < commandsIds.length; i++) {
         const { name, id } = commandsIds[i];
         slashCommandsIds.set(name, `</${name}:${id}>`);
+    }
+}
+
+export function refreshServersDatabase(): void {
+    const nulledGuilds = db.query("SELECT * FROM servers WHERE name IS NULL;").all() as Array<DatabaseGuild>;
+
+    if (nulledGuilds.length === 0)
+        return;
+
+    for (let i = 0; i < nulledGuilds.length; i++) {
+        const guild = nulledGuilds[i];
+        console.log(`Removed server: ${guild.name} (${guild.id})`);
+        removeServer(guild.id);
     }
 }
 

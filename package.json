@@ -13,7 +13,7 @@
     "@lilybird/transformers": "0.2.0-alpha.1",
     "lilybird": "0.6.0-beta.3",
     "osu-web.js": "^2.4.0",
-    "rosu-pp-js": "^1.0.1",
+    "rosu-pp-js": "^1.0.2",
     "tasai": "^1.0.0"
   },
   "devDependencies": {
