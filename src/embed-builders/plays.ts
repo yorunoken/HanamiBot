@@ -79,8 +79,8 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
     const embedType = authorDb?.embed_type ?? EmbedScoreType.Hanami;
 
     const play = await getScore({ scores: plays, index, mode });
-    const { performance } = play;
-    const { mapValues } = performance;
+    const { mapValues, difficultyAttrs, current } = play.performance;
+    const bpm = difficultyAttrs.clockRate * mapValues.bpm
 
     if (embedType === EmbedScoreType.Hanami) {
         const author = {
@@ -104,8 +104,8 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
         if (isMaximized) {
             fields[0].value += line3;
             const beatmapInfoField = [
-                `**BPM:** \`${mapValues.bpm.toFixed().toLocaleString()}\` ${SPACE} **Length:** \`${play.drainLength}\``,
-                `**AR:** \`${mapValues.ar.toFixed(1)}\` ${SPACE} **OD:** \`${mapValues.od.toFixed(1)}\` ${SPACE} **CS:** \`${mapValues.cs.toFixed(1)}\` ${SPACE} **HP:** \`${mapValues.hp.toFixed(1)}\``
+                `**BPM:** \`${bpm.toFixed().toLocaleString()}\` ${SPACE} **Length:** \`${play.drainLength}\``,
+                `**AR:** \`${difficultyAttrs.ar.toFixed(1)}\` ${SPACE} **OD:** \`${difficultyAttrs.od.toFixed(1)}\` ${SPACE} **CS:** \`${difficultyAttrs.cs.toFixed(1)}\` ${SPACE} **HP:** \`${difficultyAttrs.hp.toFixed(1)}\``
             ];
             fields.push({
                 name: "Beatmap Info:",
@@ -127,9 +127,9 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
 
     if (embedType === EmbedScoreType.Bathbot && isMaximized) {
         const beatmapInfoField = [
-            `Length: \`${play.drainLength}\` ${SPACE} BPM: \`${mapValues.bpm.toFixed().toLocaleString()}\` ${SPACE} Objects \`${mapValues.nObjects}\``,
-            `AR: \`${mapValues.ar.toFixed(1)}\` ${SPACE} OD: \`${mapValues.od
-                .toFixed(1)}\` ${SPACE} CS: \`${mapValues.cs.toFixed(1)}\` ${SPACE} HP: \`${mapValues.hp.toFixed(1)}\` Stars: ${play.stars}`
+            `Length: \`${play.drainLength}\` ${SPACE} BPM: \`${bpm.toFixed().toLocaleString()}\` ${SPACE} Objects \`${mapValues.nObjects}\``,
+            `AR: \`${difficultyAttrs.ar.toFixed(1)}\` ${SPACE} OD: \`${difficultyAttrs.od
+                .toFixed(1)}\` ${SPACE} CS: \`${difficultyAttrs.cs.toFixed(1)}\` ${SPACE} HP: \`${difficultyAttrs.hp.toFixed(1)}\` Stars: ${play.stars}`
         ];
 
         const fields = [
@@ -186,7 +186,7 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
 
     // it's owo, so return owo embed.
     const desc = [
-        `▸ ${play.grade} ${play.percentagePassed !== null ? `(${play.percentagePassed}%)` : ""} ▸ **${performance.current.pp.toFixed(2).toLocaleString()}PP** ${play.ifFcOwo} ▸ ${play.accuracy}%`,
+        `▸ ${play.grade} ${play.percentagePassed !== null ? `(${play.percentagePassed}%)` : ""} ▸ **${current.pp.toFixed(2).toLocaleString()}PP** ${play.ifFcOwo} ▸ ${play.accuracy}%`,
         `▸ ${play.score} ▸ ${play.comboValues} ▸ [${play.hitValues}]`
     ];
 

@@ -161,7 +161,7 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
     accuracy?: number,
     clockRate?: number,
     mapSettings?: { ar?: number, od?: number, cs?: number },
-    hitValues?: { count_100?: number, count_300?: number, count_50?: number, count_geki?: number, count_katu?: number, count_miss?: number },
+    hitValues?: { count_100?: number, count_300?: number, count_50?: number, count_geki?: number | null, count_katu?: number | null, count_miss?: number },
     mods: Array<ModOsuWeb> | Array<Mod> | number,
     mapData?: string
 }): Promise<PerformanceInfo | null> {
