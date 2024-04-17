@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { client } from "@utils/initalize";
-import { accuracyCalculator, downloadBeatmap, getPerformanceResults, gradeCalculator } from "@utils/osu";
+import { accuracyCalculator, downloadBeatmap, getPerformanceResults, gradeCalculator, hitValueCalculator } from "@utils/osu";
 import { getMap } from "@utils/database";
 import { grades, rulesets } from "@utils/emotes";
 import { SPACE } from "@utils/constants";
@@ -55,8 +55,6 @@ export async function simulateBuilder({
     }
     const { current, mapValues, difficultyAttrs, perfect, fc } = performance;
 
-    const order = ["count_geki", "count_300", "count_katu", "count_100", "count_50", "count_miss"];
-
     const hitValues = {
         count_300: current.state?.n300,
         count_100: current.state?.n100,
@@ -67,18 +65,7 @@ export async function simulateBuilder({
     };
     const grade = grades[gradeCalculator(map.mode as Mode, hitValues, mods ?? [""])];
 
-    let hitValuesString = "";
-    for (let i = 0; i < order.length; i++) {
-        const count = order[i];
-        const countKey = count as keyof typeof hitValues;
-        const countValue = hitValues[countKey];
-        if (typeof countValue !== "undefined") {
-            if (hitValuesString.length > 0)
-                hitValuesString += "/";
-
-            hitValuesString += countValue;
-        }
-    }
+    const hitValuesString = hitValueCalculator(map.mode as Mode, hitValues);
 
     const comboValue = current.state?.maxCombo;
     const comboValues = `**${comboValue}**/${map.max_combo}x`;
