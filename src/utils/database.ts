@@ -33,19 +33,19 @@ export function getRowCount(table: string): number {
 }
 
 export function getMap(id: string | number): DatabaseMap | null {
-    return db.prepare("SELECT * FROM maps WHERE id = ?").get(id) as DatabaseMap;
+    return db.prepare("SELECT * FROM maps WHERE id = ?").get(id) as DatabaseMap | null;
 }
 
 export function getCommand(id: string | number): DatabaseCommands | null {
-    return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DatabaseCommands;
+    return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DatabaseCommands | null;
 }
 
 export function getScores(id: string | number): DatabaseScores | null {
-    return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DatabaseScores;
+    return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DatabaseScores | null;
 }
 
 export function getScoresPp(id: string | number): DatabaseScoresPp | null {
-    return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DatabaseCommands;
+    return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DatabaseScoresPp | null;
 }
 
 export function insertData({ table, id, data }: { table: string, id: string | number, data: Array<{ name: string, value: string | number | boolean | null }> }, ignore?: boolean): void {
