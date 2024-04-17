@@ -205,7 +205,7 @@ export function initializeDatabase(): void {
         {
             name: "osu_scores_pp",
             columns: [
-                "score_id INTEGER PRIMARY KEY",
+                "id INTEGER PRIMARY KEY",
                 "pp INTEGER",
                 "pp_fc INTEGER",
                 "pp_perfect INTEGER"
