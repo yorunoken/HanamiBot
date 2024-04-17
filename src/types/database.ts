@@ -1,3 +1,5 @@
+import type { Mode } from "./osu";
+
 export enum EmbedScoreType {
     Hanami = "hanami",
     Bathbot = "bathbot",
@@ -28,6 +30,33 @@ export interface DatabaseMap {
 export interface DatabaseCommands {
     id: string;
     count: string | null;
+}
+
+export interface DatabaseScores {
+    id: number;
+    user_id: number;
+    map_id: number;
+    gamemode: Mode;
+    mods: string;
+    score: number;
+    accuracy: number;
+    max_combo: number;
+    grade: string;
+    count_50: number;
+    count_100: number;
+    count_300: number;
+    count_miss: number;
+    count_geki: number;
+    count_katu: number;
+    map_state: "ranked" | "graveyard" | "wip" | "pending" | "approved" | "qualified" | "loved";
+    ended_at: string;
+}
+
+export interface DatabaseScoresPp {
+    id: number;
+    pp: number;
+    pp_fc: number;
+    pp_perfect: number;
 }
 
 export enum ScoreEmbed {

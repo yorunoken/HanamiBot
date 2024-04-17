@@ -80,7 +80,7 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
 
     const play = await getScore({ scores: plays, index, mode });
     const { mapValues, difficultyAttrs, current } = play.performance;
-    const bpm = difficultyAttrs.clockRate * mapValues.bpm
+    const bpm = difficultyAttrs.clockRate * mapValues.bpm;
 
     if (embedType === EmbedScoreType.Hanami) {
         const author = {
@@ -105,7 +105,8 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
             fields[0].value += line3;
             const beatmapInfoField = [
                 `**BPM:** \`${bpm.toFixed().toLocaleString()}\` ${SPACE} **Length:** \`${play.drainLength}\``,
-                `**AR:** \`${difficultyAttrs.ar.toFixed(1)}\` ${SPACE} **OD:** \`${difficultyAttrs.od.toFixed(1)}\` ${SPACE} **CS:** \`${difficultyAttrs.cs.toFixed(1)}\` ${SPACE} **HP:** \`${difficultyAttrs.hp.toFixed(1)}\``
+                `**AR:** \`${difficultyAttrs.ar.toFixed(1)}\` ${SPACE} **OD:** \`${difficultyAttrs.od
+                    .toFixed(1)}\` ${SPACE} **CS:** \`${difficultyAttrs.cs.toFixed(1)}\` ${SPACE} **HP:** \`${difficultyAttrs.hp.toFixed(1)}\``
             ];
             fields.push({
                 name: "Beatmap Info:",

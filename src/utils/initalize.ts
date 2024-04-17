@@ -174,12 +174,43 @@ interface Columns {
 }
 
 export function initializeDatabase(): void {
-    const tables = [
+    const tables: Array<{ name: string, columns: Array<string> }> = [
         { name: "users", columns: ["id TEXT PRIMARY KEY", "banchoId TEXT", "score_embeds INTEGER", "mode TEXT", "embed_type TEXT"] },
         { name: "servers", columns: ["id TEXT PRIMARY KEY", "name TEXT", "owner_id TEXT", "joined_at INTEGER", "prefixes TEXT"] },
         { name: "maps", columns: ["id TEXT PRIMARY KEY", "data TEXT"] },
-        { name: "commands", columns: ["id TEXT PRIMARY KEY", "count TEXT"] },
-        { name: "commands_slash", columns: ["id TEXT PRIMARY KEY", "count TEXT"] }
+        { name: "commands", columns: ["id TEXT PRIMARY KEY", "count INTEGER"] },
+        { name: "commands_slash", columns: ["id TEXT PRIMARY KEY", "count INTEGER"] },
+        {
+            name: "osu_scores",
+            columns: [
+                "id INTEGER PRIMARY KEY",
+                "user_id INTEGER",
+                "map_id INTEGER",
+                "gamemode INTEGER",
+                "mods TEXT",
+                "score INTEGER",
+                "accuracy INTEGER",
+                "max_combo INTEGER",
+                "grade TEXT",
+                "count_50 INTEGER",
+                "count_100 INTEGER",
+                "count_300 INTEGER",
+                "count_miss INTEGER",
+                "count_geki INTEGER",
+                "count_katu INTEGER",
+                "map_state TEXT",
+                "ended_at TEXT"
+            ]
+        },
+        {
+            name: "osu_scores_pp",
+            columns: [
+                "id INTEGER PRIMARY KEY",
+                "pp INTEGER",
+                "pp_fc INTEGER",
+                "pp_perfect INTEGER"
+            ]
+        }
     ];
 
     for (let i = 0; i < tables.length; i++) {

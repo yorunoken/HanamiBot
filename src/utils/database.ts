@@ -1,5 +1,5 @@
 import db from "../data.db" with { type: "sqlite" };
-import type { DatabaseMap, DatabaseGuild, DatabaseUser, DatabaseCommands } from "@type/database";
+import type { DatabaseMap, DatabaseGuild, DatabaseUser, DatabaseCommands, DatabaseScores, DatabaseScoresPp } from "@type/database";
 
 export function query(str: string): unknown {
     return db.prepare(str).all();
@@ -33,23 +33,31 @@ export function getRowCount(table: string): number {
 }
 
 export function getMap(id: string | number): DatabaseMap | null {
-    return db.prepare("SELECT * FROM maps WHERE id = ?").get(id) as DatabaseMap;
+    return db.prepare("SELECT * FROM maps WHERE id = ?").get(id) as DatabaseMap | null;
 }
 
 export function getCommand(id: string | number): DatabaseCommands | null {
-    return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DatabaseCommands;
+    return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DatabaseCommands | null;
 }
 
-export function insertData({ table, id, data }: { table: string, id: string | number, data: Array<{ name: string, value: string | number | null }> }): void {
+export function getScores(id: string | number): DatabaseScores | null {
+    return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DatabaseScores | null;
+}
+
+export function getScoresPp(id: string | number): DatabaseScoresPp | null {
+    return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DatabaseScoresPp | null;
+}
+
+export function insertData({ table, id, data }: { table: string, id: string | number, data: Array<{ name: string, value: string | number | boolean | null }> }, ignore?: boolean): void {
     const setClause = data.map((item) => `${item.name} = ?`).join(", ");
-    const values: Array<string | number | null> = data.map((item) => item.value);
+    const values: Array<string | number | boolean | null> = data.map((item) => item.value);
 
     const existingRow = db.prepare(`SELECT * FROM ${table} WHERE id = ?`).get(id);
     if (!existingRow) {
         const fields: Array<string> = data.map((item) => item.name);
         const placeholders = fields.map(() => "?").join(", ");
 
-        db.prepare(`INSERT OR REPLACE INTO ${table} (id, ${fields.join(", ")}) values (?, ${placeholders});`)
+        db.prepare(`INSERT OR ${ignore ? "IGNORE" : "REPLACE"} INTO ${table} (id, ${fields.join(", ")}) values (?, ${placeholders});`)
             .run(id, ...values);
     }
 
