@@ -73,10 +73,7 @@ export default {
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
     await interaction.deferReply();
 
-    const args = getCommandArgs(interaction);
-
-    if (typeof args === "undefined") return;
-    const { user, mods } = args;
+    const { user, mods } = getCommandArgs(interaction);
 
     if (user.type === UserType.FAIL) {
         await interaction.editReply(user.failMessage);

@@ -31,10 +31,7 @@ export default {
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
     await interaction.deferReply();
 
-    const args = getCommandArgs(interaction);
-
-    if (typeof args === "undefined") return;
-    const { user, mods } = args;
+    const { user, mods } = getCommandArgs(interaction);
 
     const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ channelId: interaction.channelId, client: interaction.client });
     if (typeof beatmapId === "undefined" || beatmapId === null) {

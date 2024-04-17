@@ -453,6 +453,39 @@ export function gradeCalculator(mode: Mode, hits: {
     return rank;
 }
 
+const order = ["count_geki", "count_300", "count_katu", "count_100", "count_50", "count_miss"];
+export function hitValueCalculator(
+    mode: Mode,
+    statistics: {
+        count_300?: number,
+        count_miss?: number,
+        count_100?: number,
+        count_50?: number,
+        count_geki?: number | null,
+        count_katu?: number | null
+    } | null
+): string {
+    if (statistics === null) return "";
+
+    let hitValues = "";
+    for (let i = 0; i < order.length; i++) {
+        const value = statistics[order[i] as keyof typeof statistics];
+
+        if (order[i] === "count_geki" || order[i] === "count_katu" && (mode !== Mode.FRUITS && mode !== Mode.MANIA)
+            || order[i] === "count_100" && mode === Mode.TAIKO)
+            continue;
+
+        if (value !== null) {
+            if (hitValues.length > 0)
+                hitValues += "/";
+
+            hitValues += value;
+        }
+    }
+
+    return hitValues;
+}
+
 function findId(embed: EmbedStructure): number | null {
     const urlToCheck = embed.url ?? embed.author?.url;
     return urlToCheck && !(/\/(user|u)/).test(urlToCheck) ? Number((/\d+/).exec(urlToCheck)?.[0]) : null;

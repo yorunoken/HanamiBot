@@ -100,4 +100,5 @@ export type EmbedBuilderOptions = CompareBuilderOptions
     | ProfileBuilderOptions
     | AvatarBuilderOptions
     | BackgroundBuilderOptions
+    | BannerBuilderOptions
     | SimulateBuilderOptions;

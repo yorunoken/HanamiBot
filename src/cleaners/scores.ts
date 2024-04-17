@@ -1,4 +1,4 @@
-import { accuracyCalculator, getPerformanceResults, getRetryCount } from "@utils/osu";
+import { accuracyCalculator, getPerformanceResults, getRetryCount, hitValueCalculator } from "@utils/osu";
 import { grades, rulesets } from "@utils/emotes";
 import type { UserScore, Beatmap, LeaderboardScores, Mode, PlayStatistics, ScoresInfo, Score, UserBestScore } from "@type/osu";
 import type { ISOTimestamp } from "osu-web.js";
@@ -95,21 +95,7 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     //     hitValues[key] = statistics[countKey];
     // });
 
-    // The order of hit values
-    const order = ["count_geki", "count_300", "count_katu", "count_100", "count_50", "count_miss"];
-    // Map over the keys of the order object
-    let hitValues = "";
-    for (let i = 0; i < order.length; i++) {
-        const count = order[i];
-        const countKey = count as keyof typeof scoreStatistics;
-        const countValue = scoreStatistics[countKey];
-        if (countValue !== null) {
-            if (hitValues.length > 0)
-                hitValues += "/";
-
-            hitValues += countValue;
-        }
-    }
+    const hitValues = hitValueCalculator(mode, scoreStatistics);
 
     const playMaxCombo = play.max_combo;
     const { maxCombo } = performance.current.difficulty;
@@ -122,42 +108,32 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     let fcAccuracy: number | null = null;
 
     let fcStatistics: null | {
-        count_300: number,
-        count_miss: number,
-        count_100: number | null,
-        count_50: number | null,
-        count_geki: number | null,
-        count_katu: number | null
+        count_300?: number,
+        count_miss?: number,
+        count_100?: number,
+        count_50?: number,
+        count_geki?: number,
+        count_katu?: number
     } = null;
 
     if (!isFc) {
-        const hitsLeft = (scoreStatistics.count_100 ?? 0) + (scoreStatistics.count_50 ?? 0) + (scoreStatistics.count_geki ?? 0) + (scoreStatistics.count_katu ?? 0);
+        const { fc } = performance;
         fcStatistics = {
-            ...scoreStatistics,
-            count_300: performance.mapValues.nObjects - hitsLeft,
-            count_miss: 0
+            count_300: fc.state?.n300,
+            count_100: fc.state?.n100,
+            count_50: fc.state?.n50,
+            count_miss: fc.state?.misses,
+            count_geki: fc.state?.nGeki,
+            count_katu: fc.state?.nKatu
         };
+
         fcAccuracy = accuracyCalculator(mode, fcStatistics);
-        ifFcHanami = `FC: **${performance.fc.pp.toFixed(2).toLocaleString()}pp** for **${fcAccuracy.toFixed(2)}%**`;
-        ifFcBathbot = `**${performance.fc.pp.toFixed(2).toLocaleString()}**/${performance.perfect.pp.toFixed(2).toLocaleString()}PP`;
-        ifFcOwo = `(${performance.fc.pp.toFixed(2).toLocaleString()}PP for ${fcAccuracy.toFixed(2)}% FC)`;
+        ifFcHanami = `FC: **${fc.pp.toFixed(2).toLocaleString()}pp** for **${fcAccuracy.toFixed(2)}%**`;
+        ifFcBathbot = `**${fc.pp.toFixed(2).toLocaleString()}**/${performance.perfect.pp.toFixed(2).toLocaleString()}PP`;
+        ifFcOwo = `(${fc.pp.toFixed(2).toLocaleString()}PP for ${fcAccuracy.toFixed(2)}% FC)`;
     }
 
-    let fcHitValues = "";
-    for (let i = 0; i < order.length; i++) {
-        if (fcStatistics === null)
-            break;
-
-        const count = order[i];
-        const countKey = count as keyof typeof fcStatistics;
-        const countValue = fcStatistics[countKey];
-        if (countValue !== null) {
-            if (fcHitValues.length > 0)
-                fcHitValues += "/";
-
-            fcHitValues += countValue;
-        }
-    }
+    const fcHitValues = hitValueCalculator(mode, fcStatistics);
 
     // Get beatmap's drain length
     const drainLengthInSeconds = beatmap.total_length / performance.difficultyAttrs.clockRate;
