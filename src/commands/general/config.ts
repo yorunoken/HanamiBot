@@ -38,12 +38,11 @@ export default {
 
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
     await interaction.deferReply();
-    if (!interaction.inGuild()) return;
 
-    const { member } = interaction;
-    const scoreEmbedData = interaction.data.getNumber("score_embeds");
-    const modeData = interaction.data.getString("mode");
-    const embedTypeData = interaction.data.getString("embed_type");
+    const { member, data } = interaction;
+    const scoreEmbedData = data.getNumber("score_embeds");
+    const modeData = data.getString("mode");
+    const embedTypeData = data.getString("embed_type");
 
     if (typeof modeData === "undefined" && typeof scoreEmbedData === "undefined" && typeof embedTypeData === "undefined") {
         await list(interaction);

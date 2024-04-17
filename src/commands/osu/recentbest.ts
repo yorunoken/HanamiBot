@@ -86,9 +86,7 @@ export default {
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
     await interaction.deferReply();
 
-    const args = getCommandArgs(interaction);
-    if (typeof args === "undefined") return;
-    const { user } = args;
+    const { user } = getCommandArgs(interaction);
 
     let index = interaction.data.getInteger("index");
     let page = interaction.data.getInteger("page");

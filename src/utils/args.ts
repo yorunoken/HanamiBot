@@ -5,7 +5,7 @@ import { UserType } from "@type/commandArgs";
 import { ModsEnum } from "osu-web.js";
 import type { SlashCommandArgs, DifficultyOptions, Mods, PrefixCommandArgs, User } from "@type/commandArgs";
 import type { Mod } from "osu-web.js";
-import type { ApplicationCommandData, Interaction, Message } from "@lilybird/transformers";
+import type { ApplicationCommandData, GuildInteraction, Message } from "@lilybird/transformers";
 
 interface BeatMapSetURL {
     url: string;
@@ -71,9 +71,8 @@ function linkCommand(): string | undefined {
     return slashCommandsIds.get("link");
 }
 
-export function getCommandArgs(interaction: Interaction<ApplicationCommandData>, getAttributes?: boolean): SlashCommandArgs | undefined {
-    if (!interaction.isApplicationCommandInteraction() || !interaction.inGuild()) return;
-    const { data } = interaction;
+export function getCommandArgs(interaction: GuildInteraction<ApplicationCommandData>, getAttributes?: boolean): SlashCommandArgs {
+    const { data, member } = interaction;
 
     // This is so fucking annoying holy shit I can't get it right
     let difficultySettings = getAttributes ? {} as DifficultyOptions : undefined;
@@ -88,7 +87,7 @@ export function getCommandArgs(interaction: Interaction<ApplicationCommandData>,
     }
 
     const userArg = data.getString("username");
-    const userAuthor = getUser(interaction.member.user.id);
+    const userAuthor = getUser(member.user.id);
     const discordUserId = data.getUser("discord");
     const discordUser = getUser(discordUserId ?? "");
     const mode = <Mode | undefined>data.getString("mode") ?? Mode.OSU;

@@ -49,7 +49,6 @@ export default {
 
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
     await interaction.deferReply();
-    if (!interaction.inGuild()) return;
 
     const subcommand = interaction.data.subCommand ?? "list";
 

@@ -6,6 +6,8 @@ import { EmbedBuilderType } from "@type/embedBuilders";
 import { calculateButtonState, createActionRow } from "@utils/buttons";
 import { backgroundBuilder } from "@builders/background";
 import { avatarBuilder } from "@builders/avatar";
+import { bannerBuilder } from "@builders/banner";
+import { simulateBuilder } from "@builders/simulate";
 import type { DMInteraction, Interaction, InteractionReplyOptions, Message, MessageComponentData } from "@lilybird/transformers";
 import type { EmbedStructure } from "lilybird";
 import type { Event } from "@lilybird/handlers";
@@ -89,6 +91,12 @@ async function handleButton(interaction: Interaction): Promise<void> {
 
     const options: InteractionReplyOptions = {};
     switch (builderOptions.type) {
+        case EmbedBuilderType.BANNER:
+            options.embeds = bannerBuilder(builderOptions);
+            break;
+        case EmbedBuilderType.SIMULATE:
+            options.embeds = await simulateBuilder(builderOptions);
+            break;
         case EmbedBuilderType.AVATAR:
             options.embeds = avatarBuilder(builderOptions);
             break;

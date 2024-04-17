@@ -5,7 +5,7 @@ import { EmbedBuilderType } from "@type/embedBuilders";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { SlashCommand } from "@type/commands";
 import type { Mod } from "osu-web.js";
-import type { ApplicationCommandData, Interaction } from "@lilybird/transformers";
+import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
 
 export default {
     data: {
@@ -114,14 +114,10 @@ export default {
     run
 } satisfies SlashCommand;
 
-async function run(interaction: Interaction<ApplicationCommandData>): Promise<void> {
-    if (!interaction.inGuild()) return;
+async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
     await interaction.deferReply();
 
-    const args = getCommandArgs(interaction, true);
-
-    if (typeof args === "undefined") return;
-    const { user, mods, difficultySettings } = args;
+    const { user, mods, difficultySettings } = getCommandArgs(interaction, true);
 
     const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ channelId: interaction.channelId, client: interaction.client });
     if (typeof beatmapId === "undefined" || beatmapId === null) {
