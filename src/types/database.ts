@@ -6,7 +6,12 @@ export enum EmbedScoreType {
     Owo = "owobot"
 }
 
-export interface DatabaseUser {
+interface Database {
+    id: string | number;
+    length?: number;
+}
+
+export interface DatabaseUser extends Database {
     id: string;
     banchoId: string | null;
     score_embeds: number | null;
@@ -14,7 +19,7 @@ export interface DatabaseUser {
     mode: string | null;
 }
 
-export interface DatabaseGuild {
+export interface DatabaseGuild extends Database {
     id: string;
     name: string;
     owner_id: string;
@@ -22,17 +27,17 @@ export interface DatabaseGuild {
     prefixes: Array<string> | null;
 }
 
-export interface DatabaseMap {
+export interface DatabaseMap extends Database {
     id: string;
     data: string;
 }
 
-export interface DatabaseCommands {
+export interface DatabaseCommands extends Database {
     id: string;
     count: string | null;
 }
 
-export interface DatabaseScores {
+export interface DatabaseScores extends Database {
     id: number;
     user_id: number;
     map_id: number;
@@ -52,7 +57,7 @@ export interface DatabaseScores {
     ended_at: string;
 }
 
-export interface DatabaseScoresPp {
+export interface DatabaseScoresPp extends Database {
     score_id: number;
     pp: number;
     pp_fc: number;
