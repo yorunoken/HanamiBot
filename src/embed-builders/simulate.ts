@@ -70,7 +70,6 @@ export async function simulateBuilder({
     const comboValue = current.state?.maxCombo;
     const comboValues = `**${comboValue}**/${map.max_combo}x`;
     const comboDifference = (comboValue ?? 0) / map.max_combo;
-    console.log(comboDifference);
 
     const accuracy = accuracyCalculator(map.mode as Mode, hitValues);
 
