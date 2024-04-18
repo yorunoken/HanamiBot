@@ -2,7 +2,7 @@ import { getProfile } from "@cleaners/profile";
 import { getScore } from "@cleaners/scores";
 import { SPACE } from "@utils/constants";
 import { getMap } from "@utils/database";
-import { downloadBeatmap } from "@utils/osu";
+import { downloadBeatmap, saveScoreDatas } from "@utils/osu";
 import { EmbedType } from "lilybird";
 import type { CompareBuilderOptions } from "@type/embedBuilders";
 import type { EmbedStructure } from "lilybird";
@@ -15,6 +15,8 @@ export async function compareBuilder({
     mode,
     mods
 }: CompareBuilderOptions): Promise<Array<EmbedStructure>> {
+    saveScoreDatas(plays, mode, beatmap);
+
     const profile = getProfile(user, mode);
 
     if (mods?.name) {

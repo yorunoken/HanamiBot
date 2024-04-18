@@ -2,6 +2,7 @@ import { getProfile } from "@cleaners/profile";
 import { getScore } from "@cleaners/scores";
 import { SPACE } from "@utils/constants";
 import { EmbedScoreType } from "@type/database";
+import { saveScoreDatas } from "@utils/osu";
 import { EmbedType } from "lilybird";
 import type { DatabaseUser } from "@type/database";
 import type { UserScore, Mode, ProfileInfo, ScoresInfo, UserBestScore } from "@type/osu";
@@ -19,6 +20,8 @@ export async function playBuilder({
     authorDb,
     sortByDate
 }: PlaysBuilderOptions): Promise<Array<EmbedStructure>> {
+    saveScoreDatas(plays, mode);
+
     if (typeof page === "undefined" && typeof index === "undefined") {
         if (isMultiple)
             page = 0;
