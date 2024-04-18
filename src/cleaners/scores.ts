@@ -1,7 +1,7 @@
 import { accuracyCalculator, getPerformanceResults, getRetryCount, hitValueCalculator } from "@utils/osu";
 import { grades, rulesets } from "@utils/emotes";
 import { insertData } from "@utils/database";
-import type { UserScore, Beatmap, LeaderboardScores, Mode, PlayStatistics, ScoresInfo, Score, UserBestScore } from "@type/osu";
+import type { Mode, UserScore, Beatmap, LeaderboardScores, PlayStatistics, ScoresInfo, Score, UserBestScore } from "@type/osu";
 import type { ISOTimestamp } from "osu-web.js";
 
 // We won't be needing this either!
@@ -72,80 +72,8 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     // This can only mean one thing, and it's because the map couldn't be downloaded for some reason.
     if (!performance) throw new Error("Scores.ts panicked!", { cause: "`performanece` doesn't exist, presumably because the map couldn't be downloaded." });
     const { fc, current, difficultyAttrs, perfect, mapValues } = performance;
-    const { state } = current;
 
     if (play.passed && "score" in play) {
-        insertData({
-            id: play.id,
-            table: "osu_scores",
-            data: [
-                {
-                    name: "user_id",
-                    value: play.user_id
-                },
-                {
-                    name: "map_id",
-                    value: beatmap.id
-                },
-                {
-                    name: "gamemode",
-                    value: mode
-                },
-                {
-                    name: "mods",
-                    value: play.mods.join("")
-                },
-                {
-                    name: "score",
-                    value: totalScore
-                },
-                {
-                    name: "accuracy",
-                    value: play.accuracy
-                },
-                {
-                    name: "max_combo",
-                    value: play.max_combo
-                },
-                {
-                    name: "grade",
-                    value: play.rank
-                },
-                {
-                    name: "count_50",
-                    value: state?.n50 ?? 0
-                },
-                {
-                    name: "count_100",
-                    value: state?.n100 ?? 0
-                },
-                {
-                    name: "count_300",
-                    value: state?.n300 ?? 0
-                },
-                {
-                    name: "count_geki",
-                    value: state?.nGeki ?? 0
-                },
-                {
-                    name: "count_katu",
-                    value: state?.nKatu ?? 0
-                },
-                {
-                    name: "count_miss",
-                    value: state?.misses ?? 0
-                },
-                {
-                    name: "map_state",
-                    value: beatmap.status
-                },
-                {
-                    name: "ended_at",
-                    value: play.created_at
-                }
-            ]
-        }, true);
-
         insertData({
             table: "osu_scores_pp",
             id: play.id,
