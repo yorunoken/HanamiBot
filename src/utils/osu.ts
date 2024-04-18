@@ -1,5 +1,5 @@
 /* eslint-disable @stylistic/no-mixed-operators */
-import { getMap, insertData } from "./database";
+import { bulkInsertData, getMap, insertData } from "./database";
 import { Mode } from "@type/osu";
 import { Beatmap, BeatmapAttributesBuilder, Performance } from "rosu-pp-js";
 import { ModsEnum } from "osu-web.js";
@@ -9,7 +9,7 @@ import type { Message } from "@lilybird/transformers";
 import type { Mod } from "@type/mods";
 import type { UserScore, UserBestScore, AccessTokenJSON, AuthScope, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo, Score } from "@type/osu";
 import type { Client, EmbedStructure } from "lilybird";
-import type { GameMode, Mod as ModOsuWeb, Rank } from "osu-web.js";
+import type { GameMode, Mod as ModOsuWeb, Rank, Beatmap as BeatmapWeb } from "osu-web.js";
 
 /**
  * Build OAuth authorization URL for osu! using the provided parameters.
@@ -215,8 +215,6 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
         clockRate
     }).calculate(beatmap);
 
-    console.log(hitValues);
-
     const {
         count_100: n100,
         count_300: n300,
@@ -226,25 +224,6 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
         count_miss: misses
     } = hitValues ?? {};
 
-    console.log(typeof accuracy === "undefined"
-        ? {
-            mods: modsInt,
-            n100,
-            n300,
-            n50,
-            nGeki: nGeki ?? undefined,
-            nKatu: nKatu ?? undefined,
-            misses,
-            combo: maxCombo ?? perfect.difficulty.maxCombo,
-            clockRate
-        }
-        : {
-            mods: modsInt,
-            accuracy,
-            misses,
-            combo: maxCombo ?? perfect.difficulty.maxCombo,
-            clockRate
-        });
     const current = new Performance(typeof accuracy === "undefined"
         ? {
             mods: modsInt,
@@ -484,6 +463,116 @@ export function hitValueCalculator(
     }
 
     return hitValues;
+}
+
+export function saveScoreDatas(scores: Array<UserBestScore> | Array<UserScore> | Array<Score>, mode: Mode, mapTemp?: BeatmapWeb): void {
+    const entries = [];
+    for (let i = 0; i < scores.length; i++) {
+        const play = scores[i];
+
+        if (play.passed)
+            entries.push(saveScore(play, mode, mapTemp));
+    }
+
+    if (entries.length > 0)
+        bulkInsertData(entries);
+}
+
+function saveScore(play: UserBestScore | UserScore | Score, mode: Mode, mapTemp?: BeatmapWeb): {
+    id: number,
+    table: string,
+    data: Array<{
+        name: string,
+        value: number
+    } | {
+        name: string,
+        value: string
+    }>
+} {
+    let beatmap;
+    if (mapTemp) {
+        const { ...rest } = mapTemp;
+        beatmap = { ...rest };
+    } else {
+        const { beatmap: map } = play as UserBestScore | UserScore;
+        beatmap = map;
+    }
+
+    const { statistics } = play;
+
+    if (play.id === 0)
+        console.log(play);
+
+    return {
+        id: play.id,
+        table: "osu_scores",
+        data: [
+            {
+                name: "user_id",
+                value: play.user_id
+            },
+            {
+                name: "map_id",
+                value: beatmap.id
+            },
+            {
+                name: "gamemode",
+                value: mode
+            },
+            {
+                name: "mods",
+                value: play.mods.join("")
+            },
+            {
+                name: "score",
+                value: play.score
+            },
+            {
+                name: "accuracy",
+                value: play.accuracy
+            },
+            {
+                name: "max_combo",
+                value: play.max_combo
+            },
+            {
+                name: "grade",
+                value: play.rank
+            },
+            {
+                name: "count_50",
+                value: statistics.count_50
+            },
+            {
+                name: "count_100",
+                value: statistics.count_100
+            },
+            {
+                name: "count_300",
+                value: statistics.count_300
+            },
+            {
+                name: "count_geki",
+                value: statistics.count_geki ?? 0
+            },
+            {
+                name: "count_katu",
+                value: statistics.count_katu ?? 0
+            },
+            {
+                name: "count_miss",
+                value: statistics.count_miss
+            },
+            {
+                name: "map_state",
+                value: beatmap.status
+            },
+            {
+                name: "ended_at",
+                value: play.created_at
+            }
+        ]
+    };
 }
 
 function findId(embed: EmbedStructure): number | null {

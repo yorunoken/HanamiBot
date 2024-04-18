@@ -64,3 +64,20 @@ export function insertData({ table, id, data }: { table: string, id: string | nu
     db.prepare(`UPDATE ${table} SET ${setClause} WHERE id = ?;`)
         .run(...values, id);
 }
+
+export function bulkInsertData(entries: Array<{ table: string, id: string | number, data: Array<{ name: string, value: string | number | boolean | null }> }>, ignore?: boolean): void {
+    const insertStatements: Array<string> = [];
+    const values: Array<Array<string | number | boolean | null>> = [];
+
+    for (let i = 0; i < entries.length; i++) {
+        const { table, id, data } = entries[i];
+        const itemValues: Array<string | number | boolean | null> = data.map((item) => item.value);
+
+        insertStatements.push(`INSERT OR ${ignore ? "IGNORE" : "REPLACE"} INTO ${table} (id, ${data.map((item) => item.name).join(", ")}) values (?, ${data.map(() => "?").join(", ")});`);
+        values.push([id, ...itemValues]);
+    }
+
+    db.transaction(() => {
+        for (let i = 0; i < insertStatements.length; i++) db.prepare(insertStatements[i]).run(...values[i]);
+    })();
+}
