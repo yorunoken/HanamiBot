@@ -1,5 +1,5 @@
 import type { DifficultyOptions } from "./commandArgs";
-import type { DatabaseUser } from "./database";
+import type { User } from "./database";
 import type { UserScore, UserBestScore, Beatmap, LeaderboardScores, Mode, Score } from "./osu";
 import type { UserExtended, Mod } from "osu-web.js";
 
@@ -62,7 +62,7 @@ export interface PlaysBuilderOptions extends BuilderOptions {
     type: EmbedBuilderType.PLAYS;
     user: UserExtended;
     mode: Mode;
-    authorDb: DatabaseUser | null;
+    authorDb: User | null;
     index?: number;
     isMultiple?: boolean;
     sortByDate?: boolean;

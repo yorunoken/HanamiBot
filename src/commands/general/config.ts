@@ -1,5 +1,5 @@
-import { getUser, insertData } from "@utils/database";
-import { ScoreEmbed } from "@type/database";
+import { getEntry, insertData } from "@utils/database";
+import { ScoreEmbed, Tables } from "@type/database";
 import { ApplicationCommandOptionType } from "lilybird";
 import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
 import type { EmbedStructure } from "lilybird";
@@ -89,9 +89,9 @@ async function list(interaction: GuildInteraction<ApplicationCommandData>): Prom
     };
 
     const userId = interaction.member.user.id;
-    let user = getUser(userId);
+    let user = getEntry(Tables.USER, userId);
     if (!user) {
-        insertData({ table: "users", id: userId, data: [ { name: "banchoId", value: null } ] });
+        insertData({ table: Tables.USER, id: userId, data: [ { key: "banchoId", value: null } ] });
         user = { banchoId: null, mode: null, score_embeds: null, embed_type: null, id: userId };
     }
     const embeds: EmbedStructure = { fields: [], title: `Config settings of ${interaction.member.user.username}` };
@@ -110,13 +110,13 @@ async function list(interaction: GuildInteraction<ApplicationCommandData>): Prom
 }
 
 function mode(memberId: string, choice: string): void {
-    insertData({ table: "users", id: memberId, data: [ { name: "mode", value: choice } ] });
+    insertData({ table: Tables.USER, id: memberId, data: [ { key: "mode", value: choice } ] });
 }
 
 function scoreEmbed(memberId: string, choice: number): void {
-    insertData({ table: "users", id: memberId, data: [ { name: "score_embeds", value: choice } ] });
+    insertData({ table: Tables.USER, id: memberId, data: [ { key: "score_embeds", value: choice } ] });
 }
 
 function embedType(memberId: string, choice: string): void {
-    insertData({ table: "users", id: memberId, data: [ { name: "embed_type", value: choice } ] });
+    insertData({ table: Tables.USER, id: memberId, data: [ { key: "embed_type", value: choice } ] });
 }

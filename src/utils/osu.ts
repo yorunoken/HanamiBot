@@ -1,10 +1,12 @@
 /* eslint-disable @stylistic/no-mixed-operators */
-import { bulkInsertData, getMap, insertData } from "./database";
+import { bulkInsertData, getEntry, insertData } from "./database";
 import { Mode } from "@type/osu";
+import { Tables } from "@type/database";
 import { Beatmap, BeatmapAttributesBuilder, Performance } from "rosu-pp-js";
 import { ModsEnum } from "osu-web.js";
 import { ChannelType } from "lilybird";
 import https from "https";
+import type { Score as ScoreDatabase } from "@type/database";
 import type { Message } from "@lilybird/transformers";
 import type { Mod } from "@type/mods";
 import type { UserScore, UserBestScore, AccessTokenJSON, AuthScope, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo, Score } from "@type/osu";
@@ -172,7 +174,7 @@ export async function getPerformanceResults({ play, setId, beatmapId, maxCombo, 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     else rulesetId = setId!;
 
-    mapData ??= getMap(beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
+    mapData ??= getEntry(Tables.MAP, beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
     if (!mapData) return null;
 
     let modsStringArray: Array<string> = [];
@@ -289,7 +291,7 @@ export async function downloadBeatmap(id: string | number, timeoutMs = 6000): Pr
             response.on("end", function () {
                 const data = Buffer.concat(chunks).toString();
                 // console.log(data);
-                insertData({ table: "maps", id, data: [ { name: "data", value: data } ] });
+                insertData({ table: Tables.MAP, id, data: [ { key: "data", value: data } ] });
                 resolve({ id, contents: data });
             });
         }).on("error", reject);
@@ -480,13 +482,10 @@ export function saveScoreDatas(scores: Array<UserBestScore> | Array<UserScore> |
 
 function saveScore(play: UserBestScore | UserScore | Score, mode: Mode, mapTemp?: BeatmapWeb): {
     id: number,
-    table: string,
+    table: Tables,
     data: Array<{
-        name: string,
-        value: number
-    } | {
-        name: string,
-        value: string
+        key: keyof ScoreDatabase,
+        value: number | string
     }>
 } {
     let beatmap;
@@ -505,70 +504,70 @@ function saveScore(play: UserBestScore | UserScore | Score, mode: Mode, mapTemp?
 
     return {
         id: play.id,
-        table: "osu_scores",
+        table: Tables.SCORE,
         data: [
             {
-                name: "user_id",
+                key: "user_id",
                 value: play.user_id
             },
             {
-                name: "map_id",
+                key: "map_id",
                 value: beatmap.id
             },
             {
-                name: "gamemode",
+                key: "gamemode",
                 value: mode
             },
             {
-                name: "mods",
+                key: "mods",
                 value: play.mods.join("")
             },
             {
-                name: "score",
+                key: "score",
                 value: play.score
             },
             {
-                name: "accuracy",
+                key: "accuracy",
                 value: play.accuracy
             },
             {
-                name: "max_combo",
+                key: "max_combo",
                 value: play.max_combo
             },
             {
-                name: "grade",
+                key: "grade",
                 value: play.rank
             },
             {
-                name: "count_50",
+                key: "count_50",
                 value: statistics.count_50
             },
             {
-                name: "count_100",
+                key: "count_100",
                 value: statistics.count_100
             },
             {
-                name: "count_300",
+                key: "count_300",
                 value: statistics.count_300
             },
             {
-                name: "count_geki",
+                key: "count_geki",
                 value: statistics.count_geki ?? 0
             },
             {
-                name: "count_katu",
+                key: "count_katu",
                 value: statistics.count_katu ?? 0
             },
             {
-                name: "count_miss",
+                key: "count_miss",
                 value: statistics.count_miss
             },
             {
-                name: "map_state",
+                key: "map_state",
                 value: beatmap.status
             },
             {
-                name: "ended_at",
+                key: "ended_at",
                 value: play.created_at
             }
         ]

@@ -1,7 +1,8 @@
 import { client } from "@utils/initalize";
 import { downloadBeatmap, getPerformanceResults } from "@utils/osu";
-import { getMap } from "@utils/database";
+import { getEntry } from "@utils/database";
 import { rulesets } from "@utils/emotes";
+import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
 import type { MapBuilderOptions } from "@type/embedBuilders";
 import type { EmbedStructure } from "lilybird";
@@ -24,7 +25,7 @@ export async function mapBuilder({
 
     const { beatmapset: mapset, mode, version } = map;
 
-    const mapData = getMap(beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
+    const mapData = getEntry(Tables.MAP, beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
 
     const performancesAsync = [];
     const accuracyList = [98, 97, 95];

@@ -1,30 +1,20 @@
 import db from "../data.db" with { type: "sqlite" };
-import type { DatabaseMap, DatabaseGuild, DatabaseUser, DatabaseCommands, DatabaseScores, DatabaseScoresPp } from "@type/database";
+import type { Tables, TableToArgument, TableToType } from "@type/database";
 
 export function query(str: string): unknown {
     return db.prepare(str).all();
 }
 
-export function getUser(id: string | number): DatabaseUser | null {
-    const data: DatabaseUser | null = db.prepare("SELECT * FROM users WHERE id = ?").get(id) as DatabaseUser | null;
-    if (typeof data?.score_embeds === "string") data.score_embeds = Number(data.score_embeds);
+export function getEntry<T extends Tables>(table: T, id: string | number): TableToType<T> | null {
+    const data = db.prepare(`SELECT * FROM ${table} WHERE id = ?`).get(id) as TableToType<T> | null;
+    if (data !== null && "prefixes" in data && typeof data.prefixes === "string")
+        data.prefixes = JSON.parse(data.prefixes) as Array<string>;
 
     return data;
 }
 
-export function removeUser(id: string | number): void {
-    db.prepare("DELETE FROM users WHERE id = ?").run(id);
-}
-
-export function getServer(id: string | number): DatabaseGuild | null {
-    const data: DatabaseGuild | null = db.prepare("SELECT * FROM servers WHERE id = ?").get(id) as DatabaseGuild | null;
-    if (typeof data?.prefixes === "string") data.prefixes = JSON.parse(data.prefixes) as Array<string>;
-
-    return data;
-}
-
-export function removeServer(id: string | number): void {
-    db.prepare("DELETE FROM servers WHERE id = ?").run(id);
+export function removeEntry(table: Tables, id: string | number): void {
+    db.prepare(`DELETE FROM ${table} WHERE id = ?`).run(id);
 }
 
 export function getRowCount(table: string): number {
@@ -32,29 +22,25 @@ export function getRowCount(table: string): number {
     return count["COUNT(*)"];
 }
 
-export function getMap(id: string | number): DatabaseMap | null {
-    return db.prepare("SELECT * FROM maps WHERE id = ?").get(id) as DatabaseMap | null;
-}
-
-export function getCommand(id: string | number): DatabaseCommands | null {
-    return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DatabaseCommands | null;
-}
-
-export function getScores(id: string | number): DatabaseScores | null {
-    return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DatabaseScores | null;
-}
-
-export function getScoresPp(id: string | number): DatabaseScoresPp | null {
-    return db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as DatabaseScoresPp | null;
-}
-
-export function insertData({ table, id, data }: { table: string, id: string | number, data: Array<{ name: string, value: string | number | boolean | null }> }, ignore?: boolean): void {
-    const setClause = data.map((item) => `${item.name} = ?`).join(", ");
+export function insertData<T extends Tables>(
+    {
+        table,
+        id,
+        data
+    }:
+    {
+        table: T,
+        id: string | number,
+        data: Array<{ key: TableToArgument<T>, value: string | number | boolean | null }>
+    },
+    ignore?: boolean
+): void {
+    const setClause = data.map((item) => `${item.key} = ?`).join(", ");
     const values: Array<string | number | boolean | null> = data.map((item) => item.value);
 
     const existingRow = db.prepare(`SELECT * FROM ${table} WHERE id = ?`).get(id);
     if (!existingRow) {
-        const fields: Array<string> = data.map((item) => item.name);
+        const fields: Array<TableToArgument<T>> = data.map((item) => item.key);
         const placeholders = fields.map(() => "?").join(", ");
 
         db.prepare(`INSERT OR ${ignore ? "IGNORE" : "REPLACE"} INTO ${table} (id, ${fields.join(", ")}) values (?, ${placeholders});`)
@@ -64,19 +50,25 @@ export function insertData({ table, id, data }: { table: string, id: string | nu
     db.prepare(`UPDATE ${table} SET ${setClause} WHERE id = ?;`)
         .run(...values, id);
 }
-
-export function bulkInsertData(entries: Array<{ table: string, id: string | number, data: Array<{ name: string, value: string | number | boolean | null }> }>, ignore?: boolean): void {
+export function bulkInsertData<T extends Tables>(entries: Array<{
+    table: T,
+    id: string | number,
+    data: Array<{ key: TableToArgument<T>, value: string | number | boolean | null }>,
+    ignore?: boolean
+}>): void {
     const insertStatements: Array<string> = [];
     const values: Array<Array<string | number | boolean | null>> = [];
 
+    // Map values in their respective arrays
     for (let i = 0; i < entries.length; i++) {
-        const { table, id, data } = entries[i];
+        const { table, id, data, ignore } = entries[i];
         const itemValues: Array<string | number | boolean | null> = data.map((item) => item.value);
 
-        insertStatements.push(`INSERT OR ${ignore ? "IGNORE" : "REPLACE"} INTO ${table} (id, ${data.map((item) => item.name).join(", ")}) values (?, ${data.map(() => "?").join(", ")});`);
+        insertStatements.push(`INSERT OR ${ignore ? "IGNORE" : "REPLACE"} INTO ${table} (id, ${data.map((item) => item.key).join(", ")}) values (?, ${data.map(() => "?").join(", ")});`);
         values.push([id, ...itemValues]);
     }
 
+    // Prepare for the bulk insertion.
     db.transaction(() => {
         for (let i = 0; i < insertStatements.length; i++) db.prepare(insertStatements[i]).run(...values[i]);
     })();

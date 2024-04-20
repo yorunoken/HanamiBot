@@ -4,7 +4,7 @@ import { SPACE } from "@utils/constants";
 import { EmbedScoreType } from "@type/database";
 import { saveScoreDatas } from "@utils/osu";
 import { EmbedType } from "lilybird";
-import type { DatabaseUser } from "@type/database";
+import type { User } from "@type/database";
 import type { UserScore, Mode, ProfileInfo, ScoresInfo, UserBestScore } from "@type/osu";
 import type { PlaysBuilderOptions } from "@type/embedBuilders";
 import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, EmbedImageStructure, EmbedStructure, EmbedThumbnailStructure } from "lilybird";
@@ -75,7 +75,7 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
     mode: Mode,
     profile: ProfileInfo,
     index: number,
-    authorDb: DatabaseUser | null,
+    authorDb: User | null,
     isMultiple?: boolean
 }): Promise<Array<EmbedStructure>> {
     const isMaximized = (authorDb?.score_embeds ?? 1) === 1;
@@ -215,7 +215,7 @@ async function getMultiplePlays({ plays, page, mode, profile, authorDb }:
     page: number,
     mode: Mode,
     profile: ProfileInfo,
-    authorDb: DatabaseUser | null
+    authorDb: User | null
 }): Promise<Array<EmbedStructure>> {
     const embedType = authorDb?.embed_type ?? EmbedScoreType.Hanami;
 

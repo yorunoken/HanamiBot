@@ -1,4 +1,5 @@
-import { getServer, query } from "@utils/database";
+import { getEntry, query } from "@utils/database";
+import { Tables } from "@type/database";
 import { ApplicationCommandOptionType } from "lilybird";
 import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
 import type { SlashCommand } from "@type/commands";
@@ -73,7 +74,7 @@ ${response}
 
 async function servers(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
     const id = interaction.data.getString("id", true);
-    const guild = getServer(id);
+    const guild = getEntry(Tables.GUILD, id);
     if (guild === null) {
         await interaction.editReply("Server not found!");
         return;

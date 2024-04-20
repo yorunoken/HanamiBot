@@ -1,7 +1,8 @@
-import { getUser } from "./database";
+import { getEntry } from "./database";
 import { slashCommandsIds } from "./cache";
 import { Mode } from "@type/osu";
 import { UserType } from "@type/commandArgs";
+import { Tables } from "@type/database";
 import { ModsEnum } from "osu-web.js";
 import type { SlashCommandArgs, DifficultyOptions, Mods, PrefixCommandArgs, User } from "@type/commandArgs";
 import type { Mod } from "osu-web.js";
@@ -87,9 +88,9 @@ export function getCommandArgs(interaction: GuildInteraction<ApplicationCommandD
     }
 
     const userArg = data.getString("username");
-    const userAuthor = getUser(member.user.id);
+    const userAuthor = getEntry(Tables.USER, member.user.id);
     const discordUserId = data.getUser("discord");
-    const discordUser = getUser(discordUserId ?? "");
+    const discordUser = getEntry(Tables.USER, discordUserId ?? "");
     const mode = <Mode | undefined>data.getString("mode") ?? Mode.OSU;
 
     let mods: Mods = {
@@ -210,7 +211,7 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
             result.flags[key] = value;
     }
 
-    const userAuthor = getUser(message.author.id);
+    const userAuthor = getEntry(Tables.USER, message.author.id);
 
     if (!result.tempUser && userAuthor?.banchoId) {
         result.user = {
@@ -224,7 +225,7 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
         const [userArg] = result.tempUser;
 
         const discordUserId = (/<@(\d+)>/).exec(userArg)?.[1];
-        const discordUser = discordUserId ? getUser(discordUserId) : null;
+        const discordUser = discordUserId ? getEntry(Tables.USER, discordUserId) : null;
         const discordId = discordUserId ? discordUser?.banchoId : null;
 
         if (discordUserId && !discordId) {

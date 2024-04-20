@@ -1,8 +1,9 @@
 import { prefixesCache } from "./guildCreate";
 import { DEFAULT_PREFIX } from "@utils/constants";
 import { commandAliases, loadLogs, messageCommands } from "@utils/initalize";
-import { getCommand, insertData } from "@utils/database";
+import { getEntry, insertData } from "@utils/database";
 import { fuzzySearch } from "@utils/fuzzy";
+import { Tables } from "@type/database";
 import type { Message } from "@lilybird/transformers";
 import type { Event } from "@lilybird/handlers";
 
@@ -93,26 +94,26 @@ async function run(message: Message): Promise<void> {
     try {
         await command.run({ client: client, message, args, prefix, index, commandName, channel });
 
-        const server = await client.rest.getGuild(guildId);
-        await loadLogs(`INFO: [${server.name}] ${author.username} used prefix command \`${command.name}\``);
-        const docs = getCommand(commandName);
+        const guild = await client.rest.getGuild(guildId);
+        await loadLogs(`INFO: [${guild.name}] ${author.username} used prefix command \`${command.name}\``);
+        const docs = getEntry(Tables.COMMAND, commandName);
 
         if (docs === null)
-            insertData({ table: "commands", data: [ { name: "count", value: 1 } ], id: command.name });
+            insertData({ table: Tables.COMMAND, data: [ { key: "count", value: 1 } ], id: command.name });
         else
-            insertData({ table: "commands", data: [ { name: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
+            insertData({ table: Tables.COMMAND, data: [ { key: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
     } catch (error) {
         const err = error as Error;
 
-        const server = await client.rest.getGuild(guildId);
+        const guild = await client.rest.getGuild(guildId);
         console.log(err);
-        await loadLogs(`ERROR: [${server.name}] ${author.username} had an error in prefix command \`${command.name}\`: ${err.stack}`, true);
-        const docs = getCommand(command.name);
+        await loadLogs(`ERROR: [${guild.name}] ${author.username} had an error in prefix command \`${command.name}\`: ${err.stack}`, true);
+        const docs = getEntry(Tables.COMMAND, commandName);
 
         if (docs === null)
-            insertData({ table: "commands", data: [ { name: "count", value: 1 } ], id: command.name });
+            insertData({ table: Tables.COMMAND, data: [ { key: "count", value: 1 } ], id: command.name });
         else
-            insertData({ table: "commands", data: [ { name: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
+            insertData({ table: Tables.COMMAND, data: [ { key: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
     }
 
     cooldown.set(`${command.name}${author.id}`, Date.now() + command.cooldown);
@@ -128,5 +129,5 @@ function verifyUser(message: Message): void {
     if (!content) return;
 
     const [discordId, osuId] = content.split("\n");
-    insertData({ table: "users", id: discordId, data: [ { name: "banchoId", value: osuId } ] });
+    insertData({ table: Tables.USER, id: discordId, data: [ { key: "banchoId", value: osuId } ] });
 }

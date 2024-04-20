@@ -1,8 +1,9 @@
 import { getProfile } from "@cleaners/profile";
 import { getScore } from "@cleaners/scores";
 import { SPACE } from "@utils/constants";
-import { getMap } from "@utils/database";
+import { getEntry } from "@utils/database";
 import { downloadBeatmap, saveScoreDatas } from "@utils/osu";
+import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
 import type { CompareBuilderOptions } from "@type/embedBuilders";
 import type { EmbedStructure } from "lilybird";
@@ -59,7 +60,7 @@ async function getMultiplePlays({ plays, profile, beatmap, mode }:
     mode: Mode
 }): Promise<Array<EmbedStructure>> {
     const beatmapId = beatmap.id;
-    const mapData = getMap(beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
+    const mapData = getEntry(Tables.MAP, beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
 
     const playsTemp: Array<Promise<ScoresInfo>> = [];
     for (let i = 0; i < plays.length; i++) playsTemp.push(getScore({ scores: plays, index: i, mode, beatmap, mapData }));

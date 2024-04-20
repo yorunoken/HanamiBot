@@ -1,7 +1,8 @@
 import { getScore } from "@cleaners/scores";
 import { SPACE } from "@utils/constants";
-import { getMap } from "@utils/database";
+import { getEntry } from "@utils/database";
 import { downloadBeatmap } from "@utils/osu";
+import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
 import type { LeaderboardBuilderOptions } from "@type/embedBuilders";
 import type { EmbedStructure } from "lilybird";
@@ -28,7 +29,7 @@ export async function leaderboardBuilder({
 async function getPlays(plays: Array<LeaderboardScores>, beatmap: Beatmap, page: number): Promise<Array<EmbedStructure>> {
     const beatmapId = beatmap.id;
     const mode = <Mode>beatmap.mode;
-    const mapData = getMap(beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
+    const mapData = getEntry(Tables.MAP, beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
 
     const pageStart = page * 5;
     const pageEnd = pageStart + 5;

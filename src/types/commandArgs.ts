@@ -1,4 +1,4 @@
-import type { DatabaseUser } from "./database";
+import type { User as UserDb } from "./database";
 import type { Mod } from "osu-web.js";
 import type { Mode } from "./osu";
 
@@ -9,8 +9,8 @@ export const enum UserType {
 
 interface BaseUser {
     type: UserType;
-    authorDb: DatabaseUser | null;
-    playerDb?: DatabaseUser | null;
+    authorDb: UserDb | null;
+    playerDb?: UserDb | null;
     beatmapId: string | null;
 }
 

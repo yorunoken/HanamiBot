@@ -2,9 +2,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { client } from "@utils/initalize";
 import { accuracyCalculator, downloadBeatmap, getPerformanceResults, gradeCalculator, hitValueCalculator } from "@utils/osu";
-import { getMap } from "@utils/database";
+import { getEntry } from "@utils/database";
 import { grades, rulesets } from "@utils/emotes";
 import { SPACE } from "@utils/constants";
+import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
 import type { Mode } from "@type/osu";
 import type { SimulateBuilderOptions } from "@type/embedBuilders";
@@ -31,7 +32,7 @@ export async function simulateBuilder({
 
     const { beatmapset: mapset, mode, version } = map;
 
-    const mapData = getMap(beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
+    const mapData = getEntry(Tables.MAP, beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
 
     const performance = await getPerformanceResults({
         beatmapId,

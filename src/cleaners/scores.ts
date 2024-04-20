@@ -1,6 +1,7 @@
 import { accuracyCalculator, getPerformanceResults, getRetryCount, hitValueCalculator } from "@utils/osu";
 import { grades, rulesets } from "@utils/emotes";
 import { insertData } from "@utils/database";
+import { Tables } from "@type/database";
 import type { Mode, UserScore, Beatmap, LeaderboardScores, PlayStatistics, ScoresInfo, Score, UserBestScore } from "@type/osu";
 import type { ISOTimestamp } from "osu-web.js";
 
@@ -75,19 +76,19 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
 
     if (play.passed && "score" in play) {
         insertData({
-            table: "osu_scores_pp",
+            table: Tables.PP,
             id: play.id,
             data: [
                 {
-                    name: "pp",
+                    key: "pp",
                     value: current.pp
                 },
                 {
-                    name: "pp_fc",
+                    key: "pp_fc",
                     value: fc.pp
                 },
                 {
-                    name: "pp_perfect",
+                    key: "pp_perfect",
                     value: perfect.pp
                 }
             ]

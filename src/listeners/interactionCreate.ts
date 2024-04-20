@@ -1,5 +1,5 @@
 import { compareBuilder, leaderboardBuilder, mapBuilder, playBuilder, profileBuilder } from "../embed-builders";
-import { getCommand, insertData } from "@utils/database";
+import { getEntry, insertData } from "@utils/database";
 import { client, applicationCommands, loadLogs } from "@utils/initalize";
 import { mesageDataForButtons } from "@utils/cache";
 import { EmbedBuilderType } from "@type/embedBuilders";
@@ -8,6 +8,7 @@ import { backgroundBuilder } from "@builders/background";
 import { avatarBuilder } from "@builders/avatar";
 import { bannerBuilder } from "@builders/banner";
 import { simulateBuilder } from "@builders/simulate";
+import { Tables } from "@type/database";
 import type { DMInteraction, Interaction, InteractionReplyOptions, Message, MessageComponentData } from "@lilybird/transformers";
 import type { EmbedStructure } from "lilybird";
 import type { Event } from "@lilybird/handlers";
@@ -28,28 +29,28 @@ async function run(interaction: Interaction): Promise<void> {
 
         try {
             await command.run(interaction);
-            const server = await interaction.client.rest.getGuild(interaction.guildId);
-            await loadLogs(`INFO: [${server.name}] ${username} used slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}`);
+            const guild = await interaction.client.rest.getGuild(interaction.guildId);
+            await loadLogs(`INFO: [${guild.name}] ${username} used slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}`);
 
-            const docs = getCommand(interaction.data.name);
+            const docs = getEntry(Tables.COMMAND_SLASH, interaction.data.name);
             if (docs === null)
-                insertData({ table: "commands_slash", data: [ { name: "count", value: 1 } ], id: command.data.name });
+                insertData({ table: Tables.COMMAND_SLASH, data: [ { key: "count", value: 1 } ], id: command.data.name });
             else
-                insertData({ table: "commands_slash", data: [ { name: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
+                insertData({ table: Tables.COMMAND_SLASH, data: [ { key: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
         } catch (error) {
-            const server = await interaction.client.rest.getGuild(interaction.guildId);
+            const guild = await interaction.client.rest.getGuild(interaction.guildId);
             const err = error as Error;
             console.log(error);
             await loadLogs(
-                `ERROR: [${server.name}] ${username} had an error in slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}: ${err.stack}`,
+                `ERROR: [${guild.name}] ${username} had an error in slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}: ${err.stack}`,
                 true
             );
 
-            const docs = getCommand(interaction.data.name);
+            const docs = getEntry(Tables.COMMAND_SLASH, interaction.data.name);
             if (docs === null)
-                insertData({ table: "commands_slash", data: [ { name: "count", value: 1 } ], id: command.data.name });
+                insertData({ table: Tables.COMMAND_SLASH, data: [ { key: "count", value: 1 } ], id: command.data.name });
             else
-                insertData({ table: "commands_slash", data: [ { name: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
+                insertData({ table: Tables.COMMAND_SLASH, data: [ { key: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
         }
     }
 }
@@ -215,7 +216,7 @@ async function handleVerify(interaction: DMInteraction<MessageComponentData, Mes
         return;
     }
 
-    insertData({ table: "users", id: discordId, data: [ { name: "banchoId", value: osuId } ] });
+    insertData({ table: Tables.USER, id: discordId, data: [ { key: "banchoId", value: osuId } ] });
 
     const embed: EmbedStructure = {
         title: "Success!",

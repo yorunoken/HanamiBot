@@ -1,6 +1,7 @@
-import { getServer, insertData } from "@utils/database";
+import { getEntry, insertData } from "@utils/database";
 import { DEFAULT_PREFIX, MAX_AMOUNT_OF_PREFIXES } from "@utils/constants";
 import { prefixesCache } from "@listeners/guildCreate";
+import { Tables } from "@type/database";
 import { ApplicationCommandOptionType, EmbedType, PermissionFlags } from "lilybird";
 import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
 import type { SlashCommand } from "@type/commands";
@@ -75,9 +76,9 @@ async function add({ prefix, interaction, guildId }: { prefix?: string, interact
     if (checkPerms === false)
         return;
 
-    const server = getServer(guildId);
-    if (!prefix || !server) return;
-    let { prefixes } = server;
+    const guild = getEntry(Tables.GUILD, guildId);
+    if (typeof prefix === "undefined" || guild === null) return;
+    let { prefixes } = guild;
 
     if (prefixes !== null && !Array.isArray(prefixes))
         prefixes = JSON.parse(prefixes) as Array<string>;
@@ -94,7 +95,7 @@ async function add({ prefix, interaction, guildId }: { prefix?: string, interact
 
     const newPrefixes = prefixes === null ? [prefix] : [...prefixes, prefix];
 
-    insertData({ table: "servers", id: guildId, data: [ { name: "prefixes", value: JSON.stringify(newPrefixes) } ] });
+    insertData({ table: Tables.GUILD, id: guildId, data: [ { key: "prefixes", value: JSON.stringify(newPrefixes) } ] });
     prefixesCache.set(guildId, newPrefixes);
 
     await interaction.editReply(`**The prefix \`${prefix}\` has been added to the list.**`);
@@ -106,12 +107,12 @@ async function remove({ prefix, interaction, guildId }: { prefix?: string, inter
     if (checkPerms === false)
         return;
 
-    const server = getServer(guildId);
-    if (!prefix || !server) return;
-    const { prefixes } = server;
+    const guild = getEntry(Tables.GUILD, guildId);
+    if (typeof prefix === "undefined" || guild === null) return;
+    const { prefixes } = guild;
 
     if (prefixes === null) {
-        await interaction.editReply("**There aren't any prefixes on this server. You can add a new prefixes by using `/prefix add`**");
+        await interaction.editReply("**There aren't any prefixes on this guild. You can add a new prefixes by using `/prefix add`**");
         return;
     }
 
@@ -121,27 +122,27 @@ async function remove({ prefix, interaction, guildId }: { prefix?: string, inter
     }
 
     const newPrefixes = prefixes.filter((item) => item !== prefix);
-    insertData({ table: "servers", id: guildId, data: [ { name: "prefixes", value: newPrefixes.length > 0 ? JSON.stringify(newPrefixes) : null } ] });
+    insertData({ table: Tables.GUILD, id: guildId, data: [ { key: "prefixes", value: newPrefixes.length > 0 ? JSON.stringify(newPrefixes) : null } ] });
     prefixesCache.set(guildId, newPrefixes.length > 0 ? newPrefixes : DEFAULT_PREFIX);
 
     let message = `**The prefix \`${prefix}\` has been removed from the list.**`;
     if (newPrefixes.length === 0)
-        message = `**__Warning__:\nThere are no more custom prefixes on the server left. The default prefix is \`${DEFAULT_PREFIX.join("")}\`**`;
+        message = `**__Warning__:\nThere are no more custom prefixes on the guild left. The default prefix is \`${DEFAULT_PREFIX.join("")}\`**`;
 
     await interaction.editReply(message);
     return;
 }
 
 async function list({ interaction, guildId }: { interaction: GuildInteraction<ApplicationCommandData>, guildId: string }): Promise<void> {
-    const server = getServer(guildId);
-    if (!server) return;
+    const guild = getEntry(Tables.GUILD, guildId);
+    if (guild === null) return;
 
-    const { prefixes } = server;
+    const { prefixes } = guild;
 
     if (prefixes === null) {
-        await interaction.editReply(`**There aren't any custom prefixes on this server. The default is \`${DEFAULT_PREFIX.join("")}\`**`);
+        await interaction.editReply(`**There aren't any custom prefixes on this guild. The default is \`${DEFAULT_PREFIX.join("")}\`**`);
         return;
     }
 
-    await interaction.editReply({ embeds: [ { type: EmbedType.Rich, title: "Prefixes!", description: `- \`${prefixes.join("`\n- `")}\`` } ] });
+    await interaction.editReply({ embeds: [ { type: EmbedType.Rich, title: "Currently defined prefixes", description: `**\`${prefixes.join("`**, `")}\`**` } ] });
 }

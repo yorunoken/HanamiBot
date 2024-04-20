@@ -28,7 +28,7 @@ You can look at all of the libraries I use by going to `package.json` in the mai
 
 - [rosu-pp's JavaScript bind](https://github.com/MaxOhn/rosu-pp-js) to calculate pp, bpm values, other technical stuff of osu!
 
-Invite the bot to your server using [this link](https://discord.com/api/oauth2/authorize?client_id=995999045157916763&permissions=330752&scope=bot)
+Invite the bot to your guild using [this link](https://discord.com/api/oauth2/authorize?client_id=995999045157916763&permissions=330752&scope=bot)
 
 ## Commands ⭐
 
@@ -42,7 +42,7 @@ These are the bare-bone ones.
 
 - `/top` get a user's osu! top plays
 
-use `/help` in your server for more information.
+use `/help` in your guild for more information.
 
 ## Contributing 😶‍🌫️
 
