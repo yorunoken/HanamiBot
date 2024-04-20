@@ -7,7 +7,7 @@
     "check": "tsc && eslint",
     "start": "bun src/index.ts",
     "build": "bun scripts/build.ts",
-    "prod": "bun scripts/prod.ts"
+    "prod": "bun run build && bun run start"
   },
   "dependencies": {
     "@lilybird/handlers": "0.4.0-beta.2",
