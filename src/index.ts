@@ -60,8 +60,8 @@ const listeners = await createHandler({
 });
 
 await createClient({
-    useDebugRest: true,
-    attachDebugListener: true,
+    // useDebugRest: true,
+    // attachDebugListener: true,
     token: process.env.DISCORD_BOT_TOKEN,
     caching: {
         transformerTypes: { channel: Channel, guild: Guild, voiceState: GuildVoiceChannel },
