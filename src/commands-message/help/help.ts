@@ -1,4 +1,4 @@
-import { helpBuilder } from "@builders/help";
+import { helpBuilder } from "@builders/index";
 import type { MessageCommand } from "@type/commands";
 import type { Message } from "@lilybird/transformers";
 
