@@ -1,7 +1,7 @@
 import { getCommandArgs } from "@utils/args";
 import { getBeatmapIdFromContext } from "@utils/osu";
 import { EmbedBuilderType } from "@type/embedBuilders";
-import { backgroundBuilder } from "@builders/background";
+import { backgroundBuilder } from "@builders/index";
 import { client } from "@utils/initalize";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";

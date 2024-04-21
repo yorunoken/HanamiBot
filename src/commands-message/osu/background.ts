@@ -3,7 +3,7 @@ import { getBeatmapIdFromContext } from "@utils/osu";
 import { Mode } from "@type/osu";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { client } from "@utils/initalize";
-import { backgroundBuilder } from "@builders/background";
+import { backgroundBuilder } from "@builders/index";
 import { EmbedType } from "lilybird";
 import type { GuildTextChannel, Message } from "@lilybird/transformers";
 import type { MessageCommand } from "@type/commands";

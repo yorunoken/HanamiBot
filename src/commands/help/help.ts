@@ -1,4 +1,4 @@
-import { helpBuilder } from "@builders/help";
+import { helpBuilder } from "@builders/index";
 import type { SlashCommand } from "@type/commands";
 
 export default {
