@@ -1,6 +1,5 @@
 import { slashCommandsIds } from "@utils/cache";
 import type { MessageCommand } from "@type/commands";
-import type { Message } from "@lilybird/transformers";
 
 export default {
     name: "config",
@@ -11,7 +10,7 @@ export default {
     usage: `/config score_embeds: Maximized
     /config mode: osu`,
     cooldown: 1000,
-    run: async ({ message }: { message: Message }) => {
+    run: async ({ message }) => {
         await message.reply(`This command has been deprecated. Use ${slashCommandsIds.get("config")}instead.`);
     }
 } satisfies MessageCommand;

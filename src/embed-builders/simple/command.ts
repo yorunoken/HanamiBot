@@ -1,16 +1,54 @@
 import { Tables } from "@type/database";
 import { getRowCount } from "@utils/database";
+import { commandAliases, messageCommands } from "@utils/initalize";
 import type { EmbedStructure } from "lilybird";
 
-export function commandBuilder(command?: string): Array<EmbedStructure> {
+export function commandBuilder(command: string | undefined): Array<EmbedStructure> {
     if (typeof command === "undefined")
         return displayAllCommands();
 
-    return displayCommandInfo();
+    return displayCommandInfo(command);
 }
 
-function displayCommandInfo(): Array<EmbedStructure> {
-    
+function displayCommandInfo(name: string): Array<EmbedStructure> {
+    const cmd = messageCommands.get(name) ?? messageCommands.get(commandAliases.get(name) ?? "");
+    if (typeof cmd === "undefined") {
+        return [
+            {
+                title: "Uh oh.",
+                description: `Unfortunately, the command \`${name}\` doesn't exist.`
+            }
+        ];
+    }
+
+    const { default: command } = cmd;
+
+    return [
+        {
+            title: `${command.name}`,
+            description: command.description,
+            fields: [
+                {
+                    name: "Cooldown",
+                    value: `${(command.cooldown / 1000).toString()} seconds`
+                },
+                {
+                    name: "Aliases",
+                    value: command.aliases?.join(", ") ?? "`no aliases`",
+                    inline: true
+                },
+                {
+                    name: "Usage",
+                    value: command.usage,
+                    inline: false
+                },
+                {
+                    name: "Details",
+                    value: command.details ?? "`no details`"
+                }
+            ]
+        }
+    ];
 }
 
 function displayAllCommands(): Array<EmbedStructure> {
