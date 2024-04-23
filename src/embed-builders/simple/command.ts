@@ -23,6 +23,7 @@ function displayCommandInfo(name: string): Array<EmbedStructure> {
 
     const { default: command } = cmd;
 
+    const cooldownSecond = command.cooldown / 1000;
     return [
         {
             title: `${command.name}`,
@@ -30,7 +31,7 @@ function displayCommandInfo(name: string): Array<EmbedStructure> {
             fields: [
                 {
                     name: "Cooldown",
-                    value: `${(command.cooldown / 1000).toString()} seconds`
+                    value: `${cooldownSecond} second${cooldownSecond > 1 ? "s" : ""}`
                 },
                 {
                     name: "Aliases",
