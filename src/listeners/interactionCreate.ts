@@ -3,9 +3,8 @@ import { client, applicationCommands, loadLogs } from "@utils/initalize";
 import { mesageDataForButtons } from "@utils/cache";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { calculateButtonState, createActionRow } from "@utils/buttons";
-import { simulateBuilder } from "@builders/simulate";
 import { Tables } from "@type/database";
-import { compareBuilder, leaderboardBuilder, mapBuilder, playBuilder, profileBuilder, avatarBuilder, backgroundBuilder, bannerBuilder } from "@builders/index";
+import { leaderboardBuilder, playBuilder } from "@builders/index";
 import type { DMInteraction, Interaction, InteractionReplyOptions, Message, MessageComponentData } from "@lilybird/transformers";
 import type { EmbedStructure } from "lilybird";
 import type { Event } from "@lilybird/handlers";
@@ -89,27 +88,6 @@ async function handleButton(interaction: Interaction): Promise<void> {
 
     const options: InteractionReplyOptions = {};
     switch (builderOptions.type) {
-        case EmbedBuilderType.BANNER:
-            options.embeds = bannerBuilder(builderOptions);
-            break;
-        case EmbedBuilderType.SIMULATE:
-            options.embeds = await simulateBuilder(builderOptions);
-            break;
-        case EmbedBuilderType.AVATAR:
-            options.embeds = avatarBuilder(builderOptions);
-            break;
-        case EmbedBuilderType.BACKGROUND:
-            options.embeds = backgroundBuilder(builderOptions);
-            break;
-        case EmbedBuilderType.COMPARE:
-            options.embeds = await compareBuilder(builderOptions);
-            break;
-        case EmbedBuilderType.PROFILE:
-            options.embeds = profileBuilder(builderOptions);
-            break;
-        case EmbedBuilderType.MAP:
-            options.embeds = await mapBuilder(builderOptions);
-            break;
         case EmbedBuilderType.LEADERBOARD:
             if (isIncrementPage) {
                 builderOptions.page ??= 0;
@@ -185,6 +163,8 @@ async function handleButton(interaction: Interaction): Promise<void> {
 
             options.embeds = await playBuilder(builderOptions);
             break;
+        default:
+            return;
     }
 
     await interaction.editReply(options);
