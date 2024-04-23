@@ -13,6 +13,7 @@ export default {
     name: "simulate",
     aliases: ["simulate", "sim", "s"],
     description: "Display statistics of a beatmap.",
+    usage: "/simulate acc: 97 bpm: 230 combo: 900 misses: 7",
     cooldown: 1000,
     run
 } satisfies MessageCommand;

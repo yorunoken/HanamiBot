@@ -26,6 +26,9 @@ export default {
     name: "recentbest",
     aliases: Object.keys(modeAliases),
     description: "Display a list of best recent play(s) of a user.",
+    usage: `/recentbest
+    /recentbest mods: DT
+    /recentbest passes:true`,
     cooldown: 1000,
     run
 } satisfies MessageCommand;

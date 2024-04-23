@@ -5,6 +5,7 @@ import type { Message } from "@lilybird/transformers";
 export default {
     name: "help",
     description: "Get info about the bot.",
+    usage: "/help",
     cooldown: 1000,
     run: async ({ message }: { message: Message }) => {
         await message.reply({ embeds: helpBuilder() });

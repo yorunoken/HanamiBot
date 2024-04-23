@@ -4,7 +4,8 @@ import type { Message } from "@lilybird/transformers";
 
 export default {
     name: "ping",
-    description: "pong!!",
+    description: "pings the bot and sees if it's alive!",
+    usage: "/ping",
     cooldown: 1000,
     run: async ({ message }: { message: Message }) => {
         const newMessage = await message.reply({

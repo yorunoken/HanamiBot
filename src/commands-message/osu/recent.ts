@@ -33,6 +33,20 @@ const modeAliases: Record<string, { mode: Mode, includeFails: boolean }> = {
     recentpasscatch: { mode: Mode.FRUITS, includeFails: false }
 };
 
+export default {
+    name: "recent",
+    aliases: Object.keys(modeAliases),
+    description: "Display recent play(s) of a user.",
+    details: `The aliases are split between includes fails, and not includes fails.
+    \`r\`, \`rs\`, \rt\`, \`rm\`, \`rc\`, \`recent\`, \`recenttaiko\`, \`recentmania\` and \`recentcatch\` include fails, the rest do not.
+    You can use the \`passes\` argument in slash commands to specify passes.`,
+    usage: `/recent
+    /recent mods: DT
+    /recent passes:true`,
+    cooldown: 1000,
+    run
+} satisfies MessageCommand;
+
 async function run({ message, args, commandName, index = 0, channel }: { message: Message, args: Array<string>, commandName: string, index: number | undefined, channel: GuildTextChannel }): Promise<void> {
     const { mode, includeFails } = modeAliases[commandName];
     const { user, mods } = parseOsuArguments(message, args, mode);
@@ -102,10 +116,3 @@ async function run({ message, args, commandName, index = 0, channel }: { message
     mesageDataForButtons.set(sentMessage.id, embedOptions);
 }
 
-export default {
-    name: "recent",
-    aliases: Object.keys(modeAliases),
-    description: "Display recent play(s) of a user.",
-    cooldown: 1000,
-    run
-} satisfies MessageCommand;

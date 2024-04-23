@@ -11,6 +11,7 @@ import type { MessageCommand } from "@type/commands";
 export default {
     name: "banner",
     description: "Display the banner of a user.",
+    usage: "/banner",
     cooldown: 1000,
     run
 } satisfies MessageCommand;

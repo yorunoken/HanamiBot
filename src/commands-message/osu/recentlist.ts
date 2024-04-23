@@ -35,6 +35,12 @@ export default {
     name: "recentlist",
     aliases: Object.keys(modeAliases),
     description: "Display a list of recent play(s) of a user.",
+    details: `The aliases are split between includes fails, and not includes fails.
+    \`rl\`, \`rlt\`, \rlt\`, \`rlm\`, \`rlc\`, \`recentlist\`, \`recentlisttaiko\`, \`recentlistmania\` and \`recentlistcatch\` include fails, the rest do not.
+    You can use the \`passes\` argument in slash commands to specify passes.`,
+    usage: `/recentlist
+    /recentlist mods: DT
+    /recentlist passes: true`,
     cooldown: 1000,
     run
 } satisfies MessageCommand;

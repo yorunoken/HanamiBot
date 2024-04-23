@@ -5,6 +5,8 @@ import type { MessageCommand } from "@type/commands";
 export default {
     name: "owner",
     description: "Owner commands.",
+    details: "no you don't.",
+    usage: "haha no",
     cooldown: 1000,
     run
 } satisfies MessageCommand;

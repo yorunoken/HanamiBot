@@ -8,6 +8,7 @@ export interface MessageCommand {
     aliases?: Array<string>;
     cooldown: number;
     description: string;
+    details?: string;
     usage: string;
     // category: string;
     flags?: string;

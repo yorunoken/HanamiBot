@@ -12,6 +12,7 @@ export default {
     name: "background",
     aliases: ["bg", "background"],
     description: "Display background of a beatmap.",
+    usage: "/background",
     cooldown: 1000,
     run
 } satisfies MessageCommand;

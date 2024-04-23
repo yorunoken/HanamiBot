@@ -3,7 +3,8 @@ import type { Message } from "@lilybird/transformers";
 
 export default {
     name: "invite",
-    description: "Get an invite link of the bot.",
+    description: "Gives you an invite link of the bot.",
+    usage: "/invite",
     cooldown: 1000,
     run: async ({ message }: { message: Message }) => {
         const links = {
