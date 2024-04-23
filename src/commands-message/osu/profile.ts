@@ -12,6 +12,8 @@ export default {
     name: "profile",
     aliases: ["osu", "mania", "taiko", "fruits"],
     description: "Display statistics of a user.",
+    details: "You can specify the mode by using the `mod` flag in slash commands.",
+    usage: "/osu",
     cooldown: 1000,
     run
 } satisfies MessageCommand;

@@ -23,16 +23,6 @@ async function run(message: Message): Promise<void> {
     const { content, guildId, client, author } = message;
     if (!content || !guildId || author.bot) return;
 
-    const channel = await message.fetchChannel();
-    if (!channel.isText()) return;
-
-    // nyann :3333
-    const CHANCE_TO_SEND_CUTE_KITTY_CAT_I_LOVE_CATS = 0.6;
-    if (content === ":3" || content === "3:" && Math.random() > CHANCE_TO_SEND_CUTE_KITTY_CAT_I_LOVE_CATS) {
-        await channel.send(message.content === ":3" ? "3:" : ":3");
-        return;
-    }
-
     const prefixes = prefixesCache.get(guildId) ?? DEFAULT_PREFIX;
     let prefix: string | null = null;
 
@@ -86,6 +76,16 @@ async function run(message: Message): Promise<void> {
                 content: `${cooldown.get(`${command.name}${author.id}`)}ms`
             })
             .then((msg) => setTimeout(async () => msg.delete(), cooldown.get(`${command.name}${author.id}`) - Date.now()));
+        return;
+    }
+
+    const channel = await message.fetchChannel();
+    if (!channel.isText()) return;
+
+    // nyann :3333
+    const CHANCE_TO_SEND_CUTE_KITTY_CAT_I_LOVE_CATS = 0.6;
+    if (content === ":3" || content === "3:" && Math.random() > CHANCE_TO_SEND_CUTE_KITTY_CAT_I_LOVE_CATS) {
+        await channel.send(message.content === ":3" ? "3:" : ":3");
         return;
     }
 

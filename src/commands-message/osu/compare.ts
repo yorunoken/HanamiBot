@@ -25,6 +25,7 @@ export default {
     name: "compare",
     aliases: Object.keys(modeAliases),
     description: "Display play(s) of a user on a beatmap.",
+    usage: "/compare",
     cooldown: 1000,
     run
 } satisfies MessageCommand;

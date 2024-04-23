@@ -27,6 +27,16 @@ const modeAliases: Record<string, { mode: Mode }> = {
     tctb: { mode: Mode.FRUITS }
 };
 
+export default {
+    name: "top",
+    aliases: Object.keys(modeAliases),
+    description: "Display top play(s) of a user.",
+    usage: `/top
+    /top mode: fruits`,
+    cooldown: 1000,
+    run
+} satisfies MessageCommand;
+
 async function run({ message, args, commandName, index, channel }: { message: Message, args: Array<string>, commandName: string, index: number | undefined, channel: GuildTextChannel }): Promise<void> {
     const { mode } = modeAliases[commandName];
     const { user, mods, flags } = parseOsuArguments(message, args, mode);
@@ -105,10 +115,3 @@ async function run({ message, args, commandName, index, channel }: { message: Me
     mesageDataForButtons.set(sentMessage.id, embedOptions);
 }
 
-export default {
-    name: "top",
-    aliases: Object.keys(modeAliases),
-    description: "Display top play(s) of a user.",
-    cooldown: 1000,
-    run
-} satisfies MessageCommand;

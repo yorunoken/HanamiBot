@@ -26,6 +26,8 @@ export default {
     name: "leaderboard",
     aliases: Object.keys(modeAliases),
     description: "Display the leaderboard of a beatmap.",
+    details: "Only `leaderboard` and `lb` aliases are used for global commands. The rest of the aliases are for Turkish leaderboards.",
+    usage: "/leaderboard",
     cooldown: 1000,
     run
 } satisfies MessageCommand;

@@ -12,6 +12,7 @@ export default {
     name: "beatmap",
     aliases: ["beatmap", "map", "m"],
     description: "Display statistics of a beatmap.",
+    usage: "/map",
     cooldown: 1000,
     run
 } satisfies MessageCommand;

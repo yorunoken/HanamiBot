@@ -93,7 +93,8 @@ export interface BannerBuilderOptions extends BuilderOptions {
     mode: Mode;
 }
 
-export type EmbedBuilderOptions = CompareBuilderOptions
+export type EmbedBuilderOptions =
+    CompareBuilderOptions
     | LeaderboardBuilderOptions
     | MapBuilderOptions
     | PlaysBuilderOptions

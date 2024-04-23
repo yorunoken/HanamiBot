@@ -1,18 +1,27 @@
 import type { ApplicationCommandData, GuildInteraction, GuildTextChannel, Message } from "@lilybird/transformers";
 import type { Client, POSTApplicationCommandStructure } from "lilybird";
 
+type Awaitable<T> = Promise<T> | T;
+
 export interface MessageCommand {
     name: string;
     aliases?: Array<string>;
     cooldown: number;
     description: string;
+    details?: string;
+    usage: string;
     // category: string;
     flags?: string;
-    run: ({ client, message, args, prefix, index, commandName, channel }:
-    { client: Client, message: Message, args: Array<string>, prefix: string, index: number | undefined, commandName: string, channel: GuildTextChannel }) => Promise<void>;
+    run: ({ client, message, args, prefix, index, commandName, channel }: {
+        client: Client,
+        message: Message,
+        args: Array<string>,
+        prefix: string,
+        index: number | undefined,
+        commandName: string,
+        channel: GuildTextChannel
+    }) => Awaitable<void>;
 }
-
-type Awaitable<T> = Promise<T> | T;
 
 export interface SlashCommand {
     data: POSTApplicationCommandStructure;

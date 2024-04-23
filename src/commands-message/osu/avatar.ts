@@ -11,6 +11,7 @@ import type { MessageCommand } from "@type/commands";
 export default {
     name: "avatar",
     description: "Display the profile of a user.",
+    usage: "/avatar",
     cooldown: 1000,
     run
 } satisfies MessageCommand;
