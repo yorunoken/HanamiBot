@@ -17,7 +17,7 @@ export function removeEntry(table: Tables, id: string | number): void {
     db.prepare(`DELETE FROM ${table} WHERE id = ?`).run(id);
 }
 
-export function getRowCount(table: string): number {
+export function getRowCount(table: Tables): number {
     const count = db.prepare(`SELECT COUNT(*) FROM ${table};`).get() as Record<"COUNT(*)", number>;
     return count["COUNT(*)"];
 }
