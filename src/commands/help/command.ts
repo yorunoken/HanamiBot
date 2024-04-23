@@ -1,4 +1,4 @@
-import { helpBuilder } from "@builders/index";
+import { commandBuilder } from "@builders/simple/command";
 import { ApplicationCommandOptionType } from "lilybird";
 import type { SlashCommand } from "@type/commands";
 
@@ -18,7 +18,7 @@ export default {
         await interaction.deferReply();
 
         await interaction.editReply({
-            embeds: helpBuilder()
+            embeds: commandBuilder(interaction.data.getString("name"))
         });
     }
 } satisfies SlashCommand;
