@@ -5,5 +5,4 @@ package-lock.json
 .env.*
 *.db
 *.tsbuildinfo
-hanami/
 bun.lockb
