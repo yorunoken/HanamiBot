@@ -3,15 +3,17 @@
   "private": true,
   "name": "hanamibot",
   "type": "module",
+  "main": "src/index.ts",
   "scripts": {
     "check": "tsc && eslint",
-    "start": "bun src/index.ts",
+    "start": "concurrently 'cd HanamiCard && git pull && go run main.go' 'bun .'",
     "build": "bun scripts/build.ts",
     "prod": "bun run build && bun run start"
   },
   "dependencies": {
     "@lilybird/handlers": "0.4.0-beta.2",
     "@lilybird/transformers": "0.2.0-alpha.1",
+    "concurrently": "^8.2.2",
     "lilybird": "0.6.0-beta.3",
     "osu-web.js": "^2.4.0",
     "rosu-pp-js": "^1.0.2",
