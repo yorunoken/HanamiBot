@@ -4,6 +4,7 @@ export * from "./leaderboard";
 export * from "./map";
 export * from "./plays";
 export * from "./profile";
+export * from "./card";
 
 // Simple functions
 export * from "./simple/avatar";
