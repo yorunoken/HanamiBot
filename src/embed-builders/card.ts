@@ -5,11 +5,10 @@ import type { ReplyOptions } from "lilybird";
 export async function cardBuilder({ user }: CardBuilderOptions): Promise<ReplyOptions> {
     const page = await browser.newPage();
 
-    const { username, statistics } = user;
-    const params = `username=${username}&rank=${statistics.global_rank}&accuracy=${statistics
-        .hit_accuracy}&level=${`${statistics.level.current}.${statistics.level.progress}`}&avatar=${user.avatar_url}`;
+    const { username } = user;
+    const params = `username=${username}`;
 
-    const url = `https://fun.yorunoken.com/osucard?${params}`;
+    const url = `https://fun.yorunoken.com/card?${params}`;
     await page.goto(url, { waitUntil: "networkidle0" });
     await page.setViewport({ width: 600, height: 800 });
 
