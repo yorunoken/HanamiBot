@@ -25,7 +25,7 @@ setInterval(async () => {
     client.setAccessToken(accessToken);
 }, 1000 * 60 * 60);
 
-export const browser = await puppeteer.launch();
+export const browser = await puppeteer.launch({ headless: true });
 
 const keyString = process.env.KEY ?? randomBytes(32);
 const ivString = process.env.IV ?? randomBytes(16);
