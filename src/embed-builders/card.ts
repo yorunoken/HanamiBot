@@ -1,24 +1,28 @@
+import { browser } from "index";
 import type { CardBuilderOptions } from "@type/embedBuilders";
 import type { ReplyOptions } from "lilybird";
 
 export async function cardBuilder({ user }: CardBuilderOptions): Promise<ReplyOptions> {
+    const page = await browser.newPage();
+
     const { username, statistics } = user;
     const params = `username=${username}&rank=${statistics.global_rank}&accuracy=${statistics
         .hit_accuracy}&level=${`${statistics.level.current}.${statistics.level.progress}`}&avatar=${user.avatar_url}`;
 
-    const url = `http://localhost:8080/generateCard?${params}`;
-    const response = await fetch(url);
+    const url = `https://fun.yorunoken.com/osucard?${params}`;
+    await page.goto(url, { waitUntil: "networkidle0" });
+    await page.setViewport({ width: 600, height: 800 });
 
-    if (!response.ok)
-        throw new Error("Failed to generate card");
+    const screenshotBuffer = await page.screenshot({
+        fullPage: false,
+        type: "png"
+    });
 
-    const responseData = await response.json() as { image: string };
-
-    const imageBlob = await fetch(`data:image/png;base64,${responseData.image}`).then(async (res) => res.blob());
+    await page.close();
 
     return {
         content: `User card for ${username}`,
         // @ts-expect-error TypeScript thinks blob is incorrect type but it is.
-        files: [ { file: imageBlob, name: `${username}.png` } ]
+        files: [ { file: new Blob([screenshotBuffer], { type: "image/png" }), name: `${username}.png` } ]
     };
 }
