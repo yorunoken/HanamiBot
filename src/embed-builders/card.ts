@@ -10,7 +10,7 @@ export async function cardBuilder({ user }: CardBuilderOptions): Promise<ReplyOp
 
     const url = `https://fun.yorunoken.com/card?${params}`;
     await page.goto(url, { waitUntil: "networkidle0" });
-    await page.setViewport({ width: 600, height: 800 });
+    await page.setViewport({ width: 800, height: 600 });
 
     const screenshotBuffer = await page.screenshot({
         fullPage: false,
