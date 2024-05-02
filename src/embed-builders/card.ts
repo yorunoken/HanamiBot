@@ -1,8 +1,9 @@
-import { browser } from "index";
+import puppeteer from "puppeteer";
 import type { CardBuilderOptions } from "@type/embedBuilders";
 import type { ReplyOptions } from "lilybird";
 
 export async function cardBuilder({ user }: CardBuilderOptions): Promise<ReplyOptions> {
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
     const { username } = user;
@@ -17,7 +18,7 @@ export async function cardBuilder({ user }: CardBuilderOptions): Promise<ReplyOp
         type: "png"
     });
 
-    await page.close();
+    await browser.close();
 
     return {
         content: `User card for ${username}`,

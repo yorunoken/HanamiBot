@@ -16,7 +16,6 @@ import { createHandler } from "@lilybird/handlers/simple";
 import { CachingDelegationType, createClient, Intents } from "lilybird";
 import { c } from "tasai";
 import { Channel, Guild, GuildVoiceChannel } from "@lilybird/transformers";
-import puppeteer from "puppeteer";
 import { createCipheriv, randomBytes } from "node:crypto";
 
 // refresh token every hour
@@ -24,8 +23,6 @@ setInterval(async () => {
     const { accessToken } = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
     client.setAccessToken(accessToken);
 }, 1000 * 60 * 60);
-
-export const browser = await puppeteer.launch({ headless: true });
 
 const keyString = process.env.KEY ?? randomBytes(32);
 const ivString = process.env.IV ?? randomBytes(16);
