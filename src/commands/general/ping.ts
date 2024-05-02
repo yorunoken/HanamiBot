@@ -16,7 +16,7 @@ export default {
         const osuDuration = osuEnd - osuStart;
 
         await interaction.editReply({
-            content: `🏓 WebSocket: \`${ws}ms\` | Rest: \`${rest}ms\`\nosu! API: \`${osuDuration}ms\``
+            content: `🏓 WebSocket: \`${ws.toFixed()}ms\` | Rest: \`${rest.toFixed()}ms\`\nosu! API: \`${osuDuration.toFixed()}ms\``
         });
     }
 } satisfies SlashCommand;
