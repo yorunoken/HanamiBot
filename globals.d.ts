@@ -6,8 +6,7 @@ declare module "bun" {
         CLIENT_ID: string;
         CALLBACK_URL: string;
         OWNER_ID: string;
-        KEY?: string;
-        IV?: string;
+        DEV?: string;
     }
 }
 

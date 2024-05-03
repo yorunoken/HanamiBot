@@ -14,32 +14,14 @@ import { initializeDatabase, loadLogs, client } from "./utils/initalize";
 import { getAccessToken } from "./utils/osu";
 import { createHandler } from "@lilybird/handlers/simple";
 import { CachingDelegationType, createClient, Intents } from "lilybird";
-import { c } from "tasai";
 import { Channel, Guild, GuildVoiceChannel } from "@lilybird/transformers";
-import { createCipheriv, randomBytes } from "node:crypto";
+import { writeFile } from "node:fs/promises";
 
 // refresh token every hour
 setInterval(async () => {
     const { accessToken } = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
     client.setAccessToken(accessToken);
 }, 1000 * 60 * 60);
-
-const keyString = process.env.KEY ?? randomBytes(32);
-const ivString = process.env.IV ?? randomBytes(16);
-
-if (typeof process.env.KEY === "undefined" || typeof process.env.IV === "undefined")
-    console.log(c.yellow("WARNING: you are going to be using random KEY and IV. This means you won't be able to sync your encryption/decryption with your linking website."));
-
-const key = typeof keyString === "string" ? Buffer.from(keyString.split(",").map(Number)) : keyString;
-const iv = typeof ivString === "string" ? Buffer.from(ivString.split(",").map(Number)) : ivString;
-const algorithm = "aes-256-cbc";
-
-export function encrypt(text: string): string {
-    const cipher = createCipheriv(algorithm, key, iv);
-    let encrypted = cipher.update(text, "utf8", "hex");
-    encrypted += cipher.final("hex");
-    return encrypted;
-}
 
 process.on("unhandledRejection", async (error: Error) => {
     await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);
@@ -52,6 +34,9 @@ process.on("exit", async (code: number) => {
 });
 
 initializeDatabase();
+
+if (process.env.DEV !== "1")
+    await writeFile("/root/users_cache.txt", "");
 
 const listeners = await createHandler({
     dirs: {
