@@ -14,38 +14,6 @@ import type { Client, EmbedStructure } from "lilybird";
 import type { GameMode, Mod as ModOsuWeb, Rank, Beatmap as BeatmapWeb } from "osu-web.js";
 
 /**
- * Build OAuth authorization URL for osu! using the provided parameters.
- * @param clientId - Client ID for the application.
- * @param callbackUri - Redirect URI where the authorization code will be sent.
- * @param scope - Array of authorization scopes.
- * @param state - Optional parameter for preserving state between the request and callback.
- * @returns Fully constructed authorization URL.
- */
-export function buildAuthUrl(clientId: string | number, callbackUri: string, scope: Array<AuthScope>, state?: string): string {
-    // Create a new URL to later append parameters.
-    const url = new URL("https://osu.ppy.sh/oauth/authorize");
-
-    // Initialize parameters
-    const params: Record<string, string> = {
-        client_id: clientId.toString(),
-        redirect_uri: callbackUri,
-        response_type: "code",
-        scope: scope.join(" "),
-        state: state ?? ""
-    };
-
-    // Append parameters to URL using a standard for loop.
-    const paramKeys = Object.keys(params);
-    for (let i = 0; i < paramKeys.length; i++) {
-        const key = paramKeys[i];
-        const value = params[key];
-        url.searchParams.append(key, value);
-    }
-
-    return url.href;
-}
-
-/**
  * Gets the access token of the client.
  * @param clientId - Client ID for the application.
  * @param clientSecret - Client Secret for the application.
