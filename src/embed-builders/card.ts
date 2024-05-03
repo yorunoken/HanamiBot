@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer";
 import type { CardBuilderOptions } from "@type/embedBuilders";
-import type { ReplyOptions } from "lilybird";
+import type { ReplyOptions } from "@lilybird/transformers";
 
 export async function cardBuilder({ user }: CardBuilderOptions): Promise<ReplyOptions> {
     const browser = await puppeteer.launch({ headless: true });
