@@ -3,7 +3,7 @@ import type { CardBuilderOptions } from "@type/embedBuilders";
 import type { ReplyOptions } from "@lilybird/transformers";
 
 export async function cardBuilder({ user }: CardBuilderOptions): Promise<ReplyOptions> {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: true, executablePath: "/usr/bin/chromium-browser" });
     const page = await browser.newPage();
 
     const { username } = user;
