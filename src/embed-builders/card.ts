@@ -1,34 +1,28 @@
-import puppeteer from "puppeteer";
+import { chromium } from "playwright";
 import type { CardBuilderOptions } from "@type/embedBuilders";
 import type { ReplyOptions } from "@lilybird/transformers";
 
+const browser = await chromium.launch();
+
 export async function cardBuilder({ user }: CardBuilderOptions): Promise<ReplyOptions> {
-    const browser = await puppeteer.launch({
-        headless: true,
-        executablePath: "/usr/bin/chromium-browser",
-        args: ["--no-sandbox"]
-    });
+    const now = performance.now();
+
     const page = await browser.newPage();
 
     const { username } = user;
     const params = `username=${username}`;
 
-    const url = `https://fun.yorunoken.com/card?${params}`;
-    await page.goto(url, { waitUntil: "networkidle0" });
-    await page.setViewport({ width: 800, height: 600 });
+    await page.goto(`https://fun.yorunoken.com/card?${params}`, { waitUntil: "networkidle" });
+    await page.setViewportSize({ width: 850, height: 600 });
 
     const screenshotBuffer = await page.screenshot({
         fullPage: false,
         type: "png"
     });
 
-    const pagesToClose: Array<Promise<void>> = [];
+    // await browser.close();
 
-    const pages = await browser.pages();
-    for (let i = 0; i < pages.length; i++) pagesToClose.push(pages[i].close());
-    await Promise.all(pages);
-
-    await browser.close();
+    console.log("Timed spent: ", performance.now() - now);
 
     return {
         content: `User card for ${username}`,

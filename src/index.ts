@@ -15,6 +15,7 @@ import { getAccessToken } from "./utils/osu";
 import { createHandler } from "@lilybird/handlers/simple";
 import { CachingDelegationType, createClient, Intents } from "lilybird";
 import { Channel, Guild, GuildVoiceChannel } from "@lilybird/transformers";
+import { $ } from "bun";
 import { writeFile } from "node:fs/promises";
 
 // refresh token every hour
@@ -60,4 +61,9 @@ await createClient({
     ],
     ...listeners
 });
+
+// make sure chromium is dead
+try {
+    await $`pkill chromium`;
+} catch (e) {}
 

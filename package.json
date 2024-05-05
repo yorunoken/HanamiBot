@@ -15,7 +15,7 @@
     "@lilybird/transformers": "^0.2.1",
     "lilybird": "^0.6.1",
     "osu-web.js": "^2.4.0",
-    "puppeteer": "^22.7.1",
+    "playwright": "^1.43.1",
     "rosu-pp-js": "^1.0.2",
     "tasai": "^1.0.0"
   },
