@@ -64,7 +64,6 @@ await createClient({
 
 // make sure chromium is dead
 try {
-    await $`pkill chromium`;
-    await $`pkill chromium-browser`;
+    await $`pkill chromium && pkill chromium-browser`;
 } catch (e) {}
 
