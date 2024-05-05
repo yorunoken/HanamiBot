@@ -3,7 +3,11 @@ import type { CardBuilderOptions } from "@type/embedBuilders";
 import type { ReplyOptions } from "@lilybird/transformers";
 
 export async function cardBuilder({ user }: CardBuilderOptions): Promise<ReplyOptions> {
-    const browser = await puppeteer.launch({ headless: true, executablePath: "/usr/bin/chromium-browser", args: ["--no-sandbox"] });
+    const browser = await puppeteer.launch({
+        headless: true,
+        executablePath: "/usr/bin/chromium-browser",
+        args: ["--no-sandbox"]
+    });
     const page = await browser.newPage();
 
     const { username } = user;
@@ -17,6 +21,12 @@ export async function cardBuilder({ user }: CardBuilderOptions): Promise<ReplyOp
         fullPage: false,
         type: "png"
     });
+
+    const pagesToClose: Array<Promise<void>> = [];
+
+    const pages = await browser.pages();
+    for (let i = 0; i < pages.length; i++) pagesToClose.push(pages[i].close());
+    await Promise.all(pages);
 
     await browser.close();
 
