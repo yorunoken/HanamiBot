@@ -20,6 +20,7 @@ export async function cardBuilder({ user }: CardBuilderOptions): Promise<ReplyOp
         type: "png"
     });
 
+    await page.close();
     // await browser.close();
 
     console.log("Timed spent: ", performance.now() - now);
