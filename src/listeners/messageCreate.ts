@@ -96,7 +96,7 @@ async function run(message: Message): Promise<void> {
 
         const guild = await client.rest.getGuild(guildId);
         await loadLogs(`INFO: [${guild.name}] ${author.username} used prefix command \`${command.name}\``);
-        const docs = getEntry(Tables.COMMAND, commandName);
+        const docs = getEntry(Tables.COMMAND, command.name);
 
         if (docs === null)
             insertData({ table: Tables.COMMAND, data: [ { key: "count", value: 1 } ], id: command.name });
@@ -108,7 +108,7 @@ async function run(message: Message): Promise<void> {
         const guild = await client.rest.getGuild(guildId);
         console.log(err);
         await loadLogs(`ERROR: [${guild.name}] ${author.username} had an error in prefix command \`${command.name}\`: ${err.stack}`, true);
-        const docs = getEntry(Tables.COMMAND, commandName);
+        const docs = getEntry(Tables.COMMAND, command.name);
 
         if (docs === null)
             insertData({ table: Tables.COMMAND, data: [ { key: "count", value: 1 } ], id: command.name });
