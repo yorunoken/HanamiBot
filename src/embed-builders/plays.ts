@@ -7,7 +7,7 @@ import { EmbedType } from "lilybird";
 import type { User } from "@type/database";
 import type { UserScore, Mode, ProfileInfo, ScoresInfo, UserBestScore } from "@type/osu";
 import type { PlaysBuilderOptions } from "@type/embedBuilders";
-import type { EmbedAuthorStructure, EmbedFieldStructure, EmbedFooterStructure, EmbedImageStructure, EmbedStructure, EmbedThumbnailStructure } from "lilybird";
+import type { Embed } from "lilybird";
 
 export async function playBuilder({
     plays,
@@ -19,7 +19,7 @@ export async function playBuilder({
     page,
     authorDb,
     sortByDate
-}: PlaysBuilderOptions): Promise<Array<EmbedStructure>> {
+}: PlaysBuilderOptions): Promise<Array<Embed.Structure>> {
     saveScoreDatas(plays, mode);
 
     if (typeof page === "undefined" && typeof index === "undefined") {
@@ -63,7 +63,7 @@ export async function playBuilder({
                 title: "Uh oh! :x:",
                 description: `It seems like \`${profile.username}\` hasn't had any recent plays in the last 24 hours with those filters!`
             }
-        ] satisfies Array<EmbedStructure>;
+        ] satisfies Array<Embed.Structure>;
     }
 
     return typeof page !== "undefined" ? getMultiplePlays({ plays, page, mode, profile, authorDb }) : getSinglePlay({ mode, index: index ?? 0, plays, profile, authorDb, isMultiple });
@@ -77,7 +77,7 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
     index: number,
     authorDb: User | null,
     isMultiple?: boolean
-}): Promise<Array<EmbedStructure>> {
+}): Promise<Array<Embed.Structure>> {
     const isMaximized = (authorDb?.score_embeds ?? 1) === 1;
     const embedType = authorDb?.embed_type ?? EmbedScoreType.Hanami;
 
@@ -90,7 +90,7 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
             name: `${profile.username} ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}#${profile.countryRank})`,
             url: profile.userUrl,
             icon_url: profile.avatarUrl
-        } satisfies EmbedAuthorStructure;
+        } satisfies Embed.AuthorStructure;
 
         const line1 = `${play.grade} ${play.percentagePassed !== null ? `**@${play.percentagePassed}%**` : ""} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%** ${SPACE} ${play.playSubmitted}\n`;
         const line2 = `${play.ppFormatted} ${SPACE} [${play.comboValues}] ${SPACE} {${play.hitValues}}\n`;
@@ -102,7 +102,7 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
                 value: line1 + line2,
                 inline: false
             }
-        ] satisfies Array<EmbedFieldStructure>;
+        ] satisfies Array<Embed.FieldStructure>;
 
         if (isMaximized) {
             fields[0].value += line3;
@@ -118,11 +118,11 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
             });
         }
 
-        const image = isMaximized ? { url: play.coverLink } satisfies EmbedImageStructure : undefined;
-        const thumbnail = !isMaximized ? { url: play.listLink } satisfies EmbedThumbnailStructure : undefined;
+        const image = isMaximized ? { url: play.coverLink } satisfies Embed.ImageStructure : undefined;
+        const thumbnail = !isMaximized ? { url: play.listLink } satisfies Embed.ThumbnailStructure : undefined;
         const title = play.songNameFormatted;
         const url = play.mapLink;
-        const footer: EmbedFooterStructure = {
+        const footer: Embed.FooterStructure = {
             text: `${play.mapStatus} mapset by ${play.mapAuthor}${isMaximized && !isMultiple ? ` ${SPACE} - Play ${index + 1} of ${plays.length} ${SPACE} - Try ${play.retries}` : ""}`
         };
 
@@ -216,7 +216,7 @@ async function getMultiplePlays({ plays, page, mode, profile, authorDb }:
     mode: Mode,
     profile: ProfileInfo,
     authorDb: User | null
-}): Promise<Array<EmbedStructure>> {
+}): Promise<Array<Embed.Structure>> {
     const embedType = authorDb?.embed_type ?? EmbedScoreType.Hanami;
 
     const pageStart = page * 5;

@@ -2,7 +2,7 @@ import { getEntry, insertData } from "@utils/database";
 import { ScoreEmbed, Tables } from "@type/database";
 import { ApplicationCommandOptionType } from "lilybird";
 import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
-import type { EmbedStructure } from "lilybird";
+import type { Embed } from "lilybird";
 import type { SlashCommand } from "@type/commands";
 
 export default {
@@ -94,7 +94,7 @@ async function list(interaction: GuildInteraction<ApplicationCommandData>): Prom
         insertData({ table: Tables.USER, id: userId, data: [ { key: "banchoId", value: null } ] });
         user = { banchoId: null, mode: null, score_embeds: null, embed_type: null, id: userId };
     }
-    const embeds: EmbedStructure = { fields: [], title: `Config settings of ${interaction.member.user.username}` };
+    const embeds: Embed.Structure = { fields: [], title: `Config settings of ${interaction.member.user.username}` };
 
     for (const [key, v] of Object.entries(user)) {
         const value = v as string | number | null;

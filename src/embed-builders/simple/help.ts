@@ -1,8 +1,8 @@
 import { Tables } from "@type/database";
 import { getRowCount } from "@utils/database";
-import type { EmbedStructure } from "lilybird";
+import type { Embed } from "lilybird";
 
-export function helpBuilder(): Array<EmbedStructure> {
+export function helpBuilder(): Array<Embed.Structure> {
     const joinedServers = getRowCount(Tables.GUILD);
     const linkedUers = getRowCount(Tables.USER);
     const downloadedMaps = getRowCount(Tables.MAP);

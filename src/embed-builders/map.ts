@@ -5,12 +5,12 @@ import { rulesets } from "@utils/emotes";
 import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
 import type { MapBuilderOptions } from "@type/embedBuilders";
-import type { EmbedStructure } from "lilybird";
+import type { Embed } from "lilybird";
 
 export async function mapBuilder({
     beatmapId,
     mods
-}: MapBuilderOptions): Promise<Array<EmbedStructure>> {
+}: MapBuilderOptions): Promise<Array<Embed.Structure>> {
     const beatmapRequest = await client.safeParse(client.beatmaps.getBeatmap(Number(beatmapId)));
     if (!beatmapRequest.success) {
         return [

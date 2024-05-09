@@ -10,7 +10,7 @@ import type { Score as ScoreDatabase } from "@type/database";
 import type { Message } from "@lilybird/transformers";
 import type { Mod } from "@type/mods";
 import type { UserScore, UserBestScore, AccessTokenJSON, AuthScope, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo, Score } from "@type/osu";
-import type { Client, EmbedStructure } from "lilybird";
+import type { Client, Embed } from "lilybird";
 import type { GameMode, Mod as ModOsuWeb, Rank, Beatmap as BeatmapWeb } from "osu-web.js";
 
 /**
@@ -542,7 +542,7 @@ function saveScore(play: UserBestScore | UserScore | Score, mode: Mode, mapTemp?
     };
 }
 
-function findId(embed: EmbedStructure): number | null {
+function findId(embed: Embed.Structure): number | null {
     const urlToCheck = embed.url ?? embed.author?.url;
     return urlToCheck && !(/\/(user|u)/).test(urlToCheck) ? Number((/\d+/).exec(urlToCheck)?.[0]) : null;
 }

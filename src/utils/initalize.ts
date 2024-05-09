@@ -6,7 +6,7 @@ import { Tables } from "@type/database";
 import { Client as OsuClient } from "osu-web.js";
 import { mkdir, access, readFile, writeFile, readdir } from "node:fs/promises";
 import type { Guild } from "@type/database";
-import type { Client as LilybirdClient, POSTApplicationCommandStructure } from "lilybird";
+import type { Client as LilybirdClient, ApplicationCommand } from "lilybird";
 import type { DefaultMessageCommand, DefaultSlashCommand } from "@type/commands";
 
 const { accessToken } = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
@@ -57,7 +57,7 @@ export async function loadMessageCommands(): Promise<void> {
 }
 
 export async function loadApplicationCommands(clnt: LilybirdClient): Promise<void> {
-    const slashCommands: Array<POSTApplicationCommandStructure> = [];
+    const slashCommands: Array<ApplicationCommand.Create.ApplicationCommandJSONParams> = [];
     const temp: Array<Promise<DefaultSlashCommand>> = [];
 
     const items = await readdir("./src/commands", { recursive: true });

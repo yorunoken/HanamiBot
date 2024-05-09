@@ -1,5 +1,5 @@
 import type { ApplicationCommandData, GuildInteraction, GuildTextChannel, Message } from "@lilybird/transformers";
-import type { Client, POSTApplicationCommandStructure } from "lilybird";
+import type { Client, ApplicationCommand } from "lilybird";
 
 type Awaitable<T> = Promise<T> | T;
 
@@ -24,7 +24,7 @@ export interface MessageCommand {
 }
 
 export interface SlashCommand {
-    data: POSTApplicationCommandStructure;
+    data: ApplicationCommand.Create.ApplicationCommandJSONParams;
     run: (interaction: GuildInteraction<ApplicationCommandData>) => Awaitable<any>;
 }
 

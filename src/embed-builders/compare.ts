@@ -6,7 +6,7 @@ import { downloadBeatmap, saveScoreDatas } from "@utils/osu";
 import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
 import type { CompareBuilderOptions } from "@type/embedBuilders";
-import type { EmbedStructure } from "lilybird";
+import type { Embed } from "lilybird";
 import type { Beatmap, Mode, ProfileInfo, ScoresInfo, Score } from "@type/osu";
 
 export async function compareBuilder({
@@ -15,7 +15,7 @@ export async function compareBuilder({
     user,
     mode,
     mods
-}: CompareBuilderOptions): Promise<Array<EmbedStructure>> {
+}: CompareBuilderOptions): Promise<Array<Embed.Structure>> {
     saveScoreDatas(plays, mode, beatmap);
 
     const profile = getProfile(user, mode);
@@ -46,7 +46,7 @@ export async function compareBuilder({
                 title: "Uh oh! :x:",
                 description: `It seems like \`${profile.username}\` doesn't have any scores on this beatmap with these! :(`
             }
-        ] satisfies Array<EmbedStructure>;
+        ] satisfies Array<Embed.Structure>;
     }
 
     return getMultiplePlays({ plays, profile, beatmap, mode });
@@ -58,7 +58,7 @@ async function getMultiplePlays({ plays, profile, beatmap, mode }:
     profile: ProfileInfo,
     beatmap: Beatmap,
     mode: Mode
-}): Promise<Array<EmbedStructure>> {
+}): Promise<Array<Embed.Structure>> {
     const beatmapId = beatmap.id;
     const mapData = getEntry(Tables.MAP, beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
 
@@ -77,7 +77,7 @@ async function getMultiplePlays({ plays, profile, beatmap, mode }:
         description += `${line1 + line2}\n`;
     }
 
-    const embed: EmbedStructure = {
+    const embed: Embed.Structure = {
         type: EmbedType.Rich,
         author: {
             name: `${profile.username} ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}#${profile.countryRank})`,
@@ -91,5 +91,5 @@ async function getMultiplePlays({ plays, profile, beatmap, mode }:
         footer: { text: `${beatmap.status.charAt(0).toUpperCase()}${beatmap.status.slice(1)} beatmapset by ${beatmap.beatmapset.creator}` }
     };
 
-    return [embed] satisfies Array<EmbedStructure>;
+    return [embed] satisfies Array<Embed.Structure>;
 }

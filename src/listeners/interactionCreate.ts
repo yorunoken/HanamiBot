@@ -6,7 +6,7 @@ import { calculateButtonState, createActionRow } from "@utils/buttons";
 import { Tables } from "@type/database";
 import { leaderboardBuilder, playBuilder } from "@builders/index";
 import type { DMInteraction, Interaction, InteractionReplyOptions, Message, MessageComponentData } from "@lilybird/transformers";
-import type { EmbedStructure } from "lilybird";
+import type { Embed } from "lilybird";
 import type { Event } from "@lilybird/handlers";
 
 export default {
@@ -195,7 +195,7 @@ async function handleVerify(interaction: DMInteraction<MessageComponentData, Mes
 
     insertData({ table: Tables.USER, id: discordId, data: [ { key: "banchoId", value: osuId } ] });
 
-    const embed: EmbedStructure = {
+    const embed: Embed.Structure = {
         title: "Success!",
         description: `Successfully linked <@${discordId}> with ${osuUser.username}`,
         thumbnail: { url: osuUser.avatar_url }

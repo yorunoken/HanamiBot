@@ -1,5 +1,5 @@
 import { ComponentType, ButtonStyle } from "lilybird";
-import type { MessageComponentStructure } from "lilybird";
+import type { Message } from "lilybird";
 
 export const pageButtonsArgs = {
     buttonCustomIds: ["min-page", "decrement-page", "increment-page", "max-page"],
@@ -13,11 +13,11 @@ export const indexButtonsArgs = {
 export function createActionRow({
     isPage,
     disabledStates
-}: { isPage: boolean, disabledStates: Array<boolean> }): Array<MessageComponentStructure> {
+}: { isPage: boolean, disabledStates: Array<boolean> }): Array<Message.Component.Structure> {
     const { buttonCustomIds, buttonLabels } = isPage ? pageButtonsArgs : indexButtonsArgs;
 
     const length = Math.max(buttonCustomIds.length, buttonLabels.length);
-    const components: Array<MessageComponentStructure> = [];
+    const components: Array<Message.Component.Structure> = [];
     for (let i = 0; i < length; i++) {
         if (buttonCustomIds[i] && buttonLabels[i]) {
             components.push({

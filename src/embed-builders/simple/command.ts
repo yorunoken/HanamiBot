@@ -1,16 +1,16 @@
 import { Tables } from "@type/database";
 import { getRowCount } from "@utils/database";
 import { commandAliases, messageCommands } from "@utils/initalize";
-import type { EmbedStructure } from "lilybird";
+import type { Embed } from "lilybird";
 
-export function commandBuilder(command: string | undefined): Array<EmbedStructure> {
+export function commandBuilder(command: string | undefined): Array<Embed.Structure> {
     if (typeof command === "undefined")
         return displayAllCommands();
 
     return displayCommandInfo(command);
 }
 
-function displayCommandInfo(name: string): Array<EmbedStructure> {
+function displayCommandInfo(name: string): Array<Embed.Structure> {
     const cmd = messageCommands.get(name) ?? messageCommands.get(commandAliases.get(name) ?? "");
     if (typeof cmd === "undefined") {
         return [
@@ -52,7 +52,7 @@ function displayCommandInfo(name: string): Array<EmbedStructure> {
     ];
 }
 
-function displayAllCommands(): Array<EmbedStructure> {
+function displayAllCommands(): Array<Embed.Structure> {
     const usedPrefixCommands = getRowCount(Tables.COMMAND);
     const usedApplicationCommands = getRowCount(Tables.COMMAND_SLASH);
 

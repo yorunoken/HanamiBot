@@ -1,9 +1,9 @@
 import { getProfile } from "@cleaners/profile";
 import { Mode } from "@type/osu";
-import type { EmbedStructure } from "lilybird";
+import type { Embed } from "lilybird";
 import type { BannerBuilderOptions } from "@type/embedBuilders";
 
-export function bannerBuilder({ user }: BannerBuilderOptions): Array<EmbedStructure> {
+export function bannerBuilder({ user }: BannerBuilderOptions): Array<Embed.Structure> {
     const profile = getProfile(user, Mode.OSU);
 
     return [

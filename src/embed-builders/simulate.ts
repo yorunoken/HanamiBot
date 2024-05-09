@@ -9,13 +9,13 @@ import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
 import type { Mode } from "@type/osu";
 import type { SimulateBuilderOptions } from "@type/embedBuilders";
-import type { EmbedStructure } from "lilybird";
+import type { Embed } from "lilybird";
 
 export async function simulateBuilder({
     beatmapId,
     mods,
     options
-}: SimulateBuilderOptions): Promise<Array<EmbedStructure>> {
+}: SimulateBuilderOptions): Promise<Array<Embed.Structure>> {
     const beatmapRequest = await client.safeParse(client.beatmaps.getBeatmap(beatmapId));
     if (!beatmapRequest.success) {
         return [
