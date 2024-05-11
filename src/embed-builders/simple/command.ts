@@ -1,5 +1,5 @@
 import { Tables } from "@type/database";
-import { getRowCount } from "@utils/database";
+import { getRowSum } from "@utils/database";
 import { commandAliases, messageCommands } from "@utils/initalize";
 import type { Embed } from "lilybird";
 
@@ -53,8 +53,8 @@ function displayCommandInfo(name: string): Array<Embed.Structure> {
 }
 
 function displayAllCommands(): Array<Embed.Structure> {
-    const usedPrefixCommands = getRowCount(Tables.COMMAND);
-    const usedApplicationCommands = getRowCount(Tables.COMMAND_SLASH);
+    const usedPrefixCommands = getRowSum(Tables.COMMAND);
+    const usedApplicationCommands = getRowSum(Tables.COMMAND_SLASH);
 
     return [
         {

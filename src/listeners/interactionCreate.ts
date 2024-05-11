@@ -5,8 +5,9 @@ import { EmbedBuilderType } from "@type/embedBuilders";
 import { calculateButtonState, createActionRow } from "@utils/buttons";
 import { Tables } from "@type/database";
 import { leaderboardBuilder, playBuilder } from "@builders/index";
-import type { DMInteraction, Interaction, InteractionReplyOptions, Message, MessageComponentData } from "@lilybird/transformers";
+import { EmbedType } from "lilybird";
 import type { Embed } from "lilybird";
+import type { DMInteraction, Interaction, InteractionReplyOptions, Message, MessageComponentData } from "@lilybird/transformers";
 import type { Event } from "@lilybird/handlers";
 
 export default {
@@ -17,7 +18,7 @@ export default {
 async function run(interaction: Interaction): Promise<void> {
     await handleButton(interaction);
     if (interaction.isApplicationCommandInteraction() && interaction.inGuild()) {
-        const { username } = interaction.member.user;
+        const { user } = interaction.member;
 
         const commandDefault = applicationCommands.get(interaction.data.name);
         if (!commandDefault) return;
@@ -26,7 +27,7 @@ async function run(interaction: Interaction): Promise<void> {
         try {
             await command.run(interaction);
             const guild = await interaction.client.rest.getGuild(interaction.guildId);
-            await loadLogs(`INFO: [${guild.name}] ${username} used slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}`);
+            await loadLogs(`INFO: [${guild.name}] ${user.username} used slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}`);
 
             const docs = getEntry(Tables.COMMAND_SLASH, interaction.data.name);
             if (docs === null)
@@ -34,11 +35,39 @@ async function run(interaction: Interaction): Promise<void> {
             else
                 insertData({ table: Tables.COMMAND_SLASH, data: [ { key: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
         } catch (error) {
-            const guild = await interaction.client.rest.getGuild(interaction.guildId);
             const err = error as Error;
-            console.log(error);
+
+            const guild = await interaction.client.rest.getGuild(interaction.guildId);
+
+            await interaction.reply(`Oops, you came across an error!\nHere's a summary of it:\n\`\`\`${err.stack}\`\`\`\nDon't worry, the same error log has been sent to the owner of this bot.`);
+
+            await interaction.client.rest.createMessage(interaction.channelId, {
+                content: `<@${process.env.OWNER_ID}> STACK ERROR, GET YOUR ASS TO WORK`,
+                embeds: [
+                    {
+                        type: EmbedType.Rich,
+                        title: `Runtime error on command (slash): ${command.data.name}`,
+                        fields: [
+                            {
+                                name: "User",
+                                value: `<@${user.id}> (${user.username})`
+                            },
+                            {
+                                name: "Guild",
+                                value: `[${guild.name}](https://discord.com/channels/${interaction.guildId}/${interaction.channelId})`
+                            },
+                            {
+                                name: "Error",
+                                value: err.stack ?? "undefined (look at logs)"
+                            }
+                        ]
+                    }
+                ]
+            });
+
+            console.error(error);
             await loadLogs(
-                `ERROR: [${guild.name}] ${username} had an error in slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}: ${err.stack}`,
+                `ERROR: [${guild.name}] ${user.username} had an error in slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}: ${err.stack}`,
                 true
             );
 

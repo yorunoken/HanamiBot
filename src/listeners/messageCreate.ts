@@ -4,6 +4,7 @@ import { commandAliases, loadLogs, messageCommands } from "@utils/initalize";
 import { getEntry, insertData } from "@utils/database";
 import { fuzzySearch } from "@utils/fuzzy";
 import { Tables } from "@type/database";
+import { EmbedType } from "lilybird";
 import type { Message } from "@lilybird/transformers";
 import type { Event } from "@lilybird/handlers";
 
@@ -105,8 +106,39 @@ async function run(message: Message): Promise<void> {
     } catch (error) {
         const err = error as Error;
 
+        await message.reply(`Oops, you came across an error!\nHere's a summary of it:\n\`\`\`${err.stack}\`\`\`\nDon't worry, the same error log has been sent to the owner of this bot.`);
+
         const guild = await client.rest.getGuild(guildId);
-        console.log(err);
+
+        await client.rest.createMessage(message.channelId, {
+            content: `<@${process.env.OWNER_ID}> STACK ERROR, GET YOUR ASS TO WORK`,
+            embeds: [
+                {
+                    type: EmbedType.Rich,
+                    title: `Runtime error on command: ${command.name}`,
+                    fields: [
+                        {
+                            name: "User",
+                            value: `<@${author.id}> (${author.username})`
+                        },
+                        {
+                            name: "Guild",
+                            value: `[${guild.name}](https://discord.com/channels/${guildId}/${message.channelId})`
+                        },
+                        {
+                            name: "Message",
+                            value: content
+                        },
+                        {
+                            name: "Error",
+                            value: err.stack ?? "undefined (look at logs)"
+                        }
+                    ]
+                }
+            ]
+        });
+
+        console.error(err);
         await loadLogs(`ERROR: [${guild.name}] ${author.username} had an error in prefix command \`${command.name}\`: ${err.stack}`, true);
         const docs = getEntry(Tables.COMMAND, command.name);
 

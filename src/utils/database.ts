@@ -18,8 +18,13 @@ export function removeEntry(table: Tables, id: string | number): void {
 }
 
 export function getRowCount(table: Tables): number {
-    const count = db.prepare(`SELECT COUNT(*) FROM ${table};`).get() as Record<"COUNT(*)", number>;
-    return count["COUNT(*)"];
+    const qr = db.prepare(`SELECT COUNT(*) as count FROM ${table};`).get() as { count: number | null };
+    return qr.count ?? 0;
+}
+
+export function getRowSum(table: Tables): number {
+    const qr = db.prepare(`SELECT SUM(count) AS sum FROM ${table};`).get() as { sum: number | null };
+    return qr.sum ?? 0;
 }
 
 export function insertData<T extends Tables>(

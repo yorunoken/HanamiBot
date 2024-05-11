@@ -1,13 +1,14 @@
 import { Tables } from "@type/database";
-import { getRowCount } from "@utils/database";
+import { getRowCount, getRowSum } from "@utils/database";
 import type { Embed } from "lilybird";
 
 export function helpBuilder(): Array<Embed.Structure> {
     const joinedServers = getRowCount(Tables.GUILD);
     const linkedUers = getRowCount(Tables.USER);
     const downloadedMaps = getRowCount(Tables.MAP);
-    const usedPrefixCommands = getRowCount(Tables.COMMAND);
-    const usedApplicationCommands = getRowCount(Tables.COMMAND_SLASH);
+
+    const usedPrefixCommands = getRowSum(Tables.COMMAND);
+    const usedApplicationCommands = getRowSum(Tables.COMMAND_SLASH);
 
     const hanamiWebsite = "https://hanami.yorunoken.com";
     const inviteLink = "https://discord.com/oauth2/authorize?client_id=995999045157916763&permissions=265216&scope=bot";
