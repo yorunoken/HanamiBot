@@ -32,7 +32,7 @@ async function run(message: Message): Promise<void> {
     }
 
     if (content.includes("727") || content.includes("7,27") || content.includes("72,7") || content.toLowerCase().includes("wysi")) {
-        await message.react("<a:wysi:1014558614985392168>", true);
+        await message.react("wysia:1240624238189088869", true);
         return;
     }
 
