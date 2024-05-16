@@ -20,7 +20,7 @@ export default {
                 type: ApplicationCommandOptionType.STRING,
                 name: "type",
                 description: "The type of the leaderboard.",
-                choices: [ { name: "Global Leaderboard", value: "country" }, { name: "Turkish Leaderboard", value: "global" } ]
+                choices: [ { name: "Global Leaderboard", value: "global" }, { name: "Turkish Leaderboard", value: "country" } ]
             },
             {
                 type: ApplicationCommandOptionType.STRING,
