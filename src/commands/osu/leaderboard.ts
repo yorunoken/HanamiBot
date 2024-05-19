@@ -90,7 +90,7 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
         return;
     }
 
-    const isGlobal = interaction.data.getString("type") === "global";
+    const isGlobal = (interaction.data.getString("type") ?? "global") === "global";
     const { scores } = await getBeatmapTopScores({ beatmapId: Number(beatmapId), mode: beatmap.mode, isGlobal, mods: mods.name ? <Array<Mod>>mods.name.match(/.{1,2}/g) : undefined });
     if (scores.length === 0) {
         await interaction.editReply({
