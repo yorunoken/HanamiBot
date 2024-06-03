@@ -15,6 +15,7 @@ export default {
 
 const cooldown = new Map();
 
+const CHANCE_TO_SEND_CUTE_KITTY_CAT_I_LOVE_CATS = 0.2;
 async function run(message: Message): Promise<void> {
     if (message.channelId === "1193529619907891331") {
         verifyUser(message);
@@ -23,18 +24,6 @@ async function run(message: Message): Promise<void> {
 
     const { content, guildId, client, author } = message;
     if (!content || !guildId || author.bot) return;
-
-    // nyann :3333
-    const CHANCE_TO_SEND_CUTE_KITTY_CAT_I_LOVE_CATS = 0.6;
-    if (content === ":3" || content === "3:" && Math.random() > CHANCE_TO_SEND_CUTE_KITTY_CAT_I_LOVE_CATS) {
-        await message.reply(message.content === ":3" ? "3:" : ":3");
-        return;
-    }
-
-    if (content.includes("727") || content.includes("7,27") || content.includes("72,7") || content.toLowerCase().includes("wysi")) {
-        await message.react("wysia:1240624238189088869", true);
-        return;
-    }
 
     const prefixes = prefixesCache.get(guildId) ?? DEFAULT_PREFIX;
     let prefix: string | null = null;
@@ -46,8 +35,20 @@ async function run(message: Message): Promise<void> {
             break;
         }
     }
-    if (prefix === null)
+
+    if (prefix === null) {
+        // nyann :3333
+        if ((content === ":3" || content === "3:") && Math.random() < CHANCE_TO_SEND_CUTE_KITTY_CAT_I_LOVE_CATS) {
+            await message.reply(message.content === ":3" ? "3:" : ":3", { allowed_mentions: { replied_user: false, parse: [], roles: [], users: [] } });
+            return;
+        }
+
+        if (content === "727" || content === "7,27" || content === "72,7" || content === "72.7" || content === "7.27" || content.toLowerCase() === "wysi") {
+            await message.react("wysia:1240624238189088869", true);
+            return;
+        }
         return;
+    }
 
     const args = content.slice(prefix.length).trim().split(/ +/g);
     let commandName = args.shift()?.toLowerCase();
@@ -78,7 +79,7 @@ async function run(message: Message): Promise<void> {
         if (nearResults === "")
             return;
 
-        await message.reply(`It seems like ${commandName} is not a command. Did you mean: \`${nearResults}\`?`);
+        await message.reply(`It seems like ${commandName} is not a command. Did you mean: \`${nearResults}\`?`, { allowed_mentions: { replied_user: false, parse: [], roles: [], users: [] } });
         return;
     }
     const { default: command } = commandDefault;
@@ -111,11 +112,14 @@ async function run(message: Message): Promise<void> {
     } catch (error) {
         const err = error as Error;
 
-        await message.reply(`Oops, you came across an error!\nHere's a summary of it:\n\`\`\`${err.stack}\`\`\`\nDon't worry, the same error log has been sent to the owner of this bot.`);
+        await message.reply(
+            `Oops, you came across an error!\nHere's a summary of it:\n\`\`\`${err.stack}\`\`\`\nDon't worry, the same error log has been sent to the owner of this bot.`,
+            { allowed_mentions: { replied_user: false, parse: [], roles: [], users: [] } }
+        );
 
         const guild = await client.rest.getGuild(guildId);
 
-        await client.rest.createMessage(message.channelId, {
+        await client.rest.createMessage(process.env.ERROR_CHANNEL_ID, {
             content: `<@${process.env.OWNER_ID}> STACK ERROR, GET YOUR ASS TO WORK`,
             embeds: [
                 {
