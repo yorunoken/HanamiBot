@@ -1,10 +1,10 @@
 import { chromium } from "playwright";
 import type { CardBuilderOptions } from "@type/embedBuilders";
-import type { ReplyOptions } from "@lilybird/transformers";
+import type { MessageReplyOptions } from "@lilybird/transformers";
 
 const browser = await chromium.launch();
 
-export async function cardBuilder({ user }: CardBuilderOptions): Promise<ReplyOptions> {
+export async function cardBuilder({ user }: CardBuilderOptions): Promise<MessageReplyOptions> {
     const now = performance.now();
 
     const page = await browser.newPage();
