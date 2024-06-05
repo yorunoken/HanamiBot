@@ -4,6 +4,7 @@ import { createHandler } from "@lilybird/handlers/simple";
 import { CachingDelegationType, createClient, Intents } from "lilybird";
 import { Channel, Guild, GuildVoiceChannel } from "@lilybird/transformers";
 import { $ } from "bun";
+import { chromium } from "playwright";
 import { writeFile } from "node:fs/promises";
 
 // refresh token every hour
@@ -15,6 +16,13 @@ async function setToken(): Promise<void> {
 }
 
 await setToken();
+
+// make sure chromium is dead
+try {
+    await $`pkill chromium && pkill chromium-browser`;
+} catch (e) {}
+
+export const browser = await chromium.launch();
 
 process.on("unhandledRejection", async (error: Error) => {
     await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);
@@ -50,9 +58,4 @@ await createClient({
     ],
     ...listeners
 });
-
-// make sure chromium is dead
-try {
-    await $`pkill chromium && pkill chromium-browser`;
-} catch (e) {}
 
