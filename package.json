@@ -11,10 +11,11 @@
     "dependencies": {
         "@lilybird/handlers": "^0.5.0",
         "@lilybird/transformers": "^0.4.1",
-        "lilybird": "^0.7.1",
+        "lilybird": "^0.8.0",
+        "osu-api-extended": "^3.0.3",
         "osu-web.js": "^2.4.0",
         "playwright": "^1.44.0",
-        "rosu-pp-js": "^1.0.2",
+        "rosu-pp-js": "^1.1.1",
         "tasai": "^1.0.0"
     },
     "devDependencies": {
