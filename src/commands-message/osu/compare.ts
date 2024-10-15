@@ -18,7 +18,7 @@ const modeAliases: Record<string, { mode: Mode }> = {
     compareosu: { mode: Mode.OSU },
     comparetaiko: { mode: Mode.TAIKO },
     comparemania: { mode: Mode.MANIA },
-    comparecatch: { mode: Mode.FRUITS }
+    comparecatch: { mode: Mode.FRUITS },
 };
 
 export default {
@@ -27,19 +27,19 @@ export default {
     description: "Display play(s) of a user on a beatmap.",
     usage: "/compare",
     cooldown: 1000,
-    run
+    run,
 } satisfies MessageCommand;
 
 async function run({
     message,
     args,
     commandName,
-    channel
+    channel,
 }: {
-    message: Message,
-    args: Array<string>,
-    commandName: string,
-    channel: GuildTextChannel
+    message: Message;
+    args: Array<string>;
+    commandName: string;
+    channel: GuildTextChannel;
 }): Promise<void> {
     const { user, mods } = parseOsuArguments(message, args, modeAliases[commandName].mode);
     if (user.type === UserType.FAIL) {
@@ -54,24 +54,24 @@ async function run({
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :("`
-                }
-            ]
+                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :("`,
+                },
+            ],
         });
         return;
     }
     const osuUser = osuUserRequest.data;
 
-    const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ message, client: message.client });
+    const beatmapId = user.beatmapId ?? (await getBeatmapIdFromContext({ message, client: message.client }));
     if (typeof beatmapId === "undefined" || beatmapId === null) {
         await channel.send({
             embeds: [
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like the beatmap ID couldn't be found :(\n"
-                }
-            ]
+                    description: "It seems like the beatmap ID couldn't be found :(\n",
+                },
+            ],
         });
         return;
     }
@@ -83,9 +83,9 @@ async function run({
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like this beatmap doesn't exist! :("
-                }
-            ]
+                    description: "It seems like this beatmap doesn't exist! :(",
+                },
+            ],
         });
         return;
     }
@@ -97,16 +97,18 @@ async function run({
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like this beatmap's leaderboard doesn't exist! :("
-                }
-            ]
+                    description: "It seems like this beatmap's leaderboard doesn't exist! :(",
+                },
+            ],
         });
         return;
     }
 
-    const plays = (await client.beatmaps.getBeatmapUserScores(beatmap.id, osuUser.id, { query: { mode: user.mode } })).sort((a, b) => b.pp - a.pp).map((item, idx) => {
-        return { ...item, position: idx + 1 };
-    });
+    const plays = (await client.beatmaps.getBeatmapUserScores(beatmap.id, osuUser.id, { query: { mode: user.mode } }))
+        .sort((a, b) => b.pp - a.pp)
+        .map((item, idx) => {
+            return { ...item, position: idx + 1 };
+        });
 
     if (plays.length === 0) {
         await channel.send({
@@ -114,9 +116,9 @@ async function run({
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like \`${osuUser.username}\` has no plays on that beatmap!`
-                }
-            ]
+                    description: `It seems like \`${osuUser.username}\` has no plays on that beatmap!`,
+                },
+            ],
         });
         return;
     }
@@ -128,8 +130,7 @@ async function run({
         mode: user.mode,
         beatmap,
         plays,
-        mods
+        mods,
     });
     await channel.send({ embeds });
 }
-

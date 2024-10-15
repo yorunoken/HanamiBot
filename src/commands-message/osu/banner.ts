@@ -13,10 +13,10 @@ export default {
     description: "Display the banner of a user.",
     usage: "/banner",
     cooldown: 1000,
-    run
+    run,
 } satisfies MessageCommand;
 
-async function run({ message, args, channel }: { message: Message, args: Array<string>, channel: GuildTextChannel }): Promise<void> {
+async function run({ message, args, channel }: { message: Message; args: Array<string>; channel: GuildTextChannel }): Promise<void> {
     const { user } = parseOsuArguments(message, args, Mode.OSU);
     if (user.type === UserType.FAIL) {
         await channel.send(user.failMessage);
@@ -30,9 +30,9 @@ async function run({ message, args, channel }: { message: Message, args: Array<s
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`
-                }
-            ]
+                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`,
+                },
+            ],
         });
         return;
     }
@@ -42,8 +42,7 @@ async function run({ message, args, channel }: { message: Message, args: Array<s
         type: EmbedBuilderType.BANNER,
         initiatorId: message.author.id,
         user: osuUser,
-        mode: user.mode
+        mode: user.mode,
     });
     await channel.send({ embeds });
 }
-

@@ -13,7 +13,7 @@ export const enum EmbedBuilderType {
     BACKGROUND = "backgroundBuilder",
     BANNER = "bannerBuilder",
     CARD = "cardBuilder",
-    SIMULATE = "simulateBuilder"
+    SIMULATE = "simulateBuilder",
 }
 
 interface ModStructure {
@@ -35,7 +35,6 @@ export interface CompareBuilderOptions extends BuilderOptions {
     user: UserExtended;
     mode: Mode;
     mods?: ModStructure;
-
 }
 
 export interface LeaderboardBuilderOptions extends BuilderOptions {
@@ -100,7 +99,7 @@ export interface BannerBuilderOptions extends BuilderOptions {
 }
 
 export type EmbedBuilderOptions =
-    CompareBuilderOptions
+    | CompareBuilderOptions
     | LeaderboardBuilderOptions
     | MapBuilderOptions
     | PlaysBuilderOptions

@@ -15,16 +15,16 @@ export default {
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "username",
-                description: "Specify an osu! username"
+                description: "Specify an osu! username",
             },
             {
                 type: ApplicationCommandOptionType.USER,
                 name: "discord",
-                description: "Specify a linked Discord user"
-            }
-        ]
+                description: "Specify a linked Discord user",
+            },
+        ],
     },
-    run
+    run,
 } satisfies SlashCommand;
 
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
@@ -44,9 +44,9 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`
-                }
-            ]
+                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`,
+                },
+            ],
         });
         return;
     }
@@ -56,7 +56,7 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
         type: EmbedBuilderType.BANNER,
         initiatorId: interaction.member.user.id,
         user: osuUser,
-        mode: user.mode
+        mode: user.mode,
     });
 
     await interaction.editReply({ embeds });

@@ -32,7 +32,7 @@ function parseURL(url: string): BeatMapSetURL | BeatMapURL | null {
     if (url[index + 1] === "/") {
         return {
             url,
-            id: url.substring(index + 2)
+            id: url.substring(index + 2),
         } satisfies BeatMapURL;
     }
 
@@ -48,7 +48,7 @@ function parseURL(url: string): BeatMapSetURL | BeatMapURL | null {
                 url,
                 setId: subUrl,
                 gameMode: null,
-                difficultyId: null
+                difficultyId: null,
             } satisfies BeatMapSetURL;
         }
 
@@ -56,7 +56,7 @@ function parseURL(url: string): BeatMapSetURL | BeatMapURL | null {
             url,
             setId: subUrl.substring(0, hash),
             gameMode: subUrl.substring(hash + 1),
-            difficultyId: null
+            difficultyId: null,
         } satisfies BeatMapSetURL;
     }
 
@@ -64,7 +64,7 @@ function parseURL(url: string): BeatMapSetURL | BeatMapURL | null {
         url,
         setId: subUrl.substring(0, hash),
         gameMode: subUrl.substring(hash + 1, slash),
-        difficultyId: subUrl.substring(slash + 1)
+        difficultyId: subUrl.substring(slash + 1),
     } satisfies BeatMapSetURL;
 }
 
@@ -76,7 +76,7 @@ export function getCommandArgs(interaction: GuildInteraction<ApplicationCommandD
     const { data, member } = interaction;
 
     // This is so fucking annoying holy shit I can't get it right
-    let difficultySettings = getAttributes ? {} as DifficultyOptions : undefined;
+    let difficultySettings = getAttributes ? ({} as DifficultyOptions) : undefined;
     if (getAttributes === true) {
         const attributesArray: Array<keyof DifficultyOptions> = ["combo", "acc", "clock_rate", "bpm", "n300", "n100", "n50", "nmisses", "ngeki", "nkatu", "ar", "cs", "od"];
         difficultySettings = {} as DifficultyOptions;
@@ -97,7 +97,7 @@ export function getCommandArgs(interaction: GuildInteraction<ApplicationCommandD
         exclude: null,
         include: null,
         forceInclude: null,
-        name: null
+        name: null,
     };
 
     const modsValue = data.getString("mods");
@@ -107,7 +107,7 @@ export function getCommandArgs(interaction: GuildInteraction<ApplicationCommandD
             exclude: data.getBoolean("exclude") ?? null,
             include: data.getBoolean("include") ?? null,
             forceInclude: data.getBoolean("force_include") ?? null,
-            name: <Mod | undefined>modsValue ?? null
+            name: <Mod | undefined>modsValue ?? null,
         };
     }
 
@@ -120,16 +120,18 @@ export function getCommandArgs(interaction: GuildInteraction<ApplicationCommandD
         ? discordUser?.banchoId
             ? { type: UserType.SUCCESS, banchoId: discordUser.banchoId, authorDb: userAuthor, mode, beatmapId }
             : {
-                type: UserType.FAIL,
-                beatmapId,
-                authorDb: userAuthor,
-                failMessage: discordUserId ? `The user <@${discordUserId}> hasn't linked their account to the bot yet!` : `Please link your account to the bot using ${linkCommand()}!`
-            }
+                  type: UserType.FAIL,
+                  beatmapId,
+                  authorDb: userAuthor,
+                  failMessage: discordUserId
+                      ? `The user <@${discordUserId}> hasn't linked their account to the bot yet!`
+                      : `Please link your account to the bot using ${linkCommand()}!`,
+              }
         : userArg
-            ? { type: UserType.SUCCESS, banchoId: userArg, mode, beatmapId, authorDb: userAuthor }
-            : userAuthor?.banchoId
-                ? { type: UserType.SUCCESS, banchoId: userAuthor.banchoId, mode, beatmapId, authorDb: userAuthor }
-                : { type: UserType.FAIL, beatmapId, authorDb: userAuthor, failMessage: "Please link your account to the bot using /link!" };
+          ? { type: UserType.SUCCESS, banchoId: userArg, mode, beatmapId, authorDb: userAuthor }
+          : userAuthor?.banchoId
+            ? { type: UserType.SUCCESS, banchoId: userAuthor.banchoId, mode, beatmapId, authorDb: userAuthor }
+            : { type: UserType.FAIL, beatmapId, authorDb: userAuthor, failMessage: "Please link your account to the bot using /link!" };
 
     return { user, mods, difficultySettings };
 }
@@ -141,22 +143,21 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
             beatmapId: null,
             type: UserType.FAIL,
             failMessage: `Please link your account to the bot using ${linkCommand()}!`,
-            authorDb: null
+            authorDb: null,
         },
         flags: {},
         mods: {
             exclude: null,
             include: null,
             forceInclude: null,
-            name: null
-        }
+            name: null,
+        },
     };
 
     const mapLinkMatches: Array<BeatMapSetURL | BeatMapURL> = [];
     for (let i = 0; i < args.length; i++) {
         const parsedUrl = parseURL(args[i]);
-        if (parsedUrl !== null)
-            mapLinkMatches.push(parsedUrl);
+        if (parsedUrl !== null) mapLinkMatches.push(parsedUrl);
     }
 
     if (mapLinkMatches.length > 0) {
@@ -182,14 +183,13 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
         }
 
         const [key, value] = arg.split("=");
-        const [, modType, mod, force] = (/^([+-])([A-Za-z]+)(!)?$/).exec(arg) ?? [];
+        const [, modType, mod, force] = /^([+-])([A-Za-z]+)(!)?$/.exec(arg) ?? [];
 
         if (mod) {
-            const modSections = (/.{1,2}/g).exec(mod);
+            const modSections = /.{1,2}/g.exec(mod);
 
             // Make sure `mod` is an actual mod in osu!
-            if (modSections && !modSections.every((selectedMod) => selectedMod.toUpperCase() in ModsEnum || mod.toUpperCase() === "NM"))
-                continue;
+            if (modSections && !modSections.every((selectedMod) => selectedMod.toUpperCase() in ModsEnum || mod.toUpperCase() === "NM")) continue;
 
             result.mods.include = modType !== "-";
             result.mods.exclude = modType === "-" && typeof force !== "undefined";
@@ -207,8 +207,7 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
         }
 
         //  Check if it's a "=" value
-        if (key && value)
-            result.flags[key] = value;
+        if (key && value) result.flags[key] = value;
     }
 
     const userAuthor = getEntry(Tables.USER, message.author.id);
@@ -219,12 +218,12 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
             type: UserType.SUCCESS,
             banchoId: userAuthor.banchoId,
             authorDb: userAuthor,
-            mode
+            mode,
         };
     } else if (result.tempUser) {
         const [userArg] = result.tempUser;
 
-        const discordUserId = (/<@(\d+)>/).exec(userArg)?.[1];
+        const discordUserId = /<@(\d+)>/.exec(userArg)?.[1];
         const discordUser = discordUserId ? getEntry(Tables.USER, discordUserId) : null;
         const discordId = discordUserId ? discordUser?.banchoId : null;
 
@@ -233,7 +232,7 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
                 beatmapId: result.user.beatmapId,
                 type: UserType.FAIL,
                 authorDb: userAuthor,
-                failMessage: `The user <@${discordUserId}> hasn't linked their account to the bot yet!`
+                failMessage: `The user <@${discordUserId}> hasn't linked their account to the bot yet!`,
             };
         } else {
             result.user = {
@@ -241,7 +240,7 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
                 type: UserType.SUCCESS,
                 banchoId: discordId ?? userArg,
                 authorDb: userAuthor,
-                mode
+                mode,
             };
         }
     }

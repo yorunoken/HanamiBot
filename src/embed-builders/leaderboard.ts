@@ -8,18 +8,14 @@ import type { LeaderboardBuilderOptions } from "@type/embedBuilders";
 import type { Embed } from "lilybird";
 import type { Beatmap, LeaderboardScores, Mode, ScoresInfo } from "@type/osu";
 
-export async function leaderboardBuilder({
-    scores,
-    beatmap,
-    page = 0
-}: LeaderboardBuilderOptions): Promise<Array<Embed.Structure>> {
+export async function leaderboardBuilder({ scores, beatmap, page = 0 }: LeaderboardBuilderOptions): Promise<Array<Embed.Structure>> {
     if (scores.length === 0) {
         return [
             {
                 type: EmbedType.Rich,
                 title: "Uh oh! :x:",
-                description: "No scores yet. Maybe you should try setting some? :)"
-            }
+                description: "No scores yet. Maybe you should try setting some? :)",
+            },
         ] satisfies Array<Embed.Structure>;
     }
 
@@ -35,7 +31,8 @@ async function getPlays(plays: Array<LeaderboardScores>, beatmap: Beatmap, page:
     const pageEnd = pageStart + 5;
 
     const playsTemp: Array<Promise<ScoresInfo>> = [];
-    for (let i = pageStart; pageEnd > i && i < plays.length; i++) playsTemp.push(getScore({ scores: plays, index: i, mode, beatmap, mapData }));
+    for (let i = pageStart; pageEnd > i && i < plays.length; i++)
+        playsTemp.push(getScore({ scores: plays, index: i, mode, beatmap, mapData }));
 
     let description = "";
     const playResults = await Promise.all(playsTemp);
@@ -57,7 +54,9 @@ async function getPlays(plays: Array<LeaderboardScores>, beatmap: Beatmap, page:
         url: `https://osu.ppy.sh/b/${beatmap.id}`,
         thumbnail: { url: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/list.jpg` },
         description,
-        footer: { text: `${beatmap.status.charAt(0).toUpperCase()}${beatmap.status.slice(1)} beatmapset by ${beatmap.beatmapset.creator} ${SPACE} - ${SPACE} Page ${page + 1} of ${Math.ceil(plays.length / 5)}` }
+        footer: {
+            text: `${beatmap.status.charAt(0).toUpperCase()}${beatmap.status.slice(1)} beatmapset by ${beatmap.beatmapset.creator} ${SPACE} - ${SPACE} Page ${page + 1} of ${Math.ceil(plays.length / 5)}`,
+        },
     };
 
     return [embed] satisfies Array<Embed.Structure>;

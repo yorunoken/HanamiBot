@@ -14,22 +14,22 @@ export default {
     description: "Display background of a beatmap.",
     usage: "/background",
     cooldown: 1000,
-    run
+    run,
 } satisfies MessageCommand;
 
-async function run({ message, args, channel }: { message: Message, args: Array<string>, channel: GuildTextChannel }): Promise<void> {
+async function run({ message, args, channel }: { message: Message; args: Array<string>; channel: GuildTextChannel }): Promise<void> {
     const { user } = parseOsuArguments(message, args, Mode.OSU);
 
-    const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ message, client: message.client });
+    const beatmapId = user.beatmapId ?? (await getBeatmapIdFromContext({ message, client: message.client }));
     if (typeof beatmapId === "undefined" || beatmapId === null) {
         await channel.send({
             embeds: [
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like the beatmap ID couldn't be found :(\n"
-                }
-            ]
+                    description: "It seems like the beatmap ID couldn't be found :(\n",
+                },
+            ],
         });
         return;
     }
@@ -41,9 +41,9 @@ async function run({ message, args, channel }: { message: Message, args: Array<s
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like this beatmap doesn't exist! :("
-                }
-            ]
+                    description: "It seems like this beatmap doesn't exist! :(",
+                },
+            ],
         });
         return;
     }
@@ -52,7 +52,7 @@ async function run({ message, args, channel }: { message: Message, args: Array<s
     const embeds = backgroundBuilder({
         type: EmbedBuilderType.BACKGROUND,
         initiatorId: message.author.id,
-        beatmap
+        beatmap,
     });
     await channel.send({ embeds });
 }

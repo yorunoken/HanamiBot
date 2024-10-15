@@ -15,10 +15,10 @@ export default {
     description: "Display statistics of a beatmap.",
     usage: "/simulate acc: 97 bpm: 230 combo: 900 misses: 7",
     cooldown: 1000,
-    run
+    run,
 } satisfies MessageCommand;
 
-async function run({ message, args, channel }: { message: Message, args: Array<string>, channel: GuildTextChannel }): Promise<void> {
+async function run({ message, args, channel }: { message: Message; args: Array<string>; channel: GuildTextChannel }): Promise<void> {
     const { user, mods, flags } = parseOsuArguments(message, args, Mode.OSU);
 
     const options: DifficultyOptions = {
@@ -34,19 +34,19 @@ async function run({ message, args, channel }: { message: Message, args: Array<s
         n50: Number(flags.n50 ?? flags["50"]) || undefined,
         ngeki: Number(flags.ngeki ?? flags.geki) || undefined,
         nkatu: Number(flags.natu ?? flags.katu) || undefined,
-        nmisses: Number(flags.nmisses ?? flags.misses ?? flags.miss ?? flags.nmiss) || undefined
+        nmisses: Number(flags.nmisses ?? flags.misses ?? flags.miss ?? flags.nmiss) || undefined,
     };
 
-    const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ message, client: message.client });
+    const beatmapId = user.beatmapId ?? (await getBeatmapIdFromContext({ message, client: message.client }));
     if (typeof beatmapId === "undefined" || beatmapId === null) {
         await channel.send({
             embeds: [
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like the beatmap ID couldn't be found :(\n"
-                }
-            ]
+                    description: "It seems like the beatmap ID couldn't be found :(\n",
+                },
+            ],
         });
         return;
     }
@@ -56,7 +56,7 @@ async function run({ message, args, channel }: { message: Message, args: Array<s
         initiatorId: message.author.id,
         beatmapId: Number(beatmapId),
         options,
-        mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null
+        mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null,
     });
     await channel.send({ embeds });
 }

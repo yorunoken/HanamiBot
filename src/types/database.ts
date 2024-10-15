@@ -7,13 +7,13 @@ export enum Tables {
     COMMAND = "commands",
     COMMAND_SLASH = "commands_slash",
     SCORE = "osu_scores",
-    PP = "osu_scores_pp"
+    PP = "osu_scores_pp",
 }
 
 export enum EmbedScoreType {
     Hanami = "hanami",
     Bathbot = "bathbot",
-    Owo = "owobot"
+    Owo = "owobot",
 }
 
 export interface User {
@@ -71,24 +71,37 @@ export interface ScorePp {
 
 export enum ScoreEmbed {
     Maximized = 1,
-    Minimized = 0
+    Minimized = 0,
 }
 
-export type TableToArgument<T extends Tables> =
-    T extends "users" ? keyof User :
-        T extends "servers" ? keyof Guild :
-            T extends "maps" ? keyof Map :
-                T extends "commands" ? keyof Command :
-                    T extends "commands_slash" ? keyof Command :
-                        T extends "osu_scores" ? keyof Score :
-                            T extends "osu_scores_pp" ? keyof ScorePp : never;
+export type TableToArgument<T extends Tables> = T extends "users"
+    ? keyof User
+    : T extends "servers"
+      ? keyof Guild
+      : T extends "maps"
+        ? keyof Map
+        : T extends "commands"
+          ? keyof Command
+          : T extends "commands_slash"
+            ? keyof Command
+            : T extends "osu_scores"
+              ? keyof Score
+              : T extends "osu_scores_pp"
+                ? keyof ScorePp
+                : never;
 
-export type TableToType<T extends Tables> =
-    T extends "users" ? User :
-        T extends "servers" ? Guild :
-            T extends "maps" ? Map :
-                T extends "commands" ? Command :
-                    T extends "commands_slash" ? Command :
-                        T extends "osu_scores" ? Score :
-                            T extends "osu_scores_pp" ? ScorePp : never;
-
+export type TableToType<T extends Tables> = T extends "users"
+    ? User
+    : T extends "servers"
+      ? Guild
+      : T extends "maps"
+        ? Map
+        : T extends "commands"
+          ? Command
+          : T extends "commands_slash"
+            ? Command
+            : T extends "osu_scores"
+              ? Score
+              : T extends "osu_scores_pp"
+                ? ScorePp
+                : never;

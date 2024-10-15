@@ -5,7 +5,7 @@ import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transfo
 
 export default {
     data: { name: "link", description: "Link your osu! account to the bot." },
-    run
+    run,
 } satisfies SlashCommand;
 
 let state = 1;

@@ -14,5 +14,5 @@ export default {
         console.log("Loaded application commands ✅");
         refreshServersDatabase();
         console.log("Refreshed servers database ✅");
-    }
+    },
 } satisfies Event<"ready">;

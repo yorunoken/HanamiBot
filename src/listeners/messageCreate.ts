@@ -10,7 +10,7 @@ import type { Event } from "@lilybird/handlers";
 
 export default {
     event: "messageCreate",
-    run
+    run,
 } satisfies Event<"messageCreate">;
 
 const cooldown = new Map();
@@ -39,11 +39,20 @@ async function run(message: Message): Promise<void> {
     if (prefix === null) {
         // nyann :3333
         if ((content === ":3" || content === "3:") && Math.random() < CHANCE_TO_SEND_CUTE_KITTY_CAT_I_LOVE_CATS) {
-            await message.reply(message.content === ":3" ? "3:" : ":3", { allowed_mentions: { replied_user: false, parse: [], roles: [], users: [] } });
+            await message.reply(message.content === ":3" ? "3:" : ":3", {
+                allowed_mentions: { replied_user: false, parse: [], roles: [], users: [] },
+            });
             return;
         }
 
-        if (content === "727" || content === "7,27" || content === "72,7" || content === "72.7" || content === "7.27" || content.toLowerCase() === "wysi") {
+        if (
+            content === "727" ||
+            content === "7,27" ||
+            content === "72,7" ||
+            content === "72.7" ||
+            content === "7.27" ||
+            content.toLowerCase() === "wysi"
+        ) {
             await message.react("wysia:1240624238189088869", true);
             return;
         }
@@ -55,7 +64,7 @@ async function run(message: Message): Promise<void> {
     if (typeof commandName === "undefined") return;
 
     let index: number | undefined;
-    const match = (/(\D+)(\d+)/).exec(commandName);
+    const match = /(\D+)(\d+)/.exec(commandName);
     if (match) {
         const [, extractedCommandName, extractedNumber] = match;
         commandName = extractedCommandName;
@@ -72,14 +81,14 @@ async function run(message: Message): Promise<void> {
         let nearResults = "";
         for (let i = 0; i < options.length; i++) {
             const option = options[i];
-            if (option.distance <= 2)
-                nearResults += `${i > 0 ? ", " : ""}${option.option}`;
+            if (option.distance <= 2) nearResults += `${i > 0 ? ", " : ""}${option.option}`;
         }
 
-        if (nearResults === "")
-            return;
+        if (nearResults === "") return;
 
-        await message.reply(`It seems like ${commandName} is not a command. Did you mean: \`${nearResults}\`?`, { allowed_mentions: { replied_user: false, parse: [], roles: [], users: [] } });
+        await message.reply(`It seems like ${commandName} is not a command. Did you mean: \`${nearResults}\`?`, {
+            allowed_mentions: { replied_user: false, parse: [], roles: [], users: [] },
+        });
         return;
     }
     const { default: command } = commandDefault;
@@ -87,7 +96,7 @@ async function run(message: Message): Promise<void> {
     if (cooldown.has(`${command.name}${author.id}`)) {
         await message
             .reply({
-                content: `${cooldown.get(`${command.name}${author.id}`)}ms`
+                content: `${cooldown.get(`${command.name}${author.id}`)}ms`,
             })
             .then((msg) => setTimeout(async () => msg.delete(), cooldown.get(`${command.name}${author.id}`) - Date.now()));
         return;
@@ -105,16 +114,14 @@ async function run(message: Message): Promise<void> {
         await loadLogs(`INFO: [${guild.name}] ${author.username} used prefix command \`${command.name}\``);
         const docs = getEntry(Tables.COMMAND, command.name);
 
-        if (docs === null)
-            insertData({ table: Tables.COMMAND, data: [ { key: "count", value: 1 } ], id: command.name });
-        else
-            insertData({ table: Tables.COMMAND, data: [ { key: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
+        if (docs === null) insertData({ table: Tables.COMMAND, data: [{ key: "count", value: 1 }], id: command.name });
+        else insertData({ table: Tables.COMMAND, data: [{ key: "count", value: Number(docs.count ?? 0) + 1 }], id: docs.id });
     } catch (error) {
         const err = error as Error;
 
         await message.reply(
             `Oops, you came across an error!\nHere's a summary of it:\n\`\`\`${err.stack}\`\`\`\nDon't worry, the same error log has been sent to the owner of this bot.`,
-            { allowed_mentions: { replied_user: false, parse: [], roles: [], users: [] } }
+            { allowed_mentions: { replied_user: false, parse: [], roles: [], users: [] } },
         );
 
         const guild = await client.rest.getGuild(guildId);
@@ -128,33 +135,31 @@ async function run(message: Message): Promise<void> {
                     fields: [
                         {
                             name: "User",
-                            value: `<@${author.id}> (${author.username})`
+                            value: `<@${author.id}> (${author.username})`,
                         },
                         {
                             name: "Guild",
-                            value: `[${guild.name}](https://discord.com/channels/${guildId}/${message.channelId})`
+                            value: `[${guild.name}](https://discord.com/channels/${guildId}/${message.channelId})`,
                         },
                         {
                             name: "Message",
-                            value: content
+                            value: content,
                         },
                         {
                             name: "Error",
-                            value: err.stack ?? "undefined (look at logs)"
-                        }
-                    ]
-                }
-            ]
+                            value: err.stack ?? "undefined (look at logs)",
+                        },
+                    ],
+                },
+            ],
         });
 
         console.error(err);
         await loadLogs(`ERROR: [${guild.name}] ${author.username} had an error in prefix command \`${command.name}\`: ${err.stack}`, true);
         const docs = getEntry(Tables.COMMAND, command.name);
 
-        if (docs === null)
-            insertData({ table: Tables.COMMAND, data: [ { key: "count", value: 1 } ], id: command.name });
-        else
-            insertData({ table: Tables.COMMAND, data: [ { key: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
+        if (docs === null) insertData({ table: Tables.COMMAND, data: [{ key: "count", value: 1 }], id: command.name });
+        else insertData({ table: Tables.COMMAND, data: [{ key: "count", value: Number(docs.count ?? 0) + 1 }], id: docs.id });
     }
 
     cooldown.set(`${command.name}${author.id}`, Date.now() + command.cooldown);
@@ -170,5 +175,5 @@ function verifyUser(message: Message): void {
     if (!content) return;
 
     const [discordId, osuId] = content.split("\n");
-    insertData({ table: Tables.USER, id: discordId, data: [ { key: "banchoId", value: osuId } ] });
+    insertData({ table: Tables.USER, id: discordId, data: [{ key: "banchoId", value: osuId }] });
 }

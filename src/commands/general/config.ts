@@ -14,26 +14,39 @@ export default {
                 type: ApplicationCommandOptionType.NUMBER,
                 name: "score_embeds",
                 description: "Specify what size score embeds should be. (compare, recent...)",
-                choices: [ { name: "Maximized", value: 1 }, { name: "Minimized", value: 0 } ],
-                required: false
+                choices: [
+                    { name: "Maximized", value: 1 },
+                    { name: "Minimized", value: 0 },
+                ],
+                required: false,
             },
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "mode",
                 description: "Specify an osu! mode (none defaults to osu)",
-                choices: [ { name: "None", value: "osu" }, { name: "osu", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "ctb", value: "fruits" } ],
-                required: false
+                choices: [
+                    { name: "None", value: "osu" },
+                    { name: "osu", value: "osu" },
+                    { name: "mania", value: "mania" },
+                    { name: "taiko", value: "taiko" },
+                    { name: "ctb", value: "fruits" },
+                ],
+                required: false,
             },
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "embed_type",
                 description: "Specify an osu! embed type. Default: Hanami",
-                choices: [ { name: "Bathbot", value: "bathbot" }, { name: "owo", value: "owobot" }, { name: "Hanami", value: "hanami" } ],
-                required: false
-            }
-        ]
+                choices: [
+                    { name: "Bathbot", value: "bathbot" },
+                    { name: "owo", value: "owobot" },
+                    { name: "Hanami", value: "hanami" },
+                ],
+                required: false,
+            },
+        ],
     },
-    run
+    run,
 } satisfies SlashCommand;
 
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
@@ -75,9 +88,9 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
         embeds: [
             {
                 title: `Successfully changes configs for ${interaction.member.user.username}`,
-                description: `Changed configs:\n${changesText}`
-            }
-        ]
+                description: `Changed configs:\n${changesText}`,
+            },
+        ],
     });
 }
 
@@ -85,13 +98,13 @@ async function list(interaction: GuildInteraction<ApplicationCommandData>): Prom
     const defaults: Record<string, string> = {
         score_embeds: "Maximized",
         mode: "None",
-        unknown: "unknown"
+        unknown: "unknown",
     };
 
     const userId = interaction.member.user.id;
     let user = getEntry(Tables.USER, userId);
     if (!user) {
-        insertData({ table: Tables.USER, id: userId, data: [ { key: "banchoId", value: null } ] });
+        insertData({ table: Tables.USER, id: userId, data: [{ key: "banchoId", value: null }] });
         user = { banchoId: null, mode: null, score_embeds: null, embed_type: null, id: userId };
     }
     const embeds: Embed.Structure = { fields: [], title: `Config settings of ${interaction.member.user.username}` };
@@ -100,23 +113,21 @@ async function list(interaction: GuildInteraction<ApplicationCommandData>): Prom
         const value = v as string | number | null;
         if (key === "id" || key === "banchoId") continue;
 
-        if (value !== null)
-            embeds.fields?.push({ name: key, value: typeof value === "number" ? ScoreEmbed[value] : value });
-        else
-            embeds.fields?.push({ name: key, value: defaults[key || "unknown"] });
+        if (value !== null) embeds.fields?.push({ name: key, value: typeof value === "number" ? ScoreEmbed[value] : value });
+        else embeds.fields?.push({ name: key, value: defaults[key || "unknown"] });
     }
 
     await interaction.editReply({ embeds: [embeds] });
 }
 
 function mode(memberId: string, choice: string): void {
-    insertData({ table: Tables.USER, id: memberId, data: [ { key: "mode", value: choice } ] });
+    insertData({ table: Tables.USER, id: memberId, data: [{ key: "mode", value: choice }] });
 }
 
 function scoreEmbed(memberId: string, choice: number): void {
-    insertData({ table: Tables.USER, id: memberId, data: [ { key: "score_embeds", value: choice } ] });
+    insertData({ table: Tables.USER, id: memberId, data: [{ key: "score_embeds", value: choice }] });
 }
 
 function embedType(memberId: string, choice: string): void {
-    insertData({ table: Tables.USER, id: memberId, data: [ { key: "embed_type", value: choice } ] });
+    insertData({ table: Tables.USER, id: memberId, data: [{ key: "embed_type", value: choice }] });
 }

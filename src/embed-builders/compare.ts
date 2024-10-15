@@ -9,13 +9,7 @@ import type { CompareBuilderOptions } from "@type/embedBuilders";
 import type { Embed } from "lilybird";
 import type { Beatmap, Mode, ProfileInfo, ScoresInfo, Score } from "@type/osu";
 
-export async function compareBuilder({
-    beatmap,
-    plays,
-    user,
-    mode,
-    mods
-}: CompareBuilderOptions): Promise<Array<Embed.Structure>> {
+export async function compareBuilder({ beatmap, plays, user, mode, mods }: CompareBuilderOptions): Promise<Array<Embed.Structure>> {
     saveScoreDatas(plays, mode, beatmap);
 
     const profile = getProfile(user, mode);
@@ -27,14 +21,10 @@ export async function compareBuilder({
             const play = plays[i];
             const modsStr = play.mods.join("").toUpperCase() || "NM";
 
-            if (exclude && !modsStr.includes(name.toUpperCase()))
-                filteredPlays.push(play);
-            else if (forceInclude && modsStr === name.toUpperCase())
-                filteredPlays.push(play);
-            else if (include && modsStr.includes(name.toUpperCase()))
-                filteredPlays.push(play);
-            else if (!exclude && !forceInclude && !include)
-                filteredPlays.push(play);
+            if (exclude && !modsStr.includes(name.toUpperCase())) filteredPlays.push(play);
+            else if (forceInclude && modsStr === name.toUpperCase()) filteredPlays.push(play);
+            else if (include && modsStr.includes(name.toUpperCase())) filteredPlays.push(play);
+            else if (!exclude && !forceInclude && !include) filteredPlays.push(play);
         }
         plays = filteredPlays;
     }
@@ -44,20 +34,24 @@ export async function compareBuilder({
             {
                 type: EmbedType.Rich,
                 title: "Uh oh! :x:",
-                description: `It seems like \`${profile.username}\` doesn't have any scores on this beatmap with these! :(`
-            }
+                description: `It seems like \`${profile.username}\` doesn't have any scores on this beatmap with these! :(`,
+            },
         ] satisfies Array<Embed.Structure>;
     }
 
     return getMultiplePlays({ plays, profile, beatmap, mode });
 }
 
-async function getMultiplePlays({ plays, profile, beatmap, mode }:
-{
-    plays: Array<Score>,
-    profile: ProfileInfo,
-    beatmap: Beatmap,
-    mode: Mode
+async function getMultiplePlays({
+    plays,
+    profile,
+    beatmap,
+    mode,
+}: {
+    plays: Array<Score>;
+    profile: ProfileInfo;
+    beatmap: Beatmap;
+    mode: Mode;
 }): Promise<Array<Embed.Structure>> {
     const beatmapId = beatmap.id;
     const mapData = getEntry(Tables.MAP, beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
@@ -82,13 +76,13 @@ async function getMultiplePlays({ plays, profile, beatmap, mode }:
         author: {
             name: `${profile.username} ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}#${profile.countryRank})`,
             url: profile.userUrl,
-            icon_url: profile.flagUrl
+            icon_url: profile.flagUrl,
         },
         title: `${beatmapset.artist} - ${beatmapset.title} [${beatmap.version}]`,
         url: `https://osu.ppy.sh/b/${beatmap.id}`,
         thumbnail: { url: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/list.jpg` },
         description,
-        footer: { text: `${beatmap.status.charAt(0).toUpperCase()}${beatmap.status.slice(1)} beatmapset by ${beatmap.beatmapset.creator}` }
+        footer: { text: `${beatmap.status.charAt(0).toUpperCase()}${beatmap.status.slice(1)} beatmapset by ${beatmap.beatmapset.creator}` },
     };
 
     return [embed] satisfies Array<Embed.Structure>;

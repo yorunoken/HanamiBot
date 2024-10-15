@@ -3,17 +3,14 @@ import type { Message } from "lilybird";
 
 export const pageButtonsArgs = {
     buttonCustomIds: ["min-page", "decrement-page", "increment-page", "max-page"],
-    buttonLabels: ["<<", "<", ">", ">>"]
+    buttonLabels: ["<<", "<", ">", ">>"],
 };
 export const indexButtonsArgs = {
     buttonCustomIds: ["min-index", "decrement-index", "increment-index", "max-index"],
-    buttonLabels: ["<<", "<", ">", ">>"]
+    buttonLabels: ["<<", "<", ">", ">>"],
 };
 
-export function createActionRow({
-    isPage,
-    disabledStates
-}: { isPage: boolean, disabledStates: Array<boolean> }): Array<Message.Component.Structure> {
+export function createActionRow({ isPage, disabledStates }: { isPage: boolean; disabledStates: Array<boolean> }): Array<Message.Component.Structure> {
     const { buttonCustomIds, buttonLabels } = isPage ? pageButtonsArgs : indexButtonsArgs;
 
     const length = Math.max(buttonCustomIds.length, buttonLabels.length);
@@ -25,7 +22,7 @@ export function createActionRow({
                 style: ButtonStyle.Primary,
                 custom_id: buttonCustomIds[i],
                 label: buttonLabels[i],
-                disabled: disabledStates[i]
+                disabled: disabledStates[i],
             });
         }
     }
@@ -33,12 +30,11 @@ export function createActionRow({
     return [
         {
             type: ComponentType.ActionRow,
-            components
-        }
+            components,
+        },
     ];
 }
 
 export function calculateButtonState(isNext: boolean, index: number, total: number): boolean {
     return isNext ? index + 1 === total : index === 0;
 }
-

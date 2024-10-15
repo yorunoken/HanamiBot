@@ -8,5 +8,5 @@ export default {
     event: "guildDelete",
     run: (_, guild) => {
         removeEntry(Tables.GUILD, guild.id);
-    }
+    },
 } satisfies Event<"guildDelete">;

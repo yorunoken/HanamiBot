@@ -18,13 +18,12 @@ export async function playBuilder({
     isMultiple,
     page,
     authorDb,
-    sortByDate
+    sortByDate,
 }: PlaysBuilderOptions): Promise<Array<Embed.Structure>> {
     saveScoreDatas(plays, mode);
 
     if (typeof page === "undefined" && typeof index === "undefined") {
-        if (isMultiple)
-            page = 0;
+        if (isMultiple) page = 0;
         else index = 0;
     }
 
@@ -38,45 +37,48 @@ export async function playBuilder({
             const modsStr = play.mods.join("").toUpperCase() || "NM";
 
             if (exclude) {
-                if (!modsStr.includes(name.toUpperCase()))
-                    filteredPlays.push(play);
+                if (!modsStr.includes(name.toUpperCase())) filteredPlays.push(play);
             } else if (forceInclude) {
-                if (modsStr === name.toUpperCase())
-                    filteredPlays.push(play);
+                if (modsStr === name.toUpperCase()) filteredPlays.push(play);
             } else if (include) {
-                if (modsStr.includes(name.toUpperCase()))
-                    filteredPlays.push(play);
-            } else
-                filteredPlays.push(play);
+                if (modsStr.includes(name.toUpperCase())) filteredPlays.push(play);
+            } else filteredPlays.push(play);
         }
 
         plays = filteredPlays;
     }
 
-    if (sortByDate)
-        plays = plays.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    if (sortByDate) plays = plays.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
     if (index && index >= plays.length) {
         return [
             {
                 type: EmbedType.Rich,
                 title: "Uh oh! :x:",
-                description: `It seems like \`${profile.username}\` hasn't had any recent plays in the last 24 hours with those filters!`
-            }
+                description: `It seems like \`${profile.username}\` hasn't had any recent plays in the last 24 hours with those filters!`,
+            },
         ] satisfies Array<Embed.Structure>;
     }
 
-    return typeof page !== "undefined" ? getMultiplePlays({ plays, page, mode, profile, authorDb }) : getSinglePlay({ mode, index: index ?? 0, plays, profile, authorDb, isMultiple });
+    return typeof page !== "undefined"
+        ? getMultiplePlays({ plays, page, mode, profile, authorDb })
+        : getSinglePlay({ mode, index: index ?? 0, plays, profile, authorDb, isMultiple });
 }
 
-async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple }:
-{
-    plays: Array<UserBestScore> | Array<UserScore>,
-    mode: Mode,
-    profile: ProfileInfo,
-    index: number,
-    authorDb: User | null,
-    isMultiple?: boolean
+async function getSinglePlay({
+    mode,
+    index,
+    plays,
+    profile,
+    authorDb,
+    isMultiple,
+}: {
+    plays: Array<UserBestScore> | Array<UserScore>;
+    mode: Mode;
+    profile: ProfileInfo;
+    index: number;
+    authorDb: User | null;
+    isMultiple?: boolean;
 }): Promise<Array<Embed.Structure>> {
     const isMaximized = (authorDb?.score_embeds ?? 1) === 1;
     const embedType = authorDb?.embed_type ?? EmbedScoreType.Hanami;
@@ -89,7 +91,7 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
         const author = {
             name: `${profile.username} ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}#${profile.countryRank})`,
             url: profile.userUrl,
-            icon_url: profile.avatarUrl
+            icon_url: profile.avatarUrl,
         } satisfies Embed.AuthorStructure;
 
         const line1 = `${play.grade} ${play.percentagePassed !== null ? `**@${play.percentagePassed}%**` : ""} ${SPACE} ${play.score} ${SPACE} **${play.accuracy}%** ${SPACE} ${play.playSubmitted}\n`;
@@ -100,49 +102,55 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
             {
                 name: `${play.rulesetEmote} ${play.difficultyName} **+${play.mods.join("")}** [${play.stars}] ${isMultiple ? `${SPACE} Top **__#${play.position}__** of ${plays.length}` : ""}`,
                 value: line1 + line2,
-                inline: false
-            }
+                inline: false,
+            },
         ] satisfies Array<Embed.FieldStructure>;
 
         if (isMaximized) {
             fields[0].value += line3;
             const beatmapInfoField = [
                 `**BPM:** \`${bpm.toFixed().toLocaleString()}\` ${SPACE} **Length:** \`${play.drainLength}\``,
-                `**AR:** \`${difficultyAttrs.ar.toFixed(1)}\` ${SPACE} **OD:** \`${difficultyAttrs.od
-                    .toFixed(1)}\` ${SPACE} **CS:** \`${difficultyAttrs.cs.toFixed(1)}\` ${SPACE} **HP:** \`${difficultyAttrs.hp.toFixed(1)}\``
+                `**AR:** \`${difficultyAttrs.ar.toFixed(1)}\` ${SPACE} **OD:** \`${difficultyAttrs.od.toFixed(
+                    1,
+                )}\` ${SPACE} **CS:** \`${difficultyAttrs.cs.toFixed(1)}\` ${SPACE} **HP:** \`${difficultyAttrs.hp.toFixed(1)}\``,
             ];
             fields.push({
                 name: "Beatmap Info:",
                 value: beatmapInfoField.join("\n"),
-                inline: false
+                inline: false,
             });
         }
 
-        const image = isMaximized ? { url: play.coverLink } satisfies Embed.ImageStructure : undefined;
-        const thumbnail = !isMaximized ? { url: play.listLink } satisfies Embed.ThumbnailStructure : undefined;
+        const image = isMaximized ? ({ url: play.coverLink } satisfies Embed.ImageStructure) : undefined;
+        const thumbnail = !isMaximized ? ({ url: play.listLink } satisfies Embed.ThumbnailStructure) : undefined;
         const title = play.songNameFormatted;
         const url = play.mapLink;
         const footer: Embed.FooterStructure = {
-            text: `${play.mapStatus} mapset by ${play.mapAuthor}${isMaximized && !isMultiple ? ` ${SPACE} - Play ${index + 1} of ${plays.length} ${SPACE} - Try ${play.retries}` : ""}`
+            text: `${play.mapStatus} mapset by ${play.mapAuthor}${isMaximized && !isMultiple ? ` ${SPACE} - Play ${index + 1} of ${plays.length} ${SPACE} - Try ${play.retries}` : ""}`,
         };
 
-        return [ { type: EmbedType.Rich, author, fields, image, thumbnail, footer, url, title } ];
+        return [{ type: EmbedType.Rich, author, fields, image, thumbnail, footer, url, title }];
     }
 
     if (embedType === EmbedScoreType.Bathbot && isMaximized) {
         const beatmapInfoField = [
             `Length: \`${play.drainLength}\` ${SPACE} BPM: \`${bpm.toFixed().toLocaleString()}\` ${SPACE} Objects \`${mapValues.nObjects}\``,
-            `AR: \`${difficultyAttrs.ar.toFixed(1)}\` ${SPACE} OD: \`${difficultyAttrs.od
-                .toFixed(1)}\` ${SPACE} CS: \`${difficultyAttrs.cs.toFixed(1)}\` ${SPACE} HP: \`${difficultyAttrs.hp.toFixed(1)}\` Stars: ${play.stars}`
+            `AR: \`${difficultyAttrs.ar.toFixed(1)}\` ${SPACE} OD: \`${difficultyAttrs.od.toFixed(
+                1,
+            )}\` ${SPACE} CS: \`${difficultyAttrs.cs.toFixed(1)}\` ${SPACE} HP: \`${difficultyAttrs.hp.toFixed(1)}\` Stars: ${play.stars}`,
         ];
 
         const fields = [
-            { name: "Grade", value: `${play.grade} ${play.percentagePassed !== null ? `@${play.percentagePassed}%` : ""} +${play.mods.join("")}`, inline: true },
+            {
+                name: "Grade",
+                value: `${play.grade} ${play.percentagePassed !== null ? `@${play.percentagePassed}%` : ""} +${play.mods.join("")}`,
+                inline: true,
+            },
             { name: "Score", value: play.score, inline: true },
             { name: "Acc", value: `${play.accuracy}%`, inline: true },
             { name: "PP", value: `${play.ppFormatted}`, inline: true },
             { name: "Combo", value: `${play.comboValues}`, inline: true },
-            { name: "Hits", value: `{${play.hitValues}}`, inline: true }
+            { name: "Hits", value: `{${play.hitValues}}`, inline: true },
         ];
 
         if (!play.isFc) {
@@ -158,13 +166,13 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
                 author: {
                     name: `${profile.username} ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}${profile.countryRank})`,
                     url: profile.userUrl,
-                    icon_url: profile.flagUrl
+                    icon_url: profile.flagUrl,
                 },
                 title: `${play.songNameFormatted} [${play.difficultyName}]`,
                 url: play.mapLink,
                 image: { url: play.coverLink },
-                fields
-            }
+                fields,
+            },
         ];
     } else if (embedType === EmbedScoreType.Bathbot) {
         return [
@@ -173,7 +181,7 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
                 author: {
                     name: `${profile.username} ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}${profile.countryRank})`,
                     url: profile.userUrl,
-                    icon_url: profile.flagUrl
+                    icon_url: profile.flagUrl,
                 },
                 title: `${play.songNameFormatted} [${play.difficultyName}] [${play.stars}]`,
                 url: play.mapLink,
@@ -181,17 +189,17 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
                 fields: [
                     {
                         name: `${play.grade} ${play.percentagePassed !== null ? `@${play.percentagePassed}%` : ""} ${SPACE} ${play.score} ${SPACE} (${play.accuracy}%) ${SPACE} ${play.playSubmitted}`,
-                        value: `${play.ppFormatted} [ ${play.comboValues} ] {${play.hitValues}}`
-                    }
-                ]
-            }
+                        value: `${play.ppFormatted} [ ${play.comboValues} ] {${play.hitValues}}`,
+                    },
+                ],
+            },
         ];
     }
 
     // it's owo, so return owo embed.
     const desc = [
         `▸ ${play.grade} ${play.percentagePassed !== null ? `(${play.percentagePassed}%)` : ""} ▸ **${current.pp.toFixed(2).toLocaleString()}PP** ${play.ifFcOwo} ▸ ${play.accuracy}%`,
-        `▸ ${play.score} ▸ ${play.comboValues} ▸ [${play.hitValues}]`
+        `▸ ${play.score} ▸ ${play.comboValues} ▸ [${play.hitValues}]`,
     ];
 
     return [
@@ -200,22 +208,27 @@ async function getSinglePlay({ mode, index, plays, profile, authorDb, isMultiple
             author: {
                 name: `${play.songName} [${play.songArtist}] +${play.mods.join("")} [${play.stars}]`,
                 url: play.mapLink,
-                icon_url: profile.avatarUrl
+                icon_url: profile.avatarUrl,
             },
             thumbnail: { url: play.thumbLink },
             description: desc.join("\n"),
-            footer: { text: `Try #${play.retries} • On osu! Bancho` }
-        }
+            footer: { text: `Try #${play.retries} • On osu! Bancho` },
+        },
     ];
 }
 
-async function getMultiplePlays({ plays, page, mode, profile, authorDb }:
-{
-    plays: Array<UserBestScore> | Array<UserScore>,
-    page: number,
-    mode: Mode,
-    profile: ProfileInfo,
-    authorDb: User | null
+async function getMultiplePlays({
+    plays,
+    page,
+    mode,
+    profile,
+    authorDb,
+}: {
+    plays: Array<UserBestScore> | Array<UserScore>;
+    page: number;
+    mode: Mode;
+    profile: ProfileInfo;
+    authorDb: User | null;
 }): Promise<Array<Embed.Structure>> {
     const embedType = authorDb?.embed_type ?? EmbedScoreType.Hanami;
 
@@ -243,12 +256,12 @@ async function getMultiplePlays({ plays, page, mode, profile, authorDb }:
                 author: {
                     name: `${profile.username} ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}#${profile.countryRank})`,
                     url: profile.userUrl,
-                    icon_url: profile.flagUrl
+                    icon_url: profile.flagUrl,
                 },
                 thumbnail: { url: profile.avatarUrl },
                 description,
-                footer: { text: `Page ${page + 1} of ${Math.ceil(plays.length / 5)}` }
-            }
+                footer: { text: `Page ${page + 1} of ${Math.ceil(plays.length / 5)}` },
+            },
         ];
     }
 
@@ -269,12 +282,12 @@ async function getMultiplePlays({ plays, page, mode, profile, authorDb }:
                 author: {
                     name: `${profile.username} ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}#${profile.countryRank})`,
                     url: profile.userUrl,
-                    icon_url: profile.flagUrl
+                    icon_url: profile.flagUrl,
                 },
                 thumbnail: { url: profile.avatarUrl },
                 description,
-                footer: { text: `Page ${page + 1} of ${Math.ceil(plays.length / 5)} • Mode: ${mode}` }
-            }
+                footer: { text: `Page ${page + 1} of ${Math.ceil(plays.length / 5)} • Mode: ${mode}` },
+            },
         ];
     }
 
@@ -296,11 +309,11 @@ async function getMultiplePlays({ plays, page, mode, profile, authorDb }:
             author: {
                 name: `${profile.username} ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}#${profile.countryRank})`,
                 url: profile.userUrl,
-                icon_url: profile.flagUrl
+                icon_url: profile.flagUrl,
             },
             thumbnail: { url: profile.avatarUrl },
             description,
-            footer: { text: `On osu! Bancho | Page ${page + 1} of ${Math.ceil(plays.length / 5)}` }
-        }
+            footer: { text: `On osu! Bancho | Page ${page + 1} of ${Math.ceil(plays.length / 5)}` },
+        },
     ];
 }

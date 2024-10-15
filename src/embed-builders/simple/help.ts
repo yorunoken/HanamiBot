@@ -17,21 +17,22 @@ export function helpBuilder(): Array<Embed.Structure> {
     return [
         {
             title: "Info",
-            description: "Hanami is a Discord bot written in TypeScript that aims to provide you with information and calculations of osu! plays.",
+            description:
+                "Hanami is a Discord bot written in TypeScript that aims to provide you with information and calculations of osu! plays.",
             fields: [
                 {
                     name: "Statistics",
-                    value: `**Joined servers:** \`${joinedServers}\`\n**Users linked:** \`${linkedUers}\`\n**Maps in database:** ${downloadedMaps}`
+                    value: `**Joined servers:** \`${joinedServers}\`\n**Users linked:** \`${linkedUers}\`\n**Maps in database:** ${downloadedMaps}`,
                 },
                 {
                     name: "Commands",
-                    value: `**Used prefix commands:** ${usedPrefixCommands}\n**Used application commands:** ${usedApplicationCommands}`
+                    value: `**Used prefix commands:** ${usedPrefixCommands}\n**Used application commands:** ${usedApplicationCommands}`,
                 },
                 {
                     name: "Links",
-                    value: `[Official Website](${hanamiWebsite}) | [Invite Link](${inviteLink}) | [top.gg Link](${voteLink})`
-                }
-            ]
-        }
+                    value: `[Official Website](${hanamiWebsite}) | [Invite Link](${inviteLink}) | [top.gg Link](${voteLink})`,
+                },
+            ],
+        },
     ];
 }

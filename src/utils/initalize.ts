@@ -87,10 +87,9 @@ export async function loadApplicationCommands(clnt: LilybirdClient): Promise<voi
 }
 
 export function refreshServersDatabase(): void {
-    const nulledGuilds = db.query("SELECT * FROM servers WHERE name IS NULL;").all() as Array< Guild>;
+    const nulledGuilds = db.query("SELECT * FROM servers WHERE name IS NULL;").all() as Array<Guild>;
 
-    if (nulledGuilds.length === 0)
-        return;
+    if (nulledGuilds.length === 0) return;
 
     for (let i = 0; i < nulledGuilds.length; i++) {
         const guild = nulledGuilds[i];
@@ -117,45 +116,32 @@ export async function loadLogs(message: string, error?: boolean): Promise<void> 
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
-        timeZone: "UTC"
+        timeZone: "UTC",
     }).format(date)}  |  `;
 
-    const monthNames = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December"
-    ];
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
     const year = date.getFullYear();
     const month = (date.getUTCMonth() + 1).toString().padStart(2, "0");
     const monthName = monthNames[date.getUTCMonth()];
     const day = date.getUTCDate().toString().padStart(2, "0");
 
-    if (!await exists("./logs")) {
+    if (!(await exists("./logs"))) {
         console.log("The logs folder couldn't be found❌, generating..");
         await mkdir("./logs", { recursive: true });
     }
 
-    if (!await exists(`./logs/${year}`)) {
+    if (!(await exists(`./logs/${year}`))) {
         console.log(`The year ${year} couldn't be found❌, generating..`);
         await mkdir(`./logs/${year}`, { recursive: true });
     }
 
-    if (!await exists(`./logs/${year}/${month}`)) {
+    if (!(await exists(`./logs/${year}/${month}`))) {
         console.log(`The month ${monthName}(${month}) couldn't be found❌, generating..`);
         await mkdir(`./logs/${year}/${month}`, { recursive: true });
     }
 
-    if (!await exists(`./logs/${year}/${month}/${day}.txt`)) {
+    if (!(await exists(`./logs/${year}/${month}/${day}.txt`))) {
         console.log(`The day ${day} couldn't be found ❌, generating..`);
         await writeFile(`./logs/${year}/${month}/${day}.txt`, `${formattedDate}Created log file.`);
     } else {
@@ -175,7 +161,7 @@ interface Columns {
 }
 
 export function initializeDatabase(): void {
-    const tables: Array<{ name: string, columns: Array<string> }> = [
+    const tables: Array<{ name: string; columns: Array<string> }> = [
         { name: "users", columns: ["id TEXT PRIMARY KEY", "banchoId TEXT", "score_embeds INTEGER", "mode TEXT", "embed_type TEXT"] },
         { name: "servers", columns: ["id TEXT PRIMARY KEY", "name TEXT", "owner_id TEXT", "joined_at INTEGER", "prefixes TEXT"] },
         { name: "maps", columns: ["id TEXT PRIMARY KEY", "data TEXT"] },
@@ -200,18 +186,13 @@ export function initializeDatabase(): void {
                 "count_geki INTEGER",
                 "count_katu INTEGER",
                 "map_state TEXT",
-                "ended_at TEXT"
-            ]
+                "ended_at TEXT",
+            ],
         },
         {
             name: "osu_scores_pp",
-            columns: [
-                "id INTEGER PRIMARY KEY",
-                "pp INTEGER",
-                "pp_fc INTEGER",
-                "pp_perfect INTEGER"
-            ]
-        }
+            columns: ["id INTEGER PRIMARY KEY", "pp INTEGER", "pp_fc INTEGER", "pp_perfect INTEGER"],
+        },
     ];
 
     for (let i = 0; i < tables.length; i++) {
@@ -251,4 +232,3 @@ export function initializeDatabase(): void {
 
     console.log("Database up and running!");
 }
-

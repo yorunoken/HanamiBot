@@ -6,7 +6,7 @@ import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transfo
 
 export default {
     data: { name: "unlink", description: "Unlink your osu! account from the bot." },
-    run
+    run,
 } satisfies SlashCommand;
 
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {

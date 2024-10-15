@@ -15,17 +15,17 @@ export default {
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "map",
-                description: "Specify a beatmap link (eg: https://osu.ppy.sh/b/72727)"
+                description: "Specify a beatmap link (eg: https://osu.ppy.sh/b/72727)",
             },
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "mods",
                 description: "Specify a mods combination.",
-                min_length: 2
-            }
-        ]
+                min_length: 2,
+            },
+        ],
     },
-    run
+    run,
 } satisfies SlashCommand;
 
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
@@ -33,16 +33,16 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
 
     const { user, mods } = getCommandArgs(interaction);
 
-    const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ channelId: interaction.channelId, client: interaction.client });
+    const beatmapId = user.beatmapId ?? (await getBeatmapIdFromContext({ channelId: interaction.channelId, client: interaction.client }));
     if (typeof beatmapId === "undefined" || beatmapId === null) {
         await interaction.editReply({
             embeds: [
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like the beatmap ID couldn't be found :(\n"
-                }
-            ]
+                    description: "It seems like the beatmap ID couldn't be found :(\n",
+                },
+            ],
         });
         return;
     }
@@ -51,8 +51,7 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
         type: EmbedBuilderType.MAP,
         initiatorId: interaction.member.user.id,
         beatmapId: Number(beatmapId),
-        mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null
+        mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null,
     });
     await interaction.editReply({ embeds });
 }
-

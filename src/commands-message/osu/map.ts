@@ -14,22 +14,22 @@ export default {
     description: "Display statistics of a beatmap.",
     usage: "/map",
     cooldown: 1000,
-    run
+    run,
 } satisfies MessageCommand;
 
-async function run({ message, args, channel }: { message: Message, args: Array<string>, channel: GuildTextChannel }): Promise<void> {
+async function run({ message, args, channel }: { message: Message; args: Array<string>; channel: GuildTextChannel }): Promise<void> {
     const { user, mods } = parseOsuArguments(message, args, Mode.OSU);
 
-    const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ message, client: message.client });
+    const beatmapId = user.beatmapId ?? (await getBeatmapIdFromContext({ message, client: message.client }));
     if (typeof beatmapId === "undefined" || beatmapId === null) {
         await channel.send({
             embeds: [
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like the beatmap ID couldn't be found :(\n"
-                }
-            ]
+                    description: "It seems like the beatmap ID couldn't be found :(\n",
+                },
+            ],
         });
         return;
     }
@@ -38,7 +38,7 @@ async function run({ message, args, channel }: { message: Message, args: Array<s
         type: EmbedBuilderType.MAP,
         initiatorId: message.author.id,
         beatmapId: Number(beatmapId),
-        mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null
+        mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null,
     });
     await channel.send({ embeds });
 }

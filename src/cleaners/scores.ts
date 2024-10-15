@@ -15,8 +15,19 @@ import type { ISOTimestamp } from "osu-web.js";
 //     hMiss: null | number;
 // }
 
-export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
-{ scores: Array<UserBestScore> | Array<UserScore> | Array<Score> | Array<LeaderboardScores>, beatmap?: Beatmap, index: number, mode: Mode, mapData?: string }): Promise<ScoresInfo> {
+export async function getScore({
+    scores,
+    beatmap: map_,
+    index,
+    mode,
+    mapData,
+}: {
+    scores: Array<UserBestScore> | Array<UserScore> | Array<Score> | Array<LeaderboardScores>;
+    beatmap?: Beatmap;
+    index: number;
+    mode: Mode;
+    mapData?: string;
+}): Promise<ScoresInfo> {
     const play = scores[index];
 
     let beatmap;
@@ -42,8 +53,7 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
         const beatmapIds = [];
         for (let i = index; i < scores.length; i++) {
             const score = scores[i];
-            if ("beatmap" in score)
-                beatmapIds.push(score.beatmap.id);
+            if ("beatmap" in score) beatmapIds.push(score.beatmap.id);
         }
         retries = getRetryCount(beatmapIds, play.beatmap.id);
     }
@@ -63,36 +73,49 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
             count_300: play.statistics.great ?? 0,
             count_geki: play.statistics.perfect ?? 0,
             count_katu: play.statistics.good ?? 0,
-            count_miss: play.statistics.miss ?? 0
+            count_miss: play.statistics.miss ?? 0,
         };
     }
 
-    const performance = await getPerformanceResults({ hitValues: scoreStatistics, beatmapId: beatmap.id, play, maxCombo: play.max_combo, mods: play.mods, mapData });
+    const performance = await getPerformanceResults({
+        hitValues: scoreStatistics,
+        beatmapId: beatmap.id,
+        play,
+        maxCombo: play.max_combo,
+        mods: play.mods,
+        mapData,
+    });
 
     // Throw an error if performance doesn't exist.
     // This can only mean one thing, and it's because the map couldn't be downloaded for some reason.
-    if (!performance) throw new Error("Scores.ts panicked!", { cause: "`performanece` doesn't exist, presumably because the map couldn't be downloaded." });
+    if (!performance)
+        throw new Error("Scores.ts panicked!", {
+            cause: "`performanece` doesn't exist, presumably because the map couldn't be downloaded.",
+        });
     const { fc, current, difficultyAttrs, perfect, mapValues } = performance;
 
     if (play.passed && "score" in play) {
-        insertData({
-            table: Tables.PP,
-            id: play.id,
-            data: [
-                {
-                    key: "pp",
-                    value: current.pp
-                },
-                {
-                    key: "pp_fc",
-                    value: fc.pp
-                },
-                {
-                    key: "pp_perfect",
-                    value: perfect.pp
-                }
-            ]
-        }, true);
+        insertData(
+            {
+                table: Tables.PP,
+                id: play.id,
+                data: [
+                    {
+                        key: "pp",
+                        value: current.pp,
+                    },
+                    {
+                        key: "pp_fc",
+                        value: fc.pp,
+                    },
+                    {
+                        key: "pp_perfect",
+                        value: perfect.pp,
+                    },
+                ],
+            },
+            true,
+        );
     }
 
     // We won't be needing this anymore, since osu! API now returns _null_ if the statistic key is not a part of the gamemode!
@@ -132,12 +155,12 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     let fcAccuracy: number | null = null;
 
     let fcStatistics: null | {
-        count_300?: number,
-        count_miss?: number,
-        count_100?: number,
-        count_50?: number,
-        count_geki?: number,
-        count_katu?: number
+        count_300?: number;
+        count_miss?: number;
+        count_100?: number;
+        count_50?: number;
+        count_geki?: number;
+        count_katu?: number;
     } = null;
 
     if (!isFc) {
@@ -147,7 +170,7 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
             count_50: fc.state?.n50,
             count_miss: fc.state?.misses,
             count_geki: fc.state?.nGeki,
-            count_katu: fc.state?.nKatu
+            count_katu: fc.state?.nKatu,
         };
 
         fcAccuracy = accuracyCalculator(mode, fcStatistics);
@@ -166,10 +189,11 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
     // Instead of rounding it down to 40, it would make more sense to round it to 41.
     const drainSeconds = Math.ceil(drainLengthInSeconds % 60);
 
-    const objectsHit = (scoreStatistics.count_300 ?? 0) + (scoreStatistics.count_100 ?? 0) + (scoreStatistics.count_50 ?? 0) + scoreStatistics.count_miss;
+    const objectsHit =
+        (scoreStatistics.count_300 ?? 0) + (scoreStatistics.count_100 ?? 0) + (scoreStatistics.count_50 ?? 0) + scoreStatistics.count_miss;
     const objects = mapValues.nObjects;
 
-    const percentageNum = objectsHit / objects * 100;
+    const percentageNum = (objectsHit / objects) * 100;
     const beatmapStatus = beatmapset.status;
 
     return {
@@ -205,7 +229,6 @@ export async function getScore({ scores, beatmap: map_, index, mode, mapData }:
         ifFcBathbot,
         ifFcOwo,
         comboValues: `**${playMaxCombo.toLocaleString()}**/${maxCombo.toLocaleString()}x`,
-        performance
+        performance,
     };
 }
-

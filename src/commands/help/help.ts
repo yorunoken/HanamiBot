@@ -7,7 +7,7 @@ export default {
         await interaction.deferReply();
 
         await interaction.editReply({
-            embeds: helpBuilder()
+            embeds: helpBuilder(),
         });
-    }
+    },
 } satisfies SlashCommand;

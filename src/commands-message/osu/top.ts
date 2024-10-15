@@ -24,7 +24,7 @@ const modeAliases: Record<string, { mode: Mode }> = {
     tt: { mode: Mode.TAIKO },
     tm: { mode: Mode.MANIA },
     tc: { mode: Mode.FRUITS },
-    tctb: { mode: Mode.FRUITS }
+    tctb: { mode: Mode.FRUITS },
 };
 
 export default {
@@ -34,10 +34,22 @@ export default {
     usage: `/top
     /top mode: fruits`,
     cooldown: 1000,
-    run
+    run,
 } satisfies MessageCommand;
 
-async function run({ message, args, commandName, index, channel }: { message: Message, args: Array<string>, commandName: string, index: number | undefined, channel: GuildTextChannel }): Promise<void> {
+async function run({
+    message,
+    args,
+    commandName,
+    index,
+    channel,
+}: {
+    message: Message;
+    args: Array<string>;
+    commandName: string;
+    index: number | undefined;
+    channel: GuildTextChannel;
+}): Promise<void> {
     const { mode } = modeAliases[commandName];
     const { user, mods, flags } = parseOsuArguments(message, args, mode);
     if (user.type === UserType.FAIL) {
@@ -52,9 +64,9 @@ async function run({ message, args, commandName, index, channel }: { message: Me
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`
-                }
-            ]
+                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`,
+                },
+            ],
         });
         return;
     }
@@ -69,17 +81,16 @@ async function run({ message, args, commandName, index, channel }: { message: Me
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like \`${osuUser.username}\` doesn't have any plays, maybe they should go set some :)`
-                }
-            ]
+                    description: `It seems like \`${osuUser.username}\` doesn't have any plays, maybe they should go set some :)`,
+                },
+            ],
         });
         return;
     }
 
     let page = Number(flags.p ?? flags.page) - 1 || undefined;
 
-    if (typeof page === "undefined" && typeof index === "undefined")
-        page = 0;
+    if (typeof page === "undefined" && typeof index === "undefined") page = 0;
 
     const isPage = typeof page !== "undefined";
     const totalPages = isPage ? Math.ceil(plays.length / 5) : plays.length;
@@ -95,7 +106,7 @@ async function run({ message, args, commandName, index, channel }: { message: Me
         isPage,
         index,
         mods,
-        plays
+        plays,
     };
 
     const embeds = await playBuilder(embedOptions);
@@ -106,12 +117,11 @@ async function run({ message, args, commandName, index, channel }: { message: Me
             isPage,
             disabledStates: [
                 isPage ? page === 0 : index === 0,
-                calculateButtonState(false, isPage ? page ?? 0 : index ?? 0, totalPages),
-                calculateButtonState(true, isPage ? page ?? 0 : index ?? 0, totalPages),
-                isPage ? page === totalPages - 1 : index === totalPages - 1
-            ]
-        })
+                calculateButtonState(false, isPage ? (page ?? 0) : (index ?? 0), totalPages),
+                calculateButtonState(true, isPage ? (page ?? 0) : (index ?? 0), totalPages),
+                isPage ? page === totalPages - 1 : index === totalPages - 1,
+            ],
+        }),
     });
     mesageDataForButtons.set(sentMessage.id, embedOptions);
 }
-

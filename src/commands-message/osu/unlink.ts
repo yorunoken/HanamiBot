@@ -9,5 +9,5 @@ export default {
     cooldown: 1000,
     run: async ({ message }: { message: Message }) => {
         await message.reply(`This command has been deprecated. Use ${slashCommandsIds.get("unlink")} instead.`);
-    }
+    },
 } satisfies MessageCommand;

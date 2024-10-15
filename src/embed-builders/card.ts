@@ -15,7 +15,7 @@ export async function cardBuilder({ user }: CardBuilderOptions): Promise<Message
 
     const screenshotBuffer = await page.screenshot({
         fullPage: false,
-        type: "png"
+        type: "png",
     });
 
     await page.close();
@@ -26,6 +26,6 @@ export async function cardBuilder({ user }: CardBuilderOptions): Promise<Message
     return {
         content: `User card for ${username}`,
         // @ts-expect-error TypeScript thinks blob is incorrect type but it is.
-        files: [ { file: new Blob([screenshotBuffer], { type: "image/png" }), name: `${username}.png` } ]
+        files: [{ file: new Blob([screenshotBuffer], { type: "image/png" }), name: `${username}.png` }],
     };
 }

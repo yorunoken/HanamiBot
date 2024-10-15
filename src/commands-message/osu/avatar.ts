@@ -13,10 +13,10 @@ export default {
     description: "Display the profile of a user.",
     usage: "/avatar",
     cooldown: 1000,
-    run
+    run,
 } satisfies MessageCommand;
 
-async function run({ message, args, channel }: { message: Message, args: Array<string>, channel: GuildTextChannel }): Promise<void> {
+async function run({ message, args, channel }: { message: Message; args: Array<string>; channel: GuildTextChannel }): Promise<void> {
     const { user } = parseOsuArguments(message, args, Mode.OSU);
     if (user.type === UserType.FAIL) {
         await channel.send(user.failMessage);
@@ -30,9 +30,9 @@ async function run({ message, args, channel }: { message: Message, args: Array<s
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`
-                }
-            ]
+                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`,
+                },
+            ],
         });
         return;
     }
@@ -41,8 +41,7 @@ async function run({ message, args, channel }: { message: Message, args: Array<s
     const embeds = avatarBuilder({
         type: EmbedBuilderType.AVATAR,
         initiatorId: message.author.id,
-        user: osuUser
+        user: osuUser,
     });
     await channel.send({ embeds });
 }
-

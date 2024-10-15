@@ -1,4 +1,4 @@
-type SearchResult = { option: string, distance: number };
+type SearchResult = { option: string; distance: number };
 
 export function fuzzySearch(target: string, options: Array<string>): Array<SearchResult> {
     const results: Array<SearchResult> = [];
@@ -22,10 +22,8 @@ function levenshteinDistance(a: string, b: string): number {
 
     for (let i = 1; i <= a.length; i++) {
         for (let j = 1; j <= b.length; j++) {
-            if (a[i - 1] === b[j - 1])
-                dp[i][j] = dp[i - 1][j - 1];
-            else
-                dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+            if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1];
+            else dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
         }
     }
 

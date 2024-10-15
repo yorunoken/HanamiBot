@@ -16,24 +16,29 @@ export default {
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "username",
-                description: "Specify an osu! username"
+                description: "Specify an osu! username",
             },
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "map",
-                description: "Specify a beatmap link (eg: https://osu.ppy.sh/b/72727)"
+                description: "Specify a beatmap link (eg: https://osu.ppy.sh/b/72727)",
             },
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "mode",
                 description: "Specify an osu! mode",
-                choices: [ { name: "osu", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "ctb", value: "fruits" } ]
+                choices: [
+                    { name: "osu", value: "osu" },
+                    { name: "mania", value: "mania" },
+                    { name: "taiko", value: "taiko" },
+                    { name: "ctb", value: "fruits" },
+                ],
             },
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "mods",
                 description: "Specify a mods combination.",
-                min_length: 2
+                min_length: 2,
             },
             {
                 type: ApplicationCommandOptionType.STRING,
@@ -42,32 +47,32 @@ export default {
                 choices: [
                     {
                         name: "Include",
-                        value: "include"
+                        value: "include",
                     },
                     {
                         name: "Force Include",
-                        value: "force_include"
+                        value: "force_include",
                     },
                     {
                         name: "Exclude",
-                        value: "exclude"
-                    }
-                ]
+                        value: "exclude",
+                    },
+                ],
             },
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "grade",
                 description: "Consider scores only with this grade.",
-                choices: ["SS", "S", "A", "B", "C", "D"].map((grade) => ({ name: grade, value: grade }))
+                choices: ["SS", "S", "A", "B", "C", "D"].map((grade) => ({ name: grade, value: grade })),
             },
             {
                 type: ApplicationCommandOptionType.USER,
                 name: "discord",
-                description: "Specify a linked Discord user"
-            }
-        ]
+                description: "Specify a linked Discord user",
+            },
+        ],
     },
-    run
+    run,
 } satisfies SlashCommand;
 
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
@@ -87,24 +92,24 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`
-                }
-            ]
+                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`,
+                },
+            ],
         });
         return;
     }
     const osuUser = osuUserRequest.data;
 
-    const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ channelId: interaction.channelId, client: interaction.client });
+    const beatmapId = user.beatmapId ?? (await getBeatmapIdFromContext({ channelId: interaction.channelId, client: interaction.client }));
     if (typeof beatmapId === "undefined" || beatmapId === null) {
         await interaction.editReply({
             embeds: [
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like the beatmap ID couldn't be found :(\n"
-                }
-            ]
+                    description: "It seems like the beatmap ID couldn't be found :(\n",
+                },
+            ],
         });
         return;
     }
@@ -116,9 +121,9 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like this beatmap doesn't exist! :("
-                }
-            ]
+                    description: "It seems like this beatmap doesn't exist! :(",
+                },
+            ],
         });
         return;
     }
@@ -130,16 +135,18 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like this beatmap's leaderboard doesn't exist! :("
-                }
-            ]
+                    description: "It seems like this beatmap's leaderboard doesn't exist! :(",
+                },
+            ],
         });
         return;
     }
 
-    const plays = (await client.beatmaps.getBeatmapUserScores(beatmap.id, osuUser.id, { query: { mode: user.mode } })).sort((a, b) => b.pp - a.pp).map((item, idx) => {
-        return { ...item, position: idx + 1 };
-    });
+    const plays = (await client.beatmaps.getBeatmapUserScores(beatmap.id, osuUser.id, { query: { mode: user.mode } }))
+        .sort((a, b) => b.pp - a.pp)
+        .map((item, idx) => {
+            return { ...item, position: idx + 1 };
+        });
 
     if (plays.length === 0) {
         await interaction.editReply({
@@ -147,9 +154,9 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like \`${osuUser.username}\` has no plays on that beatmap!`
-                }
-            ]
+                    description: `It seems like \`${osuUser.username}\` has no plays on that beatmap!`,
+                },
+            ],
         });
         return;
     }
@@ -161,7 +168,7 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
         user: osuUser,
         beatmap,
         plays,
-        mods
+        mods,
     });
     await interaction.editReply({ embeds });
 }

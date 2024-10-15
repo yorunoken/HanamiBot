@@ -9,5 +9,5 @@ export default {
     cooldown: 1000,
     run: async ({ message, args }) => {
         await message.reply({ embeds: commandBuilder(args[0]) });
-    }
+    },
 } satisfies MessageCommand;

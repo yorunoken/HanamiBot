@@ -20,33 +20,38 @@ export default {
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "username",
-                description: "Specify an osu! username"
+                description: "Specify an osu! username",
             },
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "mode",
                 description: "Specify an osu! mode",
-                choices: [ { name: "osu", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "ctb", value: "fruits" } ]
+                choices: [
+                    { name: "osu", value: "osu" },
+                    { name: "mania", value: "mania" },
+                    { name: "taiko", value: "taiko" },
+                    { name: "ctb", value: "fruits" },
+                ],
             },
             {
                 type: ApplicationCommandOptionType.INTEGER,
                 name: "index",
                 description: "Specify an index, defaults to 1.",
                 min_value: 1,
-                max_value: 100
+                max_value: 100,
             },
             {
                 type: ApplicationCommandOptionType.INTEGER,
                 name: "page",
                 description: "Specify a page, defaults to 1.",
                 min_value: 1,
-                max_value: 20
+                max_value: 20,
             },
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "mods",
                 description: "Specify a mods combination.",
-                min_length: 2
+                min_length: 2,
             },
             {
                 type: ApplicationCommandOptionType.STRING,
@@ -55,37 +60,37 @@ export default {
                 choices: [
                     {
                         name: "Include",
-                        value: "include"
+                        value: "include",
                     },
                     {
                         name: "Force Include",
-                        value: "force_include"
+                        value: "force_include",
                     },
                     {
                         name: "Exclude",
-                        value: "exclude"
-                    }
-                ]
+                        value: "exclude",
+                    },
+                ],
             },
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "grade",
                 description: "Consider scores only with this grade.",
-                choices: ["SS", "S", "A", "B", "C", "D"].map((grade) => ({ name: grade, value: grade }))
+                choices: ["SS", "S", "A", "B", "C", "D"].map((grade) => ({ name: grade, value: grade })),
             },
             {
                 type: ApplicationCommandOptionType.BOOLEAN,
                 name: "passes",
-                description: "Whether or not only passes should be considered."
+                description: "Whether or not only passes should be considered.",
             },
             {
                 type: ApplicationCommandOptionType.USER,
                 name: "discord",
-                description: "Specify a linked Discord user"
-            }
-        ]
+                description: "Specify a linked Discord user",
+            },
+        ],
     },
-    run
+    run,
 } satisfies SlashCommand;
 
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
@@ -97,14 +102,11 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
     let index = interaction.data.getInteger("index");
     let page = interaction.data.getInteger("page");
 
-    if (typeof page === "undefined" && typeof index === "undefined")
-        page = 1;
+    if (typeof page === "undefined" && typeof index === "undefined") page = 1;
 
-    if (page)
-        page -= 1;
+    if (page) page -= 1;
 
-    if (index)
-        index -= 1;
+    if (index) index -= 1;
 
     const mod = interaction.data.getString("mods") as Mod;
     const modsAction = interaction.data.getString("mods_action");
@@ -112,11 +114,14 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
     const mods = { exclude: false, forceInclude: false, include: false, name: mod };
     switch (modsAction) {
         case "include":
-            mods.include = true; break;
+            mods.include = true;
+            break;
         case "force_include":
-            mods.forceInclude = true; break;
+            mods.forceInclude = true;
+            break;
         case "exclude":
-            mods.exclude = true; break;
+            mods.exclude = true;
+            break;
         default:
             mods.include = true;
     }
@@ -133,15 +138,19 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`
-                }
-            ]
+                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`,
+                },
+            ],
         });
         return;
     }
     const osuUser = osuUserRequest.data;
 
-    const plays = (await client.users.getUserScores(osuUser.id, PlayType.RECENT, { query: { mode: user.mode, limit: 100, include_fails: includeFails } })).map((item, idx) => {
+    const plays = (
+        await client.users.getUserScores(osuUser.id, PlayType.RECENT, {
+            query: { mode: user.mode, limit: 100, include_fails: includeFails },
+        })
+    ).map((item, idx) => {
         return { ...item, position: idx + 1 };
     });
 
@@ -151,9 +160,9 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like \`${osuUser.username}\` hasn't had any recent plays in the last 24 hours!`
-                }
-            ]
+                    description: `It seems like \`${osuUser.username}\` hasn't had any recent plays in the last 24 hours!`,
+                },
+            ],
         });
         return;
     }
@@ -171,7 +180,7 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
         page,
         index,
         isPage,
-        plays
+        plays,
     };
 
     const embeds = await playBuilder(embedOptions);
@@ -186,9 +195,9 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
                 isPage ? page === 0 : index === 0,
                 calculateButtonState(false, index ?? 0, totalPages),
                 calculateButtonState(true, index ?? 0, totalPages),
-                isPage ? page === totalPages - 1 : index === totalPages - 1
-            ]
-        })
+                isPage ? page === totalPages - 1 : index === totalPages - 1,
+            ],
+        }),
     });
 
     mesageDataForButtons.set(sentInteraction.id, embedOptions);

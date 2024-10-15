@@ -20,27 +20,30 @@ export default {
                 type: ApplicationCommandOptionType.STRING,
                 name: "type",
                 description: "The type of the leaderboard.",
-                choices: [ { name: "Global Leaderboard", value: "global" }, { name: "Turkish Leaderboard", value: "country" } ]
+                choices: [
+                    { name: "Global Leaderboard", value: "global" },
+                    { name: "Turkish Leaderboard", value: "country" },
+                ],
             },
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "map",
-                description: "Specify a beatmap link (eg: https://osu.ppy.sh/b/72727)"
+                description: "Specify a beatmap link (eg: https://osu.ppy.sh/b/72727)",
             },
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "mods",
                 description: "Specify a mods combination.",
-                min_length: 2
+                min_length: 2,
             },
             {
                 type: ApplicationCommandOptionType.NUMBER,
                 name: "page",
-                description: "Specify a page."
-            }
-        ]
+                description: "Specify a page.",
+            },
+        ],
     },
-    run
+    run,
 } satisfies SlashCommand;
 
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
@@ -48,16 +51,16 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
 
     const { user, mods } = getCommandArgs(interaction);
 
-    const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ channelId: interaction.channelId, client: interaction.client });
+    const beatmapId = user.beatmapId ?? (await getBeatmapIdFromContext({ channelId: interaction.channelId, client: interaction.client }));
     if (typeof beatmapId === "undefined" || beatmapId === null) {
         await interaction.editReply({
             embeds: [
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like the beatmap ID couldn't be found :(\n"
-                }
-            ]
+                    description: "It seems like the beatmap ID couldn't be found :(\n",
+                },
+            ],
         });
         return;
     }
@@ -69,9 +72,9 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like this beatmap doesn't exist! :("
-                }
-            ]
+                    description: "It seems like this beatmap doesn't exist! :(",
+                },
+            ],
         });
         return;
     }
@@ -83,24 +86,29 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like this beatmap's leaderboard doesn't exist! :("
-                }
-            ]
+                    description: "It seems like this beatmap's leaderboard doesn't exist! :(",
+                },
+            ],
         });
         return;
     }
 
     const isGlobal = (interaction.data.getString("type") ?? "global") === "global";
-    const { scores } = await getBeatmapTopScores({ beatmapId: Number(beatmapId), mode: beatmap.mode, isGlobal, mods: mods.name ? <Array<Mod>>mods.name.match(/.{1,2}/g) : undefined });
+    const { scores } = await getBeatmapTopScores({
+        beatmapId: Number(beatmapId),
+        mode: beatmap.mode,
+        isGlobal,
+        mods: mods.name ? <Array<Mod>>mods.name.match(/.{1,2}/g) : undefined,
+    });
     if (scores.length === 0) {
         await interaction.editReply({
             embeds: [
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like this beatmap's leaderboard doesn't exist! :("
-                }
-            ]
+                    description: "It seems like this beatmap's leaderboard doesn't exist! :(",
+                },
+            ],
         });
         return;
     }
@@ -113,7 +121,7 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
         initiatorId: interaction.member.user.id,
         page,
         beatmap,
-        scores
+        scores,
     };
 
     const embeds = await leaderboardBuilder(embedOptions);
@@ -126,9 +134,9 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
                 page === 0,
                 calculateButtonState(false, page, totalPages),
                 calculateButtonState(true, page, totalPages),
-                page === totalPages - 1
-            ]
-        })
+                page === totalPages - 1,
+            ],
+        }),
     });
 
     // ??

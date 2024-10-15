@@ -6,10 +6,21 @@ import { ApplicationCommandOptionType, EmbedType, PermissionFlags } from "lilybi
 import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
 import type { SlashCommand } from "@type/commands";
 
-const commands: Record<string, ({ prefix, interaction, guildId }: { prefix?: string, interaction: GuildInteraction<ApplicationCommandData>, guildId: string }) => Promise<void>> = {
+const commands: Record<
+    string,
+    ({
+        prefix,
+        interaction,
+        guildId,
+    }: {
+        prefix?: string;
+        interaction: GuildInteraction<ApplicationCommandData>;
+        guildId: string;
+    }) => Promise<void>
+> = {
     add,
     remove,
-    list
+    list,
 };
 
 const PermissionNames: Record<number, string> = {};
@@ -30,22 +41,22 @@ export default {
                 type: ApplicationCommandOptionType.SUB_COMMAND,
                 name: "add",
                 description: "Add a prefix",
-                options: [ { name: "prefix", description: "The prefix", type: ApplicationCommandOptionType.STRING, required: true } ]
+                options: [{ name: "prefix", description: "The prefix", type: ApplicationCommandOptionType.STRING, required: true }],
             },
             {
                 type: ApplicationCommandOptionType.SUB_COMMAND,
                 name: "remove",
                 description: "Remove a prefix",
-                options: [ { name: "prefix", description: "The prefix", type: ApplicationCommandOptionType.STRING, required: true } ]
+                options: [{ name: "prefix", description: "The prefix", type: ApplicationCommandOptionType.STRING, required: true }],
             },
             {
                 type: ApplicationCommandOptionType.SUB_COMMAND,
                 name: "list",
-                description: "Get a list of the current prefixes"
-            }
-        ]
+                description: "Get a list of the current prefixes",
+            },
+        ],
     },
-    run
+    run,
 } satisfies SlashCommand;
 
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
@@ -71,41 +82,58 @@ async function checkForPermissions(interaction: GuildInteraction<ApplicationComm
     }
 }
 
-async function add({ prefix, interaction, guildId }: { prefix?: string, interaction: GuildInteraction<ApplicationCommandData>, guildId: string }): Promise<void> {
+async function add({
+    prefix,
+    interaction,
+    guildId,
+}: {
+    prefix?: string;
+    interaction: GuildInteraction<ApplicationCommandData>;
+    guildId: string;
+}): Promise<void> {
     const checkPerms = await checkForPermissions(interaction);
-    if (checkPerms === false)
-        return;
+    if (checkPerms === false) return;
 
     const guild = getEntry(Tables.GUILD, guildId);
     if (typeof prefix === "undefined" || guild === null) return;
     let { prefixes } = guild;
 
-    if (prefixes !== null && !Array.isArray(prefixes))
-        prefixes = JSON.parse(prefixes) as Array<string>;
+    if (prefixes !== null && !Array.isArray(prefixes)) prefixes = JSON.parse(prefixes) as Array<string>;
 
     if (prefixes && prefixes.length > MAX_AMOUNT_OF_PREFIXES) {
-        await interaction.editReply(`**The maximum amount of prefixes allowed is \`${MAX_AMOUNT_OF_PREFIXES}\`. You can remove a prefix using \`/prefix remove\`**`);
+        await interaction.editReply(
+            `**The maximum amount of prefixes allowed is \`${MAX_AMOUNT_OF_PREFIXES}\`. You can remove a prefix using \`/prefix remove\`**`,
+        );
         return;
     }
 
     if (prefixes?.some((pref) => pref === prefix)) {
-        await interaction.editReply(`**The prefix \`${prefix}\` is already in the prefixes list. You can look at current prefixes by using \`/prefix list\`**`);
+        await interaction.editReply(
+            `**The prefix \`${prefix}\` is already in the prefixes list. You can look at current prefixes by using \`/prefix list\`**`,
+        );
         return;
     }
 
     const newPrefixes = prefixes === null ? [prefix] : [...prefixes, prefix];
 
-    insertData({ table: Tables.GUILD, id: guildId, data: [ { key: "prefixes", value: JSON.stringify(newPrefixes) } ] });
+    insertData({ table: Tables.GUILD, id: guildId, data: [{ key: "prefixes", value: JSON.stringify(newPrefixes) }] });
     prefixesCache.set(guildId, newPrefixes);
 
     await interaction.editReply(`**The prefix \`${prefix}\` has been added to the list.**`);
     return;
 }
 
-async function remove({ prefix, interaction, guildId }: { prefix?: string, interaction: GuildInteraction<ApplicationCommandData>, guildId: string }): Promise<void> {
+async function remove({
+    prefix,
+    interaction,
+    guildId,
+}: {
+    prefix?: string;
+    interaction: GuildInteraction<ApplicationCommandData>;
+    guildId: string;
+}): Promise<void> {
     const checkPerms = await checkForPermissions(interaction);
-    if (checkPerms === false)
-        return;
+    if (checkPerms === false) return;
 
     const guild = getEntry(Tables.GUILD, guildId);
     if (typeof prefix === "undefined" || guild === null) return;
@@ -117,12 +145,18 @@ async function remove({ prefix, interaction, guildId }: { prefix?: string, inter
     }
 
     if (!prefixes.some((pref) => pref === prefix)) {
-        await interaction.editReply(`**The prefix \`${prefix}\` is not in the prefixes list. You can look at current prefixes by using \`/prefix list\`**`);
+        await interaction.editReply(
+            `**The prefix \`${prefix}\` is not in the prefixes list. You can look at current prefixes by using \`/prefix list\`**`,
+        );
         return;
     }
 
     const newPrefixes = prefixes.filter((item) => item !== prefix);
-    insertData({ table: Tables.GUILD, id: guildId, data: [ { key: "prefixes", value: newPrefixes.length > 0 ? JSON.stringify(newPrefixes) : null } ] });
+    insertData({
+        table: Tables.GUILD,
+        id: guildId,
+        data: [{ key: "prefixes", value: newPrefixes.length > 0 ? JSON.stringify(newPrefixes) : null }],
+    });
     prefixesCache.set(guildId, newPrefixes.length > 0 ? newPrefixes : DEFAULT_PREFIX);
 
     let message = `**The prefix \`${prefix}\` has been removed from the list.**`;
@@ -133,7 +167,7 @@ async function remove({ prefix, interaction, guildId }: { prefix?: string, inter
     return;
 }
 
-async function list({ interaction, guildId }: { interaction: GuildInteraction<ApplicationCommandData>, guildId: string }): Promise<void> {
+async function list({ interaction, guildId }: { interaction: GuildInteraction<ApplicationCommandData>; guildId: string }): Promise<void> {
     const guild = getEntry(Tables.GUILD, guildId);
     if (guild === null) return;
 
@@ -144,5 +178,7 @@ async function list({ interaction, guildId }: { interaction: GuildInteraction<Ap
         return;
     }
 
-    await interaction.editReply({ embeds: [ { type: EmbedType.Rich, title: "Currently defined prefixes", description: `**\`${prefixes.join("`**, `")}\`**` } ] });
+    await interaction.editReply({
+        embeds: [{ type: EmbedType.Rich, title: "Currently defined prefixes", description: `**\`${prefixes.join("`**, `")}\`**` }],
+    });
 }

@@ -12,5 +12,5 @@ export default {
     cooldown: 1000,
     run: async ({ message }) => {
         await message.reply(`This command has been deprecated. Use ${slashCommandsIds.get("prefix")} instead.`);
-    }
+    },
 } satisfies MessageCommand;

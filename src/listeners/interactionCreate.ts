@@ -12,7 +12,7 @@ import type { Event } from "@lilybird/handlers";
 
 export default {
     event: "interactionCreate",
-    run
+    run,
 } satisfies Event<"interactionCreate">;
 
 async function run(interaction: Interaction): Promise<void> {
@@ -27,19 +27,21 @@ async function run(interaction: Interaction): Promise<void> {
         try {
             await command.run(interaction);
             const guild = await interaction.client.rest.getGuild(interaction.guildId);
-            await loadLogs(`INFO: [${guild.name}] ${user.username} used slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}`);
+            await loadLogs(
+                `INFO: [${guild.name}] ${user.username} used slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}`,
+            );
 
             const docs = getEntry(Tables.COMMAND_SLASH, interaction.data.name);
-            if (docs === null)
-                insertData({ table: Tables.COMMAND_SLASH, data: [ { key: "count", value: 1 } ], id: command.data.name });
-            else
-                insertData({ table: Tables.COMMAND_SLASH, data: [ { key: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
+            if (docs === null) insertData({ table: Tables.COMMAND_SLASH, data: [{ key: "count", value: 1 }], id: command.data.name });
+            else insertData({ table: Tables.COMMAND_SLASH, data: [{ key: "count", value: Number(docs.count ?? 0) + 1 }], id: docs.id });
         } catch (error) {
             const err = error as Error;
 
             const guild = await interaction.client.rest.getGuild(interaction.guildId);
 
-            await interaction.reply(`Oops, you came across an error!\nHere's a summary of it:\n\`\`\`${err.stack}\`\`\`\nDon't worry, the same error log has been sent to the owner of this bot.`);
+            await interaction.reply(
+                `Oops, you came across an error!\nHere's a summary of it:\n\`\`\`${err.stack}\`\`\`\nDon't worry, the same error log has been sent to the owner of this bot.`,
+            );
 
             await interaction.client.rest.createMessage(interaction.channelId, {
                 content: `<@${process.env.OWNER_ID}> STACK ERROR, GET YOUR ASS TO WORK`,
@@ -50,32 +52,30 @@ async function run(interaction: Interaction): Promise<void> {
                         fields: [
                             {
                                 name: "User",
-                                value: `<@${user.id}> (${user.username})`
+                                value: `<@${user.id}> (${user.username})`,
                             },
                             {
                                 name: "Guild",
-                                value: `[${guild.name}](https://discord.com/channels/${interaction.guildId}/${interaction.channelId})`
+                                value: `[${guild.name}](https://discord.com/channels/${interaction.guildId}/${interaction.channelId})`,
                             },
                             {
                                 name: "Error",
-                                value: err.stack ?? "undefined (look at logs)"
-                            }
-                        ]
-                    }
-                ]
+                                value: err.stack ?? "undefined (look at logs)",
+                            },
+                        ],
+                    },
+                ],
             });
 
             console.error(error);
             await loadLogs(
                 `ERROR: [${guild.name}] ${user.username} had an error in slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}: ${err.stack}`,
-                true
+                true,
             );
 
             const docs = getEntry(Tables.COMMAND_SLASH, interaction.data.name);
-            if (docs === null)
-                insertData({ table: Tables.COMMAND_SLASH, data: [ { key: "count", value: 1 } ], id: command.data.name });
-            else
-                insertData({ table: Tables.COMMAND_SLASH, data: [ { key: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
+            if (docs === null) insertData({ table: Tables.COMMAND_SLASH, data: [{ key: "count", value: 1 }], id: command.data.name });
+            else insertData({ table: Tables.COMMAND_SLASH, data: [{ key: "count", value: Number(docs.count ?? 0) + 1 }], id: docs.id });
         }
     }
 }
@@ -87,12 +87,18 @@ async function handleButton(interaction: Interaction): Promise<void> {
 
     const builderOptions = mesageDataForButtons.get(interaction.message.id);
     if (typeof builderOptions === "undefined") {
-        await interaction.reply({ ephemeral: true, content: "This button will not work because the message was created before a bot restart, so its data has been lost." });
+        await interaction.reply({
+            ephemeral: true,
+            content: "This button will not work because the message was created before a bot restart, so its data has been lost.",
+        });
         return;
     }
 
     if (builderOptions.initiatorId !== interaction.member.user.id) {
-        await interaction.reply({ ephemeral: true, content: "You need to be the person who initialized the command to be able to click the buttons." });
+        await interaction.reply({
+            ephemeral: true,
+            content: "You need to be the person who initialized the command to be able to click the buttons.",
+        });
         return;
     }
 
@@ -124,10 +130,8 @@ async function handleButton(interaction: Interaction): Promise<void> {
             } else if (isDecrementPage) {
                 builderOptions.page ??= 0;
                 builderOptions.page -= 1;
-            } else if (isMaxPage)
-                builderOptions.page = Math.ceil(builderOptions.scores.length / 5) - 1;
-            else if (isMinPage)
-                builderOptions.page = 0;
+            } else if (isMaxPage) builderOptions.page = Math.ceil(builderOptions.scores.length / 5) - 1;
+            else if (isMinPage) builderOptions.page = 0;
 
             const totalPage = builderOptions.scores.length;
 
@@ -137,8 +141,8 @@ async function handleButton(interaction: Interaction): Promise<void> {
                     (builderOptions.page ?? 0) === 0,
                     calculateButtonState(false, builderOptions.page ?? 0, totalPage),
                     calculateButtonState(true, builderOptions.page ?? 0, totalPage),
-                    (builderOptions.page ?? 0) * 5 + 5 === totalPage
-                ]
+                    (builderOptions.page ?? 0) * 5 + 5 === totalPage,
+                ],
             });
 
             options.embeds = await leaderboardBuilder(builderOptions);
@@ -157,12 +161,10 @@ async function handleButton(interaction: Interaction): Promise<void> {
                 builderOptions.index ??= 0;
                 builderOptions.index -= 1;
             } else if (isMaxPage || isMaxIndex) {
-                if (builderOptions.isPage === true)
-                    builderOptions.page = Math.ceil(builderOptions.plays.length / 5) - 1;
+                if (builderOptions.isPage === true) builderOptions.page = Math.ceil(builderOptions.plays.length / 5) - 1;
                 else builderOptions.index = Math.ceil(builderOptions.plays.length) - 1;
             } else if (isMinPage || isMinIndex) {
-                if (builderOptions.isPage === true)
-                    builderOptions.page = 0;
+                if (builderOptions.isPage === true) builderOptions.page = 0;
                 else builderOptions.index = 0;
             }
 
@@ -174,8 +176,8 @@ async function handleButton(interaction: Interaction): Promise<void> {
                         (builderOptions.page ?? 0) === 0,
                         calculateButtonState(false, builderOptions.page ?? 0, totalPages),
                         calculateButtonState(true, builderOptions.page ?? 0, totalPages),
-                        (builderOptions.page ?? 0) === totalPages - 1
-                    ]
+                        (builderOptions.page ?? 0) === totalPages - 1,
+                    ],
                 });
             } else {
                 const totalPages = Math.ceil(builderOptions.plays.length);
@@ -185,8 +187,8 @@ async function handleButton(interaction: Interaction): Promise<void> {
                         (builderOptions.index ?? 0) === 0,
                         calculateButtonState(false, builderOptions.index ?? 0, totalPages),
                         calculateButtonState(true, builderOptions.index ?? 0, totalPages),
-                        (builderOptions.index ?? 0) === totalPages - 1
-                    ]
+                        (builderOptions.index ?? 0) === totalPages - 1,
+                    ],
                 });
             }
 
@@ -222,19 +224,24 @@ async function handleVerify(interaction: DMInteraction<MessageComponentData, Mes
         return;
     }
 
-    insertData({ table: Tables.USER, id: discordId, data: [ { key: "banchoId", value: osuId } ] });
+    insertData({ table: Tables.USER, id: discordId, data: [{ key: "banchoId", value: osuId }] });
 
     const embed: Embed.Structure = {
         title: "Success!",
         description: `Successfully linked <@${discordId}> with ${osuUser.username}`,
-        thumbnail: { url: osuUser.avatar_url }
+        thumbnail: { url: osuUser.avatar_url },
     };
 
-    interaction.editReply({ embeds: [embed], components: [] }).then(async () => {
-        await loadLogs(`INFO: [Private Messages] ${username} linked their osu! account, \`${osuId}\``);
-    }).catch(async (error: Error) => {
-        console.log(error);
-        await loadLogs(`ERROR: [Private Messages] ${username} had an error while linking their osu! account, \`${discordId}\`: ${error.stack}`, true);
-    });
+    interaction
+        .editReply({ embeds: [embed], components: [] })
+        .then(async () => {
+            await loadLogs(`INFO: [Private Messages] ${username} linked their osu! account, \`${osuId}\``);
+        })
+        .catch(async (error: Error) => {
+            console.log(error);
+            await loadLogs(
+                `ERROR: [Private Messages] ${username} had an error while linking their osu! account, \`${discordId}\`: ${error.stack}`,
+                true,
+            );
+        });
 }
-

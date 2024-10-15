@@ -1,18 +1,30 @@
 import type { Mod } from "./mods";
-import type { UserScore as UserScore_, Beatmapset, Score as Score_, Fails, Beatmap as BeatmapWeb, Country, Cover, UserCompact, Rank, ISOTimestamp, UserBestScore as UserBestScore_ } from "osu-web.js";
+import type {
+    UserScore as UserScore_,
+    Beatmapset,
+    Score as Score_,
+    Fails,
+    Beatmap as BeatmapWeb,
+    Country,
+    Cover,
+    UserCompact,
+    Rank,
+    ISOTimestamp,
+    UserBestScore as UserBestScore_,
+} from "osu-web.js";
 import type { Beatmap as BeatmapRosu, BeatmapAttributes, PerformanceAttributes } from "rosu-pp-js";
 
 export const enum Mode {
     OSU = "osu",
     MANIA = "mania",
     TAIKO = "taiko",
-    FRUITS = "fruits"
+    FRUITS = "fruits",
 }
 
 export const enum PlayType {
     BEST = "best",
     RECENT = "recent",
-    FIRSTS = "firsts"
+    FIRSTS = "firsts",
 }
 
 export interface ProfileInfo {
@@ -117,17 +129,17 @@ export interface LeaderboardScore {
     ranked: boolean;
     preserve: boolean;
     maximum_statistics: {
-        great: number,
-        legacy_combo_increase: number
+        great: number;
+        legacy_combo_increase: number;
     };
     mods: Array<Mod>;
     statistics: {
-        ok?: number,
-        great?: number,
-        meh?: number,
-        miss?: number,
-        perfect?: number,
-        good?: number
+        ok?: number;
+        great?: number;
+        meh?: number;
+        miss?: number;
+        perfect?: number;
+        good?: number;
     };
     beatmap_id: number;
     best_id: number | null;
@@ -151,25 +163,24 @@ export interface LeaderboardScore {
     total_score: number;
     replay: boolean;
     current_user_attributes: {
-        pin: number | null
+        pin: number | null;
     } | null;
-
 }
 
 export type Beatmap = BeatmapWeb & {
     beatmapset: Beatmapset & {
-        ratings: Array<number>
-    },
-    checksum: string | null,
-    failtimes: Fails,
-    max_combo: number
+        ratings: Array<number>;
+    };
+    checksum: string | null;
+    failtimes: Fails;
+    max_combo: number;
 };
 
 export type LeaderboardScores = LeaderboardScore & {
     user: UserCompact & {
-        country: Country,
-        cover: Cover
-    }
+        country: Country;
+        cover: Cover;
+    };
 };
 
 export interface LeaderboardScoresRaw {

@@ -33,13 +33,12 @@ process.on("uncaughtException", async (error: Error) => {
 
 initializeDatabase();
 
-if (process.env.DEV !== "1")
-    await writeFile("/root/users_cache.txt", "");
+if (process.env.DEV !== "1") await writeFile("/root/users_cache.txt", "");
 
 const listeners = await createHandler({
     dirs: {
-        listeners: `${import.meta.dir}/listeners`
-    }
+        listeners: `${import.meta.dir}/listeners`,
+    },
 });
 
 await createClient({
@@ -48,14 +47,8 @@ await createClient({
         transformerTypes: { channel: Channel, guild: Guild, voiceState: GuildVoiceChannel },
         delegate: CachingDelegationType.DEFAULT,
         applyTransformers: true,
-        enabled: { channel: true }
+        enabled: { channel: true },
     },
-    intents: [
-        Intents.GUILDS,
-        Intents.GUILD_MESSAGES,
-        Intents.MESSAGE_CONTENT,
-        Intents.GUILD_MEMBERS
-    ],
-    ...listeners
+    intents: [Intents.GUILDS, Intents.GUILD_MESSAGES, Intents.MESSAGE_CONTENT, Intents.GUILD_MEMBERS],
+    ...listeners,
 });
-
