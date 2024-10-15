@@ -1,11 +1,5 @@
 {
-    "ignorePatterns": [
-        "*.js",
-        "*.d.ts",
-        "*.json",
-        "dist/",
-        "node_modules/**/*"
-    ],
+    "ignorePatterns": ["*.js", "*.d.ts", "*.json", "dist/", "node_modules/**/*"],
     "root": true,
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -197,7 +191,6 @@
         "@typescript-eslint/prefer-optional-chain": "error",
         "@typescript-eslint/prefer-readonly": "warn",
         "@typescript-eslint/prefer-reduce-type-parameter": "warn",
-        "@typescript-eslint/prefer-regexp-exec": "warn",
         "@typescript-eslint/prefer-return-this-type": "warn",
         "@typescript-eslint/prefer-string-starts-ends-with": "warn",
         "@typescript-eslint/prefer-ts-expect-error": "warn",
@@ -303,11 +296,7 @@
         "@typescript-eslint/no-empty-function": [
             "error",
             {
-                "allow": [
-                    "private-constructors",
-                    "protected-constructors",
-                    "decoratedFunctions"
-                ]
+                "allow": ["private-constructors", "protected-constructors", "decoratedFunctions"]
             }
         ],
         "@typescript-eslint/no-empty-interface": [
@@ -446,13 +435,6 @@
         "@stylistic/function-call-argument-newline": ["warn", "consistent"],
         "@stylistic/function-paren-newline": ["warn", "multiline"],
         "@stylistic/generator-star-spacing": ["warn", "after"],
-        "@stylistic/indent": [
-            "warn",
-            4,
-            {
-                "SwitchCase": 1
-            }
-        ],
         // "@stylistic/indent-binary-ops": [
         //     "warn",
         //     4
@@ -613,16 +595,7 @@
         "import/order": [
             "warn",
             {
-                "groups": [
-                    "index",
-                    "parent",
-                    "sibling",
-                    "internal",
-                    "external",
-                    "builtin",
-                    "object",
-                    "type"
-                ]
+                "groups": ["index", "parent", "sibling", "internal", "external", "builtin", "object", "type"]
             }
         ]
         // #endregion Import

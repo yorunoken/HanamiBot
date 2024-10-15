@@ -123,9 +123,7 @@ export function getCommandArgs(interaction: GuildInteraction<ApplicationCommandD
                   type: UserType.FAIL,
                   beatmapId,
                   authorDb: userAuthor,
-                  failMessage: discordUserId
-                      ? `The user <@${discordUserId}> hasn't linked their account to the bot yet!`
-                      : `Please link your account to the bot using ${linkCommand()}!`,
+                  failMessage: discordUserId ? `The user <@${discordUserId}> hasn't linked their account to the bot yet!` : `Please link your account to the bot using ${linkCommand()}!`,
               }
         : userArg
           ? { type: UserType.SUCCESS, banchoId: userArg, mode, beatmapId, authorDb: userAuthor }
@@ -183,10 +181,10 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
         }
 
         const [key, value] = arg.split("=");
-        const [, modType, mod, force] = /^([+-])([A-Za-z]+)(!)?$/.exec(arg) ?? [];
+        const [, modType, mod, force] = arg.match(/^([+-])([A-Za-z]+)(!)?$/) ?? [];
 
         if (mod) {
-            const modSections = /.{1,2}/g.exec(mod);
+            const modSections = mod.match(/.{1,2}/g);
 
             // Make sure `mod` is an actual mod in osu!
             if (modSections && !modSections.every((selectedMod) => selectedMod.toUpperCase() in ModsEnum || mod.toUpperCase() === "NM")) continue;
@@ -223,7 +221,7 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
     } else if (result.tempUser) {
         const [userArg] = result.tempUser;
 
-        const discordUserId = /<@(\d+)>/.exec(userArg)?.[1];
+        const discordUserId = userArg.match(/<@(\d+)>/)?.[1];
         const discordUser = discordUserId ? getEntry(Tables.USER, discordUserId) : null;
         const discordId = discordUserId ? discordUser?.banchoId : null;
 
