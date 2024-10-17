@@ -389,7 +389,7 @@
         "@stylistic/linebreak-style": "warn",
         "@stylistic/new-parens": "warn",
         "@stylistic/no-confusing-arrow": "warn",
-        "@stylistic/no-extra-parens": "warn",
+        // "@stylistic/no-extra-parens": "warn",
         "@stylistic/no-extra-semi": "warn",
         "@stylistic/no-floating-decimal": "warn",
         //   "@stylistic/no-mixed-operators": "warn",
@@ -416,13 +416,6 @@
                 "multiline": true
             }
         ],
-        "@stylistic/array-bracket-spacing": [
-            "warn",
-            "never",
-            {
-                "objectsInArrays": true
-            }
-        ],
         "@stylistic/array-element-newline": ["warn", "consistent"],
         "@stylistic/brace-style": [
             "warn",
@@ -433,7 +426,6 @@
         ],
         "@stylistic/dot-location": ["warn", "property"],
         "@stylistic/function-call-argument-newline": ["warn", "consistent"],
-        "@stylistic/function-paren-newline": ["warn", "multiline"],
         "@stylistic/generator-star-spacing": ["warn", "after"],
         // "@stylistic/indent-binary-ops": [
         //     "warn",
@@ -468,14 +460,6 @@
         "@stylistic/member-delimiter-style": [
             "warn",
             {
-                "multiline": {
-                    "delimiter": "comma",
-                    "requireLast": false
-                },
-                "singleline": {
-                    "delimiter": "comma",
-                    "requireLast": false
-                },
                 "overrides": {
                     "interface": {
                         "multiline": {
@@ -527,17 +511,6 @@
             "warn",
             {
                 "allowAllPropertiesOnSameLine": true
-            }
-        ],
-        "@stylistic/operator-linebreak": [
-            "warn",
-            "none",
-            {
-                "overrides": {
-                    "?": "ignore",
-                    ":": "ignore",
-                    "||": "before"
-                }
             }
         ],
         "@stylistic/padded-blocks": ["warn", "never"],

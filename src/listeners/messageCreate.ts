@@ -45,14 +45,7 @@ async function run(message: Message): Promise<void> {
             return;
         }
 
-        if (
-            content === "727" ||
-            content === "7,27" ||
-            content === "72,7" ||
-            content === "72.7" ||
-            content === "7.27" ||
-            content.toLowerCase() === "wysi"
-        ) {
+        if (content === "727" || content === "7,27" || content === "72,7" || content === "72.7" || content === "7.27" || content.toLowerCase() === "wysi") {
             await message.react("wysia:1240624238189088869", true);
             return;
         }
@@ -64,7 +57,7 @@ async function run(message: Message): Promise<void> {
     if (typeof commandName === "undefined") return;
 
     let index: number | undefined;
-    const match = /(\D+)(\d+)/.exec(commandName);
+    const match = commandName.match(/(\D+)(\d+)/);
     if (match) {
         const [, extractedCommandName, extractedNumber] = match;
         commandName = extractedCommandName;
@@ -119,10 +112,9 @@ async function run(message: Message): Promise<void> {
     } catch (error) {
         const err = error as Error;
 
-        await message.reply(
-            `Oops, you came across an error!\nHere's a summary of it:\n\`\`\`${err.stack}\`\`\`\nDon't worry, the same error log has been sent to the owner of this bot.`,
-            { allowed_mentions: { replied_user: false, parse: [], roles: [], users: [] } },
-        );
+        await message.reply(`Oops, you came across an error!\nHere's a summary of it:\n\`\`\`${err.stack}\`\`\`\nDon't worry, the same error log has been sent to the owner of this bot.`, {
+            allowed_mentions: { replied_user: false, parse: [], roles: [], users: [] },
+        });
 
         const guild = await client.rest.getGuild(guildId);
 

@@ -3,17 +3,16 @@ import { bulkInsertData, getEntry, insertData } from "./database";
 import { Mode } from "@type/osu";
 import { Tables } from "@type/database";
 import { Beatmap, BeatmapAttributesBuilder, Performance } from "rosu-pp-js";
-import { ModsEnum } from "osu-web.js";
 import { ChannelType } from "lilybird";
+import { GamemodeEnum, ModsEnum } from "osu-api-extended";
 import https from "https";
 import type { Score as ScoreDatabase } from "@type/database";
 import type { Message } from "@lilybird/transformers";
 import type { Mod } from "@type/mods";
 import type { UserScore, UserBestScore, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo, Score } from "@type/osu";
 import type { Client, Embed } from "lilybird";
-import type { GameMode, Mod as ModOsuWeb, Rank, Beatmap as BeatmapWeb } from "osu-web.js";
 
-export function getModsEnum(mods: Array<ModOsuWeb>, derivativeModsWithOriginal?: boolean): number {
+export function getModsEnum(mods: Array<keyof typeof ModsEnum>, derivativeModsWithOriginal?: boolean): number {
     return mods.reduce((count, mod) => {
         if (
             !["NF", "EZ", "TD", "HD", "HR", "SD", "DT", "RX", "HT", "NC", "FL", "AT", "SO", "AP", "PF", "4K", "5K", "6K", "7K", "8K", "FI", "RD", "CN", "TP", "K9", "KC", "1K", "2K", "3K", "SV2", "MR"].includes(
@@ -30,7 +29,17 @@ export function getModsEnum(mods: Array<ModOsuWeb>, derivativeModsWithOriginal?:
     }, 0);
 }
 
-export async function getBeatmapTopScores({ beatmapId, isGlobal, mode, mods }: { beatmapId: number; isGlobal: boolean; mode: GameMode; mods: Array<ModOsuWeb> | undefined }): Promise<LeaderboardScoresRaw> {
+export async function getBeatmapTopScores({
+    beatmapId,
+    isGlobal,
+    mode,
+    mods,
+}: {
+    beatmapId: number;
+    isGlobal: boolean;
+    mode: GamemodeEnum;
+    mods: Array<keyof typeof ModsEnum> | undefined;
+}): Promise<LeaderboardScoresRaw> {
     return fetch(`https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${mode}&type=${isGlobal ? "global" : "country"}${mods ? mods.map((mod) => `&mods[]=${mod.toUpperCase()}`).join("") : ""}`, {
         headers: {
             // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -42,7 +51,7 @@ export async function getBeatmapTopScores({ beatmapId, isGlobal, mode, mods }: {
     });
 }
 
-export function isNewMods(mods: Array<Mod> | Array<ModOsuWeb>): mods is Array<Mod> {
+export function isNewMods(mods: Array<keyof typeof ModsEnum>): mods is Array<keyof typeof ModsEnum> {
     return Array.isArray(mods) && mods.every((mod) => typeof mod === "object" && "acronym" in mod);
 }
 
@@ -66,7 +75,7 @@ export async function getPerformanceResults({
     clockRate?: number;
     mapSettings?: { ar?: number; od?: number; cs?: number };
     hitValues?: { count_100?: number; count_300?: number; count_50?: number; count_geki?: number | null; count_katu?: number | null; count_miss?: number };
-    mods: Array<ModOsuWeb> | Array<Mod> | number;
+    mods: Array<keyof typeof ModsEnum> | number;
     mapData?: string;
 }): Promise<PerformanceInfo | null> {
     let rulesetId: number;
