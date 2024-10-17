@@ -1,4 +1,4 @@
-import { parseOsuArguments } from "@utils/args";
+import { parseOsuArguments } from "@utils/parser";
 import { client } from "@utils/initalize";
 import { playBuilder } from "@builders/plays";
 import { Mode, PlayType } from "@type/osu";
@@ -45,19 +45,7 @@ export default {
     run,
 } satisfies MessageCommand;
 
-async function run({
-    message,
-    args,
-    commandName,
-    index,
-    channel,
-}: {
-    message: Message;
-    args: Array<string>;
-    commandName: string;
-    index: number | undefined;
-    channel: GuildTextChannel;
-}): Promise<void> {
+async function run({ message, args, commandName, index, channel }: { message: Message; args: Array<string>; commandName: string; index: number | undefined; channel: GuildTextChannel }): Promise<void> {
     const { mode, includeFails } = modeAliases[commandName];
     const { user, mods, flags } = parseOsuArguments(message, args, mode);
     if (user.type === UserType.FAIL) {
@@ -80,9 +68,7 @@ async function run({
     }
     const osuUser = osuUserRequest.data;
 
-    const plays = (
-        await client.users.getUserScores(osuUser.id, PlayType.RECENT, { query: { mode, limit: 100, include_fails: includeFails } })
-    ).map((item, idx) => {
+    const plays = (await client.users.getUserScores(osuUser.id, PlayType.RECENT, { query: { mode, limit: 100, include_fails: includeFails } })).map((item, idx) => {
         return { ...item, position: idx + 1 };
     });
 

@@ -1,4 +1,4 @@
-import { parseOsuArguments } from "@utils/args";
+import { parseOsuArguments } from "@utils/parser";
 import { profileBuilder } from "@builders/profile";
 import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
@@ -18,17 +18,7 @@ export default {
     run,
 } satisfies MessageCommand;
 
-async function run({
-    message,
-    args,
-    commandName,
-    channel,
-}: {
-    message: Message;
-    args: Array<string>;
-    commandName: string;
-    channel: GuildTextChannel;
-}): Promise<void> {
+async function run({ message, args, commandName, channel }: { message: Message; args: Array<string>; commandName: string; channel: GuildTextChannel }): Promise<void> {
     if (commandName === "profile") commandName = Mode.OSU;
 
     const { user } = parseOsuArguments(message, args, <Mode>commandName);

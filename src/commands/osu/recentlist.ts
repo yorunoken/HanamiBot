@@ -1,4 +1,4 @@
-import { getCommandArgs } from "@utils/args";
+import { getCommandArgs } from "@utils/parser";
 import { playBuilder } from "@builders/plays";
 import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";

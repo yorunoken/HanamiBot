@@ -1,4 +1,4 @@
-import { getCommandArgs } from "@utils/args";
+import { getCommandArgs } from "@utils/parser";
 import { profileBuilder } from "@builders/profile";
 import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";

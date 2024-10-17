@@ -1,4 +1,4 @@
-import { parseOsuArguments } from "@utils/args";
+import { parseOsuArguments } from "@utils/parser";
 import { mapBuilder } from "@builders/map";
 import { getBeatmapIdFromContext } from "@utils/osu";
 import { Mode } from "@type/osu";

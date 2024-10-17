@@ -1,4 +1,4 @@
-import { parseOsuArguments } from "@utils/args";
+import { parseOsuArguments } from "@utils/parser";
 import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/embedBuilders";

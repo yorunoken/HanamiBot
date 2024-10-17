@@ -1,4 +1,4 @@
-import { getCommandArgs } from "@utils/args";
+import { getCommandArgs } from "@utils/parser";
 import { playBuilder } from "@builders/plays";
 import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
@@ -171,12 +171,7 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
         embeds,
         components: createActionRow({
             isPage: false,
-            disabledStates: [
-                index === 0,
-                calculateButtonState(false, index, totalPages),
-                calculateButtonState(true, index, totalPages),
-                index === totalPages - 1,
-            ],
+            disabledStates: [index === 0, calculateButtonState(false, index, totalPages), calculateButtonState(true, index, totalPages), index === totalPages - 1],
         }),
     });
 

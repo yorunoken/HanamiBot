@@ -1,4 +1,4 @@
-import { parseOsuArguments } from "@utils/args";
+import { parseOsuArguments } from "@utils/parser";
 import { Mode } from "@type/osu";
 import { getBeatmapIdFromContext, getBeatmapTopScores } from "@utils/osu";
 import { leaderboardBuilder } from "@builders/leaderboard";
@@ -31,17 +31,7 @@ export default {
     run,
 } satisfies MessageCommand;
 
-async function run({
-    message,
-    args,
-    commandName,
-    channel,
-}: {
-    message: Message;
-    args: Array<string>;
-    commandName: string;
-    channel: GuildTextChannel;
-}): Promise<void> {
+async function run({ message, args, commandName, channel }: { message: Message; args: Array<string>; commandName: string; channel: GuildTextChannel }): Promise<void> {
     const { isGlobal } = modeAliases[commandName];
     const { user, mods, flags } = parseOsuArguments(message, args, Mode.OSU);
 
@@ -124,12 +114,7 @@ async function run({
         embeds,
         components: createActionRow({
             isPage: true,
-            disabledStates: [
-                page === 0,
-                calculateButtonState(false, page, totalPages),
-                calculateButtonState(true, page, totalPages),
-                page === totalPages - 1,
-            ],
+            disabledStates: [page === 0, calculateButtonState(false, page, totalPages), calculateButtonState(true, page, totalPages), page === totalPages - 1],
         }),
     });
 

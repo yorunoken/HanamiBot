@@ -1,4 +1,4 @@
-import { getCommandArgs } from "@utils/args";
+import { getCommandArgs } from "@utils/parser";
 import { getBeatmapIdFromContext, getBeatmapTopScores } from "@utils/osu";
 import { leaderboardBuilder } from "@builders/leaderboard";
 import { EmbedBuilderType } from "@type/embedBuilders";
@@ -130,12 +130,7 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
         embeds,
         components: createActionRow({
             isPage: true,
-            disabledStates: [
-                page === 0,
-                calculateButtonState(false, page, totalPages),
-                calculateButtonState(true, page, totalPages),
-                page === totalPages - 1,
-            ],
+            disabledStates: [page === 0, calculateButtonState(false, page, totalPages), calculateButtonState(true, page, totalPages), page === totalPages - 1],
         }),
     });
 

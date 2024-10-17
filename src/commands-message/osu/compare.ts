@@ -1,4 +1,4 @@
-import { parseOsuArguments } from "@utils/args";
+import { parseOsuArguments } from "@utils/parser";
 import { client } from "@utils/initalize";
 import { compareBuilder } from "@builders/compare";
 import { Mode } from "@type/osu";
@@ -30,17 +30,7 @@ export default {
     run,
 } satisfies MessageCommand;
 
-async function run({
-    message,
-    args,
-    commandName,
-    channel,
-}: {
-    message: Message;
-    args: Array<string>;
-    commandName: string;
-    channel: GuildTextChannel;
-}): Promise<void> {
+async function run({ message, args, commandName, channel }: { message: Message; args: Array<string>; commandName: string; channel: GuildTextChannel }): Promise<void> {
     const { user, mods } = parseOsuArguments(message, args, modeAliases[commandName].mode);
     if (user.type === UserType.FAIL) {
         await channel.send(user.failMessage);

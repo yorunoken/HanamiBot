@@ -1,4 +1,4 @@
-import { getCommandArgs } from "@utils/args";
+import { getCommandArgs } from "@utils/parser";
 import { getBeatmapIdFromContext } from "@utils/osu";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { backgroundBuilder } from "@builders/index";

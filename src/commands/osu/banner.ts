@@ -1,5 +1,5 @@
 import { bannerBuilder } from "@builders/index";
-import { getCommandArgs } from "@utils/args";
+import { getCommandArgs } from "@utils/parser";
 import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/embedBuilders";

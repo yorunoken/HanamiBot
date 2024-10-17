@@ -1,11 +1,10 @@
-import { getEntry } from "./database";
-import { slashCommandsIds } from "./cache";
+import { getEntry } from "@utils/database";
+import { slashCommandsIds } from "@utils/cache";
 import { Mode } from "@type/osu";
 import { UserType } from "@type/commandArgs";
 import { Tables } from "@type/database";
-import { ModsEnum } from "osu-web.js";
+import { ModsEnum } from "osu-api-extended";
 import type { SlashCommandArgs, DifficultyOptions, Mods, PrefixCommandArgs, User } from "@type/commandArgs";
-import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, GuildInteraction, Message } from "@lilybird/transformers";
 
 interface BeatMapSetURL {
@@ -102,12 +101,12 @@ export function getCommandArgs(interaction: GuildInteraction<ApplicationCommandD
 
     const modsValue = data.getString("mods");
     const modSections = modsValue?.toUpperCase().match(/.{1,2}/g);
-    if (modSections && !modSections.every((selectedMod) => selectedMod in ModsEnum || modsValue === "NM")) {
+    if (modSections && !modSections.every((selectedMod) => Object.values(ModsEnum).includes(selectedMod) || modsValue === "NM")) {
         mods = {
             exclude: data.getBoolean("exclude") ?? null,
             include: data.getBoolean("include") ?? null,
             forceInclude: data.getBoolean("force_include") ?? null,
-            name: <Mod | undefined>modsValue ?? null,
+            name: <keyof typeof ModsEnum | undefined>modsValue ?? null,
         };
     }
 
@@ -187,13 +186,13 @@ export function parseOsuArguments(message: Message, args: Array<string>, mode: M
             const modSections = mod.match(/.{1,2}/g);
 
             // Make sure `mod` is an actual mod in osu!
-            if (modSections && !modSections.every((selectedMod) => selectedMod.toUpperCase() in ModsEnum || mod.toUpperCase() === "NM")) continue;
+            if (modSections && !modSections.every((selectedMod) => Object.values(ModsEnum).includes(selectedMod) || mod.toUpperCase() === "NM")) continue;
 
             result.mods.include = modType !== "-";
             result.mods.exclude = modType === "-" && typeof force !== "undefined";
             result.mods.forceInclude = modType === "+" && typeof force !== "undefined";
             if (result.mods.include || result.mods.exclude || result.mods.forceInclude) {
-                result.mods.name = mod.replaceAll(/\+|!|-/g, "").toUpperCase() as Mod;
+                result.mods.name = mod.replaceAll(/\+|!|-/g, "").toUpperCase() as keyof typeof ModsEnum;
                 continue;
             }
         }

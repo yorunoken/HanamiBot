@@ -1,4 +1,4 @@
-import { getCommandArgs } from "@utils/args";
+import { getCommandArgs } from "@utils/parser";
 import { getBeatmapIdFromContext } from "@utils/osu";
 import { simulateBuilder } from "@builders/simulate";
 import { EmbedBuilderType } from "@type/embedBuilders";

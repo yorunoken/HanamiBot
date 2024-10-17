@@ -1,4 +1,4 @@
-import { parseOsuArguments } from "@utils/args";
+import { parseOsuArguments } from "@utils/parser";
 import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/embedBuilders";
@@ -17,16 +17,7 @@ export default {
     run,
 } satisfies MessageCommand;
 
-async function run({
-    message,
-    args,
-    channel,
-}: {
-    message: Message;
-    args: Array<string>;
-    commandName: string;
-    channel: GuildTextChannel;
-}): Promise<void> {
+async function run({ message, args, channel }: { message: Message; args: Array<string>; commandName: string; channel: GuildTextChannel }): Promise<void> {
     const { user } = parseOsuArguments(message, args, <Mode>Mode.OSU);
     if (user.type === UserType.FAIL) {
         await channel.send(user.failMessage);
