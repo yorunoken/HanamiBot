@@ -14,6 +14,7 @@
         "@lilybird/handlers": "^0.6.0",
         "@lilybird/transformers": "^0.4.2",
         "lilybird": "^0.7.1",
+        "osu-api-extended": "^3.0.4",
         "playwright": "^1.48.1",
         "rosu-pp-js": "^1.0.2"
     },
