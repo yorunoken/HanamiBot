@@ -9,87 +9,16 @@ import https from "https";
 import type { Score as ScoreDatabase } from "@type/database";
 import type { Message } from "@lilybird/transformers";
 import type { Mod } from "@type/mods";
-import type { UserScore, UserBestScore, AccessTokenJSON, AuthScope, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo, Score } from "@type/osu";
+import type { UserScore, UserBestScore, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo, Score } from "@type/osu";
 import type { Client, Embed } from "lilybird";
 import type { GameMode, Mod as ModOsuWeb, Rank, Beatmap as BeatmapWeb } from "osu-web.js";
-
-/**
- * Gets the access token of the client.
- * @param clientId - Client ID for the application.
- * @param clientSecret - Client Secret for the application.
- * @param scope - Array of authorization scopes.
- * @returns An object containing the access token and its expiration date.
- */
-export async function getAccessToken(
-    clientId: number,
-    clientSecret: string,
-    scope: Array<AuthScope>,
-): Promise<{
-    accessToken: string;
-    expiresIn: string;
-}> {
-    const body = JSON.stringify({
-        grant_type: "client_credentials",
-        client_id: clientId,
-        client_secret: clientSecret,
-        scope: scope.join(" "),
-        code: "code",
-    });
-
-    const request = await fetch("https://osu.ppy.sh/oauth/token", {
-        method: "POST",
-        headers: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            "Content-Type": "application/json",
-        },
-        body,
-    });
-    if (!request.ok) {
-        console.log(request);
-        throw new Error("Couldn't GET access token");
-    }
-
-    const data = (await request.json()) as AccessTokenJSON;
-
-    return { accessToken: data.access_token, expiresIn: data.expires_in };
-}
 
 export function getModsEnum(mods: Array<ModOsuWeb>, derivativeModsWithOriginal?: boolean): number {
     return mods.reduce((count, mod) => {
         if (
-            ![
-                "NF",
-                "EZ",
-                "TD",
-                "HD",
-                "HR",
-                "SD",
-                "DT",
-                "RX",
-                "HT",
-                "NC",
-                "FL",
-                "AT",
-                "SO",
-                "AP",
-                "PF",
-                "4K",
-                "5K",
-                "6K",
-                "7K",
-                "8K",
-                "FI",
-                "RD",
-                "CN",
-                "TP",
-                "K9",
-                "KC",
-                "1K",
-                "2K",
-                "3K",
-                "SV2",
-                "MR",
-            ].includes(mod)
+            !["NF", "EZ", "TD", "HD", "HR", "SD", "DT", "RX", "HT", "NC", "FL", "AT", "SO", "AP", "PF", "4K", "5K", "6K", "7K", "8K", "FI", "RD", "CN", "TP", "K9", "KC", "1K", "2K", "3K", "SV2", "MR"].includes(
+                mod,
+            )
         )
             return count;
 
@@ -101,27 +30,14 @@ export function getModsEnum(mods: Array<ModOsuWeb>, derivativeModsWithOriginal?:
     }, 0);
 }
 
-export async function getBeatmapTopScores({
-    beatmapId,
-    isGlobal,
-    mode,
-    mods,
-}: {
-    beatmapId: number;
-    isGlobal: boolean;
-    mode: GameMode;
-    mods: Array<ModOsuWeb> | undefined;
-}): Promise<LeaderboardScoresRaw> {
-    return fetch(
-        `https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${mode}&type=${isGlobal ? "global" : "country"}${mods ? mods.map((mod) => `&mods[]=${mod.toUpperCase()}`).join("") : ""}`,
-        {
-            headers: {
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                "Content-Type": "application/json",
-                Cookie: `osu_session=${process.env.ACCESS_TOKEN}`,
-            },
+export async function getBeatmapTopScores({ beatmapId, isGlobal, mode, mods }: { beatmapId: number; isGlobal: boolean; mode: GameMode; mods: Array<ModOsuWeb> | undefined }): Promise<LeaderboardScoresRaw> {
+    return fetch(`https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${mode}&type=${isGlobal ? "global" : "country"}${mods ? mods.map((mod) => `&mods[]=${mod.toUpperCase()}`).join("") : ""}`, {
+        headers: {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            "Content-Type": "application/json",
+            Cookie: `osu_session=${process.env.ACCESS_TOKEN}`,
         },
-    ).then((res) => {
+    }).then((res) => {
         return <LeaderboardScoresRaw>(<unknown>res.json());
     });
 }

@@ -1,28 +1,16 @@
 import db from "../data.db" with { type: "sqlite" };
-import { getAccessToken } from "./osu";
-import { slashCommandsIds } from "./cache";
-import { removeEntry } from "./database";
+import { slashCommandsIds } from "@utils/cache";
+import { removeEntry } from "@utils/database";
 import { Tables } from "@type/database";
-import { Client as OsuClient } from "osu-web.js";
 import { mkdir, access, readFile, writeFile, readdir } from "node:fs/promises";
 import type { Guild } from "@type/database";
 import type { Client as LilybirdClient, ApplicationCommand } from "lilybird";
 import type { DefaultMessageCommand, DefaultSlashCommand } from "@type/commands";
 
-const { accessToken } = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
-export const client = new OsuClient(accessToken);
-
 export const messageCommands = new Map<string, DefaultMessageCommand>();
 export const commandAliases = new Map<string, string>();
 export const applicationCommands = new Map<string, DefaultSlashCommand>();
 
-/**
- * Loads all message commands from the `./src/commands-message` directory and adds them to the `messageCommands` and `commandAliases` maps.
- *
- * This function reads the contents of the `./src/commands-message` directory, imports each command module, and adds the command and its aliases to the respective maps.
- *
- * @returns {Promise<void>} A promise that resolves when all message commands have been loaded.
- */
 export async function loadMessageCommands(): Promise<void> {
     // Temporary array to store promises of MessageCommands
     const temp: Array<Promise<DefaultMessageCommand>> = [];

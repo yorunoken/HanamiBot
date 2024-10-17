@@ -1,21 +1,18 @@
-import { initializeDatabase, loadLogs, client } from "./utils/initalize";
-import { getAccessToken } from "./utils/osu";
+import { initializeDatabase, loadLogs } from "./utils/initalize";
 import { createHandler } from "@lilybird/handlers/simple";
 import { CachingDelegationType, createClient, Intents } from "lilybird";
 import { Channel, Guild, GuildVoiceChannel } from "@lilybird/transformers";
 import { $ } from "bun";
 import { chromium } from "playwright";
+import { auth } from "osu-api-extended";
 import { writeFile } from "node:fs/promises";
 
-// refresh token every hour
-setInterval(setToken, 1000 * 60 * 60);
-
-async function setToken(): Promise<void> {
-    const { accessToken } = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
-    client.setAccessToken(accessToken);
-}
-
-await setToken();
+await auth.login({
+    type: "v2",
+    client_id: +process.env.CLIENT_ID,
+    client_secret: process.env.CLIENT_SECRET,
+    scopes: ["public"],
+});
 
 // make sure chromium is dead
 try {
