@@ -5,10 +5,7 @@ import { log } from "utils/logs";
 export default {
     event: "ready",
     run: async (client) => {
-        console.log(`Successfully logged in as ${client.user.username} ✅`);
-
-        console.log("Setting up Logs..");
-        await log("Start Sequence: Started the bot.");
+        await log("Start Sequence: Started the bot as ${client.user.username}.");
 
         await loadPrefixCommands();
         await log("Start Sequence: Loaded message commands");
