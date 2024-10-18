@@ -48,16 +48,16 @@ export function initializeDatabase(): void {
         const table = allTables[i];
         const { columns, name } = table;
 
-        // Get which database to use from the table name
+        // Get which database to use from the table name.
         const db = osuTables.some((t) => t.name === name) ? osuDb : discordDb;
 
-        // Create table if they it doesn't exist
+        // Create table if they it doesn't exist.
         db.run(`CREATE TABLE IF NOT EXISTS ${name} (${columns.join(", ")});`);
 
-        // Get all of existing columns in a table
+        // Get all of existing columns in a table.
         const existingColumns = db.prepare(`PRAGMA table_info(${name});`).all() as Array<Column>;
 
-        // Loop through Columns and add/remove them
+        // Loop through Columns and add/remove them.
         for (let idx = 0; idx < columns.length; idx++) {
             const columnNameType = columns[idx];
             const [columnName] = columnNameType.split(" ");
