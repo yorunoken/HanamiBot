@@ -36,19 +36,19 @@ export async function log(message: string, isError?: boolean): Promise<void> {
 
     const yearFolder = `${logsFolder}/${year}`;
     if (!(await exists(yearFolder))) {
-        console.log(`The year \`${year}\` couldn't be found, generating..`);
+        console.error(`The year \`${year}\` couldn't be found, generating..`);
         await mkdir(yearFolder, { recursive: true });
     }
 
     const monthFolder = `${logsFolder}/${year}/${month}`;
     if (!(await exists(monthFolder))) {
-        console.log(`The month \`${monthName}(${month})\` couldn't be found, generating..`);
+        console.error(`The month \`${monthName}(${month})\` couldn't be found, generating..`);
         await mkdir(monthFolder, { recursive: true });
     }
 
     const dayFolder = `${logsFolder}/${year}/${month}/${day}.log`;
     if (!(await exists(dayFolder))) {
-        console.log(`The day \`${day}\` couldn't be found, generating..`);
+        console.error(`The day \`${day}\` couldn't be found, generating..`);
         await writeFile(dayFolder, `${formattedDate}Created log file.`);
     }
 
