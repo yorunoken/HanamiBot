@@ -16,7 +16,7 @@ export async function loadPrefixCommands(): Promise<void> {
         const [category, cmd] = item.split(process.platform === "win32" ? "\\" : "/");
         if (!category || !cmd) continue;
 
-        const command = import(`../commands-prefix/${category}/${cmd}`) as Promise<DefaultPrefixCommand>;
+        const command: Promise<DefaultPrefixCommand> = import(`../commands-prefix/${category}/${cmd}`);
         tempCommands.push(command);
     }
 
@@ -50,7 +50,7 @@ export async function loadApplicationCommands(lilybirdClient: LilybirdClient): P
         if (!category || !cmd) continue;
         if (category === "data") continue;
 
-        const command = import(`../commands-application/${category}/${cmd}`) as Promise<DefaultApplicationCommand>;
+        const command: Promise<DefaultApplicationCommand> = import(`../commands-application/${category}/${cmd}`);
         tempCommands.push(command);
     }
 
