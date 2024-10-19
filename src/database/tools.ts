@@ -18,20 +18,20 @@ function getDatabase(table: Tables) {
     }
 }
 
-function getPrimaryKeyField<T extends Tables>(table: T): keyof TableEntityType<T> {
+function getPrimaryKeyField<T extends Tables>(table: T): string {
     switch (table) {
         case Tables.SCORES:
-            return "score_id" as keyof TableEntityType<T>;
+            return "score_id"; // as keyof TableEntityType<T>;
         case Tables.SCORES_PP:
-            return "score_id" as keyof TableEntityType<T>;
+            return "score_id"; // as keyof TableEntityType<T>;
         case Tables.USERS:
-            return "discord_id" as keyof TableEntityType<T>;
+            return "discord_id"; // as keyof TableEntityType<T>;
         case Tables.SERVERS:
-            return "server_id" as keyof TableEntityType<T>;
+            return "server_id"; // as keyof TableEntityType<T>;
         case Tables.COMMANDS:
-            return "command_name" as keyof TableEntityType<T>;
+            return "command_name"; // as keyof TableEntityType<T>;
         case Tables.SLASH_COMMANDS:
-            return "command_name" as keyof TableEntityType<T>;
+            return "command_name"; // as keyof TableEntityType<T>;
         default:
             throw new Error(`Unknown table: ${table}`);
     }
@@ -39,8 +39,9 @@ function getPrimaryKeyField<T extends Tables>(table: T): keyof TableEntityType<T
 
 export function getEntry<T extends Tables>(table: T, id: string | number): TableEntityType<T> | null {
     const db = getDatabase(table);
+    const primaryKeyField = getPrimaryKeyField(table);
 
-    const data = db.prepare(`SELECT * FROM ${table} WHERE id = ?`).get(id) as TableEntityType<T> | null;
+    const data = db.prepare(`SELECT * FROM ${table} WHERE ${primaryKeyField} = ?;`).get(id) as TableEntityType<T> | null;
     if (data !== null && "prefixes" in data) data.prefixes = JSON.parse(data.prefixes.toString());
 
     return data;
@@ -50,7 +51,7 @@ export function removeEntry(table: Tables, id: string | number): void {
     const db = getDatabase(table);
     const primaryKeyField = getPrimaryKeyField(table);
 
-    db.prepare(`DELETE FROM ${table} WHERE ${String(primaryKeyField)} = ?`).run(id);
+    db.prepare(`DELETE FROM ${table} WHERE ${primaryKeyField} = ?;`).run(id);
 }
 
 export function getRowCount(table: Tables): number {
@@ -83,13 +84,13 @@ export function insertData<T extends Tables>(
     const setClause = data.map((item) => `${item.key} = ?`).join(", ");
     const values: Array<string | number | boolean | null> = data.map((item) => item.value);
 
-    const existingRow = db.prepare(`SELECT * FROM ${table} WHERE ${String(primaryKeyField)} = ?`).get(id);
+    const existingRow = db.prepare(`SELECT * FROM ${table} WHERE ${primaryKeyField} = ?`).get(id);
     if (!existingRow) {
         const fields: Array<TableColumnKeys<T>> = data.map((item) => item.key);
         const placeholders = fields.map(() => "?").join(", ");
 
-        db.prepare(`INSERT OR ${ignore ? "IGNORE" : "REPLACE"} INTO ${table} (id, ${fields.join(", ")}) values (?, ${placeholders});`).run(id, ...values);
+        db.prepare(`INSERT OR ${ignore ? "IGNORE" : "REPLACE"} INTO ${table} (${primaryKeyField}, ${fields.join(", ")}) values (?, ${placeholders});`).run(id, ...values);
     }
 
-    db.prepare(`UPDATE ${table} SET ${setClause} WHERE ${String(primaryKeyField)} = ?;`).run(...values, id);
+    db.prepare(`UPDATE ${table} SET ${setClause} WHERE ${primaryKeyField} = ?;`).run(...values, id);
 }
