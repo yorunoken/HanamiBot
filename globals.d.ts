@@ -1,7 +1,7 @@
 declare module "bun" {
     interface Env {
         DISCORD_BOT_TOKEN: string;
-        ERROR_CHANNEL_WEBHOOK: string;
+        ERROR_CHANNEL_ID: string;
 
         ACCESS_TOKEN: string;
         CLIENT_SECRET: string;
