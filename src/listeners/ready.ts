@@ -1,11 +1,11 @@
-import type { Event } from "@lilybird/handlers/simple";
-import { loadApplicationCommands, loadPrefixCommands } from "utils/loadCommands";
+import { Event } from "@lilybird/handlers/simple";
+import { loadApplicationCommands, loadPrefixCommands } from "utils/load-commands";
 import { log } from "utils/logs";
 
 export default {
     event: "ready",
     run: async (client) => {
-        await log("Start Sequence: Started the bot as ${client.user.username}.");
+        await log(`Start Sequence: Started the bot as ${client.user.username}.`);
 
         await loadPrefixCommands();
         await log("Start Sequence: Loaded message commands");
