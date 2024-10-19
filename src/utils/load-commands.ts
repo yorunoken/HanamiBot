@@ -1,13 +1,13 @@
 import { readdir } from "node:fs/promises";
 import type { Client as LilybirdClient, ApplicationCommand } from "lilybird";
-import { DefaultPrefixCommand, DefaultApplicationCommand } from "types/interfaces/commands";
+import { DefaultPrefixCommand, DefaultApplicationCommand } from "types/commands/interfaces";
 
 export const prefixCommands = new Map<string, DefaultPrefixCommand>();
 export const prefixCommandAliases = new Map<string, string>();
 export const applicationCommands = new Map<string, DefaultApplicationCommand>();
 
 export async function loadPrefixCommands(): Promise<void> {
-    // Temporary array to store promises of PrefixCommands
+    // Temporary array to store promises of PrefixCommands.
     const tempCommands: Array<Promise<DefaultPrefixCommand>> = [];
 
     const items = await readdir("./src/commands-prefix", { recursive: true });
@@ -26,10 +26,10 @@ export async function loadPrefixCommands(): Promise<void> {
         const { default: command } = defaultCommand;
         const { aliases, name } = command.data;
 
-        // Add the command to the command map
+        // Add the command to the command map.
         prefixCommands.set(name, defaultCommand);
 
-        // Check if the command has aliases and add them to the command map
+        // Check if the command has aliases and add them to the command map.
         if (aliases && aliases.length > 0 && Array.isArray(aliases)) {
             for (let idx = 0; idx < aliases.length; idx++) {
                 const alias = aliases[idx];
