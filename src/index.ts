@@ -1,7 +1,9 @@
 import { auth } from "osu-api-extended";
-import { createHandler } from "@lilybird/handlers/simple";
 import { CachingDelegationType, createClient, Intents } from "lilybird";
 import { Channel, Guild, GuildVoiceChannel } from "@lilybird/transformers";
+import { createHandler } from "@lilybird/handlers/simple";
+import { initializeDatabase } from "database/initialize";
+import { defaultTransformers } from "@lilybird/transformers";
 
 // Log in to osu!
 // This method will automatically refresh the token.
@@ -12,8 +14,11 @@ await auth.login({
     scopes: ["public"],
 });
 
+// Initialize the database.
+initializeDatabase();
+
 // Handle out-of-scope errors.
-// TODO: send the error through a Discord webhook using process.env.ERROR_CHANNEL_WEBHOOK.
+// TODO: send the error through a Discord channel using process.env.ERROR_CHANNEL_ID.
 process.on("unhandledRejection", async (error: Error) => {
     console.error("An unhandled rejection was detected:", error);
 });
