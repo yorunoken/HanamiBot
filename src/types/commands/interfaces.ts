@@ -3,6 +3,16 @@ import type { Client, ApplicationCommand } from "lilybird";
 
 type Awaitable<T> = Promise<T> | T;
 
+export interface execProps {
+    client: Client;
+    message: Message;
+    args: Array<string>;
+    prefix: string;
+    index: number | undefined;
+    commandName: string;
+    channel: GuildTextChannel;
+}
+
 export interface PrefixCommand {
     data: {
         name: string;
@@ -18,23 +28,7 @@ export interface PrefixCommand {
         usageExample?: string;
     };
 
-    exec: ({
-        client,
-        message,
-        args,
-        prefix,
-        index,
-        commandName,
-        channel,
-    }: {
-        client: Client;
-        message: Message;
-        args: Array<string>;
-        prefix: string;
-        index: number | undefined;
-        commandName: string;
-        channel: GuildTextChannel;
-    }) => Awaitable<void>;
+    exec: ({ client, message, args, prefix, index, commandName, channel }: execProps) => Awaitable<void>;
 }
 
 export interface ApplicationCommand {
