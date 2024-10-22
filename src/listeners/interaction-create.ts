@@ -31,7 +31,7 @@ async function run(interaction: Interaction): Promise<void> {
 
         const guild = await interaction.client.rest.getGuild(interaction.guildId);
 
-        await interaction.reply(`Oops, you came across an error!\nHere's a summary of it:\n\`\`\`${err.stack}\`\`\`\nDon't worry, the same error log has been sent to the owner of this bot.`);
+        await interaction.editReply(`Oops, you came across an error!\nHere's a summary of it:\n\`\`\`${err.stack}\`\`\`\nDon't worry, the same error log has been sent to the owner of this bot.`);
         await interaction.client.rest.createMessage(interaction.channelId, {
             content: `<@${process.env.OWNER_ID}> STACK ERROR, GET YOUR ASS TO WORK`,
             embeds: [
