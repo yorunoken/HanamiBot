@@ -27,7 +27,6 @@ export default {
         const userCache = await fs.readFile(userCachePath, "utf8");
         const data = userCache.trim().split("\n");
         const discordLine = data.find((line) => line.endsWith("=" + authorId));
-        console.log(discordLine);
 
         let state = discordLine?.[0];
         if (!state) {
