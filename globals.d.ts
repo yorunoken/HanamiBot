@@ -6,7 +6,9 @@ declare module "bun" {
         ACCESS_TOKEN: string;
         CLIENT_SECRET: string;
         CLIENT_ID: string;
-        AUTH_CALLBACK_URL: string;
+
+        USER_CACHE_PATH: string;
+        AUTH_URL: string;
 
         DEV?: string;
     }
