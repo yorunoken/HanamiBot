@@ -4,7 +4,9 @@ import { DefaultPrefixCommand, DefaultApplicationCommand } from "types/commands/
 
 export const prefixCommands = new Map<string, DefaultPrefixCommand>();
 export const prefixCommandAliases = new Map<string, string>();
+
 export const applicationCommands = new Map<string, DefaultApplicationCommand>();
+export const applicationCommandsIds = new Map<string, string>();
 
 export async function loadPrefixCommands(): Promise<void> {
     // Temporary array to store promises of PrefixCommands.
@@ -65,6 +67,6 @@ export async function loadApplicationCommands(lilybirdClient: LilybirdClient): P
     const commandsIds = await lilybirdClient.rest.bulkOverwriteGlobalApplicationCommand(lilybirdClient.user.id, applicationCommandsInfo);
     for (let i = 0; i < commandsIds.length; i++) {
         const { name, id } = commandsIds[i];
-        // slashCommandsIds.set(name, `</${name}:${id}>`);
+        applicationCommandsIds.set(name, `</${name}:${id}>`);
     }
 }
