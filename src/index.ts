@@ -1,45 +1,36 @@
-import { initializeDatabase, loadLogs, client } from "./utils/initalize";
-import { getAccessToken } from "./utils/osu";
-import { createHandler } from "@lilybird/handlers/simple";
+import { auth } from "osu-api-extended";
 import { CachingDelegationType, createClient, Intents } from "lilybird";
 import { Channel, Guild, GuildVoiceChannel } from "@lilybird/transformers";
-import { $ } from "bun";
-import { chromium } from "playwright";
-import { writeFile } from "node:fs/promises";
+import { createHandler } from "@lilybird/handlers/simple";
+import { initializeDatabase } from "database/initialize";
+import { defaultTransformers } from "@lilybird/transformers";
 
-// refresh token every hour
-setInterval(setToken, 1000 * 60 * 60);
-
-async function setToken(): Promise<void> {
-    const { accessToken } = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
-    client.setAccessToken(accessToken);
-}
-
-await setToken();
-
-// make sure chromium is dead
-try {
-    await $`pkill chromium && pkill chromium-browser`;
-} catch (e) {}
-
-export const browser = await chromium.launch();
-
-process.on("unhandledRejection", async (error: Error) => {
-    await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);
-});
-process.on("uncaughtException", async (error: Error) => {
-    await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);
+// Log in to osu!
+// This method will automatically refresh the token.
+await auth.login({
+    type: "v2",
+    client_id: process.env.CLIENT_ID,
+    client_secret: process.env.CLIENT_SECRET,
+    scopes: ["public"],
 });
 
+// Initialize the database.
 initializeDatabase();
 
-if (process.env.DEV !== "1")
-    await writeFile("/root/users_cache.txt", "");
+// Handle out-of-scope errors.
+// TODO: send the error through a Discord channel using process.env.ERROR_CHANNEL_ID.
+process.on("unhandledRejection", async (error: Error) => {
+    console.error("An unhandled rejection was detected:", error);
+});
+
+process.on("uncaughtException", async (error: Error) => {
+    console.error("An uncaught exception was detected:", error);
+});
 
 const listeners = await createHandler({
     dirs: {
-        listeners: `${import.meta.dir}/listeners`
-    }
+        listeners: `${import.meta.dir}/listeners`,
+    },
 });
 
 await createClient({
@@ -48,14 +39,8 @@ await createClient({
         transformerTypes: { channel: Channel, guild: Guild, voiceState: GuildVoiceChannel },
         delegate: CachingDelegationType.DEFAULT,
         applyTransformers: true,
-        enabled: { channel: true }
+        enabled: { channel: true },
     },
-    intents: [
-        Intents.GUILDS,
-        Intents.GUILD_MESSAGES,
-        Intents.MESSAGE_CONTENT,
-        Intents.GUILD_MEMBERS
-    ],
-    ...listeners
+    intents: [Intents.GUILDS, Intents.GUILD_MESSAGES, Intents.MESSAGE_CONTENT, Intents.GUILD_MEMBERS],
+    ...listeners,
 });
-
