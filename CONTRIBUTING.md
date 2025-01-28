@@ -61,7 +61,7 @@ You need to fill `.env.local` with the approriate API keys to make the bot work.
 
    This one is a little tricky, because you will need to host a website.
 
-1. Hosting websites are free using [Vercel](https://vercel.com).
+1. Hosting websites is free using [Vercel](https://vercel.com).
 
 2. Create a new project in the free hosting platform, [Vercel](https://vercel.com) and select the `Import Third-Party Git Repository` option.
 
