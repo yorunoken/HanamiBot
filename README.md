@@ -16,7 +16,7 @@ Feel free to open up an issue/pull request over at the main [repository](https:/
 
 ---
 
-Probably wasn't needed, but this project is liscenced with [Apache version 2.0](http://www.apache.org/licenses)!
+Probably wasn't needed, but this project is licenced with [Apache version 2.0](http://www.apache.org/licenses)!
 
 ## Main libraries I use
 
