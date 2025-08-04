@@ -2,7 +2,7 @@ import { getEntry, removeEntry } from "@utils/database";
 import { Tables } from "@type/database";
 import type { SlashCommand } from "@type/commands";
 import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
-import { slashCommandIdsCache } from "@utils/redis";
+import { slashCommandIdsCache } from "@utils/cache";
 
 export default {
     data: { name: "unlink", description: "Unlink your osu! account from the bot." },

@@ -3,7 +3,7 @@ import { Mode } from "@type/osu";
 import { getBeatmapIdFromContext, getBeatmapTopScores } from "@utils/osu";
 import { leaderboardBuilder } from "@builders/leaderboard";
 import { EmbedBuilderType } from "@type/embedBuilders";
-import { ButtonStateCache } from "@utils/redis";
+import { ButtonStateCache } from "@utils/cache";
 import { client } from "@utils/initalize";
 import { createPaginationActionRow } from "@utils/buttons";
 import { EmbedType } from "lilybird";

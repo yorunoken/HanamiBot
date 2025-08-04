@@ -2,7 +2,7 @@ import { removeEntry } from "@utils/database";
 import { logger } from "@utils/logger";
 import { Tables } from "@type/database";
 import type { Event } from "@lilybird/handlers";
-import { guildPrefixesCache } from "@utils/redis";
+import { guildPrefixesCache } from "@utils/cache";
 
 export default {
     event: "guildDelete",

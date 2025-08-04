@@ -7,7 +7,7 @@ import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
 import type { Message } from "@lilybird/transformers";
 import type { Event } from "@lilybird/handlers";
-import { guildPrefixesCache, cooldownsCache } from "@utils/redis";
+import { guildPrefixesCache, cooldownsCache } from "@utils/cache";
 
 export default {
     event: "messageCreate",
@@ -117,7 +117,6 @@ async function run(message: Message): Promise<void> {
         }
     } catch (cooldownError) {
         logger.error("Error checking cooldown, allowing command to proceed", cooldownError as Error);
-        // Continue execution - don't block commands due to Redis issues
     }
     const channel = await message.fetchChannel();
     if (!channel.isText()) return;

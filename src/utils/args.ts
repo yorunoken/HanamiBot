@@ -6,7 +6,7 @@ import { ModsEnum } from "osu-web.js";
 import type { SlashCommandArgs, DifficultyOptions, Mods, PrefixCommandArgs, User } from "@type/commandArgs";
 import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, GuildInteraction, Message } from "@lilybird/transformers";
-import { slashCommandIdsCache } from "./redis";
+import { slashCommandIdsCache } from "./cache";
 
 interface BeatMapSetURL {
     url: string;

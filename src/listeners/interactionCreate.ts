@@ -1,7 +1,7 @@
 import { getEntry, insertData } from "@utils/database";
 import { client, applicationCommands } from "@utils/initalize";
 import { logger } from "@utils/logger";
-import { ButtonStateCache } from "@utils/redis";
+import { ButtonStateCache } from "@utils/cache";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { createPaginationActionRow } from "@utils/buttons";
 import { PaginationManager } from "@utils/pagination";

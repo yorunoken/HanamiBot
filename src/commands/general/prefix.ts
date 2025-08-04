@@ -1,6 +1,6 @@
 import { getEntry, insertData } from "@utils/database";
 import { DEFAULT_PREFIX, MAX_AMOUNT_OF_PREFIXES } from "@utils/constants";
-import { guildPrefixesCache } from "@utils/redis";
+import { guildPrefixesCache } from "@utils/cache";
 import { Tables } from "@type/database";
 import { ApplicationCommandOptionType, EmbedType, PermissionFlags } from "lilybird";
 import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";

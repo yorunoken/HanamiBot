@@ -1,7 +1,7 @@
 import db from "../data.db" with { type: "sqlite" };
 import { getAccessToken } from "./osu";
 import { removeEntry } from "./database";
-import { guildPrefixesCache, slashCommandIdsCache } from "./redis";
+import { guildPrefixesCache, slashCommandIdsCache } from "./cache";
 import { logger } from "./logger";
 import { Tables } from "@type/database";
 import { Client as OsuClient } from "osu-web.js";

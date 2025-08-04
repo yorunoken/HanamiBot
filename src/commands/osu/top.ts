@@ -5,7 +5,7 @@ import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { PlayType } from "@type/osu";
 import { createPaginationActionRow } from "@utils/buttons";
-import { ButtonStateCache } from "@utils/redis";
+import { ButtonStateCache } from "@utils/cache";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { PlaysBuilderOptions } from "@type/embedBuilders";
 import type { Mod } from "osu-web.js";

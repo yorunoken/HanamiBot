@@ -5,7 +5,7 @@ import { Mode, PlayType } from "@type/osu";
 import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { createPaginationActionRow } from "@utils/buttons";
-import { ButtonStateCache } from "@utils/redis";
+import { ButtonStateCache } from "@utils/cache";
 import { EmbedType } from "lilybird";
 import type { GuildTextChannel, Message } from "@lilybird/transformers";
 import type { PlaysBuilderOptions } from "@type/embedBuilders";
