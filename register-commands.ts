@@ -63,6 +63,9 @@ async function registerApplicationCommands() {
     try {
         // Register commands globally
         const registeredCommands = await rest.bulkOverwriteGlobalApplicationCommand(user.id, slashCommands);
+        if (registeredCommands.length === 0) {
+            throw new Error("Failed to register commands: only got 0.");
+        }
 
         log.info(`Successfully registered ${registeredCommands.length} commands:`, {
             commands: registeredCommands.map((cmd: { name: string }) => cmd.name),
