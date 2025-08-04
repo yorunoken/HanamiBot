@@ -1,4 +1,4 @@
-import Valkey from "iovalkey";
+import { createClient, RedisClientType } from "redis";
 import { logger } from "@utils/logger";
 
 // Map caches
@@ -20,67 +20,60 @@ setInterval(
 );
 
 // Redis client instance
-let redisClient: Valkey;
+let redisClient: RedisClientType;
 
 export async function initializeRedis(): Promise<void> {
     logger.info("Initializing Redis connection...");
 
-    redisClient = new Valkey({
-        host: process.env.REDIS_HOST || "localhost",
-        port: parseInt(process.env.REDIS_PORT || "6379"),
+    redisClient = createClient({
+        socket: {
+            host: process.env.REDIS_HOST || "localhost",
+            port: parseInt(process.env.REDIS_PORT || "6379"),
+            connectTimeout: 10000,
+        },
         password: process.env.REDIS_PASSWORD,
-        db: parseInt(process.env.REDIS_DB || "0"),
-        connectTimeout: 10000,
-        lazyConnect: false,
+        database: parseInt(process.env.REDIS_DB || "0"),
     });
 
-    // Wait for connection to be ready
-    await new Promise<void>((resolve, reject) => {
-        redisClient.on("ready", () => {
-            logger.info("Redis connected successfully");
-            resolve();
-        });
-
-        redisClient.on("error", (error) => {
-            logger.error("Redis connection error:", error);
-            reject(new Error(`Redis connection failed: ${error.message}`));
-        });
-
-        redisClient.on("close", () => {
-            logger.warn("Redis connection closed");
-        });
-
-        redisClient.on("reconnecting", () => {
-            logger.info("Redis reconnecting...");
-        });
-
-        setTimeout(() => {
-            reject(new Error("Redis connection timeout after 10 seconds"));
-        }, 10000);
+    // Set up error handler before connecting
+    redisClient.on("error", (error: Error) => {
+        logger.error("Redis connection error:", error);
     });
+
+    redisClient.on("connect", () => {
+        logger.info("Redis connecting...");
+    });
+
+    redisClient.on("ready", () => {
+        logger.info("Redis connected successfully");
+    });
+
+    redisClient.on("end", () => {
+        logger.warn("Redis connection closed");
+    });
+
+    redisClient.on("reconnecting", () => {
+        logger.info("Redis reconnecting...");
+    });
+
+    try {
+        await redisClient.connect();
+    } catch (error) {
+        logger.error("Failed to connect to Redis:", error);
+        throw new Error(`Redis connection failed: ${(error as Error).message}`);
+    }
 }
 
 export function isRedisAvailable(): boolean {
-    return redisClient && redisClient.status === "ready";
+    return redisClient && redisClient.isOpen;
 }
 
 export const CacheKeys = {
-    GUILD_PREFIXES: (guildId: string) => `guild:${guildId}:prefixes`,
-    USER_CONFIG: (userId: string) => `user:${userId}:config`,
-    BEATMAP: (beatmapId: string) => `beatmap:${beatmapId}`,
-    COOLDOWN: (commandName: string, userId: string) => `cooldown:${commandName}:${userId}`,
     BUTTON_STATE: (messageId: string) => `button:${messageId}:state`,
-    OAUTH_TOKEN: "oauth:token",
-    COMMAND_COUNT: (commandName: string, type: "slash" | "message") => `stats:${type}:${commandName}`,
 } as const;
 
 export const CacheTTL = {
-    GUILD_PREFIXES: 3600, // 1 hour
-    USER_CONFIG: 3600, // 1 hour
-    BEATMAP: 86400, // 24 hours
     BUTTON_STATE: 3600, // 1 hour
-    OAUTH_TOKEN: 3500, // ~1 hour (slightly less than actual expiry)
-    COMMAND_COUNT: 300, // 5 minutes (for batching)
 } as const;
 
 export class RedisCache {
@@ -106,7 +99,7 @@ export class RedisCache {
         try {
             const serialized = JSON.stringify(value);
             if (ttl) {
-                await redisClient.setex(key, ttl, serialized);
+                await redisClient.setEx(key, ttl, serialized);
             } else {
                 await redisClient.set(key, serialized);
             }
@@ -193,13 +186,13 @@ export class ButtonStateCache {
 }
 
 export async function closeRedis(): Promise<void> {
-    if (redisClient && redisClient.status !== "end") {
+    if (redisClient && redisClient.isOpen) {
         try {
             await redisClient.quit();
             logger.info("Redis connection closed gracefully");
         } catch (error) {
             logger.error("Error closing Redis connection", error as Error);
-            redisClient.disconnect();
+            await redisClient.disconnect();
         }
     }
 }

@@ -13,12 +13,11 @@
     "dependencies": {
         "@lilybird/handlers": "^0.5.0",
         "@lilybird/transformers": "^0.4.1",
-        "iovalkey": "^0.3.3",
         "lilybird": "^0.7.1",
         "osu-web.js": "^2.4.0",
         "playwright": "^1.44.0",
-        "rosu-pp-js": "3.1.0",
-        "tasai": "^1.0.0"
+        "redis": "^5.7.0",
+        "rosu-pp-js": "3.1.0"
     },
     "devDependencies": {
         "@eslint/js": "^9.32.0",
