@@ -1,14 +1,10 @@
 # Hanami 🌸
 
-a Discord bot written in TypeScript, using the Bun runtime engine.
+A Discord bot written in TypeScript, using the Bun runtime engine.
 
-I mainly wrote this bot for my friends, but a lot more people wanted to use it than I thought.
+I mainly wrote this bot for my friends, but a lot more people wanted to use it than I thought. So now, we're here. Hopefully it meets your expectations.
 
-So now, we're here. Hopefully it meets your expectations.
-
-If you're here to contribute/look at the code, welcome!
-
-Although, the code is not very well documented, I tried my best!
+If you're here to contribute/look at the code, welcome! Although, the code is not very well documented, I tried my best!
 
 Feel free to open up an issue/pull request at this [repository](https://github.com/yorunoken/HanamiBot)
 
