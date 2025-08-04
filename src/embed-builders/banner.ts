@@ -1,10 +1,10 @@
-import { getProfile } from "@utils/profile-processor";
+import { getProcessedProfile } from "@utils/profile-processor";
 import { Mode } from "@type/osu";
 import type { Embed } from "lilybird";
 import type { BannerBuilderOptions } from "@type/embedBuilders";
 
 export function bannerBuilder({ user }: BannerBuilderOptions): Array<Embed.Structure> {
-    const profile = getProfile(user, Mode.OSU);
+    const profile = getProcessedProfile(user, Mode.OSU);
 
     return [
         {

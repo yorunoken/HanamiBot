@@ -15,7 +15,7 @@ import type { ISOTimestamp } from "osu-web.js";
 //     hMiss: null | number;
 // }
 
-export async function getScore({
+export async function getProcessedScore({
     scores,
     beatmap: map_,
     index,

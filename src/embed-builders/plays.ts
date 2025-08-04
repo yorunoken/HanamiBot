@@ -1,5 +1,5 @@
-import { getProfile } from "@utils/profile-processor";
-import { getScore } from "@utils/scores-processor";
+import { getProcessedProfile } from "@utils/profile-processor";
+import { getProcessedScore } from "@utils/scores-processor";
 import { SPACE } from "@utils/constants";
 import { EmbedScoreType } from "@type/database";
 import { saveScoreDatas } from "@utils/osu";
@@ -17,7 +17,7 @@ export async function playBuilder({ plays, user, mode, index, mods, isMultiple, 
         else index = 0;
     }
 
-    const profile = getProfile(user, mode);
+    const profile = getProcessedProfile(user, mode);
 
     if (mods?.name) {
         const { exclude, forceInclude, include, name } = mods;
@@ -70,7 +70,7 @@ async function getSinglePlay({
     const isMaximized = (authorDb?.score_embeds ?? 1) === 1;
     const embedType = authorDb?.embed_type ?? EmbedScoreType.Hanami;
 
-    const play = await getScore({ scores: plays, index, mode });
+    const play = await getProcessedScore({ scores: plays, index, mode });
     const { mapValues, difficultyAttrs, current } = play.performance;
     const bpm = difficultyAttrs.clockRate * mapValues.bpm;
 
@@ -219,7 +219,7 @@ async function getMultiplePlays({
     const pageEnd = pageStart + 5;
 
     const playsTemp: Array<Promise<ScoresInfo>> = [];
-    for (let i = pageStart; pageEnd > i && i < plays.length; i++) playsTemp.push(getScore({ scores: plays, index: i, mode }));
+    for (let i = pageStart; pageEnd > i && i < plays.length; i++) playsTemp.push(getProcessedScore({ scores: plays, index: i, mode }));
     const playResults = await Promise.all(playsTemp);
 
     if (embedType === EmbedScoreType.Hanami) {

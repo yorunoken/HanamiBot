@@ -1,4 +1,4 @@
-import { getScore } from "@utils/scores-processor";
+import { getProcessedScore } from "@utils/scores-processor";
 import { SPACE } from "@utils/constants";
 import { getEntry } from "@utils/database";
 import { downloadBeatmap } from "@utils/osu";
@@ -31,7 +31,7 @@ async function getPlays(plays: Array<LeaderboardScores>, beatmap: Beatmap, page:
     const pageEnd = pageStart + 5;
 
     const playsTemp: Array<Promise<ScoresInfo>> = [];
-    for (let i = pageStart; pageEnd > i && i < plays.length; i++) playsTemp.push(getScore({ scores: plays, index: i, mode, beatmap, mapData }));
+    for (let i = pageStart; pageEnd > i && i < plays.length; i++) playsTemp.push(getProcessedScore({ scores: plays, index: i, mode, beatmap, mapData }));
 
     let description = "";
     const playResults = await Promise.all(playsTemp);

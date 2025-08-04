@@ -1,5 +1,5 @@
-import { getProfile } from "@utils/profile-processor";
-import { getScore } from "@utils/scores-processor";
+import { getProcessedProfile } from "@utils/profile-processor";
+import { getProcessedScore } from "@utils/scores-processor";
 import { SPACE } from "@utils/constants";
 import { getEntry } from "@utils/database";
 import { downloadBeatmap, saveScoreDatas } from "@utils/osu";
@@ -12,7 +12,7 @@ import type { Beatmap, Mode, ProfileInfo, ScoresInfo, Score } from "@type/osu";
 export async function compareBuilder({ beatmap, plays, user, mode, mods }: CompareBuilderOptions): Promise<Array<Embed.Structure>> {
     saveScoreDatas(plays, mode, beatmap);
 
-    const profile = getProfile(user, mode);
+    const profile = getProcessedProfile(user, mode);
 
     if (mods?.name) {
         const { exclude, forceInclude, include, name } = mods;
@@ -46,7 +46,7 @@ async function getMultiplePlays({ plays, profile, beatmap, mode }: { plays: Arra
     const mapData = getEntry(Tables.MAP, beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
 
     const playsTemp: Array<Promise<ScoresInfo>> = [];
-    for (let i = 0; i < plays.length; i++) playsTemp.push(getScore({ scores: plays, index: i, mode, beatmap, mapData }));
+    for (let i = 0; i < plays.length; i++) playsTemp.push(getProcessedScore({ scores: plays, index: i, mode, beatmap, mapData }));
 
     const { beatmapset } = beatmap;
 

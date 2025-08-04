@@ -1,11 +1,11 @@
-import { getProfile } from "@utils/profile-processor";
+import { getProcessedProfile } from "@utils/profile-processor";
 import { grades } from "@utils/constants";
 import { EmbedType } from "lilybird";
 import type { ProfileBuilderOptions } from "@type/embedBuilders";
 import type { Embed } from "lilybird";
 
 export function profileBuilder({ user, mode }: ProfileBuilderOptions): Array<Embed.Structure> {
-    const profile = getProfile(user, mode);
+    const profile = getProcessedProfile(user, mode);
     const author = {
         name: `${user.username}: ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}#${profile.countryRank})`,
         icon_url: profile.flagUrl,
