@@ -1,4 +1,5 @@
 import db from "../data.db" with { type: "sqlite" };
+import { logger } from "./logger";
 import type { Tables, TableToArgument, TableToType } from "@type/database";
 
 // Prepared statement cache for better performance
@@ -24,7 +25,7 @@ function withPerfMonitoring<T>(operation: string, fn: () => T): T {
     const end = performance.now();
     
     if (end - start > 10) { // Log slow queries (>10ms)
-        console.warn(`Slow DB operation: ${operation} took ${(end - start).toFixed(2)}ms`);
+        logger.warn(`Slow DB operation: ${operation} took ${(end - start).toFixed(2)}ms`);
     }
     
     return result;

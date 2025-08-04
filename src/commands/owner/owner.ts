@@ -1,4 +1,5 @@
 import { getEntry, query } from "@utils/database";
+import { logger } from "@utils/logger";
 import { Tables } from "@type/database";
 import { ApplicationCommandOptionType } from "lilybird";
 import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
@@ -66,7 +67,7 @@ ${response}
 \`\`\``);
         }
     } catch (e) {
-        console.error("SQL query error:", e);
+        logger.error("SQL query error", e as Error);
         await interaction.editReply("*No response was given*");
     }
 }

@@ -1,4 +1,5 @@
-import { initializeDatabase, loadLogs, client } from "./utils/initalize";
+import { initializeDatabase, client } from "./utils/initalize";
+import { logger } from "./utils/logger";
 import { getAccessToken } from "./utils/osu";
 import { initializeRedis, closeRedis } from "./utils/redis";
 import { createHandler } from "@lilybird/handlers/simple";
@@ -6,7 +7,7 @@ import { CachingDelegationType, createClient, Intents } from "lilybird";
 import { Channel, Guild, GuildVoiceChannel } from "@lilybird/transformers";
 import { $ } from "bun";
 import { chromium } from "playwright";
-import { writeFile } from "node:fs/promises";
+import { writeFile } from "fs/promises";
 
 // refresh token every hour
 setInterval(setToken, 1000 * 60 * 60);
@@ -35,35 +36,37 @@ try {
 export const browser = await chromium.launch();
 
 process.on("unhandledRejection", async (error: Error) => {
-    await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);
+    await logger.fatal("Unhandled promise rejection", error);
 });
 process.on("uncaughtException", async (error: Error) => {
-    await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);
+    await logger.fatal("Uncaught exception", error);
 });
 
 // Graceful shutdown
 process.on("SIGINT", async () => {
-    console.log("Received SIGINT, shutting down gracefully...");
+    logger.info("Received SIGINT, shutting down gracefully...");
     try {
         await browser.close();
-        console.log("Browser closed");
+        logger.info("Browser closed");
         await closeRedis();
+        await logger.flush(); // Wait for pending log writes
         process.exit(0);
     } catch (error) {
-        console.error("Error during shutdown:", error);
+        logger.error("Error during shutdown", error as Error);
         process.exit(1);
     }
 });
 
 process.on("SIGTERM", async () => {
-    console.log("Received SIGTERM, shutting down gracefully...");
+    logger.info("Received SIGTERM, shutting down gracefully...");
     try {
         await browser.close();
-        console.log("Browser closed");
+        logger.info("Browser closed");
         await closeRedis();
+        await logger.flush(); // Wait for pending log writes
         process.exit(0);
     } catch (error) {
-        console.error("Error during shutdown:", error);
+        logger.error("Error during shutdown", error as Error);
         process.exit(1);
     }
 });

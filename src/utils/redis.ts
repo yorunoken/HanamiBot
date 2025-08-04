@@ -1,10 +1,11 @@
 import Valkey from "iovalkey";
+import { logger } from "@utils/logger";
 
 // Redis client instance
 let redisClient: Valkey;
 
 export async function initializeRedis(): Promise<void> {
-    console.log("Initializing Redis connection...");
+    logger.info("Initializing Redis connection...");
 
     redisClient = new Valkey({
         host: process.env.REDIS_HOST || "localhost",
@@ -18,21 +19,21 @@ export async function initializeRedis(): Promise<void> {
     // Wait for connection to be ready
     await new Promise<void>((resolve, reject) => {
         redisClient.on("ready", () => {
-            console.log("Redis connected successfully");
+            logger.info("Redis connected successfully");
             resolve();
         });
 
         redisClient.on("error", (error) => {
-            console.error("Redis connection error:", error);
+            logger.error("Redis connection error:", error);
             reject(new Error(`Redis connection failed: ${error.message}`));
         });
 
         redisClient.on("close", () => {
-            console.warn("Redis connection closed");
+            logger.warn("Redis connection closed");
         });
 
         redisClient.on("reconnecting", () => {
-            console.log("Redis reconnecting...");
+            logger.info("Redis reconnecting...");
         });
 
         setTimeout(() => {
@@ -78,7 +79,7 @@ export class RedisCache {
             const data = await redisClient.get(key);
             return data ? JSON.parse(data) : null;
         } catch (error) {
-            console.error(`Redis GET error for key ${key}:`, error);
+            logger.error(`Redis GET error for key ${key}`, error as Error);
             throw error;
         }
     }
@@ -97,7 +98,7 @@ export class RedisCache {
             }
             return true;
         } catch (error) {
-            console.error(`Redis SET error for key ${key}:`, error);
+            logger.error(`Redis SET error for key ${key}`, error as Error);
             throw error;
         }
     }
@@ -111,7 +112,7 @@ export class RedisCache {
             await redisClient.del(key);
             return true;
         } catch (error) {
-            console.error(`Redis DEL error for key ${key}:`, error);
+            logger.error(`Redis DEL error for key ${key}`, error as Error);
             throw error;
         }
     }
@@ -125,7 +126,7 @@ export class RedisCache {
             const result = await redisClient.exists(key);
             return result === 1;
         } catch (error) {
-            console.error(`Redis EXISTS error for key ${key}:`, error);
+            logger.error(`Redis EXISTS error for key ${key}`, error as Error);
             throw error;
         }
     }
@@ -142,7 +143,7 @@ export class RedisCache {
             }
             return result;
         } catch (error) {
-            console.error(`Redis INCR error for key ${key}:`, error);
+            logger.error(`Redis INCR error for key ${key}`, error as Error);
             throw error;
         }
     }
@@ -156,7 +157,7 @@ export class RedisCache {
             await redisClient.expire(key, ttl);
             return true;
         } catch (error) {
-            console.error(`Redis EXPIRE error for key ${key}:`, error);
+            logger.error(`Redis EXPIRE error for key ${key}`, error as Error);
             throw error;
         }
     }
@@ -212,9 +213,9 @@ export async function closeRedis(): Promise<void> {
     if (redisClient && redisClient.status !== "end") {
         try {
             await redisClient.quit();
-            console.log("Redis connection closed gracefully");
+            logger.info("Redis connection closed gracefully");
         } catch (error) {
-            console.error("Error closing Redis connection:", error);
+            logger.error("Error closing Redis connection", error as Error);
             redisClient.disconnect();
         }
     }

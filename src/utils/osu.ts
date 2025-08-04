@@ -1,4 +1,5 @@
 import { bulkInsertData, getEntry, insertData } from "./database";
+import { logger } from "./logger";
 import { Mode } from "@type/osu";
 import { Tables } from "@type/database";
 import { Beatmap, BeatmapAttributesBuilder, Performance } from "rosu-pp-js";
@@ -38,13 +39,12 @@ export async function getAccessToken(
     const request = await fetch("https://osu.ppy.sh/oauth/token", {
         method: "POST",
         headers: {
-             
             "Content-Type": "application/json",
         },
         body,
     });
     if (!request.ok) {
-        console.error("Failed to get access token:", request.status, request.statusText);
+        logger.error(`Failed to get access token: ${request.status} ${request.statusText}`);
         return null;
     }
 
@@ -73,12 +73,11 @@ export function getModsEnum(mods: Array<ModOsuWeb>, derivativeModsWithOriginal?:
 export async function getBeatmapTopScores({ beatmapId, isGlobal, mode, mods }: { beatmapId: number; isGlobal: boolean; mode: GameMode; mods: Array<ModOsuWeb> | undefined }): Promise<LeaderboardScoresRaw> {
     return fetch(`https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${mode}&type=${isGlobal ? "global" : "country"}${mods ? mods.map((mod) => `&mods[]=${mod.toUpperCase()}`).join("") : ""}`, {
         headers: {
-             
             "Content-Type": "application/json",
             Cookie: `osu_session=${process.env.ACCESS_TOKEN}`,
         },
     }).then((res) => {
-        return (res.json() as unknown) as LeaderboardScoresRaw;
+        return res.json() as unknown as LeaderboardScoresRaw;
     });
 }
 
@@ -112,7 +111,6 @@ export async function getPerformanceResults({
     let rulesetId: number;
     if (typeof play !== "undefined" && "mode_int" in play) rulesetId = play.mode_int;
     else if (typeof play !== "undefined" && "mode" in play) rulesetId = play.ruleset_id;
-     
     else rulesetId = setId!;
 
     mapData ??= getEntry(Tables.MAP, beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
@@ -235,7 +233,6 @@ export async function downloadBeatmap(
                 });
                 response.on("end", function () {
                     const data = Buffer.concat(chunks).toString();
-                    // console.log(data);
                     insertData({ table: Tables.MAP, id, data: [{ key: "data", value: data }] });
                     resolve({ id, contents: data });
                 });
@@ -411,7 +408,7 @@ export function hitValueCalculator(
     return hitValues;
 }
 
-export function saveScoreDatas(scores: Array<UserBestScore | UserScore | Score> , mode: Mode, mapTemp?: BeatmapWeb): void {
+export function saveScoreDatas(scores: Array<UserBestScore | UserScore | Score>, mode: Mode, mapTemp?: BeatmapWeb): void {
     const scoresList = [];
     for (const score of scores) {
         if (score.passed) scoresList.push(saveScore(score, mode, mapTemp));
@@ -523,8 +520,8 @@ function findId(embed: Embed.Structure): number | null {
 function getEmbedFromReply(message: Message): number | null {
     const { referencedMessage } = message;
     if (typeof referencedMessage?.embeds === "undefined") {
-        return null
-    };
+        return null;
+    }
 
     const foundId = findId(referencedMessage.embeds[0]);
     return Number(foundId) || null;
@@ -533,8 +530,8 @@ function getEmbedFromReply(message: Message): number | null {
 async function cycleThroughEmbeds({ client, message, channelId }: { message?: Message; channelId?: string; client: Client }): Promise<number | null> {
     const channel = await client.rest.getChannel(message?.channelId ?? channelId ?? "");
     if (!channel.id || channel.type !== ChannelType.GUILD_TEXT) {
-        return null
-    };
+        return null;
+    }
 
     const messages = await client.rest.getChannelMessages(channel.id, { limit: 100 });
 

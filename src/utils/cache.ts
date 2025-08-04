@@ -1,5 +1,6 @@
 import type { EmbedBuilderOptions } from "@type/embedBuilders";
 import { ButtonStateCache } from "@utils/redis";
+import { logger } from "@utils/logger";
 
 export const slashCommandsIds = new Map<string, string>();
 
@@ -30,12 +31,16 @@ export class SyncMapProxy {
     set(messageId: string, options: EmbedBuilderOptions): void {
         this.cache.set(messageId, options);
         // Asynchronously sync to Redis
-        ButtonStateCache.set(messageId, options).catch(console.error);
+        ButtonStateCache.set(messageId, options).catch((error) => {
+            logger.error(`Failed to cache button state for message ${messageId}`, error as Error);
+        });
     }
 
     delete(messageId: string): void {
         this.cache.delete(messageId);
-        ButtonStateCache.del(messageId).catch(console.error);
+        ButtonStateCache.del(messageId).catch((error) => {
+            logger.error(`Failed to delete button state cache for message ${messageId}`, error as Error);
+        });
     }
 
     has(messageId: string): boolean {

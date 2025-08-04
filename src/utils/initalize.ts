@@ -3,9 +3,10 @@ import { getAccessToken } from "./osu";
 import { slashCommandsIds } from "./cache";
 import { removeEntry } from "./database";
 import { GuildPrefixCache } from "./redis";
+import { logger } from "./logger";
 import { Tables } from "@type/database";
 import { Client as OsuClient } from "osu-web.js";
-import { mkdir, access, readFile, writeFile, readdir } from "node:fs/promises";
+import { readdir } from "fs/promises";
 import type { Guild } from "@type/database";
 import type { Client as LilybirdClient, ApplicationCommand } from "lilybird";
 import type { DefaultMessageCommand, DefaultSlashCommand } from "@type/commands";
@@ -21,13 +22,7 @@ export const messageCommands = new Map<string, DefaultMessageCommand>();
 export const commandAliases = new Map<string, string>();
 export const applicationCommands = new Map<string, DefaultSlashCommand>();
 
-/**
- * Loads all message commands from the `./src/commands-message` directory and adds them to the `messageCommands` and `commandAliases` maps.
- *
- * This function reads the contents of the `./src/commands-message` directory, imports each command module, and adds the command and its aliases to the respective maps.
- *
- * @returns {Promise<void>} A promise that resolves when all message commands have been loaded.
- */
+
 export async function loadMessageCommands(): Promise<void> {
     // Temporary array to store promises of MessageCommands
     const temp: Array<Promise<DefaultMessageCommand>> = [];
@@ -92,74 +87,8 @@ export function refreshGuildsDatabase(): void {
         return;
 
     for (const guild of nulledGuilds) {
-        console.log(`Removed guild: ${guild.name} (${guild.id})`);
+        logger.info(`Removed guild: ${guild.name} (${guild.id})`);
         removeEntry(Tables.GUILD, guild.id);
-    }
-}
-
-async function exists(path: string): Promise<boolean> {
-    try {
-        await access(path);
-        return true;
-    } catch {
-        return false;
-    }
-}
-
-export async function loadLogs(message: string, error?: boolean): Promise<void> {
-    const date = new Date(Date.now());
-    const formattedDate = `${new Intl.DateTimeFormat("en-US", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        timeZone: "UTC"
-    }).format(date)}  |  `;
-
-    const monthNames = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December"
-    ];
-
-    const year = date.getFullYear();
-    const month = (date.getUTCMonth() + 1).toString().padStart(2, "0");
-    const monthName = monthNames[date.getUTCMonth()];
-    const day = date.getUTCDate().toString().padStart(2, "0");
-
-    if (!await exists("./logs")) {
-        console.log("The logs folder couldn't be found❌, generating..");
-        await mkdir("./logs", { recursive: true });
-    }
-
-    if (!await exists(`./logs/${year}`)) {
-        console.log(`The year ${year} couldn't be found❌, generating..`);
-        await mkdir(`./logs/${year}`, { recursive: true });
-    }
-
-    if (!await exists(`./logs/${year}/${month}`)) {
-        console.log(`The month ${monthName}(${month}) couldn't be found❌, generating..`);
-        await mkdir(`./logs/${year}/${month}`, { recursive: true });
-    }
-
-    if (!await exists(`./logs/${year}/${month}/${day}.txt`)) {
-        console.log(`The day ${day} couldn't be found ❌, generating..`);
-        await writeFile(`./logs/${year}/${month}/${day}.txt`, `${formattedDate}Created log file.`);
-    } else {
-        const todaysLogFile = await readFile(`./logs/${year}/${month}/${day}.txt`, "utf-8");
-        await writeFile(`./logs/${year}/${month}/${day}.txt`, `${todaysLogFile}\n${formattedDate}${message}`);
-        console[error ? "error" : "log"](`${formattedDate}${message}`);
     }
 }
 
@@ -229,7 +158,7 @@ export function initializeDatabase(): void {
 
             if (!columnExists) {
                 db.run(`ALTER TABLE ${table.name} ADD COLUMN ${columnNameType};`);
-                console.log(`Added column ${columnName} in ${table.name} table`);
+                logger.info(`Added column ${columnName} in ${table.name} table`);
             }
         }
 
@@ -239,17 +168,17 @@ export function initializeDatabase(): void {
 
             if (columnNotInTables) {
                 db.run(`ALTER TABLE ${table.name} DROP COLUMN ${columnName};`);
-                console.log(`Removed column ${columnName} from ${table.name}`);
+                logger.info(`Removed column ${columnName} from ${table.name}`);
             }
         }
     }
 
-    console.log("Database up and running!");
+    logger.info("Database up and running!");
 }
 
 export async function loadGuildPrefixes(): Promise<void> {
     try {
-        console.log("Loading guild prefixes from database...");
+        logger.info("Loading guild prefixes from database...");
         const guilds = db.prepare("SELECT id, prefixes FROM guilds WHERE prefixes IS NOT NULL").all() as Array<{ id: string, prefixes: string }>;
         
         let loadedCount = 0;
@@ -261,16 +190,16 @@ export async function loadGuildPrefixes(): Promise<void> {
                     if (success) {
                         loadedCount++;
                     } else {
-                        console.warn(`Failed to cache prefixes for guild ${guild.id}`);
+                        logger.warn(`Failed to cache prefixes for guild ${guild.id}`);
                     }
                 }
             } catch (parseError) {
-                console.error(`Failed to parse prefixes for guild ${guild.id}:`, parseError);
+                logger.error(`Failed to parse prefixes for guild ${guild.id}`, parseError as Error);
             }
         }
         
-        console.log(`Loaded ${loadedCount}/${guilds.length} guild prefixes into cache`);
+        logger.info(`Loaded ${loadedCount}/${guilds.length} guild prefixes into cache`);
     } catch (error) {
-        console.error("Failed to load guild prefixes:", error);
+        logger.error("Failed to load guild prefixes", error as Error);
     }
 }

@@ -1,4 +1,5 @@
 import { getEntry, insertData, removeEntry } from "@utils/database";
+import { logger } from "@utils/logger";
 import { Tables } from "@type/database";
 import type { Guild } from "@type/database";
 import type { Event } from "@lilybird/handlers";
@@ -33,7 +34,7 @@ export default {
             try {
                 await GuildPrefixCache.set(guild.id, document.prefixes);
             } catch (error) {
-                console.error(`Failed to cache prefixes for guild ${guild.id}:`, error);
+                logger.error(`Failed to cache prefixes for guild ${guild.id}`, error as Error);
             }
         }
     },

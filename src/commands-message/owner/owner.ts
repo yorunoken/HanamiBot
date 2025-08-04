@@ -1,4 +1,5 @@
 import { query } from "@utils/database";
+import { logger } from "@utils/logger";
 import type { GuildTextChannel, Message } from "@lilybird/transformers";
 import type { MessageCommand } from "@type/commands";
 
@@ -35,7 +36,7 @@ ${response}
 \`\`\``);
         }
     } catch (e) {
-        console.error("SQL query error:", e);
+        logger.error("SQL query error", e as Error);
         await channel.send("*No response was given*");
     }
 }

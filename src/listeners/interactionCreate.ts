@@ -1,5 +1,6 @@
 import { getEntry, insertData } from "@utils/database";
-import { client, applicationCommands, loadLogs } from "@utils/initalize";
+import { client, applicationCommands } from "@utils/initalize";
+import { logger } from "@utils/logger";
 import { ButtonStateCache } from "@utils/redis";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { createPaginationActionRow } from "@utils/buttons";
@@ -29,7 +30,14 @@ async function run(interaction: Interaction): Promise<void> {
         try {
             await command.run(interaction);
             const guild = await interaction.client.rest.getGuild(interaction.guildId);
-            await loadLogs(`INFO: [${guild.name}] ${user.username} used slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}`);
+            await logger.info(`[${guild.name}] ${user.username} used slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}`, {
+                guildId: interaction.guildId,
+                guildName: guild.name,
+                userId: user.id,
+                username: user.username,
+                command: command.data.name,
+                subCommand: interaction.data.subCommand,
+            });
 
             const docs = getEntry(Tables.COMMAND_SLASH, interaction.data.name);
             if (docs === null) insertData({ table: Tables.COMMAND_SLASH, data: [{ key: "count", value: 1 }], id: command.data.name });
@@ -65,11 +73,14 @@ async function run(interaction: Interaction): Promise<void> {
                 ],
             });
 
-            console.error(error);
-            await loadLogs(
-                `ERROR: [${guild.name}] ${user.username} had an error in slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}: ${err.stack}`,
-                true
-            );
+            await logger.error(`[${guild.name}] ${user.username} had an error in slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}`, err, {
+                guildId: interaction.guildId,
+                guildName: guild.name,
+                userId: user.id,
+                username: user.username,
+                command: command.data.name,
+                subCommand: interaction.data.subCommand,
+            });
 
             const docs = getEntry(Tables.COMMAND_SLASH, interaction.data.name);
             if (docs === null) insertData({ table: Tables.COMMAND_SLASH, data: [{ key: "count", value: 1 }], id: command.data.name });
@@ -178,10 +189,18 @@ async function handleVerify(interaction: DMInteraction<MessageComponentData, Mes
     interaction
         .editReply({ embeds: [embed], components: [] })
         .then(async () => {
-            await loadLogs(`INFO: [Private Messages] ${username} linked their osu! account, \`${osuId}\``);
+            await logger.info(`[Private Messages] ${username} linked their osu! account`, {
+                username,
+                discordId,
+                osuId,
+                osuUsername: osuUser.username,
+            });
         })
         .catch(async (error: Error) => {
-            console.error("Verify user interaction error:", error);
-            await loadLogs(`ERROR: [Private Messages] ${username} had an error while linking their osu! account, \`${discordId}\`: ${error.stack}`, true);
+            await logger.error(`[Private Messages] ${username} had an error while linking their osu! account`, error, {
+                username,
+                discordId,
+                osuId,
+            });
         });
 }

@@ -1,11 +1,11 @@
 import { sleep } from "bun";
-import { appendFile, readFile, writeFile } from "node:fs/promises";
+import { appendFile, readFile, writeFile } from "fs/promises";
 import type { SlashCommand } from "@type/commands";
 import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
 
 export default {
     data: { name: "link", description: "Link your osu! account to the bot." },
-    run
+    run,
 } satisfies SlashCommand;
 
 let state = 1;

@@ -1,5 +1,6 @@
 import { DEFAULT_PREFIX } from "@utils/constants";
-import { commandAliases, loadLogs, messageCommands } from "@utils/initalize";
+import { commandAliases, messageCommands } from "@utils/initalize";
+import { logger } from "@utils/logger";
 import { getEntry, insertData } from "@utils/database";
 import { fuzzySearch } from "@utils/fuzzy";
 import { Tables } from "@type/database";
@@ -27,7 +28,7 @@ async function run(message: Message): Promise<void> {
     try {
         guildPrefixes = (await GuildPrefixCache.get(guildId)) ?? DEFAULT_PREFIX;
     } catch (error) {
-        console.error("Failed to get guild prefixes from cache, using default:", error);
+        logger.error("Failed to get guild prefixes from cache, using default", error as Error, { guildId });
         guildPrefixes = DEFAULT_PREFIX;
     }
 
@@ -102,18 +103,18 @@ async function run(message: Message): Promise<void> {
                                 try {
                                     await msg.delete();
                                 } catch (deleteError) {
-                                    console.warn("Could not delete cooldown message:", deleteError);
+                                    logger.warn("Could not delete cooldown message", { messageId: msg.id, error: deleteError });
                                 }
                             }, remainingTime)
                         );
                 } catch (replyError) {
-                    console.warn("Could not send cooldown message:", replyError);
+                    logger.warn("Could not send cooldown message", { error: replyError });
                 }
                 return;
             }
         }
     } catch (cooldownError) {
-        console.error("Error checking cooldown, allowing command to proceed:", cooldownError);
+        logger.error("Error checking cooldown, allowing command to proceed", cooldownError as Error);
         // Continue execution - don't block commands due to Redis issues
     }
     const channel = await message.fetchChannel();
@@ -125,7 +126,14 @@ async function run(message: Message): Promise<void> {
         await command.run({ client: client, message, args, prefix: chosenPrefix, index, commandName, channel });
 
         const guild = await client.rest.getGuild(guildId);
-        await loadLogs(`INFO: [${guild.name}] ${author.username} used prefix command \`${command.name}\``);
+        await logger.info(`[${guild.name}] ${author.username} used prefix command \`${command.name}\``, {
+            guildId,
+            guildName: guild.name,
+            userId: author.id,
+            username: author.username,
+            command: command.name,
+            prefix: chosenPrefix,
+        });
         const docs = getEntry(Tables.COMMAND, command.name);
 
         if (docs === null) insertData({ table: Tables.COMMAND, data: [{ key: "count", value: 1 }], id: command.name });
@@ -167,8 +175,14 @@ async function run(message: Message): Promise<void> {
             ],
         });
 
-        console.error(err);
-        await loadLogs(`ERROR: [${guild.name}] ${author.username} had an error in prefix command \`${command.name}\`: ${err.stack}`, true);
+        await logger.error(`[${guild.name}] ${author.username} had an error in prefix command \`${command.name}\``, err, {
+            guildId,
+            guildName: guild.name,
+            userId: author.id,
+            username: author.username,
+            command: command.name,
+            prefix: chosenPrefix,
+        });
         const docs = getEntry(Tables.COMMAND, command.name);
 
         if (docs === null) insertData({ table: Tables.COMMAND, data: [{ key: "count", value: 1 }], id: command.name });
@@ -182,7 +196,11 @@ async function run(message: Message): Promise<void> {
     try {
         await CooldownCache.set(command.name, author.id, cooldownExpiry);
     } catch (cooldownError) {
-        console.error("Failed to set cooldown:", cooldownError);
+        logger.error("Failed to set cooldown", cooldownError as Error, {
+            command: command.name,
+            userId: author.id,
+            cooldownDuration,
+        });
     }
 
     return;

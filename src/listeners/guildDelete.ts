@@ -1,4 +1,5 @@
 import { removeEntry } from "@utils/database";
+import { logger } from "@utils/logger";
 import { Tables } from "@type/database";
 import type { Event } from "@lilybird/handlers";
 import { GuildPrefixCache } from "@utils/redis";
@@ -10,7 +11,7 @@ export default {
         try {
             await GuildPrefixCache.del(guild.id);
         } catch (error) {
-            console.error(`Failed to remove guild ${guild.id} from prefix cache:`, error);
+            logger.error(`Failed to remove guild ${guild.id} from prefix cache`, error as Error);
         }
     },
 } satisfies Event<"guildDelete">;

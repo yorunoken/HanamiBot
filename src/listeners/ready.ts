@@ -1,20 +1,21 @@
-import { loadApplicationCommands, loadLogs, loadMessageCommands, refreshGuildsDatabase, loadGuildPrefixes } from "@utils/initalize";
+import { loadApplicationCommands, loadMessageCommands, refreshGuildsDatabase, loadGuildPrefixes } from "@utils/initalize";
+import { logger } from "@utils/logger";
 import type { Event } from "@lilybird/handlers";
 
 export default {
     event: "ready",
     run: async (client) => {
-        console.log(`Successfully logged in as ${client.user.username} ✅`);
-        console.log("Setting up Logs..");
-        await loadLogs("Started the bot.");
-        console.log("Prepared logs ✅");
+        logger.info(`Successfully logged in as ${client.user.username} ✅`);
+        logger.info("Setting up logs...");
+        logger.info("Started the bot.");
+        logger.info("Prepared logs ✅");
         await loadMessageCommands();
-        console.log("Loaded message commands ✅");
+        logger.info("Loaded message commands ✅");
         await loadApplicationCommands(client);
-        console.log("Loaded application commands ✅");
+        logger.info("Loaded application commands ✅");
         refreshGuildsDatabase();
-        console.log("Refreshed servers database ✅");
+        logger.info("Refreshed servers database ✅");
         await loadGuildPrefixes();
-        console.log("Loaded guild prefixes into cache ✅");
+        logger.info("Loaded guild prefixes into cache ✅");
     },
 } satisfies Event<"ready">;
