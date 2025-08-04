@@ -20,7 +20,7 @@ export default {
 
         const commandName = interaction.data.getString("command");
         await interaction.editReply({
-            embeds: helpBuilder(commandName),
+            embeds: helpBuilder(commandName, true),
         });
     },
 } satisfies SlashCommand;

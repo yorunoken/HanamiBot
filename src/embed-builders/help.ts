@@ -3,17 +3,17 @@ import { getRowCount, getRowSum } from "@utils/database";
 import { applicationCommands, messageCommands, commandAliases } from "@utils/initalize";
 import type { Embed } from "lilybird";
 
-export function helpBuilder(commandName?: string): Array<Embed.Structure> {
+export function helpBuilder(commandName?: string, preferSlash?: boolean): Array<Embed.Structure> {
     if (commandName) {
-        return displayCommandInfo(commandName);
+        return displayCommandInfo(commandName, preferSlash);
     }
 
     return displayAllCommands();
 }
 
-function displayCommandInfo(name: string): Array<Embed.Structure> {
+function displayCommandInfo(name: string, preferSlash?: boolean): Array<Embed.Structure> {
     const slashCmd = applicationCommands.get(name);
-    if (slashCmd) {
+    if (slashCmd && preferSlash) {
         const { default: command } = slashCmd;
         return [
             {
@@ -36,7 +36,7 @@ function displayCommandInfo(name: string): Array<Embed.Structure> {
     }
 
     const msgCmd = messageCommands.get(name) ?? messageCommands.get(commandAliases.get(name) ?? "");
-    if (msgCmd) {
+    if (msgCmd && !preferSlash) {
         const { default: command } = msgCmd;
         const cooldownSecond = command.cooldown / 1000;
         return [
