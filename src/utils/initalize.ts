@@ -1,4 +1,4 @@
-import db from "../data.db" with { type: "sqlite" };
+import db from "../../data.db" with { type: "sqlite" };
 import { getAccessToken } from "./osu";
 import { removeEntry } from "./database";
 import { guildPrefixesCache, slashCommandIdsCache } from "./cache";
