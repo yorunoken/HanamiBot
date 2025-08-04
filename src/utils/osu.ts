@@ -19,7 +19,7 @@ export async function getAccessToken(
     scope: Array<AuthScope>,
 ): Promise<{
     accessToken: string;
-    expiresIn: string;
+    expiresIn: number;
 } | null> {
     const body = JSON.stringify({
         grant_type: "client_credentials",

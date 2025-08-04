@@ -2,10 +2,7 @@ import db from "../data.db" with { type: "sqlite" };
 import { logger } from "./logger";
 import type { Tables, TableToArgument, TableToType } from "@type/database";
 
-// Prepared statement cache for better performance
 const preparedStatements = new Map<string, any>();
-
-// Performance monitoring (optional - can be disabled in production)
 const ENABLE_DB_PERF_MONITORING = process.env.NODE_ENV === "development";
 
 function getPreparedStatement(sql: string) {

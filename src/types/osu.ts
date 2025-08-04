@@ -100,7 +100,7 @@ export type AuthScope = "public" | "chat.write" | "delegate" | "forum.write" | "
 
 export interface AccessTokenJSON {
     access_token: string;
-    expires_in: string;
+    expires_in: number;
 }
 
 export interface PlayStatistics {

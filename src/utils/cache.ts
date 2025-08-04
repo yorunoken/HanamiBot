@@ -61,7 +61,7 @@ export async function initializeRedis(): Promise<void> {
 }
 
 export function isRedisAvailable(): boolean {
-    return redisClient !== null && redisClient.status === "ready";
+    return redisClient && redisClient.status === "ready";
 }
 
 export const CacheKeys = {
