@@ -6,7 +6,7 @@ export default {
         const voteLink = "https://top.gg/bot/995999045157916763";
 
         await interaction.editReply({
-            content: `You can vote for the bot using the following link:\n${voteLink}`
+            content: `You can vote for the bot using the following link:\n${voteLink}`,
         });
-    }
+    },
 } satisfies SlashCommand;

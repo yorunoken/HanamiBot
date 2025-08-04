@@ -15,11 +15,11 @@ export default {
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "map",
-                description: "Specify a beatmap link (eg: https://osu.ppy.sh/b/72727)"
-            }
-        ]
+                description: "Specify a beatmap link (eg: https://osu.ppy.sh/b/72727)",
+            },
+        ],
     },
-    run
+    run,
 } satisfies SlashCommand;
 
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
@@ -27,16 +27,16 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
 
     const { user } = getCommandArgs(interaction);
 
-    const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ channelId: interaction.channelId, client: interaction.client });
+    const beatmapId = user.beatmapId ?? (await getBeatmapIdFromContext({ channelId: interaction.channelId, client: interaction.client }));
     if (typeof beatmapId === "undefined" || beatmapId === null) {
         await interaction.editReply({
             embeds: [
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like the beatmap ID couldn't be found :(\n"
-                }
-            ]
+                    description: "It seems like the beatmap ID couldn't be found :(\n",
+                },
+            ],
         });
         return;
     }
@@ -48,9 +48,9 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like this beatmap doesn't exist! :("
-                }
-            ]
+                    description: "It seems like this beatmap doesn't exist! :(",
+                },
+            ],
         });
         return;
     }
@@ -59,8 +59,7 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
     const embeds = backgroundBuilder({
         type: EmbedBuilderType.BACKGROUND,
         initiatorId: interaction.member.user.id,
-        beatmap: beatmap
+        beatmap: beatmap,
     });
     await interaction.editReply({ embeds });
 }
-

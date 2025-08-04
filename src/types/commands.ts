@@ -12,14 +12,22 @@ export interface MessageCommand {
     usage: string;
     // category: string;
     flags?: string;
-    run: ({ client, message, args, prefix, index, commandName, channel }: {
-        client: Client,
-        message: Message,
-        args: Array<string>,
-        prefix: string,
-        index: number | undefined,
-        commandName: string,
-        channel: GuildTextChannel
+    run: ({
+        client,
+        message,
+        args,
+        prefix,
+        index,
+        commandName,
+        channel,
+    }: {
+        client: Client;
+        message: Message;
+        args: Array<string>;
+        prefix: string;
+        index: number | undefined;
+        commandName: string;
+        channel: GuildTextChannel;
     }) => Awaitable<void>;
 }
 

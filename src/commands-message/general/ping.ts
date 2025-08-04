@@ -8,13 +8,13 @@ export default {
     cooldown: 1000,
     run: async ({ message }) => {
         const newMessage = await message.reply({
-            content: "🏓..."
+            content: "🏓...",
         });
 
         const { ws, rest } = await message.client.ping();
 
         await newMessage.edit({
-            content: `🏓 WebSocket: \`${ws}ms\` | Rest: \`${rest}ms\``
+            content: `🏓 WebSocket: \`${ws}ms\` | Rest: \`${rest}ms\``,
         });
 
         const userId = 17279598;
@@ -25,7 +25,7 @@ export default {
         const osuDuration = osuEnd - osuStart;
 
         await newMessage.edit({
-            content: `🏓 WebSocket: \`${ws.toFixed()}ms\` | Rest: \`${rest.toFixed()}ms\`\nosu! API: \`${osuDuration.toFixed()}ms\``
+            content: `🏓 WebSocket: \`${ws.toFixed()}ms\` | Rest: \`${rest.toFixed()}ms\`\nosu! API: \`${osuDuration.toFixed()}ms\``,
         });
-    }
+    },
 } satisfies MessageCommand;

@@ -10,15 +10,15 @@ export default {
             {
                 name: "name",
                 description: "Name of the command you want to get information on.",
-                type: ApplicationCommandOptionType.STRING
-            }
-        ]
+                type: ApplicationCommandOptionType.STRING,
+            },
+        ],
     },
     run: async (interaction) => {
         await interaction.deferReply();
 
         await interaction.editReply({
-            embeds: commandBuilder(interaction.data.getString("name"))
+            embeds: commandBuilder(interaction.data.getString("name")),
         });
-    }
+    },
 } satisfies SlashCommand;

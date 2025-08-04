@@ -4,7 +4,7 @@ import type { Mode } from "./osu";
 
 export const enum UserType {
     SUCCESS = "success",
-    FAIL = "fail"
+    FAIL = "fail",
 }
 
 interface BaseUser {

@@ -19,30 +19,28 @@ function withPerfMonitoring<T>(operation: string, fn: () => T): T {
     if (!ENABLE_DB_PERF_MONITORING) {
         return fn();
     }
-    
+
     const start = performance.now();
     const result = fn();
     const end = performance.now();
-    
-    if (end - start > 10) { // Log slow queries (>10ms)
+
+    if (end - start > 10) {
+        // Log slow queries (>10ms)
         logger.warn(`Slow DB operation: ${operation} took ${(end - start).toFixed(2)}ms`);
     }
-    
+
     return result;
 }
 
 export function query(str: string): unknown {
-    return withPerfMonitoring(`query: ${str.substring(0, 50)}...`, () => 
-        getPreparedStatement(str).all()
-    );
+    return withPerfMonitoring(`query: ${str.substring(0, 50)}...`, () => getPreparedStatement(str).all());
 }
 
 export function getEntry<T extends Tables>(table: T, id: string | number): TableToType<T> | null {
     return withPerfMonitoring(`getEntry: ${table}`, () => {
         const stmt = getPreparedStatement(`SELECT * FROM ${table} WHERE id = ?`);
         const data = stmt.get(id) as TableToType<T> | null;
-        if (data !== null && "prefixes" in data && typeof data.prefixes === "string")
-            data.prefixes = JSON.parse(data.prefixes) as Array<string>;
+        if (data !== null && "prefixes" in data && typeof data.prefixes === "string") data.prefixes = JSON.parse(data.prefixes) as Array<string>;
 
         return data;
     });
@@ -69,21 +67,20 @@ export function insertData<T extends Tables>(
     {
         table,
         id,
-        data
-    }:
-    {
-        table: T,
-        id: string | number,
-        data: Array<{ key: TableToArgument<T>, value: string | number | boolean | null }>
+        data,
+    }: {
+        table: T;
+        id: string | number;
+        data: Array<{ key: TableToArgument<T>; value: string | number | boolean | null }>;
     },
-    ignore?: boolean
+    ignore?: boolean,
 ): void {
     const fields: Array<TableToArgument<T>> = data.map((item) => item.key);
     const values: Array<string | number | boolean | null> = data.map((item) => item.value);
-    
+
     const selectStmt = getPreparedStatement(`SELECT 1 FROM ${table} WHERE id = ? LIMIT 1`);
     const existingRow = selectStmt.get(id);
-    
+
     if (!existingRow) {
         const placeholders = fields.map(() => "?").join(", ");
         const insertSql = `INSERT OR ${ignore ? "IGNORE" : "REPLACE"} INTO ${table} (id, ${fields.join(", ")}) VALUES (?, ${placeholders})`;
@@ -96,12 +93,14 @@ export function insertData<T extends Tables>(
         updateStmt.run(...values, id);
     }
 }
-export function bulkInsertData<T extends Tables>(entries: Array<{
-    table: T,
-    id: string | number,
-    data: Array<{ key: TableToArgument<T>, value: string | number | boolean | null }>,
-    ignore?: boolean
-}>): void {
+export function bulkInsertData<T extends Tables>(
+    entries: Array<{
+        table: T;
+        id: string | number;
+        data: Array<{ key: TableToArgument<T>; value: string | number | boolean | null }>;
+        ignore?: boolean;
+    }>,
+): void {
     // Group entries by table and operation type for better batching
     const insertByTable = new Map<string, Array<any>>();
     const statementCache = new Map<string, any>();
@@ -110,18 +109,18 @@ export function bulkInsertData<T extends Tables>(entries: Array<{
         const { table, id, data, ignore } = entry;
         const fields = data.map((item) => item.key);
         const values = data.map((item) => item.value);
-        
+
         const placeholders = fields.map(() => "?").join(", ");
         const sql = `INSERT OR ${ignore ? "IGNORE" : "REPLACE"} INTO ${table} (id, ${fields.join(", ")}) VALUES (?, ${placeholders})`;
-        
+
         if (!statementCache.has(sql)) {
             statementCache.set(sql, getPreparedStatement(sql));
         }
-        
+
         if (!insertByTable.has(sql)) {
             insertByTable.set(sql, []);
         }
-        
+
         insertByTable.get(sql)!.push([id, ...values]);
     }
 
@@ -134,6 +133,6 @@ export function bulkInsertData<T extends Tables>(entries: Array<{
             }
         }
     });
-    
+
     transaction();
 }

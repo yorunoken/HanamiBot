@@ -107,7 +107,7 @@ async function run(message: Message): Promise<void> {
                                 } catch (deleteError) {
                                     logger.warn("Could not delete cooldown message", { messageId: msg.id, error: deleteError });
                                 }
-                            }, remainingTime)
+                            }, remainingTime),
                         );
                 } catch (replyError) {
                     logger.warn("Could not send cooldown message", { error: replyError });

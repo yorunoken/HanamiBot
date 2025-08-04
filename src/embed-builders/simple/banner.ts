@@ -9,7 +9,7 @@ export function bannerBuilder({ user }: BannerBuilderOptions): Array<Embed.Struc
     return [
         {
             author: { name: `Banner of ${profile.username}`, icon_url: profile.flagUrl, url: profile.userUrl },
-            image: { url: profile.bannerUrl }
-        }
+            image: { url: profile.bannerUrl },
+        },
     ];
 }

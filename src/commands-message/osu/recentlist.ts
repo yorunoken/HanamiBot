@@ -11,7 +11,7 @@ import type { GuildTextChannel, Message } from "@lilybird/transformers";
 import type { PlaysBuilderOptions } from "@type/embedBuilders";
 import type { MessageCommand } from "@type/commands";
 
-const modeAliases: Record<string, { mode: Mode, includeFails: boolean }> = {
+const modeAliases: Record<string, { mode: Mode; includeFails: boolean }> = {
     rl: { mode: Mode.OSU, includeFails: true },
     rlt: { mode: Mode.TAIKO, includeFails: true },
     rlm: { mode: Mode.MANIA, includeFails: true },
@@ -28,7 +28,7 @@ const modeAliases: Record<string, { mode: Mode, includeFails: boolean }> = {
     recentlistpass: { mode: Mode.OSU, includeFails: false },
     recentlistpasstaiko: { mode: Mode.TAIKO, includeFails: false },
     recentlistpassmania: { mode: Mode.MANIA, includeFails: false },
-    recentlistpasscatch: { mode: Mode.FRUITS, includeFails: false }
+    recentlistpasscatch: { mode: Mode.FRUITS, includeFails: false },
 };
 
 export default {
@@ -42,10 +42,10 @@ export default {
     /recentlist mods: DT
     /recentlist passes: true`,
     cooldown: 1000,
-    run
+    run,
 } satisfies MessageCommand;
 
-async function run({ message, args, commandName, index, channel }: { message: Message, args: Array<string>, commandName: string, index: number | undefined, channel: GuildTextChannel }): Promise<void> {
+async function run({ message, args, commandName, index, channel }: { message: Message; args: Array<string>; commandName: string; index: number | undefined; channel: GuildTextChannel }): Promise<void> {
     const { mode, includeFails } = modeAliases[commandName];
     const { user, mods, flags } = parseOsuArguments(message, args, mode);
     if (user.type === UserType.FAIL) {
@@ -60,9 +60,9 @@ async function run({ message, args, commandName, index, channel }: { message: Me
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`
-                }
-            ]
+                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`,
+                },
+            ],
         });
         return;
     }
@@ -78,17 +78,16 @@ async function run({ message, args, commandName, index, channel }: { message: Me
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like \`${osuUser.username}\` hasn't had any recent plays in the last 24 hours!`
-                }
-            ]
+                    description: `It seems like \`${osuUser.username}\` hasn't had any recent plays in the last 24 hours!`,
+                },
+            ],
         });
         return;
     }
 
     let page = Number(flags.p ?? flags.page) - 1 || undefined;
 
-    if (typeof page === "undefined" && typeof index === "undefined")
-        page = 0;
+    if (typeof page === "undefined" && typeof index === "undefined") page = 0;
 
     const isPage = typeof page !== "undefined";
 
@@ -103,14 +102,14 @@ async function run({ message, args, commandName, index, channel }: { message: Me
         isPage,
         index,
         mods,
-        plays
+        plays,
     };
 
     const embeds = await playBuilder(embedOptions);
 
     const sentMessage = await channel.send({
         embeds,
-        components: createPaginationActionRow(embedOptions)
+        components: createPaginationActionRow(embedOptions),
     });
     await ButtonStateCache.set(sentMessage.id, embedOptions);
 }

@@ -7,14 +7,17 @@ export const cooldownsCache = new Map<string, number>();
 export const slashCommandIdsCache = new Map<string, string>();
 
 // Clear cooldown cache every hour
-setInterval(() => {
-    const now = Date.now();
-    for (const [key, expiresAt] of cooldownsCache.entries()) {
-        if (expiresAt <= now) {
-            cooldownsCache.delete(key);
+setInterval(
+    () => {
+        const now = Date.now();
+        for (const [key, expiresAt] of cooldownsCache.entries()) {
+            if (expiresAt <= now) {
+                cooldownsCache.delete(key);
+            }
         }
-    }
-}, 5 * 60 * 1000);
+    },
+    5 * 60 * 1000,
+);
 
 // Redis client instance
 let redisClient: Valkey;

@@ -98,7 +98,7 @@ async function getSinglePlay({
             const beatmapInfoField = [
                 `**BPM:** \`${bpm.toFixed().toLocaleString()}\` ${SPACE} **Length:** \`${play.drainLength}\``,
                 `**AR:** \`${difficultyAttrs.ar.toFixed(1)}\` ${SPACE} **OD:** \`${difficultyAttrs.od.toFixed(1)}\` ${SPACE} **CS:** \`${difficultyAttrs.cs.toFixed(
-                    1
+                    1,
                 )}\` ${SPACE} **HP:** \`${difficultyAttrs.hp.toFixed(1)}\``,
             ];
             fields.push({
@@ -123,7 +123,7 @@ async function getSinglePlay({
         const beatmapInfoField = [
             `Length: \`${play.drainLength}\` ${SPACE} BPM: \`${bpm.toFixed().toLocaleString()}\` ${SPACE} Objects \`${mapValues.nObjects}\``,
             `AR: \`${difficultyAttrs.ar.toFixed(1)}\` ${SPACE} OD: \`${difficultyAttrs.od.toFixed(1)}\` ${SPACE} CS: \`${difficultyAttrs.cs.toFixed(1)}\` ${SPACE} HP: \`${difficultyAttrs.hp.toFixed(
-                1
+                1,
             )}\` Stars: ${play.stars}`,
         ];
 

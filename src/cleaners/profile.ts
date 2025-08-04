@@ -38,12 +38,12 @@ export function getProfile(user: UserExtended, mode: Mode): ProfileInfo {
             year: "numeric",
             month: "numeric",
             day: "numeric",
-            timeZone: "UTC"
+            timeZone: "UTC",
         }),
         rankS: statistics.grade_counts.s.toLocaleString(),
         rankA: statistics.grade_counts.a.toLocaleString(),
         rankSs: statistics.grade_counts.ss.toLocaleString(),
         rankSh: statistics.grade_counts.sh.toLocaleString(),
-        rankSsh: statistics.grade_counts.ssh.toLocaleString()
+        rankSsh: statistics.grade_counts.ssh.toLocaleString(),
     };
 }

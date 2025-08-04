@@ -23,7 +23,7 @@ import type { GameMode, Mod as ModOsuWeb, Rank, Beatmap as BeatmapWeb } from "os
 export async function getAccessToken(
     clientId: number,
     clientSecret: string,
-    scope: Array<AuthScope>
+    scope: Array<AuthScope>,
 ): Promise<{
     accessToken: string;
     expiresIn: string;
@@ -57,7 +57,7 @@ export function getModsEnum(mods: Array<ModOsuWeb>, derivativeModsWithOriginal?:
     return mods.reduce((count, mod) => {
         if (
             !["NF", "EZ", "TD", "HD", "HR", "SD", "DT", "RX", "HT", "NC", "FL", "AT", "SO", "AP", "PF", "4K", "5K", "6K", "7K", "8K", "FI", "RD", "CN", "TP", "K9", "KC", "1K", "2K", "3K", "SV2", "MR"].includes(
-                mod
+                mod,
             )
         )
             return count;
@@ -122,7 +122,7 @@ export async function getPerformanceResults({
     else if (isNewMods(mods)) {
         modsInt = getModsEnum(
             mods.map((x) => x.acronym),
-            true
+            true,
         );
         for (const mod of mods) {
             if (mod.acronym === "DT" && mod.settings?.speed_change) {
@@ -178,7 +178,7 @@ export async function getPerformanceResults({
                   misses,
                   combo: maxCombo ?? perfect.difficulty.maxCombo,
                   clockRate,
-              }
+              },
     ).calculate(perfect);
 
     const fc = new Performance(
@@ -200,7 +200,7 @@ export async function getPerformanceResults({
                   accuracy,
                   combo: perfect.difficulty.maxCombo,
                   clockRate,
-              }
+              },
     ).calculate(perfect);
 
     return {
@@ -216,7 +216,7 @@ export async function getPerformanceResults({
 
 export async function downloadBeatmap(
     id: string | number,
-    timeoutMs = 6000
+    timeoutMs = 6000,
 ): Promise<{
     id: string | number;
     contents: string;
@@ -257,7 +257,7 @@ export function accuracyCalculator(
         count_miss?: number | null;
         count_geki?: number | null;
         count_katu?: number | null;
-    }
+    },
 ): number {
     let { count_100: count100, count_300: count300, count_50: count50, count_geki: countGeki, count_katu: countKatu, count_miss: countMiss } = hits;
     count100 ??= 0;
@@ -297,7 +297,7 @@ export function gradeCalculator(
         count_geki?: number | null;
         count_katu?: number | null;
     },
-    mods: Array<string>
+    mods: Array<string>,
 ): Rank {
     let { count_100: n100, count_300: n300, count_50: n50, count_geki: nGeki, count_katu: nKatu, count_miss: nMiss } = hits;
     n100 ??= 0;
@@ -388,7 +388,7 @@ export function hitValueCalculator(
         count_50?: number;
         count_geki?: number | null;
         count_katu?: number | null;
-    } | null
+    } | null,
 ): string {
     if (statistics === null) return "";
 
@@ -420,7 +420,7 @@ export function saveScoreDatas(scores: Array<UserBestScore | UserScore | Score>,
 function saveScore(
     play: UserBestScore | UserScore | Score,
     mode: Mode,
-    mapTemp?: BeatmapWeb
+    mapTemp?: BeatmapWeb,
 ): {
     id: number;
     table: Tables;

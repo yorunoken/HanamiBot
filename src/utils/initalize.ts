@@ -73,11 +73,11 @@ export async function loadApplicationCommands(): Promise<void> {
     try {
         const commandIdsFile = await Bun.file("./command-ids.json").text();
         const commandIds = JSON.parse(commandIdsFile) as Record<string, string>;
-        
+
         for (const [name, formattedId] of Object.entries(commandIds)) {
             slashCommandIdsCache.set(name, formattedId);
         }
-        
+
         logger.info(`Loaded ${Object.keys(commandIds).length} command IDs from cache`);
     } catch (_error) {
         logger.warn("No command IDs file found. Run 'bun run register-commands' to register commands with Discord.");
@@ -85,10 +85,9 @@ export async function loadApplicationCommands(): Promise<void> {
 }
 
 export function refreshGuildsDatabase(): void {
-    const nulledGuilds = db.query("SELECT * FROM guilds WHERE name IS NULL;").all() as Array< Guild>;
+    const nulledGuilds = db.query("SELECT * FROM guilds WHERE name IS NULL;").all() as Array<Guild>;
 
-    if (nulledGuilds.length === 0)
-        return;
+    if (nulledGuilds.length === 0) return;
 
     for (const guild of nulledGuilds) {
         logger.info(`Removed guild: ${guild.name} (${guild.id})`);
@@ -106,7 +105,7 @@ interface Columns {
 }
 
 export function initializeDatabase(): void {
-    const tables: Array<{ name: string, columns: Array<string> }> = [
+    const tables: Array<{ name: string; columns: Array<string> }> = [
         { name: "users", columns: ["id TEXT PRIMARY KEY", "banchoId TEXT", "score_embeds INTEGER", "mode TEXT", "embed_type TEXT"] },
         { name: "guilds", columns: ["id TEXT PRIMARY KEY", "name TEXT", "owner_id TEXT", "joined_at INTEGER", "prefixes TEXT"] },
         { name: "maps", columns: ["id TEXT PRIMARY KEY", "data TEXT"] },
@@ -131,18 +130,13 @@ export function initializeDatabase(): void {
                 "count_geki INTEGER",
                 "count_katu INTEGER",
                 "map_state TEXT",
-                "ended_at TEXT"
-            ]
+                "ended_at TEXT",
+            ],
         },
         {
             name: "osu_scores_pp",
-            columns: [
-                "id INTEGER PRIMARY KEY",
-                "pp INTEGER",
-                "pp_fc INTEGER",
-                "pp_perfect INTEGER"
-            ]
-        }
+            columns: ["id INTEGER PRIMARY KEY", "pp INTEGER", "pp_fc INTEGER", "pp_perfect INTEGER"],
+        },
     ];
 
     for (const table of tables) {
@@ -182,8 +176,8 @@ export function initializeDatabase(): void {
 
 export async function loadGuildPrefixes(): Promise<void> {
     try {
-        const guilds = db.prepare("SELECT id, prefixes FROM guilds WHERE prefixes IS NOT NULL").all() as Array<{ id: string, prefixes: string }>;
-        
+        const guilds = db.prepare("SELECT id, prefixes FROM guilds WHERE prefixes IS NOT NULL").all() as Array<{ id: string; prefixes: string }>;
+
         let loadedCount = 0;
         for (const guild of guilds) {
             try {
@@ -196,7 +190,7 @@ export async function loadGuildPrefixes(): Promise<void> {
                 logger.error(`Failed to parse prefixes for guild ${guild.id}`, parseError as Error);
             }
         }
-        
+
         logger.info(`Loaded ${loadedCount}/${guilds.length} guild prefixes into cache`);
     } catch (error) {
         logger.error("Failed to load guild prefixes", error as Error);

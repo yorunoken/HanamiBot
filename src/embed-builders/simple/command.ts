@@ -4,8 +4,7 @@ import { commandAliases, messageCommands } from "@utils/initalize";
 import type { Embed } from "lilybird";
 
 export function commandBuilder(command: string | undefined): Array<Embed.Structure> {
-    if (typeof command === "undefined")
-        return displayAllCommands();
+    if (typeof command === "undefined") return displayAllCommands();
 
     return displayCommandInfo(command);
 }
@@ -16,8 +15,8 @@ function displayCommandInfo(name: string): Array<Embed.Structure> {
         return [
             {
                 title: "Uh oh.",
-                description: `Unfortunately, the command \`${name}\` doesn't exist.`
-            }
+                description: `Unfortunately, the command \`${name}\` doesn't exist.`,
+            },
         ];
     }
 
@@ -31,24 +30,24 @@ function displayCommandInfo(name: string): Array<Embed.Structure> {
             fields: [
                 {
                     name: "Cooldown",
-                    value: `${cooldownSecond} second${cooldownSecond > 1 ? "s" : ""}`
+                    value: `${cooldownSecond} second${cooldownSecond > 1 ? "s" : ""}`,
                 },
                 {
                     name: "Aliases",
                     value: command.aliases?.join(", ") ?? "`no aliases`",
-                    inline: true
+                    inline: true,
                 },
                 {
                     name: "Usage",
                     value: command.usage,
-                    inline: false
+                    inline: false,
                 },
                 {
                     name: "Details",
-                    value: command.details ?? "`no details`"
-                }
-            ]
-        }
+                    value: command.details ?? "`no details`",
+                },
+            ],
+        },
     ];
 }
 
@@ -59,7 +58,7 @@ function displayAllCommands(): Array<Embed.Structure> {
     return [
         {
             title: "Commands",
-            description: `**Used prefix commands:** ${usedPrefixCommands}\n**Used application commands:** ${usedApplicationCommands}`
-        }
+            description: `**Used prefix commands:** ${usedPrefixCommands}\n**Used application commands:** ${usedApplicationCommands}`,
+        },
     ];
 }

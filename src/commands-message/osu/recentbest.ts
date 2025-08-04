@@ -19,7 +19,7 @@ const modeAliases: Record<string, { mode: Mode }> = {
     recentbest: { mode: Mode.OSU },
     recentbesttaiko: { mode: Mode.TAIKO },
     recentbestmania: { mode: Mode.MANIA },
-    recentbestcatch: { mode: Mode.FRUITS }
+    recentbestcatch: { mode: Mode.FRUITS },
 };
 
 export default {
@@ -30,10 +30,10 @@ export default {
     /recentbest mods: DT
     /recentbest passes:true`,
     cooldown: 1000,
-    run
+    run,
 } satisfies MessageCommand;
 
-async function run({ message, args, commandName, index, channel }: { message: Message, args: Array<string>, commandName: string, index: number | undefined, channel: GuildTextChannel }): Promise<void> {
+async function run({ message, args, commandName, index, channel }: { message: Message; args: Array<string>; commandName: string; index: number | undefined; channel: GuildTextChannel }): Promise<void> {
     const { mode } = modeAliases[commandName];
     const { user, mods, flags } = parseOsuArguments(message, args, mode);
     if (user.type === UserType.FAIL) {
@@ -48,9 +48,9 @@ async function run({ message, args, commandName, index, channel }: { message: Me
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`
-                }
-            ]
+                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`,
+                },
+            ],
         });
         return;
     }
@@ -65,17 +65,16 @@ async function run({ message, args, commandName, index, channel }: { message: Me
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like \`${osuUser.username}\` doesn't have any plays, maybe they should go set some :)`
-                }
-            ]
+                    description: `It seems like \`${osuUser.username}\` doesn't have any plays, maybe they should go set some :)`,
+                },
+            ],
         });
         return;
     }
 
     let page = Number(flags.p ?? flags.page) - 1 || undefined;
 
-    if (typeof page === "undefined" && typeof index === "undefined")
-        page = 0;
+    if (typeof page === "undefined" && typeof index === "undefined") page = 0;
 
     const isPage = typeof page !== "undefined";
 
@@ -91,14 +90,14 @@ async function run({ message, args, commandName, index, channel }: { message: Me
         isPage,
         plays,
         index,
-        mods
+        mods,
     };
 
     const embeds = await playBuilder(embedOptions);
 
     const sentMessage = await channel.send({
         embeds,
-        components: createPaginationActionRow(embedOptions)
+        components: createPaginationActionRow(embedOptions),
     });
     await ButtonStateCache.set(sentMessage.id, embedOptions);
 }

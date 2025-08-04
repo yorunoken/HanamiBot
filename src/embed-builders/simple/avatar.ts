@@ -9,7 +9,7 @@ export function avatarBuilder({ user }: AvatarBuilderOptions): Array<Embed.Struc
     return [
         {
             author: { name: `Profile avatar of ${profile.username}`, icon_url: profile.flagUrl, url: profile.userUrl },
-            image: { url: profile.avatarUrl }
-        }
+            image: { url: profile.avatarUrl },
+        },
     ];
 }

@@ -9,7 +9,7 @@ export function profileBuilder({ user, mode }: ProfileBuilderOptions): Array<Emb
     const author = {
         name: `${user.username}: ${profile.pp}pp (#${profile.globalRank} ${profile.countryCode}#${profile.countryRank})`,
         icon_url: profile.flagUrl,
-        url: profile.userUrl
+        url: profile.userUrl,
     } satisfies Embed.AuthorStructure;
 
     const fields = [
@@ -20,20 +20,20 @@ export function profileBuilder({ user, mode }: ProfileBuilderOptions): Array<Emb
                 `**Playcount:** \`${profile.playCount}\` (\`${profile.playHours} hrs\`)`,
                 `${profile.peakGlobalRank.length > 0 ? `**Peak Rank:** #\`${profile.peakGlobalRank}\` • **Achieved:** <t:${profile.peakGlobalRankTime}:R>` : "**Peak Rank:** #`-`"}`,
                 `**Followers:** \`${profile.followers}\` • **Max Combo:** \`${profile.maxCombo}\``,
-                `**Recommended Star Rating:** \`${profile.recommendedStarRating}\`★`
+                `**Recommended Star Rating:** \`${profile.recommendedStarRating}\`★`,
             ].join("\n"),
-            inline: false
+            inline: false,
         },
         {
             name: "Grades :mortar_board:",
             value: `${grades.SSH}\`${profile.rankSsh}\` ${grades.SS}\`${profile.rankSs}\` ${grades.SH}\`${profile.rankSh}\` ${grades.S}\`${profile.rankS}\` ${grades.A}\`${profile.rankA}\``,
-            inline: false
-        }
+            inline: false,
+        },
     ] satisfies Array<Embed.FieldStructure>;
 
     const footer = { text: `Joined osu! on ${profile.joinedAt} (${profile.joinedAgo} yrs ago)` } satisfies Embed.FooterStructure;
     const thumbnail = { url: profile.avatarUrl } satisfies Embed.ThumbnailStructure;
     const image = { url: profile.bannerUrl } satisfies Embed.ImageStructure;
 
-    return [ { type: EmbedType.Rich, author, fields, footer, thumbnail, image } ] satisfies Array<Embed.Structure>;
+    return [{ type: EmbedType.Rich, author, fields, footer, thumbnail, image }] satisfies Array<Embed.Structure>;
 }

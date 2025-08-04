@@ -77,31 +77,31 @@ export enum ScoreEmbed {
 export type TableToArgument<T extends Tables> = T extends "users"
     ? keyof User
     : T extends "guilds"
-    ? keyof Guild
-    : T extends "maps"
-    ? keyof Map
-    : T extends "commands"
-    ? keyof Command
-    : T extends "commands_slash"
-    ? keyof Command
-    : T extends "osu_scores"
-    ? keyof Score
-    : T extends "osu_scores_pp"
-    ? keyof ScorePp
-    : never;
+      ? keyof Guild
+      : T extends "maps"
+        ? keyof Map
+        : T extends "commands"
+          ? keyof Command
+          : T extends "commands_slash"
+            ? keyof Command
+            : T extends "osu_scores"
+              ? keyof Score
+              : T extends "osu_scores_pp"
+                ? keyof ScorePp
+                : never;
 
 export type TableToType<T extends Tables> = T extends "users"
     ? User
     : T extends "guilds"
-    ? Guild
-    : T extends "maps"
-    ? Map
-    : T extends "commands"
-    ? Command
-    : T extends "commands_slash"
-    ? Command
-    : T extends "osu_scores"
-    ? Score
-    : T extends "osu_scores_pp"
-    ? ScorePp
-    : never;
+      ? Guild
+      : T extends "maps"
+        ? Map
+        : T extends "commands"
+          ? Command
+          : T extends "commands_slash"
+            ? Command
+            : T extends "osu_scores"
+              ? Score
+              : T extends "osu_scores_pp"
+                ? ScorePp
+                : never;

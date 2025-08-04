@@ -125,10 +125,10 @@ export function getCommandArgs(interaction: GuildInteraction<ApplicationCommandD
                   failMessage: discordUserId ? `The user <@${discordUserId}> hasn't linked their account to the bot yet!` : `Please link your account to the bot using ${linkCommand()}!`,
               }
         : userArg
-        ? { type: UserType.SUCCESS, banchoId: userArg, mode, beatmapId, authorDb: userAuthor }
-        : userAuthor?.banchoId
-        ? { type: UserType.SUCCESS, banchoId: userAuthor.banchoId, mode, beatmapId, authorDb: userAuthor }
-        : { type: UserType.FAIL, beatmapId, authorDb: userAuthor, failMessage: "Please link your account to the bot using /link!" };
+          ? { type: UserType.SUCCESS, banchoId: userArg, mode, beatmapId, authorDb: userAuthor }
+          : userAuthor?.banchoId
+            ? { type: UserType.SUCCESS, banchoId: userAuthor.banchoId, mode, beatmapId, authorDb: userAuthor }
+            : { type: UserType.FAIL, beatmapId, authorDb: userAuthor, failMessage: "Please link your account to the bot using /link!" };
 
     return { user, mods, difficultySettings };
 }
