@@ -5,10 +5,8 @@
     "type": "module",
     "main": "src/index.ts",
     "scripts": {
-        "check": "tsc && eslint",
-        "start": "bun .",
-        "build": "bun scripts/build.ts",
-        "prod": "bun run build && bun run start"
+        "check": "eslint",
+        "start": "bun ."
     },
     "dependencies": {
         "@lilybird/handlers": "^0.5.0",
@@ -16,16 +14,13 @@
         "lilybird": "^0.7.1",
         "osu-web.js": "^2.4.0",
         "playwright": "^1.44.0",
-        "rosu-pp-js": "^2.0.0",
+        "rosu-pp-js": "3.1.0",
         "tasai": "^1.0.0"
     },
     "devDependencies": {
         "@types/bun": "latest",
-        "eslint": "^8.55.0",
-        "@typescript-eslint/parser": "^6.13.2",
-        "@typescript-eslint/eslint-plugin": "^6.13.2",
-        "@stylistic/eslint-plugin": "^1.4.1",
-        "eslint-plugin-import": "^2.29.0",
-        "eslint-import-resolver-typescript": "^3.6.1"
+        "eslint": "9.32.0",
+        "@eslint/js": "^9.32.0",
+        "typescript-eslint": "^8.38.0"
     }
 }

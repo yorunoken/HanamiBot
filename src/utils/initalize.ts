@@ -9,7 +9,11 @@ import type { Guild } from "@type/database";
 import type { Client as LilybirdClient, ApplicationCommand } from "lilybird";
 import type { DefaultMessageCommand, DefaultSlashCommand } from "@type/commands";
 
-const { accessToken } = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
+const tokenResult = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
+if (!tokenResult) {
+    throw new Error("Failed to get initial access token");
+}
+const { accessToken } = tokenResult;
 export const client = new OsuClient(accessToken);
 
 export const messageCommands = new Map<string, DefaultMessageCommand>();
@@ -28,8 +32,7 @@ export async function loadMessageCommands(): Promise<void> {
     const temp: Array<Promise<DefaultMessageCommand>> = [];
 
     const items = await readdir("./src/commands-message", { recursive: true });
-    for (let i = 0; i < items.length; i++) {
-        const item = items[i];
+    for (const item of items) {
         const [category, cmd] = item.split(process.platform === "win32" ? "\\" : "/");
         if (!category || !cmd) continue;
 
@@ -38,8 +41,7 @@ export async function loadMessageCommands(): Promise<void> {
     }
 
     const commands = await Promise.all(temp);
-    for (let i = 0; i < commands.length; i++) {
-        const command = commands[i];
+    for (const command of commands) {
         const { default: cmd } = command;
 
         // Add the command to the command map
@@ -48,8 +50,7 @@ export async function loadMessageCommands(): Promise<void> {
         const { aliases } = cmd;
         // Check if the command has aliases and add them to the command map
         if (aliases && aliases.length > 0 && Array.isArray(aliases)) {
-            for (let idx = 0; idx < aliases.length; idx++) {
-                const alias = aliases[idx];
+            for (const alias of aliases) {
                 commandAliases.set(alias, cmd.name);
             }
         }
@@ -61,8 +62,7 @@ export async function loadApplicationCommands(clnt: LilybirdClient): Promise<voi
     const temp: Array<Promise<DefaultSlashCommand>> = [];
 
     const items = await readdir("./src/commands", { recursive: true });
-    for (let i = 0; i < items.length; i++) {
-        const item = items[i];
+    for (const item of items) {
         const [category, cmd] = item.split(process.platform === "win32" ? "\\" : "/");
         if (!category || !cmd) continue;
         if (category === "data") continue;
@@ -72,16 +72,14 @@ export async function loadApplicationCommands(clnt: LilybirdClient): Promise<voi
     }
 
     const commands = await Promise.all(temp);
-    for (let i = 0; i < commands.length; i++) {
-        const command = commands[i];
+    for (const command of commands) {
         const { default: cmd } = command;
         slashCommands.push(cmd.data);
         applicationCommands.set(cmd.data.name, command);
     }
 
     const commandsIds = await clnt.rest.bulkOverwriteGlobalApplicationCommand(clnt.user.id, slashCommands);
-    for (let i = 0; i < commandsIds.length; i++) {
-        const { name, id } = commandsIds[i];
+    for (const { name, id } of commandsIds) {
         slashCommandsIds.set(name, `</${name}:${id}>`);
     }
 }
@@ -92,8 +90,7 @@ export function refreshServersDatabase(): void {
     if (nulledGuilds.length === 0)
         return;
 
-    for (let i = 0; i < nulledGuilds.length; i++) {
-        const guild = nulledGuilds[i];
+    for (const guild of nulledGuilds) {
         console.log(`Removed guild: ${guild.name} (${guild.id})`);
         removeEntry(Tables.GUILD, guild.id);
     }
@@ -103,7 +100,7 @@ async function exists(path: string): Promise<boolean> {
     try {
         await access(path);
         return true;
-    } catch (e) {
+    } catch {
         return false;
     }
 }
@@ -214,19 +211,17 @@ export function initializeDatabase(): void {
         }
     ];
 
-    for (let i = 0; i < tables.length; i++) {
-        const table = tables[i];
+    for (const table of tables) {
         const { columns } = table;
 
         // Create the Databases if they don't exist
         db.run(`CREATE TABLE IF NOT EXISTS ${table.name} (${columns.join(", ")});`);
 
         //  Get all of the existing databases
-        const existingColumns = <Array<Columns>>db.prepare(`PRAGMA table_info(${table.name});`).all();
+        const existingColumns = db.prepare(`PRAGMA table_info(${table.name});`).all() as Array<Columns>;
 
         // Loop through Columns and add/remove them
-        for (let idx = 0; idx < columns.length; idx++) {
-            const columnNameType = columns[idx];
+        for (const columnNameType of columns) {
             const [columnName] = columnNameType.split(" ");
 
             const columnExists = existingColumns.some((col) => col.name === columnName);
@@ -237,8 +232,7 @@ export function initializeDatabase(): void {
             }
         }
 
-        for (let idx = 0; idx < existingColumns.length; idx++) {
-            const column = existingColumns[idx];
+        for (const column of existingColumns) {
             const columnName = column.name;
             const columnNotInTables = !columns.some((colType) => colType.startsWith(columnName));
 

@@ -2,7 +2,8 @@ import { getEntry, insertData } from "@utils/database";
 import { client, applicationCommands, loadLogs } from "@utils/initalize";
 import { mesageDataForButtons } from "@utils/cache";
 import { EmbedBuilderType } from "@type/embedBuilders";
-import { calculateButtonState, createActionRow } from "@utils/buttons";
+import { createPaginationActionRow } from "@utils/buttons";
+import { PaginationManager } from "@utils/pagination";
 import { Tables } from "@type/database";
 import { leaderboardBuilder, playBuilder } from "@builders/index";
 import { EmbedType } from "lilybird";
@@ -12,7 +13,7 @@ import type { Event } from "@lilybird/handlers";
 
 export default {
     event: "interactionCreate",
-    run
+    run,
 } satisfies Event<"interactionCreate">;
 
 async function run(interaction: Interaction): Promise<void> {
@@ -30,10 +31,8 @@ async function run(interaction: Interaction): Promise<void> {
             await loadLogs(`INFO: [${guild.name}] ${user.username} used slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}`);
 
             const docs = getEntry(Tables.COMMAND_SLASH, interaction.data.name);
-            if (docs === null)
-                insertData({ table: Tables.COMMAND_SLASH, data: [ { key: "count", value: 1 } ], id: command.data.name });
-            else
-                insertData({ table: Tables.COMMAND_SLASH, data: [ { key: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
+            if (docs === null) insertData({ table: Tables.COMMAND_SLASH, data: [{ key: "count", value: 1 }], id: command.data.name });
+            else insertData({ table: Tables.COMMAND_SLASH, data: [{ key: "count", value: Number(docs.count ?? 0) + 1 }], id: docs.id });
         } catch (error) {
             const err = error as Error;
 
@@ -50,19 +49,19 @@ async function run(interaction: Interaction): Promise<void> {
                         fields: [
                             {
                                 name: "User",
-                                value: `<@${user.id}> (${user.username})`
+                                value: `<@${user.id}> (${user.username})`,
                             },
                             {
                                 name: "Guild",
-                                value: `[${guild.name}](https://discord.com/channels/${interaction.guildId}/${interaction.channelId})`
+                                value: `[${guild.name}](https://discord.com/channels/${interaction.guildId}/${interaction.channelId})`,
                             },
                             {
                                 name: "Error",
-                                value: err.stack ?? "undefined (look at logs)"
-                            }
-                        ]
-                    }
-                ]
+                                value: err.stack ?? "undefined (look at logs)",
+                            },
+                        ],
+                    },
+                ],
             });
 
             console.error(error);
@@ -72,10 +71,8 @@ async function run(interaction: Interaction): Promise<void> {
             );
 
             const docs = getEntry(Tables.COMMAND_SLASH, interaction.data.name);
-            if (docs === null)
-                insertData({ table: Tables.COMMAND_SLASH, data: [ { key: "count", value: 1 } ], id: command.data.name });
-            else
-                insertData({ table: Tables.COMMAND_SLASH, data: [ { key: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
+            if (docs === null) insertData({ table: Tables.COMMAND_SLASH, data: [{ key: "count", value: 1 }], id: command.data.name });
+            else insertData({ table: Tables.COMMAND_SLASH, data: [{ key: "count", value: Number(docs.count ?? 0) + 1 }], id: docs.id });
         }
     }
 }
@@ -96,108 +93,61 @@ async function handleButton(interaction: Interaction): Promise<void> {
         return;
     }
 
-    // This is hard-types like this because the buttons are not going to be clickable anyways.
-    await interaction.updateComponents({ components: createActionRow({ isPage: true, disabledStates: [true, true, true, true] }) });
+    // Temporarily disable all buttons during processing  
+    await interaction.updateComponents({ 
+        components: [{ 
+            type: 1, 
+            components: [
+                { type: 2, style: 1, custom_id: "disabled", label: "<<", disabled: true },
+                { type: 2, style: 1, custom_id: "disabled", label: "<", disabled: true },
+                { type: 2, style: 1, custom_id: "disabled", label: ">", disabled: true },
+                { type: 2, style: 1, custom_id: "disabled", label: ">>", disabled: true }
+            ]
+        }]
+    });
 
-    // Display an error message because I'm dumb and haven't programmed this yet.
+    // Handle wildcard buttons (not implemented yet)
     if (interaction.data.id === "wildcard-page" || interaction.data.id === "wildcard-index") {
         await interaction.reply({ ephemeral: true, content: "This feature has not been implemented yet." });
         return;
     }
 
-    const isIncrementPage = interaction.data.id === "increment-page";
-    const isDecrementPage = interaction.data.id === "decrement-page";
-    const isIncrementIndex = interaction.data.id === "increment-index";
-    const isDecrementIndex = interaction.data.id === "decrement-index";
+    // Parse the button action using the new pagination system
+    const buttonAction = PaginationManager.parseButtonAction(interaction.data.id);
+    if (!buttonAction) {
+        await interaction.reply({ ephemeral: true, content: "Unknown button action." });
+        return;
+    }
 
-    const isMaxPage = interaction.data.id === "max-page";
-    const isMinPage = interaction.data.id === "min-page";
-    const isMaxIndex = interaction.data.id === "max-index";
-    const isMinIndex = interaction.data.id === "min-index";
+    // Update the builder options with the new pagination state
+    const updatedOptions = PaginationManager.updateBuilderOptions(
+        builderOptions,
+        buttonAction.action,
+        buttonAction.type
+    );
+
+    // Update the cache with the new options
+    mesageDataForButtons.set(interaction.message.id, updatedOptions);
 
     const options: InteractionReplyOptions = {};
-    switch (builderOptions.type) {
+
+    // Build the appropriate embed and components based on the builder type
+    switch (updatedOptions.type) {
         case EmbedBuilderType.LEADERBOARD:
-            if (isIncrementPage) {
-                builderOptions.page ??= 0;
-                builderOptions.page += 1;
-            } else if (isDecrementPage) {
-                builderOptions.page ??= 0;
-                builderOptions.page -= 1;
-            } else if (isMaxPage)
-                builderOptions.page = Math.ceil(builderOptions.scores.length / 5) - 1;
-            else if (isMinPage)
-                builderOptions.page = 0;
-
-            const totalPage = builderOptions.scores.length;
-
-            options.components = createActionRow({
-                isPage: true,
-                disabledStates: [
-                    (builderOptions.page ?? 0) === 0,
-                    calculateButtonState(false, builderOptions.page ?? 0, totalPage),
-                    calculateButtonState(true, builderOptions.page ?? 0, totalPage),
-                    (builderOptions.page ?? 0) * 5 + 5 === totalPage
-                ]
-            });
-
-            options.embeds = await leaderboardBuilder(builderOptions);
+            options.embeds = await leaderboardBuilder(updatedOptions as any);
             break;
         case EmbedBuilderType.PLAYS:
-            if (isIncrementPage) {
-                builderOptions.page ??= 0;
-                builderOptions.page += 1;
-            } else if (isDecrementPage) {
-                builderOptions.page ??= 0;
-                builderOptions.page -= 1;
-            } else if (isIncrementIndex) {
-                builderOptions.index ??= 0;
-                builderOptions.index += 1;
-            } else if (isDecrementIndex) {
-                builderOptions.index ??= 0;
-                builderOptions.index -= 1;
-            } else if (isMaxPage || isMaxIndex) {
-                if (builderOptions.isPage === true)
-                    builderOptions.page = Math.ceil(builderOptions.plays.length / 5) - 1;
-                else builderOptions.index = Math.ceil(builderOptions.plays.length) - 1;
-            } else if (isMinPage || isMinIndex) {
-                if (builderOptions.isPage === true)
-                    builderOptions.page = 0;
-                else builderOptions.index = 0;
-            }
-
-            if (builderOptions.isPage === true) {
-                const totalPages = Math.ceil(builderOptions.plays.length / 5);
-                options.components = createActionRow({
-                    isPage: builderOptions.isPage,
-                    disabledStates: [
-                        (builderOptions.page ?? 0) === 0,
-                        calculateButtonState(false, builderOptions.page ?? 0, totalPages),
-                        calculateButtonState(true, builderOptions.page ?? 0, totalPages),
-                        (builderOptions.page ?? 0) === totalPages - 1
-                    ]
-                });
-            } else {
-                const totalPages = Math.ceil(builderOptions.plays.length);
-                options.components = createActionRow({
-                    isPage: false,
-                    disabledStates: [
-                        (builderOptions.index ?? 0) === 0,
-                        calculateButtonState(false, builderOptions.index ?? 0, totalPages),
-                        calculateButtonState(true, builderOptions.index ?? 0, totalPages),
-                        (builderOptions.index ?? 0) === totalPages - 1
-                    ]
-                });
-            }
-
-            options.embeds = await playBuilder(builderOptions);
+            options.embeds = await playBuilder(updatedOptions as any);
             break;
         default:
+            await interaction.reply({ ephemeral: true, content: "Unsupported builder type for pagination." });
             return;
     }
 
+    // Create the action row with proper disabled states
+    options.components = createPaginationActionRow(updatedOptions);
+
     await interaction.editReply(options);
-    return;
 }
 
 async function handleVerify(interaction: DMInteraction<MessageComponentData, Message>): Promise<void> {
@@ -222,19 +172,21 @@ async function handleVerify(interaction: DMInteraction<MessageComponentData, Mes
         return;
     }
 
-    insertData({ table: Tables.USER, id: discordId, data: [ { key: "banchoId", value: osuId } ] });
+    insertData({ table: Tables.USER, id: discordId, data: [{ key: "banchoId", value: osuId }] });
 
     const embed: Embed.Structure = {
         title: "Success!",
         description: `Successfully linked <@${discordId}> with ${osuUser.username}`,
-        thumbnail: { url: osuUser.avatar_url }
+        thumbnail: { url: osuUser.avatar_url },
     };
 
-    interaction.editReply({ embeds: [embed], components: [] }).then(async () => {
-        await loadLogs(`INFO: [Private Messages] ${username} linked their osu! account, \`${osuId}\``);
-    }).catch(async (error: Error) => {
-        console.log(error);
-        await loadLogs(`ERROR: [Private Messages] ${username} had an error while linking their osu! account, \`${discordId}\`: ${error.stack}`, true);
-    });
+    interaction
+        .editReply({ embeds: [embed], components: [] })
+        .then(async () => {
+            await loadLogs(`INFO: [Private Messages] ${username} linked their osu! account, \`${osuId}\``);
+        })
+        .catch(async (error: Error) => {
+            console.error("Verify user interaction error:", error);
+            await loadLogs(`ERROR: [Private Messages] ${username} had an error while linking their osu! account, \`${discordId}\`: ${error.stack}`, true);
+        });
 }
-

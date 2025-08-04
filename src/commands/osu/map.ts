@@ -51,7 +51,7 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
         type: EmbedBuilderType.MAP,
         initiatorId: interaction.member.user.id,
         beatmapId: Number(beatmapId),
-        mods: <Array<Mod> | null>mods.name?.match(/.{1,2}/g) ?? null
+        mods: mods.name?.match(/.{1,2}/g) as Array<Mod> | null ?? null
     });
     await interaction.editReply({ embeds });
 }

@@ -31,7 +31,7 @@ export default {
             data
         });
 
-        // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
+         
         if (document !== null && document.prefixes !== null)
             prefixesCache.set(guild.id, document.prefixes);
     }

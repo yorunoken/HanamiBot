@@ -11,7 +11,11 @@ import { writeFile } from "node:fs/promises";
 setInterval(setToken, 1000 * 60 * 60);
 
 async function setToken(): Promise<void> {
-    const { accessToken } = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
+    const tokenResult = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
+    if (!tokenResult) {
+        throw new Error("Failed to get access token");
+    }
+    const { accessToken } = tokenResult;
     client.setAccessToken(accessToken);
 }
 
@@ -20,7 +24,9 @@ await setToken();
 // make sure chromium is dead
 try {
     await $`pkill chromium && pkill chromium-browser`;
-} catch (e) {}
+} catch {
+    // don't do anything
+}
 
 export const browser = await chromium.launch();
 
@@ -31,15 +37,39 @@ process.on("uncaughtException", async (error: Error) => {
     await loadLogs(`ERROR: uncaught exception: ${error.stack}`, true);
 });
 
+// Graceful shutdown
+process.on("SIGINT", async () => {
+    console.log("Received SIGINT, shutting down gracefully...");
+    try {
+        await browser.close();
+        console.log("Browser closed");
+        process.exit(0);
+    } catch (error) {
+        console.error("Error during shutdown:", error);
+        process.exit(1);
+    }
+});
+
+process.on("SIGTERM", async () => {
+    console.log("Received SIGTERM, shutting down gracefully...");
+    try {
+        await browser.close();
+        console.log("Browser closed");
+        process.exit(0);
+    } catch (error) {
+        console.error("Error during shutdown:", error);
+        process.exit(1);
+    }
+});
+
 initializeDatabase();
 
-if (process.env.DEV !== "1")
-    await writeFile("/root/users_cache.txt", "");
+if (process.env.DEV !== "1") await writeFile("/root/users_cache.txt", "");
 
 const listeners = await createHandler({
     dirs: {
-        listeners: `${import.meta.dir}/listeners`
-    }
+        listeners: `${import.meta.dir}/listeners`,
+    },
 });
 
 await createClient({
@@ -48,14 +78,8 @@ await createClient({
         transformerTypes: { channel: Channel, guild: Guild, voiceState: GuildVoiceChannel },
         delegate: CachingDelegationType.DEFAULT,
         applyTransformers: true,
-        enabled: { channel: true }
+        enabled: { channel: true },
     },
-    intents: [
-        Intents.GUILDS,
-        Intents.GUILD_MESSAGES,
-        Intents.MESSAGE_CONTENT,
-        Intents.GUILD_MEMBERS
-    ],
-    ...listeners
+    intents: [Intents.GUILDS, Intents.GUILD_MESSAGES, Intents.MESSAGE_CONTENT, Intents.GUILD_MEMBERS],
+    ...listeners,
 });
-

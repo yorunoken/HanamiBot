@@ -13,22 +13,22 @@ export default {
                 type: ApplicationCommandOptionType.SUB_COMMAND,
                 name: "sql",
                 description: "Make a raw SQL query.",
-                options: [ { type: ApplicationCommandOptionType.STRING, name: "query", description: "Input your SQL query", required: true } ]
+                options: [{ type: ApplicationCommandOptionType.STRING, name: "query", description: "Input your SQL query", required: true }],
             },
             {
                 type: ApplicationCommandOptionType.SUB_COMMAND,
                 name: "servers",
                 description: "Fetch servers.",
-                options: [ { type: ApplicationCommandOptionType.STRING, name: "id", description: "Server ID to fetch.", required: true } ]
-            }
-        ]
+                options: [{ type: ApplicationCommandOptionType.STRING, name: "id", description: "Server ID to fetch.", required: true }],
+            },
+        ],
     },
-    run
+    run,
 } satisfies SlashCommand;
 
 const commands: Record<string, (interaction: GuildInteraction<ApplicationCommandData>) => Promise<void>> = {
     sql,
-    servers
+    servers,
 };
 
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
@@ -56,10 +56,9 @@ async function sql(interaction: GuildInteraction<ApplicationCommandData>): Promi
         if (response.length > 1500) {
             const blob = new Blob([response], { type: "application/json" });
 
-            // @ts-expect-error TypeScript thinks blob is incorrect type but it is.
             await interaction.editReply({
                 content: "*Text was too large to send*\n*Here is the file instead:*",
-                files: [ { file: blob, name: "sqlite_report.json" } ]
+                files: [{ file: blob as File, name: "sqlite_report.json" }],
             });
         } else {
             await interaction.editReply(`SQL result:\n\`\`\`json
@@ -67,7 +66,7 @@ ${response}
 \`\`\``);
         }
     } catch (e) {
-        console.log(e);
+        console.error("SQL query error:", e);
         await interaction.editReply("*No response was given*");
     }
 }
@@ -84,7 +83,7 @@ async function servers(interaction: GuildInteraction<ApplicationCommandData>): P
         await interaction.editReply(`SQL result:\n\`\`\`json
 ${JSON.stringify(guild, null, 2)}
 \`\`\``);
-    } catch (e) {
+    } catch {
         await interaction.editReply("*No response was given*");
     }
 }

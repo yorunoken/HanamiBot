@@ -4,7 +4,7 @@ import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { PlayType } from "@type/osu";
-import { calculateButtonState, createActionRow } from "@utils/buttons";
+import { createPaginationActionRow } from "@utils/buttons";
 import { mesageDataForButtons } from "@utils/cache";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { PlaysBuilderOptions } from "@type/embedBuilders";
@@ -149,23 +149,15 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
         mods: { exclude: false, forceInclude: false, include: true, name: mod },
         authorDb: user.authorDb,
         index,
+        isPage: false, // Use index mode for single play navigation
         plays
     };
 
     const embeds = await playBuilder(embedOptions);
 
-    const totalPages = plays.length;
     const sentInteraction = await interaction.editReply({
         embeds,
-        components: createActionRow({
-            isPage: false,
-            disabledStates: [
-                index === 0,
-                calculateButtonState(false, index, totalPages),
-                calculateButtonState(true, index, totalPages),
-                index === totalPages - 1
-            ]
-        })
+        components: createPaginationActionRow(embedOptions)
     });
 
     mesageDataForButtons.set(sentInteraction.id, embedOptions);

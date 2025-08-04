@@ -12,6 +12,6 @@ declare module "bun" {
 }
 
 declare module "*.db" {
-    var db: import("bun:sqlite").Database;
+    const db: import("bun:sqlite").Database;
     export = db;
 }

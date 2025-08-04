@@ -15,14 +15,13 @@ export default {
     details: "You can specify the mode by using the `mod` flag in slash commands.",
     usage: "/osu",
     cooldown: 1000,
-    run
+    run,
 } satisfies MessageCommand;
 
-async function run({ message, args, commandName, channel }: { message: Message, args: Array<string>, commandName: string, channel: GuildTextChannel }): Promise<void> {
-    if (commandName === "profile")
-        commandName = Mode.OSU;
+async function run({ message, args, commandName, channel }: { message: Message; args: Array<string>; commandName: string; channel: GuildTextChannel }): Promise<void> {
+    if (commandName === "profile") commandName = Mode.OSU;
 
-    const { user } = parseOsuArguments(message, args, <Mode>commandName);
+    const { user } = parseOsuArguments(message, args, commandName as Mode);
     if (user.type === UserType.FAIL) {
         await channel.send(user.failMessage);
         return;
@@ -35,9 +34,9 @@ async function run({ message, args, commandName, channel }: { message: Message, 
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`
-                }
-            ]
+                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`,
+                },
+            ],
         });
         return;
     }
@@ -47,8 +46,7 @@ async function run({ message, args, commandName, channel }: { message: Message, 
         type: EmbedBuilderType.PROFILE,
         initiatorId: message.author.id,
         user: osuUser,
-        mode: user.mode
+        mode: user.mode,
     });
     await channel.send({ embeds });
 }
-

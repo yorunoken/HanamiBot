@@ -14,11 +14,11 @@ export default {
     description: "Display card of a user.",
     usage: "/card",
     cooldown: 1000,
-    run
+    run,
 } satisfies MessageCommand;
 
-async function run({ message, args, channel }: { message: Message, args: Array<string>, commandName: string, channel: GuildTextChannel }): Promise<void> {
-    const { user } = parseOsuArguments(message, args, <Mode>Mode.OSU);
+async function run({ message, args, channel }: { message: Message; args: Array<string>; commandName: string; channel: GuildTextChannel }): Promise<void> {
+    const { user } = parseOsuArguments(message, args, Mode.OSU as Mode);
     if (user.type === UserType.FAIL) {
         await channel.send(user.failMessage);
         return;
@@ -31,9 +31,9 @@ async function run({ message, args, channel }: { message: Message, args: Array<s
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`
-                }
-            ]
+                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`,
+                },
+            ],
         });
         return;
     }
@@ -42,8 +42,7 @@ async function run({ message, args, channel }: { message: Message, args: Array<s
     const options = await cardBuilder({
         type: EmbedBuilderType.CARD,
         initiatorId: message.author.id,
-        user: osuUser
+        user: osuUser,
     });
     await channel.send(options);
 }
-

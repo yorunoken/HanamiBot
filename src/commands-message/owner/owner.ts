@@ -8,10 +8,10 @@ export default {
     details: "no you don't.",
     usage: "haha no",
     cooldown: 1000,
-    run
+    run,
 } satisfies MessageCommand;
 
-async function run({ message, args, channel }: { message: Message, args: Array<string>, channel: GuildTextChannel }): Promise<void> {
+async function run({ message, args, channel }: { message: Message; args: Array<string>; channel: GuildTextChannel }): Promise<void> {
     if (message.author.id !== process.env.OWNER_ID) {
         await channel.send("secert!!!!!");
         return;
@@ -25,10 +25,9 @@ async function run({ message, args, channel }: { message: Message, args: Array<s
         if (response.length > 1500) {
             const blob = new Blob([response], { type: "application/json" });
 
-            // @ts-expect-error TypeScript thinks blob is incorrect type but it is.
             await channel.send({
                 content: "*Text was too large to send*\n*Here is the file instead:*",
-                files: [ { file: blob, name: "sqlite_report.json" } ]
+                files: [{ file: blob as File, name: "sqlite_report.json" }],
             });
         } else {
             await channel.send(`SQL result:\n\`\`\`json
@@ -36,7 +35,7 @@ ${response}
 \`\`\``);
         }
     } catch (e) {
-        console.log(e);
+        console.error("SQL query error:", e);
         await channel.send("*No response was given*");
     }
 }

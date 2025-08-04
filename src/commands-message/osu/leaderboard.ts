@@ -5,7 +5,7 @@ import { leaderboardBuilder } from "@builders/leaderboard";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { mesageDataForButtons } from "@utils/cache";
 import { client } from "@utils/initalize";
-import { calculateButtonState, createActionRow } from "@utils/buttons";
+import { createPaginationActionRow } from "@utils/buttons";
 import { EmbedType } from "lilybird";
 import type { Mod } from "osu-web.js";
 import type { LeaderboardBuilderOptions } from "@type/embedBuilders";
@@ -18,8 +18,7 @@ const modeAliases: Record<string, { isGlobal: boolean }> = {
     countryleaderboard: { isGlobal: false },
     countrylb: { isGlobal: false },
     clb: { isGlobal: false },
-    ct: { isGlobal: false }
-
+    ct: { isGlobal: false },
 };
 
 export default {
@@ -29,23 +28,23 @@ export default {
     details: "Only `leaderboard` and `lb` aliases are used for global commands. The rest of the aliases are for Turkish leaderboards.",
     usage: "/leaderboard",
     cooldown: 1000,
-    run
+    run,
 } satisfies MessageCommand;
 
-async function run({ message, args, commandName, channel }: { message: Message, args: Array<string>, commandName: string, channel: GuildTextChannel }): Promise<void> {
+async function run({ message, args, commandName, channel }: { message: Message; args: Array<string>; commandName: string; channel: GuildTextChannel }): Promise<void> {
     const { isGlobal } = modeAliases[commandName];
     const { user, mods, flags } = parseOsuArguments(message, args, Mode.OSU);
 
-    const beatmapId = user.beatmapId ?? await getBeatmapIdFromContext({ message, client: message.client });
+    const beatmapId = user.beatmapId ?? (await getBeatmapIdFromContext({ message, client: message.client }));
     if (typeof beatmapId === "undefined" || beatmapId === null) {
         await channel.send({
             embeds: [
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like the beatmap ID couldn't be found :(\n"
-                }
-            ]
+                    description: "It seems like the beatmap ID couldn't be found :(\n",
+                },
+            ],
         });
         return;
     }
@@ -57,9 +56,9 @@ async function run({ message, args, commandName, channel }: { message: Message, 
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like this beatmap doesn't exist! :("
-                }
-            ]
+                    description: "It seems like this beatmap doesn't exist! :(",
+                },
+            ],
         });
         return;
     }
@@ -71,9 +70,9 @@ async function run({ message, args, commandName, channel }: { message: Message, 
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like this beatmap's leaderboard doesn't exist! :("
-                }
-            ]
+                    description: "It seems like this beatmap's leaderboard doesn't exist! :(",
+                },
+            ],
         });
         return;
     }
@@ -82,7 +81,7 @@ async function run({ message, args, commandName, channel }: { message: Message, 
         beatmapId: Number(beatmapId),
         mode: beatmap.mode,
         isGlobal,
-        mods: mods.name ? <Array<Mod>>mods.name.match(/.{1,2}/g) : undefined
+        mods: mods.name ? (mods.name.match(/.{1,2}/g) as Array<Mod>) : undefined,
     });
 
     if (scores.length === 0) {
@@ -91,39 +90,29 @@ async function run({ message, args, commandName, channel }: { message: Message, 
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: "It seems like this beatmap's leaderboard doesn't exist! :("
-                }
-            ]
+                    description: "It seems like this beatmap's leaderboard doesn't exist! :(",
+                },
+            ],
         });
         return;
     }
 
     const page = Number(flags.p ?? flags.page ?? 1) - 1;
-    const totalPages = Math.ceil(scores.length / 5);
 
     const embedOptions: LeaderboardBuilderOptions = {
         type: EmbedBuilderType.LEADERBOARD,
         initiatorId: message.author.id,
         page: page,
         beatmap,
-        scores
+        scores,
     };
 
     const embeds = await leaderboardBuilder(embedOptions);
 
     const sentMessage = await channel.send({
         embeds,
-        components: createActionRow({
-            isPage: true,
-            disabledStates: [
-                page === 0,
-                calculateButtonState(false, page, totalPages),
-                calculateButtonState(true, page, totalPages),
-                page === totalPages - 1
-            ]
-        })
+        components: createPaginationActionRow(embedOptions),
     });
 
     mesageDataForButtons.set(sentMessage.id, embedOptions);
 }
-

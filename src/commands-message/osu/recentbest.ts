@@ -4,7 +4,7 @@ import { playBuilder } from "@builders/plays";
 import { Mode, PlayType } from "@type/osu";
 import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/embedBuilders";
-import { createActionRow, calculateButtonState } from "@utils/buttons";
+import { createPaginationActionRow } from "@utils/buttons";
 import { mesageDataForButtons } from "@utils/cache";
 import { EmbedType } from "lilybird";
 import type { GuildTextChannel, Message } from "@lilybird/transformers";
@@ -78,7 +78,6 @@ async function run({ message, args, commandName, index, channel }: { message: Me
         page = 0;
 
     const isPage = typeof page !== "undefined";
-    const totalPages = Math.ceil(plays.length / 5);
 
     const embedOptions: PlaysBuilderOptions = {
         type: EmbedBuilderType.PLAYS,
@@ -99,15 +98,7 @@ async function run({ message, args, commandName, index, channel }: { message: Me
 
     const sentMessage = await channel.send({
         embeds,
-        components: createActionRow({
-            isPage,
-            disabledStates: [
-                isPage ? page === 0 : index === 0,
-                calculateButtonState(false, isPage ? page ?? 0 : index ?? 0, totalPages),
-                calculateButtonState(true, isPage ? page ?? 0 : index ?? 0, totalPages),
-                isPage ? page === totalPages - 1 : index === totalPages - 1
-            ]
-        })
+        components: createPaginationActionRow(embedOptions)
     });
     mesageDataForButtons.set(sentMessage.id, embedOptions);
 }

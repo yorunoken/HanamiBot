@@ -1,44 +1,17 @@
-import { ComponentType, ButtonStyle } from "lilybird";
+import { PaginationManager, ITEMS_PER_PAGE } from "./pagination";
 import type { Message } from "lilybird";
+import type { EmbedBuilderOptions } from "@type/embedBuilders";
 
-export const pageButtonsArgs = {
-    buttonCustomIds: ["min-page", "decrement-page", "increment-page", "max-page"],
-    buttonLabels: ["<<", "<", ">", ">>"]
-};
-export const indexButtonsArgs = {
-    buttonCustomIds: ["min-index", "decrement-index", "increment-index", "max-index"],
-    buttonLabels: ["<<", "<", ">", ">>"]
-};
+// New simplified exports using PaginationManager
+export function createPaginationActionRow(builderOptions: EmbedBuilderOptions): Array<Message.Component.Structure> {
+    const totalItems = PaginationManager.getTotalItems(builderOptions);
+    const paginationType = PaginationManager.getPaginationType(builderOptions);
+    const currentValue = PaginationManager.getCurrentValue(builderOptions, paginationType);
 
-export function createActionRow({
-    isPage,
-    disabledStates
-}: { isPage: boolean, disabledStates: Array<boolean> }): Array<Message.Component.Structure> {
-    const { buttonCustomIds, buttonLabels } = isPage ? pageButtonsArgs : indexButtonsArgs;
-
-    const length = Math.max(buttonCustomIds.length, buttonLabels.length);
-    const components: Array<Message.Component.Structure> = [];
-    for (let i = 0; i < length; i++) {
-        if (buttonCustomIds[i] && buttonLabels[i]) {
-            components.push({
-                type: ComponentType.Button,
-                style: ButtonStyle.Primary,
-                custom_id: buttonCustomIds[i],
-                label: buttonLabels[i],
-                disabled: disabledStates[i]
-            });
-        }
-    }
-
-    return [
-        {
-            type: ComponentType.ActionRow,
-            components
-        }
-    ];
+    return PaginationManager.createActionRow({
+        type: paginationType,
+        totalItems,
+        currentValue,
+        itemsPerPage: ITEMS_PER_PAGE,
+    });
 }
-
-export function calculateButtonState(isNext: boolean, index: number, total: number): boolean {
-    return isNext ? index + 1 === total : index === 0;
-}
-
