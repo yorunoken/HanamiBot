@@ -1,4 +1,4 @@
-# Hanami 🌸
+# Hanami
 
 A Discord bot written in TypeScript, using the Bun runtime engine.
 
