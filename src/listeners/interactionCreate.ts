@@ -106,28 +106,16 @@ async function handleButton(interaction: Interaction): Promise<void> {
     }
 
     // Temporarily disable all buttons during processing
-    await interaction.updateComponents({
-        components: [
-            {
-                type: 1,
-                components: [
-                    { type: 2, style: 1, custom_id: "disabled", label: "<<", disabled: true },
-                    { type: 2, style: 1, custom_id: "disabled", label: "<", disabled: true },
-                    { type: 2, style: 1, custom_id: "disabled", label: ">", disabled: true },
-                    { type: 2, style: 1, custom_id: "disabled", label: ">>", disabled: true },
-                ],
-            },
-        ],
-    });
+    await interaction.deferComponentReply();
 
     if (interaction.data.id === "wildcard-page" || interaction.data.id === "wildcard-index") {
-        await interaction.reply({ ephemeral: true, content: "This feature has not been implemented yet." });
+        await interaction.editReply({ content: "This feature has not been implemented yet." });
         return;
     }
 
     const buttonAction = PaginationManager.parseButtonAction(interaction.data.id);
     if (!buttonAction) {
-        await interaction.reply({ ephemeral: true, content: "Unknown button action." });
+        await interaction.editReply({ content: "Unknown button action." });
         return;
     }
 
