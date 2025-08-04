@@ -27,7 +27,7 @@ function displayCommandInfo(name: string): Array<Embed.Structure> {
                     },
                     {
                         name: "Options",
-                        value: command.data.options?.map((opt) => `\`${opt.name}\` - ${opt.description} ${opt.required ? "(required)" : "(optional)"}`).join("\n") ?? "No options",
+                        value: command.data.options?.map((opt) => `\`${opt.name}\` - ${opt.description} ${opt.required ? "(required)" : ""}`).join("\n") ?? "No options",
                         inline: false,
                     },
                 ],
