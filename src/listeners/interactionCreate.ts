@@ -93,45 +93,39 @@ async function handleButton(interaction: Interaction): Promise<void> {
         return;
     }
 
-    // Temporarily disable all buttons during processing  
-    await interaction.updateComponents({ 
-        components: [{ 
-            type: 1, 
-            components: [
-                { type: 2, style: 1, custom_id: "disabled", label: "<<", disabled: true },
-                { type: 2, style: 1, custom_id: "disabled", label: "<", disabled: true },
-                { type: 2, style: 1, custom_id: "disabled", label: ">", disabled: true },
-                { type: 2, style: 1, custom_id: "disabled", label: ">>", disabled: true }
-            ]
-        }]
+    // Temporarily disable all buttons during processing
+    await interaction.updateComponents({
+        components: [
+            {
+                type: 1,
+                components: [
+                    { type: 2, style: 1, custom_id: "disabled", label: "<<", disabled: true },
+                    { type: 2, style: 1, custom_id: "disabled", label: "<", disabled: true },
+                    { type: 2, style: 1, custom_id: "disabled", label: ">", disabled: true },
+                    { type: 2, style: 1, custom_id: "disabled", label: ">>", disabled: true },
+                ],
+            },
+        ],
     });
 
-    // Handle wildcard buttons (not implemented yet)
     if (interaction.data.id === "wildcard-page" || interaction.data.id === "wildcard-index") {
         await interaction.reply({ ephemeral: true, content: "This feature has not been implemented yet." });
         return;
     }
 
-    // Parse the button action using the new pagination system
     const buttonAction = PaginationManager.parseButtonAction(interaction.data.id);
     if (!buttonAction) {
         await interaction.reply({ ephemeral: true, content: "Unknown button action." });
         return;
     }
 
-    // Update the builder options with the new pagination state
-    const updatedOptions = PaginationManager.updateBuilderOptions(
-        builderOptions,
-        buttonAction.action,
-        buttonAction.type
-    );
+    const updatedOptions = PaginationManager.updateBuilderOptions(builderOptions, buttonAction.action, buttonAction.type);
 
-    // Update the cache with the new options
     mesageDataForButtons.set(interaction.message.id, updatedOptions);
 
     const options: InteractionReplyOptions = {};
 
-    // Build the appropriate embed and components based on the builder type
+    // Build the appropriate embed
     switch (updatedOptions.type) {
         case EmbedBuilderType.LEADERBOARD:
             options.embeds = await leaderboardBuilder(updatedOptions as any);

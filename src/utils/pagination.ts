@@ -6,14 +6,14 @@ export const ITEMS_PER_PAGE = 5;
 
 export enum PaginationType {
     PAGE = "page",
-    INDEX = "index"
+    INDEX = "index",
 }
 
 export enum PaginationAction {
     FIRST = "first",
-    PREV = "prev", 
+    PREV = "prev",
     NEXT = "next",
-    LAST = "last"
+    LAST = "last",
 }
 
 export interface PaginationState {
@@ -35,7 +35,7 @@ export class PaginationManager {
         const suffix = type === PaginationType.PAGE ? "page" : "index";
         return {
             customIds: [`min-${suffix}`, `decrement-${suffix}`, `increment-${suffix}`, `max-${suffix}`],
-            labels: ["<<", "<", ">", ">>"]
+            labels: ["<<", "<", ">", ">>"],
         };
     }
 
@@ -43,51 +43,49 @@ export class PaginationManager {
         const { type, totalItems, currentValue, itemsPerPage = ITEMS_PER_PAGE } = config;
         const { customIds, labels } = this.getButtonConfig(type);
 
-        const totalPages = type === PaginationType.PAGE 
-            ? Math.ceil(totalItems / itemsPerPage) 
-            : totalItems;
+        const totalPages = type === PaginationType.PAGE ? Math.ceil(totalItems / itemsPerPage) : totalItems;
 
         const disabledStates = [
             currentValue === 0, // First button
             currentValue === 0, // Previous button
             currentValue >= totalPages - 1, // Next button
-            currentValue >= totalPages - 1  // Last button
+            currentValue >= totalPages - 1, // Last button
         ];
 
         const components: Array<Message.Component.Structure> = [];
-        
+
         for (let i = 0; i < customIds.length; i++) {
             components.push({
                 type: ComponentType.Button,
                 style: ButtonStyle.Primary,
                 custom_id: customIds[i],
                 label: labels[i],
-                disabled: disabledStates[i]
+                disabled: disabledStates[i],
             });
         }
 
-        return [{
-            type: ComponentType.ActionRow,
-            components
-        }];
+        return [
+            {
+                type: ComponentType.ActionRow,
+                components,
+            },
+        ];
     }
 
     static parseButtonAction(buttonId: string): { type: PaginationType; action: PaginationAction } | null {
-        const patterns = [
-            { regex: /^(min|max|increment|decrement)-(page|index)$/, groups: ['action', 'type'] }
-        ];
+        const patterns = [{ regex: /^(min|max|increment|decrement)-(page|index)$/, groups: ["action", "type"] }];
 
         for (const pattern of patterns) {
             const match = buttonId.match(pattern.regex);
             if (match) {
                 const actionMap: Record<string, PaginationAction> = {
-                    'min': PaginationAction.FIRST,
-                    'decrement': PaginationAction.PREV,
-                    'increment': PaginationAction.NEXT,
-                    'max': PaginationAction.LAST
+                    min: PaginationAction.FIRST,
+                    decrement: PaginationAction.PREV,
+                    increment: PaginationAction.NEXT,
+                    max: PaginationAction.LAST,
                 };
 
-                const type = match[2] === 'page' ? PaginationType.PAGE : PaginationType.INDEX;
+                const type = match[2] === "page" ? PaginationType.PAGE : PaginationType.INDEX;
                 const action = actionMap[match[1]];
 
                 return { type, action };
@@ -97,16 +95,8 @@ export class PaginationManager {
         return null;
     }
 
-    static calculateNewValue(
-        action: PaginationAction,
-        currentValue: number,
-        totalItems: number,
-        type: PaginationType,
-        itemsPerPage: number = ITEMS_PER_PAGE
-    ): number {
-        const maxValue = type === PaginationType.PAGE 
-            ? Math.ceil(totalItems / itemsPerPage) - 1
-            : totalItems - 1;
+    static calculateNewValue(action: PaginationAction, currentValue: number, totalItems: number, type: PaginationType, itemsPerPage: number = ITEMS_PER_PAGE): number {
+        const maxValue = type === PaginationType.PAGE ? Math.ceil(totalItems / itemsPerPage) - 1 : totalItems - 1;
 
         switch (action) {
             case PaginationAction.FIRST:
@@ -122,19 +112,14 @@ export class PaginationManager {
         }
     }
 
-    static updateBuilderOptions(
-        options: EmbedBuilderOptions,
-        action: PaginationAction,
-        type: PaginationType
-    ): EmbedBuilderOptions {
+    static updateBuilderOptions(options: EmbedBuilderOptions, action: PaginationAction, type: PaginationType): EmbedBuilderOptions {
         // Clone the options to avoid mutations
         const updatedOptions = { ...options } as any;
 
-        // Determine total items based on builder type
         let totalItems = 0;
-        if ('scores' in updatedOptions && Array.isArray(updatedOptions.scores)) {
+        if ("scores" in updatedOptions && Array.isArray(updatedOptions.scores)) {
             totalItems = updatedOptions.scores.length;
-        } else if ('plays' in updatedOptions && Array.isArray(updatedOptions.plays)) {
+        } else if ("plays" in updatedOptions && Array.isArray(updatedOptions.plays)) {
             totalItems = updatedOptions.plays.length;
         }
 
@@ -142,18 +127,18 @@ export class PaginationManager {
             const currentPage = updatedOptions.page ?? 0;
             const newPage = this.calculateNewValue(action, currentPage, totalItems, type);
             updatedOptions.page = newPage;
-            
+
             // For plays builder, also update isPage flag
-            if ('isPage' in updatedOptions) {
+            if ("isPage" in updatedOptions) {
                 updatedOptions.isPage = true;
             }
         } else {
             const currentIndex = updatedOptions.index ?? 0;
             const newIndex = this.calculateNewValue(action, currentIndex, totalItems, type);
             updatedOptions.index = newIndex;
-            
+
             // For plays builder, also update isPage flag
-            if ('isPage' in updatedOptions) {
+            if ("isPage" in updatedOptions) {
                 updatedOptions.isPage = false;
             }
         }
@@ -162,10 +147,10 @@ export class PaginationManager {
     }
 
     static getTotalItems(options: EmbedBuilderOptions): number {
-        if ('scores' in options && Array.isArray(options.scores)) {
+        if ("scores" in options && Array.isArray(options.scores)) {
             return options.scores.length;
         }
-        if ('plays' in options && Array.isArray(options.plays)) {
+        if ("plays" in options && Array.isArray(options.plays)) {
             return options.plays.length;
         }
         return 0;
@@ -182,10 +167,10 @@ export class PaginationManager {
     static getPaginationType(options: EmbedBuilderOptions): PaginationType {
         const optionsAny = options as any;
         // For plays builder, check the isPage flag
-        if ('isPage' in optionsAny) {
+        if ("isPage" in optionsAny) {
             return optionsAny.isPage === true ? PaginationType.PAGE : PaginationType.INDEX;
         }
-        
+
         // Default to page for other builders (like leaderboard)
         return PaginationType.PAGE;
     }
