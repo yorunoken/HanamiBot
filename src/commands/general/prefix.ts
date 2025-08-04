@@ -1,6 +1,6 @@
 import { getEntry, insertData } from "@utils/database";
 import { DEFAULT_PREFIX, MAX_AMOUNT_OF_PREFIXES } from "@utils/constants";
-import { GuildPrefixCache } from "@utils/redis";
+import { guildPrefixesCache } from "@utils/redis";
 import { Tables } from "@type/database";
 import { ApplicationCommandOptionType, EmbedType, PermissionFlags } from "lilybird";
 import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
@@ -94,7 +94,7 @@ async function add({ prefix, interaction, guildId }: { prefix?: string; interact
     const newPrefixes = prefixes === null ? [prefix] : [...prefixes, prefix];
 
     insertData({ table: Tables.GUILD, id: guildId, data: [{ key: "prefixes", value: JSON.stringify(newPrefixes) }] });
-    await GuildPrefixCache.set(guildId, newPrefixes);
+    guildPrefixesCache.set(guildId, newPrefixes);
 
     await interaction.editReply(`**The prefix \`${prefix}\` has been added to the list.**`);
     return;
@@ -120,7 +120,7 @@ async function remove({ prefix, interaction, guildId }: { prefix?: string; inter
 
     const newPrefixes = prefixes.filter((item) => item !== prefix);
     insertData({ table: Tables.GUILD, id: guildId, data: [{ key: "prefixes", value: newPrefixes.length > 0 ? JSON.stringify(newPrefixes) : null }] });
-    await GuildPrefixCache.set(guildId, newPrefixes.length > 0 ? newPrefixes : DEFAULT_PREFIX);
+    guildPrefixesCache.set(guildId, newPrefixes.length > 0 ? newPrefixes : DEFAULT_PREFIX);
 
     let message = `**The prefix \`${prefix}\` has been removed from the list.**`;
     if (newPrefixes.length === 0) message = `**__Warning__:\nThere are no more custom prefixes on the guild left. The default prefix is \`${DEFAULT_PREFIX.join("")}\`**`;

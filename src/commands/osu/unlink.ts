@@ -1,18 +1,19 @@
 import { getEntry, removeEntry } from "@utils/database";
-import { slashCommandsIds } from "@utils/cache";
 import { Tables } from "@type/database";
 import type { SlashCommand } from "@type/commands";
 import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
+import { slashCommandIdsCache } from "@utils/redis";
 
 export default {
     data: { name: "unlink", description: "Unlink your osu! account from the bot." },
-    run
+    run,
 } satisfies SlashCommand;
 
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
     await interaction.deferReply(true);
 
-    const linkCommand = slashCommandsIds.get("link");
+    const linkCommandId = slashCommandIdsCache.get("link");
+    const linkCommand = linkCommandId ?? "/link";
     const userId = interaction.member.user.id;
     const user = getEntry(Tables.USER, userId);
     if (!user?.banchoId) {

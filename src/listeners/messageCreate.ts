@@ -7,7 +7,7 @@ import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
 import type { Message } from "@lilybird/transformers";
 import type { Event } from "@lilybird/handlers";
-import { GuildPrefixCache, CooldownCache } from "@utils/redis";
+import { guildPrefixesCache, cooldownsCache } from "@utils/redis";
 
 export default {
     event: "messageCreate",
@@ -26,7 +26,7 @@ async function run(message: Message): Promise<void> {
 
     let guildPrefixes: Array<string>;
     try {
-        guildPrefixes = (await GuildPrefixCache.get(guildId)) ?? DEFAULT_PREFIX;
+        guildPrefixes = guildPrefixesCache.get(guildId) ?? DEFAULT_PREFIX;
     } catch (error) {
         logger.error("Failed to get guild prefixes from cache, using default", error as Error, { guildId });
         guildPrefixes = DEFAULT_PREFIX;
@@ -88,9 +88,11 @@ async function run(message: Message): Promise<void> {
 
     // Check cooldown
     try {
-        if (await CooldownCache.exists(command.name, author.id)) {
-            const cooldownExpiry = await CooldownCache.get(command.name, author.id);
-            const remainingTime = cooldownExpiry ? cooldownExpiry - Date.now() : 0;
+        const cooldownKey = `${command.name}:${author.id}`;
+        const cooldownExpiry = cooldownsCache.get(cooldownKey);
+
+        if (cooldownExpiry && cooldownExpiry > Date.now()) {
+            const remainingTime = cooldownExpiry - Date.now();
 
             if (remainingTime > 0) {
                 try {
@@ -194,7 +196,8 @@ async function run(message: Message): Promise<void> {
     const cooldownExpiry = Date.now() + cooldownDuration;
 
     try {
-        await CooldownCache.set(command.name, author.id, cooldownExpiry);
+        const cooldownKey = `${command.name}:${author.id}`;
+        cooldownsCache.set(cooldownKey, cooldownExpiry);
     } catch (cooldownError) {
         logger.error("Failed to set cooldown", cooldownError as Error, {
             command: command.name,

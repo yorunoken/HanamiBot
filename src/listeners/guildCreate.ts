@@ -3,7 +3,7 @@ import { logger } from "@utils/logger";
 import { Tables } from "@type/database";
 import type { Guild } from "@type/database";
 import type { Event } from "@lilybird/handlers";
-import { GuildPrefixCache } from "@utils/redis";
+import { guildPrefixesCache } from "@utils/redis";
 
 export default {
     event: "guildCreate",
@@ -32,7 +32,7 @@ export default {
 
         if (document !== null && document.prefixes !== null) {
             try {
-                await GuildPrefixCache.set(guild.id, document.prefixes);
+                guildPrefixesCache.set(guild.id, document.prefixes);
             } catch (error) {
                 logger.error(`Failed to cache prefixes for guild ${guild.id}`, error as Error);
             }

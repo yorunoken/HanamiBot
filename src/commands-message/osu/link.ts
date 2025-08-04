@@ -1,6 +1,6 @@
-import { slashCommandsIds } from "@utils/cache";
 import type { Message } from "@lilybird/transformers";
 import type { MessageCommand } from "@type/commands";
+import { slashCommandIdsCache } from "@utils/redis";
 
 export default {
     name: "link",
@@ -8,7 +8,8 @@ export default {
     usage: "/link",
     cooldown: 1000,
     run: async ({ message }: { message: Message }) => {
-        await message.reply(`This command has been deprecated. Use ${slashCommandsIds.get("link")} instead.`);
-    }
+        const linkCommandId = slashCommandIdsCache.get("link");
+        const commandMention = linkCommandId ?? "/link";
+        await message.reply(`This command has been deprecated. Use ${commandMention} instead.`);
+    },
 } satisfies MessageCommand;
-

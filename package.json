@@ -5,8 +5,8 @@
     "type": "module",
     "main": "src/index.ts",
     "scripts": {
-        "check": "eslint",
-        "start": "bun .",
+        "check": "tsc --noEmit && eslint",
+        "start": "bun src/index.ts",
         "register-commands": "bun register-commands.ts"
     },
     "dependencies": {

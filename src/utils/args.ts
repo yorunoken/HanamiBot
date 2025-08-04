@@ -1,5 +1,4 @@
 import { getEntry } from "./database";
-import { slashCommandsIds } from "./cache";
 import { Mode } from "@type/osu";
 import { UserType } from "@type/commandArgs";
 import { Tables } from "@type/database";
@@ -7,6 +6,7 @@ import { ModsEnum } from "osu-web.js";
 import type { SlashCommandArgs, DifficultyOptions, Mods, PrefixCommandArgs, User } from "@type/commandArgs";
 import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, GuildInteraction, Message } from "@lilybird/transformers";
+import { slashCommandIdsCache } from "./redis";
 
 interface BeatMapSetURL {
     url: string;
@@ -69,7 +69,7 @@ function parseURL(url: string): BeatMapSetURL | BeatMapURL | null {
 }
 
 function linkCommand(): string | undefined {
-    return slashCommandsIds.get("link");
+    return slashCommandIdsCache.get("link");
 }
 
 export function getCommandArgs(interaction: GuildInteraction<ApplicationCommandData>, getAttributes?: boolean): SlashCommandArgs {

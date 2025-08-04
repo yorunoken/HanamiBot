@@ -1,5 +1,5 @@
-import { slashCommandsIds } from "@utils/cache";
 import type { MessageCommand } from "@type/commands";
+import { slashCommandIdsCache } from "@utils/redis";
 
 export default {
     name: "config",
@@ -11,6 +11,8 @@ export default {
     /config mode: osu`,
     cooldown: 1000,
     run: async ({ message }) => {
-        await message.reply(`This command has been deprecated. Use ${slashCommandsIds.get("config")}instead.`);
-    }
+        const configCommandId = slashCommandIdsCache.get("config");
+        const commandMention = configCommandId ?? "/config";
+        await message.reply(`This command has been deprecated. Use ${commandMention} instead.`);
+    },
 } satisfies MessageCommand;

@@ -1,8 +1,7 @@
 import db from "../data.db" with { type: "sqlite" };
 import { getAccessToken } from "./osu";
-import { slashCommandsIds } from "./cache";
 import { removeEntry } from "./database";
-import { GuildPrefixCache } from "./redis";
+import { guildPrefixesCache, slashCommandIdsCache } from "./redis";
 import { logger } from "./logger";
 import { Tables } from "@type/database";
 import { Client as OsuClient } from "osu-web.js";
@@ -20,7 +19,6 @@ export const client = new OsuClient(accessToken);
 export const messageCommands = new Map<string, DefaultMessageCommand>();
 export const commandAliases = new Map<string, string>();
 export const applicationCommands = new Map<string, DefaultSlashCommand>();
-
 
 export async function loadMessageCommands(): Promise<void> {
     // Temporary array to store promises of MessageCommands
@@ -77,7 +75,7 @@ export async function loadApplicationCommands(): Promise<void> {
         const commandIds = JSON.parse(commandIdsFile) as Record<string, string>;
         
         for (const [name, formattedId] of Object.entries(commandIds)) {
-            slashCommandsIds.set(name, formattedId);
+            slashCommandIdsCache.set(name, formattedId);
         }
         
         logger.info(`Loaded ${Object.keys(commandIds).length} command IDs from cache`);
@@ -191,12 +189,8 @@ export async function loadGuildPrefixes(): Promise<void> {
             try {
                 if (guild.prefixes) {
                     const prefixes = JSON.parse(guild.prefixes) as Array<string>;
-                    const success = await GuildPrefixCache.set(guild.id, prefixes);
-                    if (success) {
-                        loadedCount++;
-                    } else {
-                        logger.warn(`Failed to cache prefixes for guild ${guild.id}`);
-                    }
+                    guildPrefixesCache.set(guild.id, prefixes);
+                    loadedCount++;
                 }
             } catch (parseError) {
                 logger.error(`Failed to parse prefixes for guild ${guild.id}`, parseError as Error);

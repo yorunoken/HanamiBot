@@ -1,6 +1,21 @@
 import Valkey from "iovalkey";
 import { logger } from "@utils/logger";
 
+// Map caches
+export const guildPrefixesCache = new Map<string, Array<string>>();
+export const cooldownsCache = new Map<string, number>();
+export const slashCommandIdsCache = new Map<string, string>();
+
+// Clear cooldown cache every hour
+setInterval(() => {
+    const now = Date.now();
+    for (const [key, expiresAt] of cooldownsCache.entries()) {
+        if (expiresAt <= now) {
+            cooldownsCache.delete(key);
+        }
+    }
+}, 5 * 60 * 1000);
+
 // Redis client instance
 let redisClient: Valkey;
 
@@ -40,10 +55,6 @@ export async function initializeRedis(): Promise<void> {
             reject(new Error("Redis connection timeout after 10 seconds"));
         }, 10000);
     });
-}
-
-export function getRedisClient() {
-    return redisClient;
 }
 
 export function isRedisAvailable(): boolean {
@@ -175,37 +186,6 @@ export class ButtonStateCache {
 
     static async del(messageId: string): Promise<boolean> {
         return RedisCache.del(CacheKeys.BUTTON_STATE(messageId));
-    }
-}
-
-export class GuildPrefixCache {
-    static async get(guildId: string): Promise<Array<string> | null> {
-        return RedisCache.get<Array<string>>(CacheKeys.GUILD_PREFIXES(guildId));
-    }
-
-    static async set(guildId: string, prefixes: Array<string>): Promise<boolean> {
-        return RedisCache.set(CacheKeys.GUILD_PREFIXES(guildId), prefixes, CacheTTL.GUILD_PREFIXES);
-    }
-
-    static async del(guildId: string): Promise<boolean> {
-        return RedisCache.del(CacheKeys.GUILD_PREFIXES(guildId));
-    }
-}
-
-export class CooldownCache {
-    static async get(commandName: string, userId: string): Promise<number | null> {
-        const key = CacheKeys.COOLDOWN(commandName, userId);
-        return RedisCache.get<number>(key);
-    }
-
-    static async set(commandName: string, userId: string, expiresAt: number): Promise<boolean> {
-        const key = CacheKeys.COOLDOWN(commandName, userId);
-        const ttl = Math.max(1, Math.floor((expiresAt - Date.now()) / 1000));
-        return RedisCache.set(key, expiresAt, ttl);
-    }
-
-    static async exists(commandName: string, userId: string): Promise<boolean> {
-        return RedisCache.exists(CacheKeys.COOLDOWN(commandName, userId));
     }
 }
 

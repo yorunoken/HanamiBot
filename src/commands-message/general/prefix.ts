@@ -1,5 +1,5 @@
-import { slashCommandsIds } from "@utils/cache";
 import type { MessageCommand } from "@type/commands";
+import { slashCommandIdsCache } from "@utils/redis";
 
 export default {
     name: "prefix",
@@ -11,6 +11,8 @@ export default {
     /prefix list`,
     cooldown: 1000,
     run: async ({ message }) => {
-        await message.reply(`This command has been deprecated. Use ${slashCommandsIds.get("prefix")} instead.`);
-    }
+        const prefixCommandId = slashCommandIdsCache.get("prefix");
+        const commandMention = prefixCommandId ?? "/prefix";
+        await message.reply(`This command has been deprecated. Use ${commandMention} instead.`);
+    },
 } satisfies MessageCommand;
