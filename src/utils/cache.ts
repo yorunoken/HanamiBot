@@ -59,7 +59,7 @@ export async function initializeRedis(): Promise<void> {
     try {
         await redisClient.connect();
     } catch (error) {
-        logger.error("Failed to connect to Redis:", error);
+        logger.error("Failed to connect to Redis:", error as Error);
         throw new Error(`Redis connection failed: ${(error as Error).message}`);
     }
 }
