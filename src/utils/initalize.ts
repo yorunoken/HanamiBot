@@ -8,7 +8,6 @@ import { Tables } from "@type/database";
 import { Client as OsuClient } from "osu-web.js";
 import { readdir } from "fs/promises";
 import type { Guild } from "@type/database";
-import type { Client as LilybirdClient, ApplicationCommand } from "lilybird";
 import type { DefaultMessageCommand, DefaultSlashCommand } from "@type/commands";
 
 const tokenResult = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
@@ -53,8 +52,7 @@ export async function loadMessageCommands(): Promise<void> {
     }
 }
 
-export async function loadApplicationCommands(clnt: LilybirdClient): Promise<void> {
-    const slashCommands: Array<ApplicationCommand.Create.ApplicationCommandJSONParams> = [];
+export async function loadApplicationCommands(): Promise<void> {
     const temp: Array<Promise<DefaultSlashCommand>> = [];
 
     const items = await readdir("./src/commands", { recursive: true });
@@ -70,13 +68,21 @@ export async function loadApplicationCommands(clnt: LilybirdClient): Promise<voi
     const commands = await Promise.all(temp);
     for (const command of commands) {
         const { default: cmd } = command;
-        slashCommands.push(cmd.data);
         applicationCommands.set(cmd.data.name, command);
     }
 
-    const commandsIds = await clnt.rest.bulkOverwriteGlobalApplicationCommand(clnt.user.id, slashCommands);
-    for (const { name, id } of commandsIds) {
-        slashCommandsIds.set(name, `</${name}:${id}>`);
+    // Load command IDs from file (if exists)
+    try {
+        const commandIdsFile = await Bun.file("./command-ids.json").text();
+        const commandIds = JSON.parse(commandIdsFile) as Record<string, string>;
+        
+        for (const [name, formattedId] of Object.entries(commandIds)) {
+            slashCommandsIds.set(name, formattedId);
+        }
+        
+        logger.info(`Loaded ${Object.keys(commandIds).length} command IDs from cache`);
+    } catch (_error) {
+        logger.warn("No command IDs file found. Run 'bun run register-commands' to register commands with Discord.");
     }
 }
 
@@ -178,7 +184,6 @@ export function initializeDatabase(): void {
 
 export async function loadGuildPrefixes(): Promise<void> {
     try {
-        logger.info("Loading guild prefixes from database...");
         const guilds = db.prepare("SELECT id, prefixes FROM guilds WHERE prefixes IS NOT NULL").all() as Array<{ id: string, prefixes: string }>;
         
         let loadedCount = 0;
