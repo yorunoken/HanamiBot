@@ -1,25 +1,21 @@
 # Contributing
 
-To start contributing, you either need to install [Bun](https://bun.sh/)
+To start contributing, you need to install [Bun](https://bun.sh/)
 
 1. Install Bun using curl
     - `curl -fsSL https://bun.sh/install | bash`
       or if you're on Windows:
     - `powershell -c "irm bun.sh/install.ps1 | iex"`
 
-2. Install npm.
-
-3. Clone the repository.
+2. Clone the repository.
     - `git clone https://github.com/yorunoken/hanamibot`
 
-4. Navigate inside the directory and install the dev, and normal dependencies.
-    - `cd hanamibot && npm install -D`
+3. Navigate inside the directory and install the dev, and normal dependencies.
+    - `cd HanamiBot && bun install`
 
-5. Install ESLint as an extension in your IDE to help with types.
+4. Install ESLint and Prettier as an extension in your IDE to help with types and formatting.
 
-6. Fill out `.env.local` with your API keys (see below to see how).
-
-7. You can use `bun start` to start the bot and test your code.
+5. Fill out `.env.local` with your API keys (see below to see how).
 
 ## Getting API keys
 
@@ -55,7 +51,7 @@ You need to fill `.env.local` with the approriate API keys to make the bot work.
 
 3. Edit your newly made application.
 
-4. Copy its Client ID and Client secret and you're good to go.
+4. Copy its Client ID and Client secret, paste them into the env file and you're good to go.
 
 ### CALLBACK_URL (callback URL for /link command)
 
@@ -68,3 +64,71 @@ This one is a little tricky, because you will need to host a website.
 3. Input my template repo <https://github.com/YoruNoKen/hanamiVerifier> and build the website.
 
 4. Copy the URL, add it to `Application Callback URLs` in your osu! Application and your .env.local file.
+
+### ERROR_CHANNEL_ID (Optional - for error logging)
+
+1. Create a Discord server for development/testing if you don't have one.
+
+2. Create a text channel specifically for error logs (e.g., `#error-logs`).
+
+3. Right-click on the channel and select `Copy Channel ID` (you may need to enable Developer Mode in Discord settings first).
+
+4. Paste the channel ID as the value for `ERROR_CHANNEL_ID`.
+
+### OWNER_ID (Your Discord user ID)
+
+1. In Discord, right-click on your username/avatar and select `Copy User ID` (Developer Mode must be enabled).
+
+2. Paste your user ID as the value for `OWNER_ID`.
+
+### DEV (Development mode)
+
+Set this to `1` to enable development mode, or `0` for production. For local development, keep it as `1`.
+
+### Redis Configuration
+
+This project uses Redis to remember button message data even after the bot was restarted:
+
+1. Install Redis on your system:
+    - **Linux/macOS**: `sudo apt install redis-server` or `brew install redis`
+    - **Windows**: Download from [Redis for Windows](https://github.com/microsoftarchive/redis/releases)
+
+2. Start the Redis server:
+    - **Linux/macOS**: `redis-server`
+    - **Windows**: Run the Redis server executable
+
+3. The default configuration should work:
+    - `REDIS_HOST=localhost`
+    - `REDIS_PORT=6379`
+    - `REDIS_PASSWORD=very_secure_password` (change this to a secure password)
+    - `REDIS_DB=0`
+
+## Running the Bot
+
+After setting up all the environment variables:
+
+1. Copy `.env.example` to `.env.local`:
+
+    ```bash
+    cp .env.example .env.local
+    ```
+
+2. Fill in all the required values in `.env.local` according to the sections above.
+
+3. Register the bot's slash commands:
+
+    ```bash
+    bun run register-commands.ts
+    ```
+
+4. Start the bot:
+    ```bash
+    bun start
+    ```
+
+## Development Guidelines
+
+- Use ESLint and Prettier for code formatting
+- Follow the existing code structure and patterns
+- Test your changes thoroughly before submitting a pull request
+- Make sure all environment variables are properly configured
