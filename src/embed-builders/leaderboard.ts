@@ -1,4 +1,4 @@
-import { getScore } from "@cleaners/scores";
+import { getScore } from "@utils/scores-processor";
 import { SPACE } from "@utils/constants";
 import { getEntry } from "@utils/database";
 import { downloadBeatmap } from "@utils/osu";

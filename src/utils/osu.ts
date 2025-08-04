@@ -13,13 +13,6 @@ import type { UserScore, UserBestScore, AccessTokenJSON, AuthScope, LeaderboardS
 import type { Client, Embed } from "lilybird";
 import type { GameMode, Mod as ModOsuWeb, Rank, Beatmap as BeatmapWeb } from "osu-web.js";
 
-/**
- * Gets the access token of the client.
- * @param clientId - Client ID for the application.
- * @param clientSecret - Client Secret for the application.
- * @param scope - Array of authorization scopes.
- * @returns An object containing the access token and its expiration date.
- */
 export async function getAccessToken(
     clientId: number,
     clientSecret: string,

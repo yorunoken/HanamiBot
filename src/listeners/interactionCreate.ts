@@ -3,7 +3,7 @@ import { client, applicationCommands } from "@utils/initalize";
 import { logger } from "@utils/logger";
 import { ButtonStateCache } from "@utils/cache";
 import { EmbedBuilderType } from "@type/embedBuilders";
-import { createPaginationActionRow } from "@utils/buttons";
+import { createPaginationActionRow } from "@utils/pagination";
 import { PaginationManager } from "@utils/pagination";
 import { Tables } from "@type/database";
 import { leaderboardBuilder, playBuilder } from "@builders/index";

@@ -1,5 +1,5 @@
-import { getProfile } from "@cleaners/profile";
-import { getScore } from "@cleaners/scores";
+import { getProfile } from "@utils/profile-processor";
+import { getScore } from "@utils/scores-processor";
 import { SPACE } from "@utils/constants";
 import { getEntry } from "@utils/database";
 import { downloadBeatmap, saveScoreDatas } from "@utils/osu";

@@ -175,3 +175,17 @@ export class PaginationManager {
         return PaginationType.PAGE;
     }
 }
+
+// Button creation utilities
+export function createPaginationActionRow(builderOptions: EmbedBuilderOptions): Array<Message.Component.Structure> {
+    const totalItems = PaginationManager.getTotalItems(builderOptions);
+    const paginationType = PaginationManager.getPaginationType(builderOptions);
+    const currentValue = PaginationManager.getCurrentValue(builderOptions, paginationType);
+
+    return PaginationManager.createActionRow({
+        type: paginationType,
+        totalItems,
+        currentValue,
+        itemsPerPage: ITEMS_PER_PAGE,
+    });
+}

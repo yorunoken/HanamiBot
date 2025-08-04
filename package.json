@@ -7,7 +7,8 @@
     "scripts": {
         "check": "tsc --noEmit && eslint",
         "start": "bun src/index.ts",
-        "register-commands": "bun register-commands.ts"
+        "register-commands": "bun register-commands.ts",
+        "format": "prettier --write ."
     },
     "dependencies": {
         "@lilybird/handlers": "^0.5.0",

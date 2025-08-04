@@ -5,7 +5,7 @@ import { leaderboardBuilder } from "@builders/leaderboard";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { ButtonStateCache } from "@utils/cache";
 import { client } from "@utils/initalize";
-import { createPaginationActionRow } from "@utils/buttons";
+import { createPaginationActionRow } from "@utils/pagination";
 import { EmbedType } from "lilybird";
 import type { Mod } from "osu-web.js";
 import type { LeaderboardBuilderOptions } from "@type/embedBuilders";

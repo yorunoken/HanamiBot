@@ -1,7 +1,7 @@
 import { client } from "@utils/initalize";
 import { accuracyCalculator, downloadBeatmap, getPerformanceResults, gradeCalculator, hitValueCalculator } from "@utils/osu";
 import { getEntry } from "@utils/database";
-import { grades, rulesets } from "@utils/emotes";
+import { grades, rulesets } from "@utils/constants";
 import { SPACE } from "@utils/constants";
 import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";

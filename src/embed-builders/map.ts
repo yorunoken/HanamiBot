@@ -1,7 +1,7 @@
 import { client } from "@utils/initalize";
 import { downloadBeatmap, getPerformanceResults } from "@utils/osu";
 import { getEntry } from "@utils/database";
-import { rulesets } from "@utils/emotes";
+import { rulesets } from "@utils/constants";
 import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
 import type { MapBuilderOptions } from "@type/embedBuilders";

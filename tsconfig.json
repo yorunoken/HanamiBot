@@ -21,8 +21,7 @@
             "@type/*": ["types/*"],
             "@utils/*": ["utils/*"],
             "@listeners/*": ["listeners/*"],
-            "@builders/*": ["embed-builders/*"],
-            "@cleaners/*": ["cleaners/*"]
+            "@builders/*": ["embed-builders/*"]
         },
         "types": [
             "bun-types", // add Bun global

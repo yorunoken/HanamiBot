@@ -1,13 +1,15 @@
-// Complicated functions
+// Complex embed builders
 export * from "./compare";
 export * from "./leaderboard";
 export * from "./map";
 export * from "./plays";
 export * from "./profile";
 export * from "./card";
+export * from "./simulate";
 
-// Simple functions
-export * from "./simple/avatar";
-export * from "./simple/background";
-export * from "./simple/banner";
-export * from "./simple/help";
+// Simple embed builders
+export * from "./avatar";
+export * from "./background";
+export * from "./banner";
+export * from "./help";
+export * from "./command";

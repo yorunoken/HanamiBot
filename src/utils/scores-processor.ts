@@ -1,5 +1,5 @@
 import { accuracyCalculator, getPerformanceResults, getRetryCount, hitValueCalculator } from "@utils/osu";
-import { grades, rulesets } from "@utils/emotes";
+import { grades, rulesets } from "@utils/constants";
 import { insertData } from "@utils/database";
 import { Tables } from "@type/database";
 import type { Mode, UserScore, Beatmap, LeaderboardScores, PlayStatistics, ScoresInfo, Score, UserBestScore } from "@type/osu";

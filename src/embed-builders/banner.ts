@@ -1,4 +1,4 @@
-import { getProfile } from "@cleaners/profile";
+import { getProfile } from "@utils/profile-processor";
 import { Mode } from "@type/osu";
 import type { Embed } from "lilybird";
 import type { BannerBuilderOptions } from "@type/embedBuilders";

@@ -1,4 +1,4 @@
-import { commandBuilder } from "@builders/simple/command";
+import { commandBuilder } from "@builders/command";
 import type { MessageCommand } from "@type/commands";
 
 export default {

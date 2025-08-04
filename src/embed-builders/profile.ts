@@ -1,5 +1,5 @@
-import { getProfile } from "@cleaners/profile";
-import { grades } from "@utils/emotes";
+import { getProfile } from "@utils/profile-processor";
+import { grades } from "@utils/constants";
 import { EmbedType } from "lilybird";
 import type { ProfileBuilderOptions } from "@type/embedBuilders";
 import type { Embed } from "lilybird";

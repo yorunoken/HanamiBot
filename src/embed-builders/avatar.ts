@@ -1,5 +1,5 @@
 import { Mode } from "@type/osu";
-import { getProfile } from "@cleaners/profile";
+import { getProfile } from "@utils/profile-processor";
 import type { Embed } from "lilybird";
 import type { AvatarBuilderOptions } from "@type/embedBuilders";
 
