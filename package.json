@@ -7,7 +7,7 @@
     "scripts": {
         "check": "tsc --noEmit && eslint",
         "start": "bun src/index.ts",
-        "register-commands": "bun register-commands.ts",
+        "register": "bun register-commands.ts",
         "format": "prettier --write ."
     },
     "dependencies": {
