@@ -2,6 +2,7 @@ import db from "../data.db" with { type: "sqlite" };
 import { getAccessToken } from "./osu";
 import { slashCommandsIds } from "./cache";
 import { removeEntry } from "./database";
+import { GuildPrefixCache } from "./redis";
 import { Tables } from "@type/database";
 import { Client as OsuClient } from "osu-web.js";
 import { mkdir, access, readFile, writeFile, readdir } from "node:fs/promises";
@@ -84,8 +85,8 @@ export async function loadApplicationCommands(clnt: LilybirdClient): Promise<voi
     }
 }
 
-export function refreshServersDatabase(): void {
-    const nulledGuilds = db.query("SELECT * FROM servers WHERE name IS NULL;").all() as Array< Guild>;
+export function refreshGuildsDatabase(): void {
+    const nulledGuilds = db.query("SELECT * FROM guilds WHERE name IS NULL;").all() as Array< Guild>;
 
     if (nulledGuilds.length === 0)
         return;
@@ -174,7 +175,7 @@ interface Columns {
 export function initializeDatabase(): void {
     const tables: Array<{ name: string, columns: Array<string> }> = [
         { name: "users", columns: ["id TEXT PRIMARY KEY", "banchoId TEXT", "score_embeds INTEGER", "mode TEXT", "embed_type TEXT"] },
-        { name: "servers", columns: ["id TEXT PRIMARY KEY", "name TEXT", "owner_id TEXT", "joined_at INTEGER", "prefixes TEXT"] },
+        { name: "guilds", columns: ["id TEXT PRIMARY KEY", "name TEXT", "owner_id TEXT", "joined_at INTEGER", "prefixes TEXT"] },
         { name: "maps", columns: ["id TEXT PRIMARY KEY", "data TEXT"] },
         { name: "commands", columns: ["id TEXT PRIMARY KEY", "count INTEGER"] },
         { name: "commands_slash", columns: ["id TEXT PRIMARY KEY", "count INTEGER"] },
@@ -246,3 +247,30 @@ export function initializeDatabase(): void {
     console.log("Database up and running!");
 }
 
+export async function loadGuildPrefixes(): Promise<void> {
+    try {
+        console.log("Loading guild prefixes from database...");
+        const guilds = db.prepare("SELECT id, prefixes FROM guilds WHERE prefixes IS NOT NULL").all() as Array<{ id: string, prefixes: string }>;
+        
+        let loadedCount = 0;
+        for (const guild of guilds) {
+            try {
+                if (guild.prefixes) {
+                    const prefixes = JSON.parse(guild.prefixes) as Array<string>;
+                    const success = await GuildPrefixCache.set(guild.id, prefixes);
+                    if (success) {
+                        loadedCount++;
+                    } else {
+                        console.warn(`Failed to cache prefixes for guild ${guild.id}`);
+                    }
+                }
+            } catch (parseError) {
+                console.error(`Failed to parse prefixes for guild ${guild.id}:`, parseError);
+            }
+        }
+        
+        console.log(`Loaded ${loadedCount}/${guilds.length} guild prefixes into cache`);
+    } catch (error) {
+        console.error("Failed to load guild prefixes:", error);
+    }
+}

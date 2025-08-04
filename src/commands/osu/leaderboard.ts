@@ -4,7 +4,7 @@ import { leaderboardBuilder } from "@builders/leaderboard";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { client } from "@utils/initalize";
 import { createPaginationActionRow } from "@utils/buttons";
-import { mesageDataForButtons } from "@utils/cache";
+import { ButtonStateCache } from "@utils/redis";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { LeaderboardBuilderOptions } from "@type/embedBuilders";
 import type { Mod } from "osu-web.js";
@@ -125,5 +125,5 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
         components: createPaginationActionRow(embedOptions),
     });
 
-    mesageDataForButtons.set(sentInteraction.id, embedOptions);
+    await ButtonStateCache.set(sentInteraction.id, embedOptions);
 }

@@ -1,4 +1,4 @@
-import { loadApplicationCommands, loadLogs, loadMessageCommands, refreshServersDatabase } from "@utils/initalize";
+import { loadApplicationCommands, loadLogs, loadMessageCommands, refreshGuildsDatabase, loadGuildPrefixes } from "@utils/initalize";
 import type { Event } from "@lilybird/handlers";
 
 export default {
@@ -12,7 +12,9 @@ export default {
         console.log("Loaded message commands ✅");
         await loadApplicationCommands(client);
         console.log("Loaded application commands ✅");
-        refreshServersDatabase();
+        refreshGuildsDatabase();
         console.log("Refreshed servers database ✅");
-    }
+        await loadGuildPrefixes();
+        console.log("Loaded guild prefixes into cache ✅");
+    },
 } satisfies Event<"ready">;

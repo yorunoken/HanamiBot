@@ -1,5 +1,6 @@
 import { initializeDatabase, loadLogs, client } from "./utils/initalize";
 import { getAccessToken } from "./utils/osu";
+import { initializeRedis, closeRedis } from "./utils/redis";
 import { createHandler } from "@lilybird/handlers/simple";
 import { CachingDelegationType, createClient, Intents } from "lilybird";
 import { Channel, Guild, GuildVoiceChannel } from "@lilybird/transformers";
@@ -20,6 +21,9 @@ async function setToken(): Promise<void> {
 }
 
 await setToken();
+
+// Initialize Redis
+await initializeRedis();
 
 // make sure chromium is dead
 try {
@@ -43,6 +47,7 @@ process.on("SIGINT", async () => {
     try {
         await browser.close();
         console.log("Browser closed");
+        await closeRedis();
         process.exit(0);
     } catch (error) {
         console.error("Error during shutdown:", error);
@@ -55,6 +60,7 @@ process.on("SIGTERM", async () => {
     try {
         await browser.close();
         console.log("Browser closed");
+        await closeRedis();
         process.exit(0);
     } catch (error) {
         console.error("Error during shutdown:", error);

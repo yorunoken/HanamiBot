@@ -5,7 +5,7 @@ import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { PlayType } from "@type/osu";
 import { createPaginationActionRow } from "@utils/buttons";
-import { mesageDataForButtons } from "@utils/cache";
+import { ButtonStateCache } from "@utils/redis";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { PlaysBuilderOptions } from "@type/embedBuilders";
 import type { Mod } from "osu-web.js";
@@ -20,26 +20,31 @@ export default {
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "username",
-                description: "Specify an osu! username"
+                description: "Specify an osu! username",
             },
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "mode",
                 description: "Specify an osu! mode",
-                choices: [ { name: "osu", value: "osu" }, { name: "mania", value: "mania" }, { name: "taiko", value: "taiko" }, { name: "ctb", value: "fruits" } ]
+                choices: [
+                    { name: "osu", value: "osu" },
+                    { name: "mania", value: "mania" },
+                    { name: "taiko", value: "taiko" },
+                    { name: "ctb", value: "fruits" },
+                ],
             },
             {
                 type: ApplicationCommandOptionType.INTEGER,
                 name: "index",
                 description: "Specify an index, defaults to 1.",
                 min_value: 1,
-                max_value: 100
+                max_value: 100,
             },
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "mods",
                 description: "Specify a mods combination.",
-                min_length: 2
+                min_length: 2,
             },
             {
                 type: ApplicationCommandOptionType.STRING,
@@ -48,37 +53,37 @@ export default {
                 choices: [
                     {
                         name: "Include",
-                        value: "include"
+                        value: "include",
                     },
                     {
                         name: "Force Include",
-                        value: "force_include"
+                        value: "force_include",
                     },
                     {
                         name: "Exclude",
-                        value: "exclude"
-                    }
-                ]
+                        value: "exclude",
+                    },
+                ],
             },
             {
                 type: ApplicationCommandOptionType.STRING,
                 name: "grade",
                 description: "Consider scores only with this grade.",
-                choices: ["SS", "S", "A", "B", "C", "D"].map((grade) => ({ name: grade, value: grade }))
+                choices: ["SS", "S", "A", "B", "C", "D"].map((grade) => ({ name: grade, value: grade })),
             },
             {
                 type: ApplicationCommandOptionType.BOOLEAN,
                 name: "passes",
-                description: "Whether or not only passes should be considered."
+                description: "Whether or not only passes should be considered.",
             },
             {
                 type: ApplicationCommandOptionType.USER,
                 name: "discord",
-                description: "Specify a linked Discord user"
-            }
-        ]
+                description: "Specify a linked Discord user",
+            },
+        ],
     },
-    run
+    run,
 } satisfies SlashCommand;
 
 async function run(interaction: GuildInteraction<ApplicationCommandData>): Promise<void> {
@@ -95,11 +100,14 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
     const mods = { exclude: false, forceInclude: false, include: false, name: mod };
     switch (modsAction) {
         case "include":
-            mods.include = true; break;
+            mods.include = true;
+            break;
         case "force_include":
-            mods.forceInclude = true; break;
+            mods.forceInclude = true;
+            break;
         case "exclude":
-            mods.exclude = true; break;
+            mods.exclude = true;
+            break;
         default:
             mods.include = true;
     }
@@ -116,9 +124,9 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`
-                }
-            ]
+                    description: `It seems like the user **\`${user.banchoId}\`** doesn't exist! :(`,
+                },
+            ],
         });
         return;
     }
@@ -134,9 +142,9 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
                 {
                     type: EmbedType.Rich,
                     title: "Uh oh! :x:",
-                    description: `It seems like \`${osuUser.username}\` hasn't had any recent plays in the last 24 hours!`
-                }
-            ]
+                    description: `It seems like \`${osuUser.username}\` hasn't had any recent plays in the last 24 hours!`,
+                },
+            ],
         });
         return;
     }
@@ -150,15 +158,15 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
         authorDb: user.authorDb,
         index,
         isPage: false, // Use index mode for single play navigation
-        plays
+        plays,
     };
 
     const embeds = await playBuilder(embedOptions);
 
     const sentInteraction = await interaction.editReply({
         embeds,
-        components: createPaginationActionRow(embedOptions)
+        components: createPaginationActionRow(embedOptions),
     });
 
-    mesageDataForButtons.set(sentInteraction.id, embedOptions);
+    await ButtonStateCache.set(sentInteraction.id, embedOptions);
 }

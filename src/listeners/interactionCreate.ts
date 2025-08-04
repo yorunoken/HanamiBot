@@ -1,6 +1,6 @@
 import { getEntry, insertData } from "@utils/database";
 import { client, applicationCommands, loadLogs } from "@utils/initalize";
-import { mesageDataForButtons } from "@utils/cache";
+import { ButtonStateCache } from "@utils/redis";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { createPaginationActionRow } from "@utils/buttons";
 import { PaginationManager } from "@utils/pagination";
@@ -10,6 +10,7 @@ import { EmbedType } from "lilybird";
 import type { Embed } from "lilybird";
 import type { DMInteraction, Interaction, InteractionReplyOptions, Message, MessageComponentData } from "@lilybird/transformers";
 import type { Event } from "@lilybird/handlers";
+import type { EmbedBuilderOptions } from "@type/embedBuilders";
 
 export default {
     event: "interactionCreate",
@@ -82,8 +83,8 @@ async function handleButton(interaction: Interaction): Promise<void> {
     if (interaction.inDM()) return handleVerify(interaction);
     if (!interaction.inGuild()) return;
 
-    const builderOptions = mesageDataForButtons.get(interaction.message.id);
-    if (typeof builderOptions === "undefined") {
+    const builderOptions = await ButtonStateCache.get<EmbedBuilderOptions>(interaction.message.id);
+    if (builderOptions === null || builderOptions === undefined) {
         await interaction.reply({ ephemeral: true, content: "This button will not work because the message was created before a bot restart, so its data has been lost." });
         return;
     }
@@ -121,7 +122,7 @@ async function handleButton(interaction: Interaction): Promise<void> {
 
     const updatedOptions = PaginationManager.updateBuilderOptions(builderOptions, buttonAction.action, buttonAction.type);
 
-    mesageDataForButtons.set(interaction.message.id, updatedOptions);
+    await ButtonStateCache.set(interaction.message.id, updatedOptions);
 
     const options: InteractionReplyOptions = {};
 

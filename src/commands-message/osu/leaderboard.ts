@@ -3,7 +3,7 @@ import { Mode } from "@type/osu";
 import { getBeatmapIdFromContext, getBeatmapTopScores } from "@utils/osu";
 import { leaderboardBuilder } from "@builders/leaderboard";
 import { EmbedBuilderType } from "@type/embedBuilders";
-import { mesageDataForButtons } from "@utils/cache";
+import { ButtonStateCache } from "@utils/redis";
 import { client } from "@utils/initalize";
 import { createPaginationActionRow } from "@utils/buttons";
 import { EmbedType } from "lilybird";
@@ -114,5 +114,5 @@ async function run({ message, args, commandName, channel }: { message: Message; 
         components: createPaginationActionRow(embedOptions),
     });
 
-    mesageDataForButtons.set(sentMessage.id, embedOptions);
+    await ButtonStateCache.set(sentMessage.id, embedOptions);
 }

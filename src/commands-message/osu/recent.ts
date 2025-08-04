@@ -5,7 +5,7 @@ import { Mode, PlayType } from "@type/osu";
 import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/embedBuilders";
 import { createPaginationActionRow } from "@utils/buttons";
-import { mesageDataForButtons } from "@utils/cache";
+import { ButtonStateCache } from "@utils/redis";
 import { EmbedType } from "lilybird";
 import type { GuildTextChannel, Message } from "@lilybird/transformers";
 import type { PlaysBuilderOptions } from "@type/embedBuilders";
@@ -105,6 +105,6 @@ async function run({ message, args, commandName, index = 0, channel }: { message
         components: createPaginationActionRow(embedOptions)
     });
 
-    mesageDataForButtons.set(sentMessage.id, embedOptions);
+    await ButtonStateCache.set(sentMessage.id, embedOptions);
 }
 

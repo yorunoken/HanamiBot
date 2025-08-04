@@ -1,4 +1,3 @@
-import { prefixesCache } from "./guildCreate";
 import { DEFAULT_PREFIX } from "@utils/constants";
 import { commandAliases, loadLogs, messageCommands } from "@utils/initalize";
 import { getEntry, insertData } from "@utils/database";
@@ -7,13 +6,12 @@ import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
 import type { Message } from "@lilybird/transformers";
 import type { Event } from "@lilybird/handlers";
+import { GuildPrefixCache, CooldownCache } from "@utils/redis";
 
 export default {
     event: "messageCreate",
     run,
 } satisfies Event<"messageCreate">;
-
-const cooldown = new Map();
 
 const CHANCE_TO_SEND_CUTE_KITTY_CAT_I_LOVE_CATS = 0.2;
 async function run(message: Message): Promise<void> {
@@ -25,7 +23,14 @@ async function run(message: Message): Promise<void> {
     const { content, guildId, client, author } = message;
     if (!content || !guildId || author.bot) return;
 
-    const guildPrefixes = prefixesCache.get(guildId) ?? DEFAULT_PREFIX;
+    let guildPrefixes: Array<string>;
+    try {
+        guildPrefixes = (await GuildPrefixCache.get(guildId)) ?? DEFAULT_PREFIX;
+    } catch (error) {
+        console.error("Failed to get guild prefixes from cache, using default:", error);
+        guildPrefixes = DEFAULT_PREFIX;
+    }
+
     let chosenPrefix: string | null = null;
 
     for (const guildPrefix of guildPrefixes) {
@@ -80,15 +85,37 @@ async function run(message: Message): Promise<void> {
     }
     const { default: command } = commandDefault;
 
-    if (cooldown.has(`${command.name}${author.id}`)) {
-        await message
-            .reply({
-                content: `${cooldown.get(`${command.name}${author.id}`)}ms`,
-            })
-            .then((msg) => setTimeout(async () => msg.delete(), cooldown.get(`${command.name}${author.id}`) - Date.now()));
-        return;
-    }
+    // Check cooldown
+    try {
+        if (await CooldownCache.exists(command.name, author.id)) {
+            const cooldownExpiry = await CooldownCache.get(command.name, author.id);
+            const remainingTime = cooldownExpiry ? cooldownExpiry - Date.now() : 0;
 
+            if (remainingTime > 0) {
+                try {
+                    await message
+                        .reply({
+                            content: `${remainingTime}ms`,
+                        })
+                        .then((msg) =>
+                            setTimeout(async () => {
+                                try {
+                                    await msg.delete();
+                                } catch (deleteError) {
+                                    console.warn("Could not delete cooldown message:", deleteError);
+                                }
+                            }, remainingTime)
+                        );
+                } catch (replyError) {
+                    console.warn("Could not send cooldown message:", replyError);
+                }
+                return;
+            }
+        }
+    } catch (cooldownError) {
+        console.error("Error checking cooldown, allowing command to proceed:", cooldownError);
+        // Continue execution - don't block commands due to Redis issues
+    }
     const channel = await message.fetchChannel();
     if (!channel.isText()) return;
 
@@ -148,10 +175,15 @@ async function run(message: Message): Promise<void> {
         else insertData({ table: Tables.COMMAND, data: [{ key: "count", value: Number(docs.count ?? 0) + 1 }], id: docs.id });
     }
 
-    cooldown.set(`${command.name}${author.id}`, Date.now() + command.cooldown);
-    setTimeout(() => {
-        cooldown.delete(`${command.name}${author.id}`);
-    }, command.cooldown);
+    // Set cooldown in Redis
+    const cooldownDuration = command.cooldown || 1000; // Default to 1 second if undefined
+    const cooldownExpiry = Date.now() + cooldownDuration;
+
+    try {
+        await CooldownCache.set(command.name, author.id, cooldownExpiry);
+    } catch (cooldownError) {
+        console.error("Failed to set cooldown:", cooldownError);
+    }
 
     return;
 }
