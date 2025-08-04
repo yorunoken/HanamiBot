@@ -5,27 +5,26 @@
     "type": "module",
     "main": "src/index.ts",
     "scripts": {
-        "check": "tsc && eslint",
-        "start": "bun .",
-        "build": "bun scripts/build.ts",
-        "prod": "bun run build && bun run start"
+        "check": "tsc --noEmit && eslint",
+        "start": "bun src/index.ts",
+        "register-commands": "bun register-commands.ts",
+        "format": "prettier --write ."
     },
     "dependencies": {
         "@lilybird/handlers": "^0.5.0",
         "@lilybird/transformers": "^0.4.1",
+        "iovalkey": "^0.3.3",
         "lilybird": "^0.7.1",
         "osu-web.js": "^2.4.0",
         "playwright": "^1.44.0",
-        "rosu-pp-js": "^2.0.0",
+        "rosu-pp-js": "3.1.0",
         "tasai": "^1.0.0"
     },
     "devDependencies": {
+        "@eslint/js": "^9.32.0",
         "@types/bun": "latest",
-        "eslint": "^8.55.0",
-        "@typescript-eslint/parser": "^6.13.2",
-        "@typescript-eslint/eslint-plugin": "^6.13.2",
-        "@stylistic/eslint-plugin": "^1.4.1",
-        "eslint-plugin-import": "^2.29.0",
-        "eslint-import-resolver-typescript": "^3.6.1"
+        "eslint": "9.32.0",
+        "prettier": "^3.6.2",
+        "typescript-eslint": "^8.38.0"
     }
 }

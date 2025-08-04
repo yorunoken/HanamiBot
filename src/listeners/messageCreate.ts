@@ -1,19 +1,18 @@
-import { prefixesCache } from "./guildCreate";
 import { DEFAULT_PREFIX } from "@utils/constants";
-import { commandAliases, loadLogs, messageCommands } from "@utils/initalize";
+import { commandAliases, messageCommands } from "@utils/initalize";
+import { logger } from "@utils/logger";
 import { getEntry, insertData } from "@utils/database";
 import { fuzzySearch } from "@utils/fuzzy";
 import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
 import type { Message } from "@lilybird/transformers";
 import type { Event } from "@lilybird/handlers";
+import { guildPrefixesCache, cooldownsCache } from "@utils/cache";
 
 export default {
     event: "messageCreate",
-    run
+    run,
 } satisfies Event<"messageCreate">;
-
-const cooldown = new Map();
 
 const CHANCE_TO_SEND_CUTE_KITTY_CAT_I_LOVE_CATS = 0.2;
 async function run(message: Message): Promise<void> {
@@ -25,18 +24,24 @@ async function run(message: Message): Promise<void> {
     const { content, guildId, client, author } = message;
     if (!content || !guildId || author.bot) return;
 
-    const prefixes = prefixesCache.get(guildId) ?? DEFAULT_PREFIX;
-    let prefix: string | null = null;
+    let guildPrefixes: Array<string>;
+    try {
+        guildPrefixes = guildPrefixesCache.get(guildId) ?? DEFAULT_PREFIX;
+    } catch (error) {
+        logger.error("Failed to get guild prefixes from cache, using default", error as Error, { guildId });
+        guildPrefixes = DEFAULT_PREFIX;
+    }
 
-    for (let i = 0; i < prefixes.length; i++) {
-        const item = prefixes[i];
-        if (content.startsWith(item)) {
-            prefix = item;
+    let chosenPrefix: string | null = null;
+
+    for (const guildPrefix of guildPrefixes) {
+        if (content.startsWith(guildPrefix)) {
+            chosenPrefix = guildPrefix;
             break;
         }
     }
 
-    if (prefix === null) {
+    if (chosenPrefix === null) {
         // nyann :3333
         if ((content === ":3" || content === "3:") && Math.random() < CHANCE_TO_SEND_CUTE_KITTY_CAT_I_LOVE_CATS) {
             await message.reply(message.content === ":3" ? "3:" : ":3", { allowed_mentions: { replied_user: false, parse: [], roles: [], users: [] } });
@@ -50,12 +55,12 @@ async function run(message: Message): Promise<void> {
         return;
     }
 
-    const args = content.slice(prefix.length).trim().split(/ +/g);
+    const args = content.slice(chosenPrefix.length).trim().split(/ +/g);
     let commandName = args.shift()?.toLowerCase();
     if (typeof commandName === "undefined") return;
 
     let index: number | undefined;
-    const match = (/(\D+)(\d+)/).exec(commandName);
+    const match = /(\D+)(\d+)/.exec(commandName);
     if (match) {
         const [, extractedCommandName, extractedNumber] = match;
         commandName = extractedCommandName;
@@ -69,53 +74,77 @@ async function run(message: Message): Promise<void> {
         const possibleCommands = Array.from(messageCommands.values()).map((command) => command.default.name);
         const options = fuzzySearch(commandName, possibleCommands);
 
-        let nearResults = "";
-        for (let i = 0; i < options.length; i++) {
-            const option = options[i];
-            if (option.distance <= 2)
-                nearResults += `${i > 0 ? ", " : ""}${option.option}`;
-        }
+        const nearResults = options
+            .filter((option) => option.distance <= 2)
+            .map((option) => option.option)
+            .join(", ");
 
-        if (nearResults === "")
-            return;
+        if (nearResults === "") return;
 
         await message.reply(`It seems like ${commandName} is not a command. Did you mean: \`${nearResults}\`?`, { allowed_mentions: { replied_user: false, parse: [], roles: [], users: [] } });
         return;
     }
     const { default: command } = commandDefault;
 
-    if (cooldown.has(`${command.name}${author.id}`)) {
-        await message
-            .reply({
-                content: `${cooldown.get(`${command.name}${author.id}`)}ms`
-            })
-            .then((msg) => setTimeout(async () => msg.delete(), cooldown.get(`${command.name}${author.id}`) - Date.now()));
-        return;
-    }
+    // Check cooldown
+    try {
+        const cooldownKey = `${command.name}:${author.id}`;
+        const cooldownExpiry = cooldownsCache.get(cooldownKey);
 
+        if (cooldownExpiry && cooldownExpiry > Date.now()) {
+            const remainingTime = cooldownExpiry - Date.now();
+
+            if (remainingTime > 0) {
+                try {
+                    await message
+                        .reply({
+                            content: `${remainingTime}ms`,
+                        })
+                        .then((msg) =>
+                            setTimeout(async () => {
+                                try {
+                                    await msg.delete();
+                                } catch (deleteError) {
+                                    logger.warn("Could not delete cooldown message", { messageId: msg.id, error: deleteError });
+                                }
+                            }, remainingTime),
+                        );
+                } catch (replyError) {
+                    logger.warn("Could not send cooldown message", { error: replyError });
+                }
+                return;
+            }
+        }
+    } catch (cooldownError) {
+        logger.error("Error checking cooldown, allowing command to proceed", cooldownError as Error);
+    }
     const channel = await message.fetchChannel();
     if (!channel.isText()) return;
 
     await client.rest.triggerTypingIndicator(channel.id);
 
     try {
-        await command.run({ client: client, message, args, prefix, index, commandName, channel });
+        await command.run({ client: client, message, args, prefix: chosenPrefix, index, commandName, channel });
 
         const guild = await client.rest.getGuild(guildId);
-        await loadLogs(`INFO: [${guild.name}] ${author.username} used prefix command \`${command.name}\``);
+        await logger.info(`[${guild.name}] ${author.username} used prefix command \`${command.name}\``, {
+            guildId,
+            guildName: guild.name,
+            userId: author.id,
+            username: author.username,
+            command: command.name,
+            prefix: chosenPrefix,
+        });
         const docs = getEntry(Tables.COMMAND, command.name);
 
-        if (docs === null)
-            insertData({ table: Tables.COMMAND, data: [ { key: "count", value: 1 } ], id: command.name });
-        else
-            insertData({ table: Tables.COMMAND, data: [ { key: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
+        if (docs === null) insertData({ table: Tables.COMMAND, data: [{ key: "count", value: 1 }], id: command.name });
+        else insertData({ table: Tables.COMMAND, data: [{ key: "count", value: Number(docs.count ?? 0) + 1 }], id: docs.id });
     } catch (error) {
         const err = error as Error;
 
-        await message.reply(
-            `Oops, you came across an error!\nHere's a summary of it:\n\`\`\`${err.stack}\`\`\`\nDon't worry, the same error log has been sent to the owner of this bot.`,
-            { allowed_mentions: { replied_user: false, parse: [], roles: [], users: [] } }
-        );
+        await message.reply(`Oops, you came across an error!\nHere's a summary of it:\n\`\`\`${err.stack}\`\`\`\nDon't worry, the same error log has been sent to the owner of this bot.`, {
+            allowed_mentions: { replied_user: false, parse: [], roles: [], users: [] },
+        });
 
         const guild = await client.rest.getGuild(guildId);
 
@@ -128,39 +157,53 @@ async function run(message: Message): Promise<void> {
                     fields: [
                         {
                             name: "User",
-                            value: `<@${author.id}> (${author.username})`
+                            value: `<@${author.id}> (${author.username})`,
                         },
                         {
                             name: "Guild",
-                            value: `[${guild.name}](https://discord.com/channels/${guildId}/${message.channelId})`
+                            value: `[${guild.name}](https://discord.com/channels/${guildId}/${message.channelId})`,
                         },
                         {
                             name: "Message",
-                            value: content
+                            value: content,
                         },
                         {
                             name: "Error",
-                            value: err.stack ?? "undefined (look at logs)"
-                        }
-                    ]
-                }
-            ]
+                            value: err.stack ?? "undefined (look at logs)",
+                        },
+                    ],
+                },
+            ],
         });
 
-        console.error(err);
-        await loadLogs(`ERROR: [${guild.name}] ${author.username} had an error in prefix command \`${command.name}\`: ${err.stack}`, true);
+        await logger.error(`[${guild.name}] ${author.username} had an error in prefix command \`${command.name}\``, err, {
+            guildId,
+            guildName: guild.name,
+            userId: author.id,
+            username: author.username,
+            command: command.name,
+            prefix: chosenPrefix,
+        });
         const docs = getEntry(Tables.COMMAND, command.name);
 
-        if (docs === null)
-            insertData({ table: Tables.COMMAND, data: [ { key: "count", value: 1 } ], id: command.name });
-        else
-            insertData({ table: Tables.COMMAND, data: [ { key: "count", value: Number(docs.count ?? 0) + 1 } ], id: docs.id });
+        if (docs === null) insertData({ table: Tables.COMMAND, data: [{ key: "count", value: 1 }], id: command.name });
+        else insertData({ table: Tables.COMMAND, data: [{ key: "count", value: Number(docs.count ?? 0) + 1 }], id: docs.id });
     }
 
-    cooldown.set(`${command.name}${author.id}`, Date.now() + command.cooldown);
-    setTimeout(() => {
-        cooldown.delete(`${command.name}${author.id}`);
-    }, command.cooldown);
+    // Set cooldown in Redis
+    const cooldownDuration = command.cooldown || 1000; // Default to 1 second if undefined
+    const cooldownExpiry = Date.now() + cooldownDuration;
+
+    try {
+        const cooldownKey = `${command.name}:${author.id}`;
+        cooldownsCache.set(cooldownKey, cooldownExpiry);
+    } catch (cooldownError) {
+        logger.error("Failed to set cooldown", cooldownError as Error, {
+            command: command.name,
+            userId: author.id,
+            cooldownDuration,
+        });
+    }
 
     return;
 }
@@ -170,5 +213,5 @@ function verifyUser(message: Message): void {
     if (!content) return;
 
     const [discordId, osuId] = content.split("\n");
-    insertData({ table: Tables.USER, id: discordId, data: [ { key: "banchoId", value: osuId } ] });
+    insertData({ table: Tables.USER, id: discordId, data: [{ key: "banchoId", value: osuId }] });
 }
