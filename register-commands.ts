@@ -36,7 +36,7 @@ async function extractCommandData(filePath: string): Promise<ApplicationCommand.
     }
 }
 
-async function registerCommands() {
+async function registerApplicationCommands() {
     log.info("Starting command registration...");
 
     // Create a REST client
@@ -45,13 +45,13 @@ async function registerCommands() {
 
     const slashCommands: Array<ApplicationCommand.Create.ApplicationCommandJSONParams> = [];
 
-    const items = await readdir("./src/commands", { recursive: true });
+    const items = await readdir("./src/commands/application", { recursive: true });
     for (const item of items) {
         const [category, cmd] = item.split(process.platform === "win32" ? "\\" : "/");
         if (!category || !cmd) continue;
         if (category === "data") continue;
 
-        const filePath = `./src/commands/${category}/${cmd}`;
+        const filePath = `./src/commands/application/${category}/${cmd}`;
         const commandData = await extractCommandData(filePath);
         if (commandData) {
             slashCommands.push(commandData);
@@ -86,7 +86,7 @@ async function registerCommands() {
 }
 
 // Run the registration
-registerCommands().catch((error) => {
+registerApplicationCommands().catch((error) => {
     log.fatal("Command registration failed", error);
     process.exit(1);
 });

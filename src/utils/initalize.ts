@@ -24,12 +24,12 @@ export async function loadMessageCommands(): Promise<void> {
     // Temporary array to store promises of MessageCommands
     const temp: Array<Promise<DefaultMessageCommand>> = [];
 
-    const items = await readdir("./src/commands-message", { recursive: true });
+    const items = await readdir("./src/commands/message", { recursive: true });
     for (const item of items) {
         const [category, cmd] = item.split(process.platform === "win32" ? "\\" : "/");
         if (!category || !cmd) continue;
 
-        const command = import(`../commands-message/${category}/${cmd}`) as Promise<DefaultMessageCommand>;
+        const command = import(`../commands/message/${category}/${cmd}`) as Promise<DefaultMessageCommand>;
         temp.push(command);
     }
 
@@ -53,13 +53,13 @@ export async function loadMessageCommands(): Promise<void> {
 export async function loadApplicationCommands(): Promise<void> {
     const temp: Array<Promise<DefaultSlashCommand>> = [];
 
-    const items = await readdir("./src/commands", { recursive: true });
+    const items = await readdir("./src/commands/application", { recursive: true });
     for (const item of items) {
         const [category, cmd] = item.split(process.platform === "win32" ? "\\" : "/");
         if (!category || !cmd) continue;
         if (category === "data") continue;
 
-        const command = import(`../commands/${category}/${cmd}`) as Promise<DefaultSlashCommand>;
+        const command = import(`../commands/application/${category}/${cmd}`) as Promise<DefaultSlashCommand>;
         temp.push(command);
     }
 
@@ -79,7 +79,7 @@ export async function loadApplicationCommands(): Promise<void> {
         }
 
         logger.info(`Loaded ${Object.keys(commandIds).length} command IDs from cache`);
-    } catch (_error) {
+    } catch {
         logger.warn("No command IDs file found. Run 'bun run register-commands' to register commands with Discord.");
     }
 }
