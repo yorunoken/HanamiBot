@@ -10,11 +10,18 @@ Feel free to open up an issue/pull request at this [repository](https://github.c
 
 ## What does it do?
 
-It's an osu! Discord bot. You can check your stats, recent plays, top plays, compare scores, get beatmap info, and a bunch of other stuff.
+HanamiBot is a comprehensive osu! Discord bot that provides detailed statistics and gameplay information. Features include:
 
-Link your osu! account with `/link` and you won't need to type your username every time.
+- **Player Statistics**: View detailed profiles, rankings, and performance metrics
+- **Recent Activity**: Track recent plays and scores
+- **Score Analysis**: Compare scores, calculate performance points, and analyze plays
+- **Beatmap Information**: Get detailed beatmap statistics, backgrounds, and metadata
+- **Account Linking**: Link your osu! account with `/link` for personalized commands
+- **Server Customization**: Custom prefixes and configuration options
 
-Use `/help` to see all the commands.
+The bot supports both slash commands and traditional prefix commands, with full osu! game mode support (Standard, Taiko, Catch, Mania).
+
+Use `/help` to see all available commands.
 
 ## Invite the bot
 

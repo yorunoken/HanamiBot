@@ -89,6 +89,6 @@ await createClient({
         applyTransformers: true,
         enabled: { channel: true },
     },
-    intents: [Intents.GUILDS, Intents.GUILD_MESSAGES, Intents.MESSAGE_CONTENT, Intents.GUILD_MEMBERS],
+    intents: [Intents.GUILDS, Intents.GUILD_MESSAGES, Intents.MESSAGE_CONTENT],
     ...listeners,
 });

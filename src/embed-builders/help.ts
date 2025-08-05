@@ -174,7 +174,7 @@ function displayAllCommands(): Array<Embed.Structure> {
     });
 
     const hanamiWebsite = "https://hanami.yorunoken.com";
-    const inviteLink = "https://discord.com/oauth2/authorize?client_id=995999045157916763&permissions=265216&scope=bot";
+    const inviteLink = "https://discord.com/oauth2/authorize?client_id=995999045157916763&permissions=346176&scope=bot";
     const voteLink = "https://top.gg/bot/995999045157916763";
 
     fields.push({

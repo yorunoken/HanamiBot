@@ -7,7 +7,7 @@ export default {
     cooldown: 1000,
     run: async ({ message }) => {
         const links = {
-            invite: "https://discord.com/oauth2/authorize?client_id=995999045157916763&permissions=265216&scope=bot",
+            invite: "https://discord.com/oauth2/authorize?client_id=995999045157916763&permissions=346176&scope=bot",
             vote: "https://top.gg/bot/995999045157916763",
         };
 
