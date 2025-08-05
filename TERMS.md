@@ -19,7 +19,7 @@ You agree not to use Hanami Bot to:
 
 ## 4. Intellectual Property
 
-The bot, its original content, features, and functionality are owned by Hanami Bot and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
+The bot, its original content, features, and functionality are owned by yorunoken and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
 
 ## 5. Limitation of Liability
 
