@@ -53,7 +53,7 @@ You need to fill `.env.local` with the approriate API keys to make the bot work.
 
 4. Copy its Client ID and Client secret, paste them into the env file and you're good to go.
 
-### CALLBACK_URL (callback URL for /link command)
+### AUTH_URL (callback URL for /link command)
 
 This one is a little tricky, because you will need to host a website.
 

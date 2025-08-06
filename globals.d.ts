@@ -4,7 +4,7 @@ declare module "bun" {
         ACCESS_TOKEN: string;
         CLIENT_SECRET: string;
         CLIENT_ID: string;
-        CALLBACK_URL: string;
+        AUTH_URL: string;
         ERROR_CHANNEL_ID: string;
         OWNER_ID: string;
         DEV?: string;

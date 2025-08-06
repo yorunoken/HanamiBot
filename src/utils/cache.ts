@@ -70,10 +70,12 @@ export function isRedisAvailable(): boolean {
 
 export const CacheKeys = {
     BUTTON_STATE: (messageId: string) => `button:${messageId}:state`,
+    STATE_DISCORD: (state: string) => `state:${state}`,
 } as const;
 
 export const CacheTTL = {
     BUTTON_STATE: 3600, // 1 hour
+    STATE_DISCORD: 600, // 10 minutes
 } as const;
 
 export class RedisCache {
@@ -182,6 +184,24 @@ export class ButtonStateCache {
 
     static async del(messageId: string): Promise<boolean> {
         return RedisCache.del(CacheKeys.BUTTON_STATE(messageId));
+    }
+}
+
+export class StateCache {
+    static async get(state: string): Promise<string | null> {
+        return RedisCache.get<string>(CacheKeys.STATE_DISCORD(state));
+    }
+
+    static async set(state: string, discordId: string): Promise<boolean> {
+        return RedisCache.set(CacheKeys.STATE_DISCORD(state), discordId, CacheTTL.STATE_DISCORD);
+    }
+
+    static async del(state: string): Promise<boolean> {
+        return RedisCache.del(CacheKeys.STATE_DISCORD(state));
+    }
+
+    static async exists(state: string): Promise<boolean> {
+        return RedisCache.exists(CacheKeys.STATE_DISCORD(state));
     }
 }
 
