@@ -1,7 +1,12 @@
 import { createClient, RedisClientType } from "redis";
 import { logger } from "@utils/logger";
+import { DefaultMessageCommand, DefaultSlashCommand } from "@type/commands";
 
 // Map caches
+export const messageCommands = new Map<string, DefaultMessageCommand>();
+export const commandAliases = new Map<string, string>();
+export const applicationCommands = new Map<string, DefaultSlashCommand>();
+
 export const guildPrefixesCache = new Map<string, Array<string>>();
 export const cooldownsCache = new Map<string, number>();
 export const slashCommandIdsCache = new Map<string, string>();

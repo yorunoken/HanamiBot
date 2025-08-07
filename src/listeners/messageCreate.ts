@@ -1,5 +1,5 @@
 import { DEFAULT_PREFIX } from "@utils/constants";
-import { commandAliases, messageCommands } from "@utils/initalize";
+import { commandAliases, messageCommands } from "@utils/cache";
 import { logger } from "@utils/logger";
 import { getEntry, insertData } from "@utils/database";
 import { fuzzySearch } from "@utils/fuzzy";

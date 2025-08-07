@@ -1,7 +1,7 @@
 import db from "../../data.db" with { type: "sqlite" };
 import { getAccessToken } from "./osu";
 import { removeEntry } from "./database";
-import { guildPrefixesCache, slashCommandIdsCache } from "./cache";
+import { guildPrefixesCache, messageCommands, slashCommandIdsCache, commandAliases, applicationCommands } from "./cache";
 import { logger } from "./logger";
 import { Tables } from "@type/database";
 import { Client as OsuClient } from "osu-web.js";
@@ -15,10 +15,6 @@ if (!tokenResult) {
 }
 const { accessToken } = tokenResult;
 export const client = new OsuClient(accessToken);
-
-export const messageCommands = new Map<string, DefaultMessageCommand>();
-export const commandAliases = new Map<string, string>();
-export const applicationCommands = new Map<string, DefaultSlashCommand>();
 
 export async function loadMessageCommands(): Promise<void> {
     // Temporary array to store promises of MessageCommands

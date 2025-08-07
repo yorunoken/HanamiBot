@@ -1,5 +1,6 @@
 import { getEntry, insertData } from "@utils/database";
-import { client, applicationCommands } from "@utils/initalize";
+import { client } from "@utils/initalize";
+import { applicationCommands } from "@utils/cache";
 import { logger } from "@utils/logger";
 import { ButtonStateCache } from "@utils/cache";
 import { EmbedBuilderType } from "@type/embedBuilders";

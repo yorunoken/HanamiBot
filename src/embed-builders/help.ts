@@ -1,6 +1,6 @@
 import { Tables } from "@type/database";
 import { getRowCount, getRowSum } from "@utils/database";
-import { applicationCommands, messageCommands, commandAliases } from "@utils/initalize";
+import { applicationCommands, messageCommands, commandAliases } from "@utils/cache";
 import type { Embed } from "lilybird";
 
 export function helpBuilder(commandName?: string, preferSlash?: boolean): Array<Embed.Structure> {

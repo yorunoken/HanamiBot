@@ -98,7 +98,6 @@ export function bulkInsertData<T extends Tables>(
         ignore?: boolean;
     }>,
 ): void {
-    // Group entries by table and operation type for better batching
     const insertByTable = new Map<string, Array<any>>();
     const statementCache = new Map<string, any>();
 
