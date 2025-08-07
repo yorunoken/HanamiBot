@@ -1,5 +1,20 @@
 import type { Mod } from "./mods";
-import type { UserScore as UserScore_, Beatmapset, Score as Score_, Fails, Beatmap as BeatmapWeb, Country, Cover, UserCompact, Rank, ISOTimestamp, UserBestScore as UserBestScore_ } from "osu-web.js";
+import type {
+    UserScore as UserScore_,
+    UserScoreV2 as UserScoreV2_,
+    UserBestScore as UserBestScore_,
+    UserBestScoreV2 as UserBestScoreV2_,
+    Score as Score_,
+    ScoreV2 as ScoreV2_,
+    Beatmapset,
+    Fails,
+    Beatmap as BeatmapWeb,
+    Country,
+    Cover,
+    UserCompact,
+    Rank,
+    ISOTimestamp,
+} from "osu-web.js";
 import type { Beatmap as BeatmapRosu, BeatmapAttributes, PerformanceAttributes } from "rosu-pp-js";
 
 export const enum Mode {
@@ -75,6 +90,7 @@ export interface ScoresInfo {
     drainLength: string;
     stars: string;
     rulesetEmote: string;
+    pp: number;
     ppFormatted: string;
     playSubmitted: string;
     ifFcHanami: string | null;
@@ -103,13 +119,21 @@ export interface AccessTokenJSON {
     expires_in: number;
 }
 
-export interface PlayStatistics {
-    count_100: number;
-    count_300: number;
-    count_50: number;
-    count_geki: number | null;
-    count_katu: number | null;
-    count_miss: number;
+export interface ScoreStatisticsV2 {
+    perfect: number | null;
+    great: number | null;
+    good?: number;
+    ignore_hit?: number;
+    ignore_miss?: number;
+    large_bonus?: number;
+    large_tick_hit?: number;
+    legacy_combo_increase?: number;
+    meh?: number;
+    miss?: number;
+    ok?: number;
+    small_bonus?: number;
+    small_tick_hit?: number;
+    small_tick_miss?: number;
 }
 
 export interface LeaderboardScore {
@@ -121,14 +145,7 @@ export interface LeaderboardScore {
         legacy_combo_increase: number;
     };
     mods: Array<Mod>;
-    statistics: {
-        ok?: number;
-        great?: number;
-        meh?: number;
-        miss?: number;
-        perfect?: number;
-        good?: number;
-    };
+    statistics: ScoreStatisticsV2;
     beatmap_id: number;
     best_id: number | null;
     id: number;
@@ -153,6 +170,10 @@ export interface LeaderboardScore {
     current_user_attributes: {
         pin: number | null;
     } | null;
+    user: UserCompact & {
+        country: Country;
+        cover: Cover;
+    };
 }
 
 export type Beatmap = BeatmapWeb & {
@@ -164,15 +185,8 @@ export type Beatmap = BeatmapWeb & {
     max_combo: number;
 };
 
-export type LeaderboardScores = LeaderboardScore & {
-    user: UserCompact & {
-        country: Country;
-        cover: Cover;
-    };
-};
-
 export interface LeaderboardScoresRaw {
-    scores: Array<LeaderboardScores>;
+    scores: Array<LeaderboardScore>;
 }
 
 export interface UserScore extends UserScore_ {
@@ -183,6 +197,25 @@ export interface UserBestScore extends UserBestScore_ {
     position: number;
 }
 
+export interface UserScoreV2 extends Omit<UserScoreV2_, "statistics"> {
+    statistics: ScoreStatisticsV2;
+    position: number;
+}
+
+export interface UserBestScore extends UserBestScore_ {
+    position: number;
+}
+
+export interface UserBestScoreV2 extends Omit<UserBestScoreV2_, "statistics"> {
+    statistics: ScoreStatisticsV2;
+    position: number;
+}
+
 export interface Score extends Score_ {
+    position: number;
+}
+
+export interface ScoreV2 extends Omit<ScoreV2_, "statistics"> {
+    statistics: ScoreStatisticsV2;
     position: number;
 }

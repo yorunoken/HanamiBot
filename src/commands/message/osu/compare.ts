@@ -1,4 +1,5 @@
 import { parseOsuArguments } from "@utils/args";
+import { getBeatmapUserScores } from "@utils/score-api";
 import { client } from "@utils/initalize";
 import { compareBuilder } from "@builders/compare";
 import { Mode } from "@type/osu";
@@ -96,11 +97,7 @@ async function run({ message, args, commandName, channel }: { message: Message; 
         return;
     }
 
-    const plays = (await client.beatmaps.getBeatmapUserScores(beatmap.id, osuUser.id, { query: { mode: user.mode } }))
-        .sort((a, b) => b.pp - a.pp)
-        .map((item, idx) => {
-            return { ...item, position: idx + 1 };
-        });
+    const plays = await getBeatmapUserScores(beatmap.id, osuUser.id, { query: { mode: user.mode } }, user.authorDb);
 
     if (plays.length === 0) {
         await channel.send({

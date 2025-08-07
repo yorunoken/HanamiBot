@@ -22,6 +22,7 @@ export interface User {
     score_embeds: number | null;
     embed_type: EmbedScoreType | null;
     mode: string | null;
+    score_data: number | null;
 }
 
 export interface Guild {
@@ -72,6 +73,11 @@ export interface ScorePp {
 export enum ScoreEmbed {
     Maximized = 1,
     Minimized = 0,
+}
+
+export enum ScoreData {
+    Stable = 0,
+    Lazer = 1,
 }
 
 export type TableToArgument<T extends Tables> = T extends "users"

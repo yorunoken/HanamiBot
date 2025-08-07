@@ -230,10 +230,8 @@ class Logger {
     }
 }
 
-// Export a default logger instance
 export const logger = new Logger();
 
-// Create specific loggers for different components
 export function createLogger(name: string, config?: Partial<LoggerConfig>): Logger {
     const loggerConfig = {
         ...config,

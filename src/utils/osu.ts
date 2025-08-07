@@ -9,9 +9,9 @@ import https from "https";
 import type { Score as ScoreDatabase } from "@type/database";
 import type { Message } from "@lilybird/transformers";
 import type { Mod } from "@type/mods";
-import type { UserScore, UserBestScore, AccessTokenJSON, AuthScope, LeaderboardScore, LeaderboardScoresRaw, PerformanceInfo, Score } from "@type/osu";
-import type { Client, Embed } from "lilybird";
-import type { GameMode, Mod as ModOsuWeb, Rank, Beatmap as BeatmapWeb } from "osu-web.js";
+import type { UserScore, UserBestScore, UserScoreV2, UserBestScoreV2, ScoreV2, AccessTokenJSON, AuthScope, LeaderboardScoresRaw, PerformanceInfo, Score, LeaderboardScore } from "@type/osu";
+import type { LilyClient, Embed } from "lilybird";
+import type { GameMode, Mod as ModOsuWeb, Rank, Beatmap as BeatmapWeb, ScoreStatistics } from "osu-web.js";
 
 export async function getAccessToken(
     clientId: number,
@@ -63,15 +63,21 @@ export function getModsEnum(mods: Array<ModOsuWeb>, derivativeModsWithOriginal?:
     }, 0);
 }
 
-export async function getBeatmapTopScores({ beatmapId, isGlobal, mode, mods }: { beatmapId: number; isGlobal: boolean; mode: GameMode; mods: Array<ModOsuWeb> | undefined }): Promise<LeaderboardScoresRaw> {
-    return fetch(`https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${mode}&type=${isGlobal ? "global" : "country"}${mods ? mods.map((mod) => `&mods[]=${mod.toUpperCase()}`).join("") : ""}`, {
-        headers: {
-            "Content-Type": "application/json",
-            Cookie: `osu_session=${process.env.ACCESS_TOKEN}`,
+export async function getBeatmapTopScores({ beatmapId, isGlobal, mode, mods }: { beatmapId: number; isGlobal: boolean; mode: GameMode; mods: Array<ModOsuWeb> | undefined }): Promise<Array<LeaderboardScore>> {
+    const leaderboard = await fetch(
+        `https://osu.ppy.sh/beatmaps/${beatmapId}/scores?mode=${mode}&type=${isGlobal ? "global" : "country"}${mods ? mods.map((mod) => `&mods[]=${mod.toUpperCase()}`).join("") : ""}`,
+        {
+            headers: {
+                "Content-Type": "application/json",
+                Cookie: `osu_session=${process.env.ACCESS_TOKEN}`,
+            },
         },
-    }).then((res) => {
+    ).then((res) => {
         return res.json() as unknown as LeaderboardScoresRaw;
     });
+    const { scores } = leaderboard;
+
+    return scores;
 }
 
 export function isNewMods(mods: Array<Mod> | Array<ModOsuWeb>): mods is Array<Mod> {
@@ -90,7 +96,7 @@ export async function getPerformanceResults({
     mods,
     mapData,
 }: {
-    play?: UserBestScore | UserScore | Score | LeaderboardScore;
+    play?: UserBestScore | UserScore | Score | LeaderboardScore | UserBestScoreV2 | UserScoreV2 | ScoreV2;
     setId?: number;
     beatmapId: number;
     maxCombo?: number;
@@ -401,7 +407,7 @@ export function hitValueCalculator(
     return hitValues;
 }
 
-export function saveScoreDatas(scores: Array<UserBestScore | UserScore | Score>, mode: Mode, mapTemp?: BeatmapWeb): void {
+export function saveScoreDatas(scores: Array<UserBestScore | UserScore | Score | UserBestScoreV2 | UserScoreV2 | ScoreV2>, mode: Mode, mapTemp?: BeatmapWeb): void {
     const scoresList = [];
     for (const score of scores) {
         if (score.passed) scoresList.push(saveScore(score, mode, mapTemp));
@@ -411,7 +417,7 @@ export function saveScoreDatas(scores: Array<UserBestScore | UserScore | Score>,
 }
 
 function saveScore(
-    play: UserBestScore | UserScore | Score,
+    play: UserBestScore | UserScore | Score | UserBestScoreV2 | UserScoreV2 | ScoreV2,
     mode: Mode,
     mapTemp?: BeatmapWeb,
 ): {
@@ -431,7 +437,19 @@ function saveScore(
         beatmap = map;
     }
 
-    const { statistics } = play;
+    let statistics: ScoreStatistics;
+    if ("score" in play) {
+        statistics = play.statistics;
+    } else {
+        statistics = {
+            count_300: play.statistics.great ?? 0,
+            count_100: play.statistics.ok ?? 0,
+            count_50: play.statistics.meh ?? 0,
+            count_geki: play.statistics.perfect ?? 0,
+            count_katu: play.statistics.good ?? 0,
+            count_miss: play.statistics.miss ?? 0,
+        };
+    }
 
     return {
         id: play.id,
@@ -455,7 +473,7 @@ function saveScore(
             },
             {
                 key: "score",
-                value: play.score,
+                value: "score" in play ? play.score : play.total_score,
             },
             {
                 key: "accuracy",
@@ -499,7 +517,7 @@ function saveScore(
             },
             {
                 key: "ended_at",
-                value: play.created_at,
+                value: "created_at" in play ? play.created_at : play.ended_at,
             },
         ],
     };
@@ -520,7 +538,7 @@ function getEmbedFromReply(message: Message): number | null {
     return Number(foundId) || null;
 }
 
-async function cycleThroughEmbeds({ client, message, channelId }: { message?: Message; channelId?: string; client: Client }): Promise<number | null> {
+async function cycleThroughEmbeds({ client, message, channelId }: { message?: Message; channelId?: string; client: LilyClient }): Promise<number | null> {
     const channel = await client.rest.getChannel(message?.channelId ?? channelId ?? "");
     if (!channel.id || channel.type !== ChannelType.GUILD_TEXT) {
         return null;
@@ -538,7 +556,7 @@ async function cycleThroughEmbeds({ client, message, channelId }: { message?: Me
     return beatmapId;
 }
 
-export async function getBeatmapIdFromContext({ client, message, channelId }: { message?: Message; client: Client; channelId?: string }): Promise<number | null> {
+export async function getBeatmapIdFromContext({ client, message, channelId }: { message?: Message; client: LilyClient; channelId?: string }): Promise<number | null> {
     return typeof message?.referencedMessage !== "undefined" ? getEmbedFromReply(message) : cycleThroughEmbeds({ message, client, channelId });
 }
 

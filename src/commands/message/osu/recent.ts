@@ -1,4 +1,5 @@
 import { parseOsuArguments } from "@utils/args";
+import { getUserScores } from "@utils/score-api";
 import { client } from "@utils/initalize";
 import { playBuilder } from "@builders/plays";
 import { Mode, PlayType } from "@type/osu";
@@ -69,9 +70,8 @@ async function run({ message, args, commandName, index = 0, channel }: { message
         return;
     }
     const osuUser = osuUserRequest.data;
-    const plays = (await client.users.getUserScores(osuUser.id, PlayType.RECENT, { query: { mode, limit: 100, include_fails: includeFails } })).map((item, idx) => {
-        return { ...item, position: idx + 1 };
-    });
+
+    const plays = await getUserScores(osuUser.id, PlayType.RECENT, { query: { mode, limit: 100, include_fails: includeFails } }, user.authorDb);
 
     if (plays.length === 0) {
         await channel.send({

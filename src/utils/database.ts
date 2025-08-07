@@ -75,20 +75,25 @@ export function insertData<T extends Tables>(
     const fields: Array<TableToArgument<T>> = data.map((item) => item.key);
     const values: Array<string | number | boolean | null> = data.map((item) => item.value);
 
-    const selectStmt = getPreparedStatement(`SELECT 1 FROM ${table} WHERE id = ? LIMIT 1`);
-    const existingRow = selectStmt.get(id);
+    // Execute all operations in a single transaction to prevent database locks
+    const transaction = db.transaction(() => {
+        const selectStmt = getPreparedStatement(`SELECT 1 FROM ${table} WHERE id = ? LIMIT 1`);
+        const existingRow = selectStmt.get(id);
 
-    if (!existingRow) {
-        const placeholders = fields.map(() => "?").join(", ");
-        const insertSql = `INSERT OR ${ignore ? "IGNORE" : "REPLACE"} INTO ${table} (id, ${fields.join(", ")}) VALUES (?, ${placeholders})`;
-        const insertStmt = getPreparedStatement(insertSql);
-        insertStmt.run(id, ...values);
-    } else {
-        const setClause = fields.map((field) => `${field} = ?`).join(", ");
-        const updateSql = `UPDATE ${table} SET ${setClause} WHERE id = ?`;
-        const updateStmt = getPreparedStatement(updateSql);
-        updateStmt.run(...values, id);
-    }
+        if (!existingRow) {
+            const placeholders = fields.map(() => "?").join(", ");
+            const insertSql = `INSERT OR ${ignore ? "IGNORE" : "REPLACE"} INTO ${table} (id, ${fields.join(", ")}) VALUES (?, ${placeholders})`;
+            const insertStmt = getPreparedStatement(insertSql);
+            insertStmt.run(id, ...values);
+        } else {
+            const setClause = fields.map((field) => `${field} = ?`).join(", ");
+            const updateSql = `UPDATE ${table} SET ${setClause} WHERE id = ?`;
+            const updateStmt = getPreparedStatement(updateSql);
+            updateStmt.run(...values, id);
+        }
+    });
+
+    transaction();
 }
 export function bulkInsertData<T extends Tables>(
     entries: Array<{

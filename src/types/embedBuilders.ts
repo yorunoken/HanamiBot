@@ -1,6 +1,6 @@
 import type { DifficultyOptions } from "./commandArgs";
 import type { User } from "./database";
-import type { UserScore, UserBestScore, Beatmap, LeaderboardScores, Mode, Score } from "./osu";
+import type { Beatmap, LeaderboardScore, Mode, Score, UserBestScoreV2, UserScoreV2, ScoreV2, UserBestScore, UserScore } from "./osu";
 import type { UserExtended, Mod } from "osu-web.js";
 
 export const enum EmbedBuilderType {
@@ -31,7 +31,7 @@ export interface BuilderOptions {
 export interface CompareBuilderOptions extends BuilderOptions {
     type: EmbedBuilderType.COMPARE;
     beatmap: Beatmap;
-    plays: Array<Score>;
+    plays: Array<Score | ScoreV2>;
     user: UserExtended;
     mode: Mode;
     mods?: ModStructure;
@@ -40,7 +40,7 @@ export interface CompareBuilderOptions extends BuilderOptions {
 
 export interface LeaderboardBuilderOptions extends BuilderOptions {
     type: EmbedBuilderType.LEADERBOARD;
-    scores: Array<LeaderboardScores>;
+    scores: Array<LeaderboardScore>;
     beatmap: Beatmap;
     page: number | undefined;
 }
@@ -59,7 +59,7 @@ export interface MapBuilderOptions extends BuilderOptions {
 }
 
 export interface PlaysBuilderOptions extends BuilderOptions {
-    plays: Array<UserBestScore> | Array<UserScore>;
+    plays: Array<UserBestScore | UserScore | UserBestScoreV2 | UserScoreV2>;
     type: EmbedBuilderType.PLAYS;
     user: UserExtended;
     mode: Mode;

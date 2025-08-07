@@ -107,7 +107,7 @@ interface Columns {
 
 export function initializeDatabase(): void {
     const tables: Array<{ name: string; columns: Array<string> }> = [
-        { name: "users", columns: ["id TEXT PRIMARY KEY", "banchoId TEXT", "score_embeds INTEGER", "mode TEXT", "embed_type TEXT"] },
+        { name: "users", columns: ["id TEXT PRIMARY KEY", "banchoId TEXT", "score_embeds INTEGER", "mode TEXT", "embed_type TEXT", "score_data INTEGER"] },
         { name: "guilds", columns: ["id TEXT PRIMARY KEY", "name TEXT", "owner_id TEXT", "joined_at INTEGER", "prefixes TEXT"] },
         { name: "maps", columns: ["id TEXT PRIMARY KEY", "data TEXT"] },
         { name: "commands", columns: ["id TEXT PRIMARY KEY", "count INTEGER"] },

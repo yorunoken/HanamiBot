@@ -5,7 +5,7 @@ import { EmbedScoreType } from "@type/database";
 import { saveScoreDatas } from "@utils/osu";
 import { EmbedType } from "lilybird";
 import type { User } from "@type/database";
-import type { UserScore, Mode, ProfileInfo, ScoresInfo, UserBestScore } from "@type/osu";
+import type { UserScore, Mode, ProfileInfo, ScoresInfo, UserBestScore, UserScoreV2, UserBestScoreV2 } from "@type/osu";
 import type { PlaysBuilderOptions } from "@type/embedBuilders";
 import type { Embed } from "lilybird";
 
@@ -37,7 +37,12 @@ export async function playBuilder({ plays, user, mode, index, mods, isMultiple, 
         plays = filteredPlays;
     }
 
-    if (sortByDate) plays = plays.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    if (sortByDate)
+        plays = plays.sort((a: any, b: any) => {
+            const dateA = "created_at" in a ? a.created_at : a.ended_at;
+            const dateB = "created_at" in b ? b.created_at : b.ended_at;
+            return new Date(dateB).getTime() - new Date(dateA).getTime();
+        });
 
     if (index && index >= plays.length) {
         return [
@@ -60,7 +65,7 @@ async function getSinglePlay({
     authorDb,
     isMultiple,
 }: {
-    plays: Array<UserBestScore> | Array<UserScore>;
+    plays: Array<UserBestScore | UserScore | UserBestScoreV2 | UserScoreV2>;
     mode: Mode;
     profile: ProfileInfo;
     index: number;
@@ -207,7 +212,7 @@ async function getMultiplePlays({
     profile,
     authorDb,
 }: {
-    plays: Array<UserBestScore> | Array<UserScore>;
+    plays: Array<UserBestScore | UserScore | UserBestScoreV2 | UserScoreV2>;
     page: number;
     mode: Mode;
     profile: ProfileInfo;

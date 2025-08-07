@@ -44,6 +44,16 @@ export default {
                 ],
                 required: false,
             },
+            {
+                type: ApplicationCommandOptionType.NUMBER,
+                name: "score_data",
+                description: "Specify score data source. Stable: old osu!, Lazer: new osu!lazer",
+                choices: [
+                    { name: "Stable", value: 0 },
+                    { name: "Lazer", value: 1 },
+                ],
+                required: false,
+            },
         ],
     },
     run,
@@ -56,8 +66,9 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
     const scoreEmbedData = data.getNumber("score_embeds");
     const modeData = data.getString("mode");
     const embedTypeData = data.getString("embed_type");
+    const scoreDataValue = data.getNumber("score_data");
 
-    if (typeof modeData === "undefined" && typeof scoreEmbedData === "undefined" && typeof embedTypeData === "undefined") {
+    if (typeof modeData === "undefined" && typeof scoreEmbedData === "undefined" && typeof embedTypeData === "undefined" && typeof scoreDataValue === "undefined") {
         await list(interaction);
         return;
     }
@@ -70,12 +81,17 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
 
     if (typeof scoreEmbedData !== "undefined") {
         scoreEmbed(member.user.id, scoreEmbedData);
-        changes.push({ type: "mode", data: ScoreEmbed[scoreEmbedData] });
+        changes.push({ type: "score_embeds", data: ScoreEmbed[scoreEmbedData] });
     }
 
     if (typeof embedTypeData !== "undefined") {
         embedType(member.user.id, embedTypeData);
-        changes.push({ type: "mode", data: embedTypeData });
+        changes.push({ type: "embed_type", data: embedTypeData });
+    }
+
+    if (typeof scoreDataValue !== "undefined") {
+        scoreData(member.user.id, scoreDataValue);
+        changes.push({ type: "score_data", data: scoreDataValue === 0 ? "Stable" : "Lazer" });
     }
 
     let changesText = "";
@@ -97,6 +113,7 @@ async function list(interaction: GuildInteraction<ApplicationCommandData>): Prom
     const defaults: Record<string, string> = {
         score_embeds: "Maximized",
         mode: "None",
+        score_data: "Stable",
         unknown: "unknown",
     };
 
@@ -104,16 +121,29 @@ async function list(interaction: GuildInteraction<ApplicationCommandData>): Prom
     let user = getEntry(Tables.USER, userId);
     if (!user) {
         insertData({ table: Tables.USER, id: userId, data: [{ key: "banchoId", value: null }] });
-        user = { banchoId: null, mode: null, score_embeds: null, embed_type: null, id: userId };
+        user = { banchoId: null, mode: null, score_embeds: null, embed_type: null, score_data: null, id: userId };
     }
     const embeds: Embed.Structure = { fields: [], title: `Config settings of ${interaction.member.user.username}` };
 
-    for (const [key, v] of Object.entries(user)) {
-        const value = v as string | number | null;
-        if (key === "id" || key === "banchoId") continue;
+    if (user) {
+        for (const [key, v] of Object.entries(user)) {
+            const value = v as string | number | null;
+            if (key === "id" || key === "banchoId") continue;
 
-        if (value !== null) embeds.fields?.push({ name: key, value: typeof value === "number" ? ScoreEmbed[value] : value });
-        else embeds.fields?.push({ name: key, value: defaults[key || "unknown"] });
+            if (value !== null) {
+                let displayValue: string;
+                if (key === "score_embeds" && typeof value === "number") {
+                    displayValue = ScoreEmbed[value];
+                } else if (key === "score_data" && typeof value === "number") {
+                    displayValue = value === 0 ? "Stable" : "Lazer";
+                } else {
+                    displayValue = typeof value === "number" ? value.toString() : value;
+                }
+                embeds.fields?.push({ name: key, value: displayValue });
+            } else {
+                embeds.fields?.push({ name: key, value: defaults[key || "unknown"] });
+            }
+        }
     }
 
     await interaction.editReply({ embeds: [embeds] });
@@ -129,4 +159,8 @@ function scoreEmbed(memberId: string, choice: number): void {
 
 function embedType(memberId: string, choice: string): void {
     insertData({ table: Tables.USER, id: memberId, data: [{ key: "embed_type", value: choice }] });
+}
+
+function scoreData(memberId: string, choice: number): void {
+    insertData({ table: Tables.USER, id: memberId, data: [{ key: "score_data", value: choice }] });
 }

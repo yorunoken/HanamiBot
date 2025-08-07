@@ -2,8 +2,8 @@ import { accuracyCalculator, getPerformanceResults, getRetryCount, hitValueCalcu
 import { grades, rulesets } from "@utils/constants";
 import { insertData } from "@utils/database";
 import { Tables } from "@type/database";
-import type { Mode, UserScore, Beatmap, LeaderboardScores, PlayStatistics, ScoresInfo, Score, UserBestScore } from "@type/osu";
-import type { ISOTimestamp } from "osu-web.js";
+import type { Mode, UserScore, Beatmap, LeaderboardScore, ScoresInfo, Score, UserBestScore, UserBestScoreV2, UserScoreV2, ScoreV2 } from "@type/osu";
+import type { ISOTimestamp, ScoreStatistics } from "osu-web.js";
 
 // We won't be needing this either!
 // interface HitValues {
@@ -22,7 +22,7 @@ export async function getProcessedScore({
     mode,
     mapData,
 }: {
-    scores: Array<UserBestScore> | Array<UserScore> | Array<Score> | Array<LeaderboardScores>;
+    scores: Array<UserBestScore | UserBestScoreV2 | UserScore | UserScoreV2 | Score | ScoreV2 | LeaderboardScore>;
     beatmap?: Beatmap;
     index: number;
     mode: Mode;
@@ -44,7 +44,7 @@ export async function getProcessedScore({
 
     let totalScore: number;
     let createdAt: ISOTimestamp;
-    let scoreStatistics: PlayStatistics;
+    let scoreStatistics: ScoreStatistics;
     let user: string | undefined;
     let userId: number | undefined;
     let retries: number | undefined;
@@ -58,26 +58,39 @@ export async function getProcessedScore({
         retries = getRetryCount(beatmapIds, play.beatmap.id);
     }
 
+    console.log(play);
+
     if ("score" in play) {
         totalScore = play.score;
         createdAt = play.created_at;
         scoreStatistics = play.statistics;
     } else {
-        user = play.user.username;
-        userId = play.user_id;
+        // Handle V2 and leaderboard scores
+        if ("user" in play && play.user) {
+            user = play.user.username;
+            userId = play.user_id;
+        }
         totalScore = play.total_score;
         createdAt = play.ended_at;
+
         scoreStatistics = {
-            count_50: play.statistics.meh ?? 0,
-            count_100: play.statistics.ok ?? 0,
             count_300: play.statistics.great ?? 0,
+            count_100: play.statistics.ok ?? 0,
+            count_50: play.statistics.meh ?? 0,
             count_geki: play.statistics.perfect ?? 0,
             count_katu: play.statistics.good ?? 0,
             count_miss: play.statistics.miss ?? 0,
         };
     }
 
-    const performance = await getPerformanceResults({ hitValues: scoreStatistics, beatmapId: beatmap.id, play, maxCombo: play.max_combo, mods: play.mods, mapData });
+    const performance = await getPerformanceResults({
+        hitValues: scoreStatistics,
+        beatmapId: beatmap.id,
+        play: play as any,
+        maxCombo: play.max_combo,
+        mods: play.mods as any,
+        mapData,
+    });
 
     // Throw an error if performance doesn't exist.
     // This can only mean one thing, and it's because the map couldn't be downloaded for some reason.
@@ -212,6 +225,7 @@ export async function getProcessedScore({
         drainLength: `${drainMinutes}:${drainSeconds < 10 ? `0${drainSeconds}` : drainSeconds}`,
         stars: `${current.difficulty.stars.toFixed(2).toLocaleString()}★`,
         rulesetEmote: rulesets[mode],
+        pp: current.pp,
         ppFormatted: `**${current.pp.toFixed(2).toLocaleString()}**/${perfect.pp.toFixed(2).toLocaleLowerCase()}pp`,
         playSubmitted: `<t:${new Date(createdAt).getTime() / 1000}:R>`,
         ifFcHanami,
