@@ -3,9 +3,9 @@ import { logger } from "@utils/logger";
 import { DefaultMessageCommand, DefaultSlashCommand } from "@type/commands";
 
 // Map caches
-export const messageCommands = new Map<string, DefaultMessageCommand>();
-export const commandAliases = new Map<string, string>();
-export const applicationCommands = new Map<string, DefaultSlashCommand>();
+export const messageCommandsCache = new Map<string, DefaultMessageCommand>();
+export const commandAliasesCache = new Map<string, string>();
+export const applicationCommandsCache = new Map<string, DefaultSlashCommand>();
 
 export const guildPrefixesCache = new Map<string, Array<string>>();
 export const cooldownsCache = new Map<string, number>();

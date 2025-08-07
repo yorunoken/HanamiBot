@@ -1,5 +1,5 @@
 import { DEFAULT_PREFIX } from "@utils/constants";
-import { commandAliases, messageCommands } from "@utils/cache";
+import { commandAliasesCache, messageCommandsCache } from "@utils/cache";
 import { logger } from "@utils/logger";
 import { getEntry, insertData } from "@utils/database";
 import { fuzzySearch } from "@utils/fuzzy";
@@ -67,11 +67,11 @@ async function run(message: Message): Promise<void> {
         index = parseInt(extractedNumber) - 1;
     }
 
-    const alias = commandAliases.get(commandName);
-    const commandDefault = alias ? messageCommands.get(alias) : messageCommands.get(commandName);
+    const alias = commandAliasesCache.get(commandName);
+    const commandDefault = alias ? messageCommandsCache.get(alias) : messageCommandsCache.get(commandName);
 
     if (!commandDefault) {
-        const possibleCommands = Array.from(messageCommands.values()).map((command) => command.default.name);
+        const possibleCommands = Array.from(messageCommandsCache.values()).map((command) => command.default.name);
         const options = fuzzySearch(commandName, possibleCommands);
 
         const nearResults = options

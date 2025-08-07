@@ -1,6 +1,6 @@
 import { getEntry, insertData } from "@utils/database";
 import { client } from "@utils/initalize";
-import { applicationCommands } from "@utils/cache";
+import { applicationCommandsCache } from "@utils/cache";
 import { logger } from "@utils/logger";
 import { ButtonStateCache } from "@utils/cache";
 import { EmbedBuilderType } from "@type/embedBuilders";
@@ -24,7 +24,7 @@ async function run(interaction: Interaction): Promise<void> {
     if (interaction.isApplicationCommandInteraction() && interaction.inGuild()) {
         const { user } = interaction.member;
 
-        const commandDefault = applicationCommands.get(interaction.data.name);
+        const commandDefault = applicationCommandsCache.get(interaction.data.name);
         if (!commandDefault) return;
         const { default: command } = commandDefault;
 

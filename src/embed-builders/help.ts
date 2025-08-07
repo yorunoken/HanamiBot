@@ -1,6 +1,6 @@
 import { Tables } from "@type/database";
 import { getRowCount, getRowSum } from "@utils/database";
-import { applicationCommands, messageCommands, commandAliases } from "@utils/cache";
+import { applicationCommandsCache, messageCommandsCache, commandAliasesCache } from "@utils/cache";
 import type { Embed } from "lilybird";
 
 export function helpBuilder(commandName?: string, preferSlash?: boolean): Array<Embed.Structure> {
@@ -12,7 +12,7 @@ export function helpBuilder(commandName?: string, preferSlash?: boolean): Array<
 }
 
 function displayCommandInfo(name: string, preferSlash?: boolean): Array<Embed.Structure> {
-    const slashCmd = applicationCommands.get(name);
+    const slashCmd = applicationCommandsCache.get(name);
     if (slashCmd && preferSlash) {
         const { default: command } = slashCmd;
         return [
@@ -35,7 +35,7 @@ function displayCommandInfo(name: string, preferSlash?: boolean): Array<Embed.St
         ];
     }
 
-    const msgCmd = messageCommands.get(name) ?? messageCommands.get(commandAliases.get(name) ?? "");
+    const msgCmd = messageCommandsCache.get(name) ?? messageCommandsCache.get(commandAliasesCache.get(name) ?? "");
     if (msgCmd && !preferSlash) {
         const { default: command } = msgCmd;
         const cooldownSecond = command.cooldown / 1000;
@@ -90,15 +90,15 @@ function displayAllCommands(): Array<Embed.Structure> {
     const usedApplicationCommands = getRowSum(Tables.COMMAND_SLASH);
 
     // Get all command categories
-    const slashCommands = Array.from(applicationCommands.keys()).sort();
-    const prefixCommands = Array.from(messageCommands.keys()).sort();
+    const slashCommands = Array.from(applicationCommandsCache.keys()).sort();
+    const prefixCommands = Array.from(messageCommandsCache.keys()).sort();
 
     // Group commands by category
     const slashCategories: Record<string, Array<string>> = {};
     const prefixCategories: Record<string, Array<string>> = {};
 
     for (const cmdName of slashCommands) {
-        const cmd = applicationCommands.get(cmdName);
+        const cmd = applicationCommandsCache.get(cmdName);
         if (!cmd) continue;
 
         let category = "General";
@@ -118,7 +118,7 @@ function displayAllCommands(): Array<Embed.Structure> {
     }
 
     for (const cmdName of prefixCommands) {
-        const cmd = messageCommands.get(cmdName);
+        const cmd = messageCommandsCache.get(cmdName);
         if (!cmd) continue;
 
         let category = "General";
