@@ -35,6 +35,7 @@ export interface CompareBuilderOptions extends BuilderOptions {
     user: UserExtended;
     mode: Mode;
     mods?: ModStructure;
+    page?: number;
 }
 
 export interface LeaderboardBuilderOptions extends BuilderOptions {

@@ -5,6 +5,8 @@ import { Mode } from "@type/osu";
 import { UserType } from "@type/commandArgs";
 import { getBeatmapIdFromContext } from "@utils/osu";
 import { EmbedBuilderType } from "@type/embedBuilders";
+import { createPaginationActionRow } from "@utils/pagination";
+import { ButtonStateCache } from "@utils/cache";
 import { EmbedType } from "lilybird";
 import type { GuildTextChannel, Message } from "@lilybird/transformers";
 import type { MessageCommand } from "@type/commands";
@@ -113,14 +115,21 @@ async function run({ message, args, commandName, channel }: { message: Message; 
         return;
     }
 
-    const embeds = await compareBuilder({
-        type: EmbedBuilderType.COMPARE,
+    const embedOptions = {
+        type: EmbedBuilderType.COMPARE as EmbedBuilderType.COMPARE,
         initiatorId: message.author.id,
         user: osuUser,
         mode: user.mode,
         beatmap,
         plays,
         mods,
+        page: 0,
+    };
+
+    const embeds = await compareBuilder(embedOptions);
+    const sentMessage = await channel.send({
+        embeds,
+        components: createPaginationActionRow(embedOptions),
     });
-    await channel.send({ embeds });
+    await ButtonStateCache.set(sentMessage.id, embedOptions);
 }

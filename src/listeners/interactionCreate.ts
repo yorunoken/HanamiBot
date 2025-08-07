@@ -7,7 +7,7 @@ import { EmbedBuilderType } from "@type/embedBuilders";
 import { createPaginationActionRow } from "@utils/pagination";
 import { PaginationManager } from "@utils/pagination";
 import { Tables } from "@type/database";
-import { leaderboardBuilder, playBuilder } from "@builders/index";
+import { leaderboardBuilder, playBuilder, compareBuilder } from "@builders/index";
 import { EmbedType } from "lilybird";
 import type { Embed } from "lilybird";
 import type { DMInteraction, Interaction, InteractionReplyOptions, Message, MessageComponentData } from "@lilybird/transformers";
@@ -133,6 +133,9 @@ async function handleButton(interaction: Interaction): Promise<void> {
             break;
         case EmbedBuilderType.PLAYS:
             options.embeds = await playBuilder(updatedOptions as any);
+            break;
+        case EmbedBuilderType.COMPARE:
+            options.embeds = await compareBuilder(updatedOptions as any);
             break;
         default:
             await interaction.reply({ ephemeral: true, content: "Unsupported builder type for pagination." });

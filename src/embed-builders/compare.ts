@@ -9,7 +9,7 @@ import type { CompareBuilderOptions } from "@type/embedBuilders";
 import type { Embed } from "lilybird";
 import type { Beatmap, Mode, ProfileInfo, ScoresInfo, Score } from "@type/osu";
 
-export async function compareBuilder({ beatmap, plays, user, mode, mods }: CompareBuilderOptions): Promise<Array<Embed.Structure>> {
+export async function compareBuilder({ beatmap, plays, user, mode, mods, page = 0 }: CompareBuilderOptions): Promise<Array<Embed.Structure>> {
     saveScoreDatas(plays, mode, beatmap);
 
     const profile = getProcessedProfile(user, mode);
@@ -38,15 +38,18 @@ export async function compareBuilder({ beatmap, plays, user, mode, mods }: Compa
         ] satisfies Array<Embed.Structure>;
     }
 
-    return getMultiplePlays({ plays, profile, beatmap, mode });
+    return getMultiplePlays({ plays, profile, beatmap, mode, page });
 }
 
-async function getMultiplePlays({ plays, profile, beatmap, mode }: { plays: Array<Score>; profile: ProfileInfo; beatmap: Beatmap; mode: Mode }): Promise<Array<Embed.Structure>> {
+async function getMultiplePlays({ plays, profile, beatmap, mode, page }: { plays: Array<Score>; profile: ProfileInfo; beatmap: Beatmap; mode: Mode; page: number }): Promise<Array<Embed.Structure>> {
     const beatmapId = beatmap.id;
     const mapData = getEntry(Tables.MAP, beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
 
+    const pageStart = page * 5;
+    const pageEnd = pageStart + 5;
+
     const playsTemp: Array<Promise<ScoresInfo>> = [];
-    for (let i = 0; i < plays.length; i++) playsTemp.push(getProcessedScore({ scores: plays, index: i, mode, beatmap, mapData }));
+    for (let i = pageStart; pageEnd > i && i < plays.length; i++) playsTemp.push(getProcessedScore({ scores: plays, index: i, mode, beatmap, mapData }));
 
     const { beatmapset } = beatmap;
 
@@ -70,7 +73,9 @@ async function getMultiplePlays({ plays, profile, beatmap, mode }: { plays: Arra
         url: `https://osu.ppy.sh/b/${beatmap.id}`,
         thumbnail: { url: `https://assets.ppy.sh/beatmaps/${beatmapset.id}/covers/list.jpg` },
         description,
-        footer: { text: `${beatmap.status.charAt(0).toUpperCase()}${beatmap.status.slice(1)} beatmapset by ${beatmap.beatmapset.creator}` },
+        footer: {
+            text: `${beatmap.status.charAt(0).toUpperCase()}${beatmap.status.slice(1)} beatmapset by ${beatmap.beatmapset.creator} ${SPACE} - ${SPACE} Page ${page + 1} of ${Math.ceil(plays.length / 5)}`,
+        },
     };
 
     return [embed] satisfies Array<Embed.Structure>;

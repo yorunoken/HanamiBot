@@ -4,6 +4,8 @@ import { UserType } from "@type/commandArgs";
 import { compareBuilder } from "@builders/compare";
 import { getBeatmapIdFromContext } from "@utils/osu";
 import { EmbedBuilderType } from "@type/embedBuilders";
+import { createPaginationActionRow } from "@utils/pagination";
+import { ButtonStateCache } from "@utils/cache";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
 import type { SlashCommand } from "@type/commands";
@@ -161,14 +163,21 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
         return;
     }
 
-    const embeds = await compareBuilder({
-        type: EmbedBuilderType.COMPARE,
+    const embedOptions = {
+        type: EmbedBuilderType.COMPARE as EmbedBuilderType.COMPARE,
         initiatorId: interaction.member.user.id,
         mode: user.mode,
         user: osuUser,
         beatmap,
         plays,
         mods,
+        page: 0,
+    };
+
+    const embeds = await compareBuilder(embedOptions);
+    const sentInteraction = await interaction.editReply({
+        embeds,
+        components: createPaginationActionRow(embedOptions),
     });
-    await interaction.editReply({ embeds });
+    await ButtonStateCache.set(sentInteraction.id, embedOptions);
 }
