@@ -94,7 +94,7 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
     }
 
     const isGlobal = (interaction.data.getString("type") ?? "global") === "global";
-    const { scores } = await getBeatmapTopScores({ beatmapId: Number(beatmapId), mode: beatmap.mode, isGlobal, mods: mods.name ? (mods.name.match(/.{1,2}/g) as Array<Mod>) : undefined });
+    const scores = await getBeatmapTopScores({ beatmapId: Number(beatmapId), mode: beatmap.mode, isGlobal, mods: mods.name ? (mods.name.match(/.{1,2}/g) as Array<Mod>) : undefined });
     if (scores.length === 0) {
         await interaction.editReply({
             embeds: [

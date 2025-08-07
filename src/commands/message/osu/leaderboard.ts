@@ -77,7 +77,7 @@ async function run({ message, args, commandName, channel }: { message: Message; 
         return;
     }
 
-    const { scores } = await getBeatmapTopScores({
+    const scores = await getBeatmapTopScores({
         beatmapId: Number(beatmapId),
         mode: beatmap.mode,
         isGlobal,

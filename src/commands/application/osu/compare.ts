@@ -1,4 +1,5 @@
 import { getCommandArgs } from "@utils/args";
+import { getBeatmapUserScores } from "@utils/score-api";
 import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
 import { compareBuilder } from "@builders/compare";
@@ -144,11 +145,7 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
         return;
     }
 
-    const plays = (await client.beatmaps.getBeatmapUserScores(beatmap.id, osuUser.id, { query: { mode: user.mode } }))
-        .sort((a, b) => b.pp - a.pp)
-        .map((item, idx) => {
-            return { ...item, position: idx + 1 };
-        });
+    const plays = (await getBeatmapUserScores(beatmap.id, osuUser.id, { query: { mode: user.mode } }, user.authorDb)).sort((a: any, b: any) => b.pp - a.pp);
 
     if (plays.length === 0) {
         await interaction.editReply({

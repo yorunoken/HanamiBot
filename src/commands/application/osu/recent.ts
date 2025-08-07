@@ -6,6 +6,7 @@ import { EmbedBuilderType } from "@type/embedBuilders";
 import { PlayType } from "@type/osu";
 import { createPaginationActionRow } from "@utils/pagination";
 import { ButtonStateCache } from "@utils/cache";
+import { getUserScores } from "@utils/score-api";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { PlaysBuilderOptions } from "@type/embedBuilders";
 import type { Mod } from "osu-web.js";
@@ -132,9 +133,7 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
     }
     const osuUser = osuUserRequest.data;
 
-    const plays = (await client.users.getUserScores(osuUser.id, PlayType.RECENT, { query: { mode: user.mode, limit: 100, include_fails: includeFails } })).map((item, idx) => {
-        return { ...item, position: idx + 1 };
-    });
+    const plays = await getUserScores(osuUser.id, PlayType.RECENT, { query: { mode: user.mode, limit: 100, include_fails: includeFails } }, user.authorDb);
 
     if (plays.length === 0) {
         await interaction.editReply({

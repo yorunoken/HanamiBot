@@ -7,7 +7,7 @@ import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
 import type { CompareBuilderOptions } from "@type/embedBuilders";
 import type { Embed } from "lilybird";
-import type { Beatmap, Mode, ProfileInfo, ScoresInfo, Score } from "@type/osu";
+import type { Beatmap, Mode, ProfileInfo, ScoresInfo, Score, ScoreV2 } from "@type/osu";
 
 export async function compareBuilder({ beatmap, plays, user, mode, mods, page = 0 }: CompareBuilderOptions): Promise<Array<Embed.Structure>> {
     saveScoreDatas(plays, mode, beatmap);
@@ -41,7 +41,7 @@ export async function compareBuilder({ beatmap, plays, user, mode, mods, page = 
     return getMultiplePlays({ plays, profile, beatmap, mode, page });
 }
 
-async function getMultiplePlays({ plays, profile, beatmap, mode, page }: { plays: Array<Score>; profile: ProfileInfo; beatmap: Beatmap; mode: Mode; page: number }): Promise<Array<Embed.Structure>> {
+async function getMultiplePlays({ plays, profile, beatmap, mode, page }: { plays: Array<Score | ScoreV2>; profile: ProfileInfo; beatmap: Beatmap; mode: Mode; page: number }): Promise<Array<Embed.Structure>> {
     const beatmapId = beatmap.id;
     const mapData = getEntry(Tables.MAP, beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
 
@@ -54,8 +54,10 @@ async function getMultiplePlays({ plays, profile, beatmap, mode, page }: { plays
     const { beatmapset } = beatmap;
 
     let description = "";
+
     // Create an array of promises to await
-    const playResults = await Promise.all(playsTemp);
+    let playResults = await Promise.all(playsTemp);
+    playResults = playResults.sort((a, b) => b.pp - a.pp);
     for (const playResult of playResults) {
         const line1 = `${playResult.grade} **[${playResult.stars}]** ${SPACE}  ${playResult.ppFormatted} ${SPACE} **${playResult.accuracy}% ${SPACE} +${playResult.mods.join("")}**\n`;
         const line2 = `${playResult.score} ${SPACE} {${playResult.hitValues}} ${SPACE} [${playResult.comboValues}] ${SPACE} ${playResult.playSubmitted}`;

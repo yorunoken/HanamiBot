@@ -1,5 +1,6 @@
 import { getCommandArgs } from "@utils/args";
 import { playBuilder } from "@builders/plays";
+import { getUserScores } from "@utils/score-api";
 import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/embedBuilders";
@@ -146,9 +147,7 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
     }
     const osuUser = osuUserRequest.data;
 
-    const plays = (await client.users.getUserScores(osuUser.id, PlayType.RECENT, { query: { mode: user.mode, limit: 100, include_fails: includeFails } })).map((item, idx) => {
-        return { ...item, position: idx + 1 };
-    });
+    const plays = await getUserScores(osuUser.id, PlayType.RECENT, { query: { mode: user.mode, limit: 100, include_fails: includeFails } }, user.authorDb);
 
     if (plays.length === 0) {
         await interaction.editReply({

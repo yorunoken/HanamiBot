@@ -6,7 +6,7 @@ import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
 import type { LeaderboardBuilderOptions } from "@type/embedBuilders";
 import type { Embed } from "lilybird";
-import type { Beatmap, LeaderboardScores, Mode, ScoresInfo } from "@type/osu";
+import type { Beatmap, LeaderboardScore, Mode, ScoresInfo } from "@type/osu";
 
 export async function leaderboardBuilder({ scores, beatmap, page = 0 }: LeaderboardBuilderOptions): Promise<Array<Embed.Structure>> {
     if (scores.length === 0) {
@@ -22,7 +22,7 @@ export async function leaderboardBuilder({ scores, beatmap, page = 0 }: Leaderbo
     return getPlays(scores, beatmap, page);
 }
 
-async function getPlays(plays: Array<LeaderboardScores>, beatmap: Beatmap, page: number): Promise<Array<Embed.Structure>> {
+async function getPlays(plays: Array<LeaderboardScore>, beatmap: Beatmap, page: number): Promise<Array<Embed.Structure>> {
     const beatmapId = beatmap.id;
     const mode = beatmap.mode as Mode;
     const mapData = getEntry(Tables.MAP, beatmapId)?.data ?? (await downloadBeatmap(beatmapId)).contents;
