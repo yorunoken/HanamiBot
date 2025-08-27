@@ -58,8 +58,6 @@ export async function getProcessedScore({
         retries = getRetryCount(beatmapIds, play.beatmap.id);
     }
 
-    console.log(play);
-
     if ("score" in play) {
         totalScore = play.score;
         createdAt = play.created_at;
@@ -83,11 +81,13 @@ export async function getProcessedScore({
         };
     }
 
+    const objectsHit = (scoreStatistics.count_300 ?? 0) + (scoreStatistics.count_100 ?? 0) + (scoreStatistics.count_50 ?? 0) + scoreStatistics.count_miss;
     const performance = await getPerformanceResults({
         hitValues: scoreStatistics,
         beatmapId: beatmap.id,
         play: play as any,
         maxCombo: play.max_combo,
+        objectsHit,
         mods: play.mods as any,
         mapData,
     });
@@ -192,7 +192,6 @@ export async function getProcessedScore({
     // Instead of rounding it down to 40, it would make more sense to round it to 41.
     const drainSeconds = Math.ceil(drainLengthInSeconds % 60);
 
-    const objectsHit = (scoreStatistics.count_300 ?? 0) + (scoreStatistics.count_100 ?? 0) + (scoreStatistics.count_50 ?? 0) + scoreStatistics.count_miss;
     const objects = mapValues.nObjects;
 
     const percentageNum = (objectsHit / objects) * 100;
