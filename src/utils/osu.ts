@@ -95,6 +95,7 @@ export async function getPerformanceResults({
     hitValues,
     mods,
     mapData,
+    objectsHit,
 }: {
     play?: UserBestScore | UserScore | Score | LeaderboardScore | UserBestScoreV2 | UserScoreV2 | ScoreV2;
     setId?: number;
@@ -106,6 +107,7 @@ export async function getPerformanceResults({
     hitValues?: { count_100?: number; count_300?: number; count_50?: number; count_geki?: number | null; count_katu?: number | null; count_miss?: number };
     mods: Array<ModOsuWeb> | Array<Mod> | number;
     mapData?: string;
+    objectsHit?: number;
 }): Promise<PerformanceInfo | null> {
     let rulesetId: number;
     if (typeof play !== "undefined" && "mode_int" in play) rulesetId = play.mode_int;
@@ -168,6 +170,7 @@ export async function getPerformanceResults({
                   nGeki: nGeki ?? undefined,
                   nKatu: nKatu ?? undefined,
                   misses,
+                  passedObjects: objectsHit,
                   combo: maxCombo ?? perfect.difficulty.maxCombo,
                   clockRate,
               }
@@ -175,6 +178,7 @@ export async function getPerformanceResults({
                   mods: modsInt,
                   accuracy,
                   misses,
+                  passedObjects: objectsHit,
                   combo: maxCombo ?? perfect.difficulty.maxCombo,
                   clockRate,
               },

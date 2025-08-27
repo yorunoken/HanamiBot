@@ -4,6 +4,7 @@ import { insertData } from "@utils/database";
 import { Tables } from "@type/database";
 import type { Mode, UserScore, Beatmap, LeaderboardScore, ScoresInfo, Score, UserBestScore, UserBestScoreV2, UserScoreV2, ScoreV2 } from "@type/osu";
 import type { ISOTimestamp, ScoreStatistics } from "osu-web.js";
+import fs from "fs";
 
 // We won't be needing this either!
 // interface HitValues {
@@ -83,10 +84,12 @@ export async function getProcessedScore({
         };
     }
 
+    const objectsHit = (scoreStatistics.count_300 ?? 0) + (scoreStatistics.count_100 ?? 0) + (scoreStatistics.count_50 ?? 0) + scoreStatistics.count_miss;
     const performance = await getPerformanceResults({
         hitValues: scoreStatistics,
         beatmapId: beatmap.id,
         play: play as any,
+        objectsHit,
         maxCombo: play.max_combo,
         mods: play.mods as any,
         mapData,
@@ -192,7 +195,6 @@ export async function getProcessedScore({
     // Instead of rounding it down to 40, it would make more sense to round it to 41.
     const drainSeconds = Math.ceil(drainLengthInSeconds % 60);
 
-    const objectsHit = (scoreStatistics.count_300 ?? 0) + (scoreStatistics.count_100 ?? 0) + (scoreStatistics.count_50 ?? 0) + scoreStatistics.count_miss;
     const objects = mapValues.nObjects;
 
     const percentageNum = (objectsHit / objects) * 100;
