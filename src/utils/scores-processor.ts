@@ -4,7 +4,6 @@ import { insertData } from "@utils/database";
 import { Tables } from "@type/database";
 import type { Mode, UserScore, Beatmap, LeaderboardScore, ScoresInfo, Score, UserBestScore, UserBestScoreV2, UserScoreV2, ScoreV2 } from "@type/osu";
 import type { ISOTimestamp, ScoreStatistics } from "osu-web.js";
-import fs from "fs";
 
 // We won't be needing this either!
 // interface HitValues {
