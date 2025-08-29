@@ -1,4 +1,4 @@
-import { helpBuilder } from "@builders/index";
+import { helpBuilder } from "@builders";
 import type { MessageCommand } from "@type/commands";
 
 export default {

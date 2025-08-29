@@ -1,7 +1,7 @@
 import { parseOsuArguments } from "@utils/args";
 import { getBeatmapUserScores } from "@utils/score-api";
 import { client } from "@utils/initalize";
-import { compareBuilder } from "@builders/compare";
+import { compareBuilder } from "@builders";
 import { Mode } from "@type/osu";
 import { UserType } from "@type/commandArgs";
 import { getBeatmapIdFromContext } from "@utils/osu";

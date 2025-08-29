@@ -1,4 +1,4 @@
-import { bannerBuilder } from "@builders/index";
+import { bannerBuilder } from "@builders";
 import { getCommandArgs } from "@utils/args";
 import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";

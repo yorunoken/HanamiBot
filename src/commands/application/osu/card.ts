@@ -2,7 +2,7 @@ import { getCommandArgs } from "@utils/args";
 import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/builders";
-import { cardBuilder } from "@builders/card";
+import { cardBuilder } from "@builders";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
 import type { SlashCommand } from "@type/commands";

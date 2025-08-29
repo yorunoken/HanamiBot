@@ -7,7 +7,7 @@ import { EmbedBuilderType } from "@type/builders";
 import { createPaginationActionRow } from "@utils/pagination";
 import { PaginationManager } from "@utils/pagination";
 import { Tables } from "@type/database";
-import { leaderboardBuilder, playBuilder, compareBuilder } from "@builders/index";
+import { leaderboardBuilder, playBuilder, compareBuilder } from "@builders";
 import { EmbedType } from "lilybird";
 import type { Embed } from "lilybird";
 import type { DMInteraction, Interaction, InteractionReplyOptions, Message, MessageComponentData } from "@lilybird/transformers";
@@ -21,7 +21,7 @@ export default {
 
 async function run(interaction: Interaction): Promise<void> {
     await handleButton(interaction);
-    
+
     if (interaction.isApplicationCommandInteraction() && interaction.inGuild()) {
         const { user } = interaction.member;
 

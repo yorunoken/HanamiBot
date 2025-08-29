@@ -2,7 +2,7 @@ import { getCommandArgs } from "@utils/args";
 import { getBeatmapUserScores } from "@utils/score-api";
 import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
-import { compareBuilder } from "@builders/compare";
+import { compareBuilder } from "@builders";
 import { getBeatmapIdFromContext } from "@utils/osu";
 import { EmbedBuilderType } from "@type/builders";
 import { createPaginationActionRow } from "@utils/pagination";

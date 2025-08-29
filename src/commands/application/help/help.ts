@@ -1,4 +1,4 @@
-import { helpBuilder } from "@builders/index";
+import { helpBuilder } from "@builders";
 import { ApplicationCommandOptionType } from "lilybird";
 import type { SlashCommand } from "@type/commands";
 

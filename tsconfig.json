@@ -21,7 +21,7 @@
             "@type/*": ["types/*"],
             "@utils/*": ["utils/*"],
             "@listeners/*": ["listeners/*"],
-            "@builders/*": ["embed-builders/*"],
+            "@builders": ["embed-builders/index.ts"],
             "@db": ["../data.db"]
         },
         "types": [

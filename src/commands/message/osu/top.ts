@@ -1,7 +1,7 @@
 import { parseOsuArguments } from "@utils/args";
 import { getUserScores } from "@utils/score-api";
 import { client } from "@utils/initalize";
-import { playBuilder } from "@builders/plays";
+import { playBuilder } from "@builders";
 import { Mode, PlayType } from "@type/osu";
 import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/builders";

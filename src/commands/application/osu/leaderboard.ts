@@ -1,6 +1,6 @@
 import { getCommandArgs } from "@utils/args";
 import { getBeatmapIdFromContext, getBeatmapTopScores } from "@utils/osu";
-import { leaderboardBuilder } from "@builders/leaderboard";
+import { leaderboardBuilder } from "@builders";
 import { EmbedBuilderType } from "@type/builders";
 import { client } from "@utils/initalize";
 import { createPaginationActionRow } from "@utils/pagination";

@@ -3,7 +3,7 @@ import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/builders";
 import { Mode } from "@type/osu";
-import { avatarBuilder } from "@builders/index";
+import { avatarBuilder } from "@builders";
 import { EmbedType } from "lilybird";
 import type { GuildTextChannel, Message } from "@lilybird/transformers";
 import type { MessageCommand } from "@type/commands";

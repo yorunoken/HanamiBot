@@ -1,5 +1,5 @@
 import { getCommandArgs } from "@utils/args";
-import { profileBuilder } from "@builders/profile";
+import { profileBuilder } from "@builders";
 import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
 import { EmbedBuilderType } from "@type/builders";

@@ -1,7 +1,7 @@
 import { parseOsuArguments } from "@utils/args";
 import { Mode } from "@type/osu";
 import { getBeatmapIdFromContext, getBeatmapTopScores } from "@utils/osu";
-import { leaderboardBuilder } from "@builders/leaderboard";
+import { leaderboardBuilder } from "@builders";
 import { EmbedBuilderType } from "@type/builders";
 import { ButtonStateCache } from "@utils/cache";
 import { client } from "@utils/initalize";

@@ -1,5 +1,5 @@
 import { getCommandArgs } from "@utils/args";
-import { playBuilder } from "@builders/plays";
+import { playBuilder } from "@builders";
 import { getUserScores } from "@utils/score-api";
 import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
