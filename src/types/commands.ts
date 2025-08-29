@@ -10,7 +10,6 @@ export interface MessageCommand {
     description: string;
     details?: string;
     usage: string;
-    // category: string;
     flags?: string;
     run: ({
         client,

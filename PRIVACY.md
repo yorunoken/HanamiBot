@@ -8,20 +8,20 @@ Welcome to Hanami Bot. This privacy policy explains how we collect, use, and pro
 
 Hanami Bot collects and stores the following information:
 
--   Discord user IDs
--   Server IDs
--   Command usage statistics
--   osu! user IDs (when linked by users)
--   osu! user scores (when linked by users)
+- Discord user IDs
+- Server IDs
+- Command usage statistics
+- osu! user IDs (when linked by users)
+- osu! user scores
 
 ## 3. How We Use Your Information
 
 We use the collected information for the following purposes:
 
--   To provide and maintain bot functionality
--   To improve user experience
--   To track command usage and optimize performance
--   To link Discord accounts with osu! accounts for related features
+- To provide and maintain bot functionality
+- To improve user experience
+- To track command usage and optimize performance
+- To link Discord accounts with osu! accounts for related features
 
 ## 4. Data Storage and Security
 
@@ -35,9 +35,9 @@ Hanami Bot integrates with the osu! API. Please refer to the [osu! Privacy Polic
 
 You have the right to:
 
--   Access the personal information we hold about you
--   Request correction of your personal information
--   Request deletion of your data from our systems
+- Access the personal information we hold about you
+- Request correction of your personal information
+- Request deletion of your data from our systems
 
 ## 7. Changes to This Policy
 
