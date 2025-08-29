@@ -1,19 +1,18 @@
-import { initializeDatabase, client } from "./utils/initalize";
-import { logger } from "./utils/logger";
-import { getAccessToken } from "./utils/osu";
-import { initializeRedis, closeRedis } from "./utils/cache";
+import { initializeDatabase, client } from "@utils/initalize";
+import { logger } from "@utils/logger";
+import { getAccessToken } from "@utils/osu";
+import { initializeRedis, closeRedis } from "@utils/cache";
 import { createHandler } from "@lilybird/handlers/simple";
 import { CachingDelegationType, createClient, Intents } from "lilybird";
 import { Channel, Guild, GuildVoiceChannel } from "@lilybird/transformers";
 import { $ } from "bun";
 import { chromium } from "playwright";
-import { writeFile } from "fs/promises";
 
 // refresh token every hour
 setInterval(setToken, 1000 * 60 * 60);
 
 async function setToken(): Promise<void> {
-    const tokenResult = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
+    const tokenResult = await getAccessToken(+process.env.OSU_CLIENT_ID, process.env.OSU_CLIENT_SECRET, ["public"]);
     if (!tokenResult) {
         throw new Error("Failed to get access token");
     }
@@ -42,14 +41,15 @@ process.on("uncaughtException", async (error: Error) => {
     await logger.fatal("Uncaught exception", error);
 });
 
-// Graceful shutdown
+// graceful shutdown
+
 process.on("SIGINT", async () => {
     logger.info("Received SIGINT, shutting down gracefully...");
     try {
         await browser.close();
         logger.info("Browser closed");
         await closeRedis();
-        await logger.flush(); // Wait for pending log writes
+        await logger.flush();
         process.exit(0);
     } catch (error) {
         logger.error("Error during shutdown", error as Error);
@@ -63,7 +63,7 @@ process.on("SIGTERM", async () => {
         await browser.close();
         logger.info("Browser closed");
         await closeRedis();
-        await logger.flush(); // Wait for pending log writes
+        await logger.flush();
         process.exit(0);
     } catch (error) {
         logger.error("Error during shutdown", error as Error);
@@ -73,14 +73,13 @@ process.on("SIGTERM", async () => {
 
 initializeDatabase();
 
-if (process.env.DEV !== "1") await writeFile("/root/users_cache.txt", "");
-
 const listeners = await createHandler({
     dirs: {
         listeners: `${import.meta.dir}/listeners`,
     },
 });
 
+// I'll need to upgrade to the latest version soon enough.
 await createClient({
     token: process.env.DISCORD_BOT_TOKEN,
     caching: {

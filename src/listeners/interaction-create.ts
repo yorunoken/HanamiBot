@@ -3,7 +3,7 @@ import { client } from "@utils/initalize";
 import { applicationCommandsCache } from "@utils/cache";
 import { logger } from "@utils/logger";
 import { ButtonStateCache } from "@utils/cache";
-import { EmbedBuilderType } from "@type/embedBuilders";
+import { EmbedBuilderType } from "@type/builders";
 import { createPaginationActionRow } from "@utils/pagination";
 import { PaginationManager } from "@utils/pagination";
 import { Tables } from "@type/database";
@@ -12,7 +12,7 @@ import { EmbedType } from "lilybird";
 import type { Embed } from "lilybird";
 import type { DMInteraction, Interaction, InteractionReplyOptions, Message, MessageComponentData } from "@lilybird/transformers";
 import type { Event } from "@lilybird/handlers";
-import type { EmbedBuilderOptions } from "@type/embedBuilders";
+import type { EmbedBuilderOptions } from "@type/builders";
 
 export default {
     event: "interactionCreate",
@@ -21,6 +21,7 @@ export default {
 
 async function run(interaction: Interaction): Promise<void> {
     await handleButton(interaction);
+    
     if (interaction.isApplicationCommandInteraction() && interaction.inGuild()) {
         const { user } = interaction.member;
 

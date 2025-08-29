@@ -1,10 +1,8 @@
-import { ScoreData } from "@type/database";
 import { client } from "@utils/initalize";
-import { PlayType, Mode } from "@type/osu";
-import type { User } from "@type/database";
-import type { UserScore, UserBestScore, UserScoreV2, UserBestScoreV2, Score, ScoreV2 } from "@type/osu";
+import { type User, ScoreData } from "@type/database";
+import type { UserScore, UserBestScore, UserScoreV2, UserBestScoreV2, Score, ScoreV2, PlayType, Mode } from "@type/osu";
 
-export function shouldUseLazerApi(authorDb: User | null): boolean {
+function shouldUseLazerApi(authorDb: User | null): boolean {
     return (authorDb?.score_data ?? ScoreData.Stable) === ScoreData.Lazer;
 }
 

@@ -1,8 +1,8 @@
-import db from "../../data.db" with { type: "sqlite" };
-import { getAccessToken } from "./osu";
-import { removeEntry } from "./database";
-import { guildPrefixesCache, messageCommandsCache, slashCommandIdsCache, commandAliasesCache, applicationCommandsCache } from "./cache";
-import { logger } from "./logger";
+import db from "@db";
+import { getAccessToken } from "@utils/osu";
+import { removeEntry } from "@utils/database";
+import { guildPrefixesCache, messageCommandsCache, slashCommandIdsCache, commandAliasesCache, applicationCommandsCache } from "@utils/cache";
+import { logger } from "@utils/logger";
 import { Tables } from "@type/database";
 import { Client as OsuClient } from "osu-web.js";
 import { readdir } from "fs/promises";
@@ -10,7 +10,7 @@ import type { Guild } from "@type/database";
 import type { DefaultMessageCommand, DefaultSlashCommand } from "@type/commands";
 import { LilyClient, ApplicationCommand } from "lilybird";
 
-const tokenResult = await getAccessToken(+process.env.CLIENT_ID, process.env.CLIENT_SECRET, ["public"]);
+const tokenResult = await getAccessToken(+process.env.OSU_CLIENT_ID, process.env.OSU_CLIENT_SECRET, ["public"]);
 if (!tokenResult) {
     throw new Error("Failed to get initial access token");
 }

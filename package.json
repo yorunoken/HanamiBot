@@ -5,8 +5,9 @@
     "type": "module",
     "main": "src/index.ts",
     "scripts": {
+        "dev": "APP_ENV=development bun src/index.ts",
+        "start": "APP_ENV=production bun src/index.ts",
         "check": "tsc --noEmit && eslint",
-        "start": "bun src/index.ts",
         "register": "bun scripts/register-commands.ts",
         "format": "prettier --write ."
     },

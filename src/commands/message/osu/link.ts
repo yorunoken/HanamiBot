@@ -13,7 +13,7 @@ export default {
         const state = Buffer.from(randomBytes).toString("hex");
         await StateCache.set(state, message.author.id);
 
-        const authUrl = `${process.env.AUTH_URL}?state=${state}`;
+        const authUrl = `${process.env.OSU_AUTH_URL}?state=${state}`;
         const msg = await message.reply(`You can [click here](<${authUrl}>) to link your osu! account to the bot! (expires in 10 minutes)`);
 
         let isCompleted = false;

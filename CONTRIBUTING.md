@@ -31,7 +31,7 @@ You need to fill `.env.local` with the approriate API keys to make the bot work.
 
 4. You should also enable all 3 of the privilaged intents for the bot to function.
 
-### ACCESS_TOKEN (osu! key to make leaderboard commands function)
+### OSU_ACCESS_TOKEN (osu! key to make leaderboard commands function)
 
 1. Go to [osu!s home page](https://osu.ppy.sh/home) and press f12 to open up the developer page.
 
@@ -43,7 +43,7 @@ You need to fill `.env.local` with the approriate API keys to make the bot work.
 
 5. Copy its value, that's your `OSU_SESSION` key.
 
-### CLIENT_SECRET and CLIENT_ID (osu! Auth)
+### OSU_CLIENT_SECRET and OSU_CLIENT_ID (osu! Auth)
 
 1. Go to [osu! account settings](https://osu.ppy.sh/home/account/edit) and scroll until you see `OAuth` section.
 
@@ -53,7 +53,7 @@ You need to fill `.env.local` with the approriate API keys to make the bot work.
 
 4. Copy its Client ID and Client secret, paste them into the env file and you're good to go.
 
-### AUTH_URL (callback URL for /link command)
+### OSU_AUTH_URL (callback URL for /link command)
 
 This one is a little tricky, because you will need to host a website.
 

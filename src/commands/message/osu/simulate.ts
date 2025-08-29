@@ -1,7 +1,7 @@
 import { parseOsuArguments } from "@utils/args";
 import { getBeatmapIdFromContext } from "@utils/osu";
 import { Mode } from "@type/osu";
-import { EmbedBuilderType } from "@type/embedBuilders";
+import { EmbedBuilderType } from "@type/builders";
 import { simulateBuilder } from "@builders/simulate";
 import { EmbedType } from "lilybird";
 import type { DifficultyOptions } from "@type/commandArgs";

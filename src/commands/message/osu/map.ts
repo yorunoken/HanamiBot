@@ -2,7 +2,7 @@ import { parseOsuArguments } from "@utils/args";
 import { mapBuilder } from "@builders/map";
 import { getBeatmapIdFromContext } from "@utils/osu";
 import { Mode } from "@type/osu";
-import { EmbedBuilderType } from "@type/embedBuilders";
+import { EmbedBuilderType } from "@type/builders";
 import { EmbedType } from "lilybird";
 import type { Mod } from "osu-web.js";
 import type { GuildTextChannel, Message } from "@lilybird/transformers";

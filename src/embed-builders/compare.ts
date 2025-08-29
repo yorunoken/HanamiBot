@@ -1,18 +1,18 @@
-import { getProcessedProfile } from "@utils/profile-processor";
-import { getProcessedScore } from "@utils/scores-processor";
+import { getFormattedProfile } from "@utils/formatter";
+import { getFormattedScore } from "@utils/formatter";
 import { SPACE } from "@utils/constants";
 import { getEntry } from "@utils/database";
 import { downloadBeatmap, saveScoreDatas } from "@utils/osu";
 import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
-import type { CompareBuilderOptions } from "@type/embedBuilders";
+import type { CompareBuilderOptions } from "@type/builders";
 import type { Embed } from "lilybird";
 import type { Beatmap, Mode, ProfileInfo, ScoresInfo, Score, ScoreV2 } from "@type/osu";
 
 export async function compareBuilder({ beatmap, plays, user, mode, mods, page = 0 }: CompareBuilderOptions): Promise<Array<Embed.Structure>> {
     saveScoreDatas(plays, mode, beatmap);
 
-    const profile = getProcessedProfile(user, mode);
+    const profile = getFormattedProfile(user, mode);
 
     if (mods?.name) {
         const { exclude, forceInclude, include, name } = mods;
@@ -49,7 +49,7 @@ async function getMultiplePlays({ plays, profile, beatmap, mode, page }: { plays
     const pageEnd = pageStart + 5;
 
     const playsTemp: Array<Promise<ScoresInfo>> = [];
-    for (let i = pageStart; pageEnd > i && i < plays.length; i++) playsTemp.push(getProcessedScore({ scores: plays, index: i, mode, beatmap, mapData }));
+    for (let i = pageStart; pageEnd > i && i < plays.length; i++) playsTemp.push(getFormattedScore({ scores: plays, index: i, mode, beatmap, mapData }));
 
     const { beatmapset } = beatmap;
 

@@ -1,4 +1,4 @@
-import { DEFAULT_PREFIX } from "@utils/constants";
+import { DEFAULT_PREFIX, wysiEmoji } from "@utils/constants";
 import { commandAliasesCache, messageCommandsCache } from "@utils/cache";
 import { logger } from "@utils/logger";
 import { getEntry, insertData } from "@utils/database";
@@ -16,24 +16,12 @@ export default {
 
 const CHANCE_TO_SEND_CUTE_KITTY_CAT_I_LOVE_CATS = 0.2;
 async function run(message: Message): Promise<void> {
-    if (message.channelId === "1193529619907891331") {
-        verifyUser(message);
-        return;
-    }
-
     const { content, guildId, client, author } = message;
     if (!content || !guildId || author.bot) return;
 
-    let guildPrefixes: Array<string>;
-    try {
-        guildPrefixes = guildPrefixesCache.get(guildId) ?? DEFAULT_PREFIX;
-    } catch (error) {
-        logger.error("Failed to get guild prefixes from cache, using default", error as Error, { guildId });
-        guildPrefixes = DEFAULT_PREFIX;
-    }
-
+    // I guess this is fine since guilds can have a max of 10 prefixes
+    const guildPrefixes: Array<string> = guildPrefixesCache.get(guildId) ?? DEFAULT_PREFIX;
     let chosenPrefix: string | null = null;
-
     for (const guildPrefix of guildPrefixes) {
         if (content.startsWith(guildPrefix)) {
             chosenPrefix = guildPrefix;
@@ -48,8 +36,9 @@ async function run(message: Message): Promise<void> {
             return;
         }
 
-        if (content === "727" || content === "7,27" || content === "72,7" || content === "72.7" || content === "7.27" || content.toLowerCase() === "wysi") {
-            await message.react("wysia:1240624238189088869", true);
+        const wysiArr = ["727", "7,27", "72,7", "72.7", "7.27", "wysi"];
+        if (wysiArr.some((wysi) => content.toLowerCase() === wysi)) {
+            await message.react(wysiEmoji, true);
             return;
         }
         return;
@@ -88,8 +77,7 @@ async function run(message: Message): Promise<void> {
 
     // Check cooldown
     try {
-        const cooldownKey = `${command.name}:${author.id}`;
-        const cooldownExpiry = cooldownsCache.get(cooldownKey);
+        const cooldownExpiry = cooldownsCache.get(`${command.name}:${author.id}`);
 
         if (cooldownExpiry && cooldownExpiry > Date.now()) {
             const remainingTime = cooldownExpiry - Date.now();
@@ -118,10 +106,12 @@ async function run(message: Message): Promise<void> {
     } catch (cooldownError) {
         logger.error("Error checking cooldown, allowing command to proceed", cooldownError as Error);
     }
+
     const channel = await message.fetchChannel();
     if (!channel.isText()) return;
 
-    await client.rest.triggerTypingIndicator(channel.id);
+    // normally this would need `await`, but I don't want the bot to wait while it's sending the request.
+    client.rest.triggerTypingIndicator(channel.id);
 
     try {
         await command.run({ client: client, message, args, prefix: chosenPrefix, index, commandName, channel });
@@ -140,9 +130,10 @@ async function run(message: Message): Promise<void> {
         if (docs === null) insertData({ table: Tables.COMMAND, data: [{ key: "count", value: 1 }], id: command.name });
         else insertData({ table: Tables.COMMAND, data: [{ key: "count", value: Number(docs.count ?? 0) + 1 }], id: docs.id });
     } catch (error) {
+        // handle errors
         const err = error as Error;
 
-        await message.reply(`Oops, you came across an error!\nHere's a summary of it:\n\`\`\`${err.stack}\`\`\`\nDon't worry, the same error log has been sent to the owner of this bot.`, {
+        await message.reply(`Oops, you came across an error!\nDon't worry, an error log has been sent to the owner of this bot.`, {
             allowed_mentions: { replied_user: false, parse: [], roles: [], users: [] },
         });
 
@@ -190,28 +181,8 @@ async function run(message: Message): Promise<void> {
         else insertData({ table: Tables.COMMAND, data: [{ key: "count", value: Number(docs.count ?? 0) + 1 }], id: docs.id });
     }
 
-    // Set cooldown in Redis
-    const cooldownDuration = command.cooldown || 1000; // Default to 1 second if undefined
+    // set cooldown
+    const cooldownDuration = command.cooldown || 1000; // default to 1 second if undefined
     const cooldownExpiry = Date.now() + cooldownDuration;
-
-    try {
-        const cooldownKey = `${command.name}:${author.id}`;
-        cooldownsCache.set(cooldownKey, cooldownExpiry);
-    } catch (cooldownError) {
-        logger.error("Failed to set cooldown", cooldownError as Error, {
-            command: command.name,
-            userId: author.id,
-            cooldownDuration,
-        });
-    }
-
-    return;
-}
-
-function verifyUser(message: Message): void {
-    const { content } = message;
-    if (!content) return;
-
-    const [discordId, osuId] = content.split("\n");
-    insertData({ table: Tables.USER, id: discordId, data: [{ key: "banchoId", value: osuId }] });
+    cooldownsCache.set(`${command.name}:${author.id}`, cooldownExpiry);
 }

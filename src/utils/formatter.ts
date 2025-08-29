@@ -2,8 +2,8 @@ import { accuracyCalculator, getPerformanceResults, getRetryCount, hitValueCalcu
 import { grades, rulesets } from "@utils/constants";
 import { insertData } from "@utils/database";
 import { Tables } from "@type/database";
-import type { Mode, UserScore, Beatmap, LeaderboardScore, ScoresInfo, Score, UserBestScore, UserBestScoreV2, UserScoreV2, ScoreV2 } from "@type/osu";
-import type { ISOTimestamp, ScoreStatistics } from "osu-web.js";
+import type { Mode, UserScore, Beatmap, LeaderboardScore, ScoresInfo, Score, UserBestScore, UserBestScoreV2, UserScoreV2, ScoreV2, ProfileInfo } from "@type/osu";
+import type { ISOTimestamp, ScoreStatistics, UserExtended } from "osu-web.js";
 
 // We won't be needing this either!
 // interface HitValues {
@@ -15,7 +15,7 @@ import type { ISOTimestamp, ScoreStatistics } from "osu-web.js";
 //     hMiss: null | number;
 // }
 
-export async function getProcessedScore({
+export async function getFormattedScore({
     scores,
     beatmap: map_,
     index,
@@ -63,7 +63,7 @@ export async function getProcessedScore({
         createdAt = play.created_at;
         scoreStatistics = play.statistics;
     } else {
-        // Handle V2 and leaderboard scores
+        // handle V2 and leaderboard scores
         if ("user" in play && play.user) {
             user = play.user.username;
             userId = play.user_id;
@@ -92,8 +92,8 @@ export async function getProcessedScore({
         mapData,
     });
 
-    // Throw an error if performance doesn't exist.
-    // This can only mean one thing, and it's because the map couldn't be downloaded for some reason.
+    // throw an error if performance doesn't exist.
+    // this can only mean one thing, and it's because the map couldn't be downloaded for some reason.
     if (!performance) throw new Error("Scores.ts panicked!", { cause: "`performanece` doesn't exist, presumably because the map couldn't be downloaded." });
     const { fc, current, difficultyAttrs, perfect, mapValues } = performance;
 
@@ -184,12 +184,12 @@ export async function getProcessedScore({
 
     const fcHitValues = hitValueCalculator(mode, fcStatistics);
 
-    // Get beatmap's drain length
+    // get beatmap's drain length
     const drainLengthInSeconds = beatmap.total_length / difficultyAttrs.clockRate;
     const drainMinutes = Math.floor(drainLengthInSeconds / 60);
 
     // I thought Math.ceil would do a better job here since if the seconds is gonna be like, 40.88,
-    // Instead of rounding it down to 40, it would make more sense to round it to 41.
+    // instead of rounding it down to 40, it would make more sense to round it to 41.
     const drainSeconds = Math.ceil(drainLengthInSeconds % 60);
 
     const objects = mapValues.nObjects;
@@ -232,5 +232,52 @@ export async function getProcessedScore({
         ifFcOwo,
         comboValues: `**${playMaxCombo.toLocaleString()}**/${maxCombo.toLocaleString()}x`,
         performance,
+    };
+}
+
+export function getFormattedProfile(user: UserExtended, mode: Mode): ProfileInfo {
+    const { statistics } = user;
+    const userJoinDate = new Date(user.join_date);
+
+    return {
+        username: user.username,
+        userCover: user.cover.url,
+        avatarUrl: user.avatar_url,
+        userUrl: `https://osu.ppy.sh/users/${user.id}/${mode}`,
+        bannerUrl: user.cover.url,
+        flagUrl: `https://osu.ppy.sh/images/flags/${user.country_code}.png`,
+        countryCode: user.country.code,
+        globalRank: statistics.global_rank?.toLocaleString() ?? "-",
+        countryRank: statistics.country_rank?.toLocaleString() ?? "-",
+        peakGlobalRank: user.rank_highest?.rank.toLocaleString() ?? "",
+        peakGlobalRankTime: new Date(user.rank_highest?.updated_at ?? 0).getTime() / 1000,
+        pp: statistics.pp.toLocaleString(),
+        accuracy: statistics.hit_accuracy.toFixed(2),
+        level: `${user.statistics.level.current}.${statistics.level.progress.toString(10).padStart(2, "0")}`,
+        playCount: statistics.play_count.toLocaleString(),
+        playHours: (statistics.play_time / 3600).toFixed(0),
+        followers: user.follower_count.toLocaleString(),
+        maxCombo: statistics.maximum_combo.toLocaleString(),
+        rankedScore: statistics.ranked_score.toLocaleString(),
+        totalScore: statistics.total_score.toLocaleString(),
+        objectsHit: statistics.total_hits.toLocaleString(),
+        occupation: user.occupation,
+        interest: user.interests,
+        location: user.location,
+        recommendedStarRating: (Math.pow(statistics.pp, 0.4) * 0.195).toFixed(2),
+        joinedAgo: (Math.floor((Date.now() - userJoinDate.valueOf()) / (1000 * 60 * 60 * 24 * 30)) / 12).toFixed(1),
+        joinedAt: userJoinDate.toLocaleDateString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+            timeZone: "UTC",
+        }),
+        rankS: statistics.grade_counts.s.toLocaleString(),
+        rankA: statistics.grade_counts.a.toLocaleString(),
+        rankSs: statistics.grade_counts.ss.toLocaleString(),
+        rankSh: statistics.grade_counts.sh.toLocaleString(),
+        rankSsh: statistics.grade_counts.ssh.toLocaleString(),
     };
 }

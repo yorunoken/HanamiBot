@@ -15,6 +15,7 @@ export function fuzzySearch(target: string, options: Array<string>): Array<Searc
     return results;
 }
 
+// I think I got the code from some random ahh website lmao
 function levenshteinDistance(a: string, b: string): number {
     const dp: Array<Array<number>> = Array.from(Array(a.length + 1), () => Array(b.length + 1).fill(0) as Array<number>);
 

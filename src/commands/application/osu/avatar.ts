@@ -1,7 +1,7 @@
 import { getCommandArgs } from "@utils/args";
 import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
-import { EmbedBuilderType } from "@type/embedBuilders";
+import { EmbedBuilderType } from "@type/builders";
 import { avatarBuilder } from "@builders/index";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";

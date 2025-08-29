@@ -1,7 +1,7 @@
 import { getCommandArgs } from "@utils/args";
 import { getBeatmapIdFromContext } from "@utils/osu";
 import { simulateBuilder } from "@builders/simulate";
-import { EmbedBuilderType } from "@type/embedBuilders";
+import { EmbedBuilderType } from "@type/builders";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
 import type { SlashCommand } from "@type/commands";
 import type { Mod } from "osu-web.js";

@@ -15,7 +15,7 @@ async function run(interaction: GuildInteraction<ApplicationCommandData>): Promi
     const state = Buffer.from(randomBytes).toString("hex");
     StateCache.set(state, interaction.member.user.id);
 
-    const authUrl = `${process.env.AUTH_URL}?state=${state}`;
+    const authUrl = `${process.env.OSU_AUTH_URL}?state=${state}`;
     await interaction.editReply(`You can [click here](<${authUrl}>) to link your osu! account to the bot! (expires in 10 minutes)`);
 
     await sleep(20 * 60 * 1000);

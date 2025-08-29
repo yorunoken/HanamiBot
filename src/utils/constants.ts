@@ -1,6 +1,7 @@
 export const DEFAULT_PREFIX = [";"];
 export const MAX_AMOUNT_OF_PREFIXES = 10;
 export const SPACE = "\0";
+export const wysiEmoji = "wysia:1240624238189088869";
 
 export const grades = {
     SSH: "<:XH_:1057763296717045891>",

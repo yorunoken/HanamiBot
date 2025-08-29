@@ -1,6 +1,6 @@
 import { ComponentType, ButtonStyle } from "lilybird";
 import type { Message } from "lilybird";
-import type { EmbedBuilderOptions } from "@type/embedBuilders";
+import type { EmbedBuilderOptions } from "@type/builders";
 
 export const ITEMS_PER_PAGE = 5;
 
@@ -176,7 +176,6 @@ export class PaginationManager {
     }
 }
 
-// Button creation utilities
 export function createPaginationActionRow(builderOptions: EmbedBuilderOptions): Array<Message.Component.Structure> {
     const totalItems = PaginationManager.getTotalItems(builderOptions);
     const paginationType = PaginationManager.getPaginationType(builderOptions);

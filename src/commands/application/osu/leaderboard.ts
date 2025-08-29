@@ -1,12 +1,12 @@
 import { getCommandArgs } from "@utils/args";
 import { getBeatmapIdFromContext, getBeatmapTopScores } from "@utils/osu";
 import { leaderboardBuilder } from "@builders/leaderboard";
-import { EmbedBuilderType } from "@type/embedBuilders";
+import { EmbedBuilderType } from "@type/builders";
 import { client } from "@utils/initalize";
 import { createPaginationActionRow } from "@utils/pagination";
 import { ButtonStateCache } from "@utils/cache";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";
-import type { LeaderboardBuilderOptions } from "@type/embedBuilders";
+import type { LeaderboardBuilderOptions } from "@type/builders";
 import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, GuildInteraction } from "@lilybird/transformers";
 import type { SlashCommand } from "@type/commands";

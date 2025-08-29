@@ -1,10 +1,10 @@
 import { Mode } from "@type/osu";
-import { getProcessedProfile } from "@utils/profile-processor";
+import { getFormattedProfile } from "@utils/formatter";
 import type { Embed } from "lilybird";
-import type { AvatarBuilderOptions } from "@type/embedBuilders";
+import type { AvatarBuilderOptions } from "@type/builders";
 
 export function avatarBuilder({ user }: AvatarBuilderOptions): Array<Embed.Structure> {
-    const profile = getProcessedProfile(user, Mode.OSU);
+    const profile = getFormattedProfile(user, Mode.OSU);
 
     return [
         {

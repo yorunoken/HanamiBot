@@ -1,10 +1,10 @@
-import { getProcessedScore } from "@utils/scores-processor";
+import { getFormattedScore } from "@utils/formatter";
 import { SPACE } from "@utils/constants";
 import { getEntry } from "@utils/database";
 import { downloadBeatmap } from "@utils/osu";
 import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
-import type { LeaderboardBuilderOptions } from "@type/embedBuilders";
+import type { LeaderboardBuilderOptions } from "@type/builders";
 import type { Embed } from "lilybird";
 import type { Beatmap, LeaderboardScore, Mode, ScoresInfo } from "@type/osu";
 
@@ -31,7 +31,7 @@ async function getPlays(plays: Array<LeaderboardScore>, beatmap: Beatmap, page: 
     const pageEnd = pageStart + 5;
 
     const playsTemp: Array<Promise<ScoresInfo>> = [];
-    for (let i = pageStart; pageEnd > i && i < plays.length; i++) playsTemp.push(getProcessedScore({ scores: plays, index: i, mode, beatmap, mapData }));
+    for (let i = pageStart; pageEnd > i && i < plays.length; i++) playsTemp.push(getFormattedScore({ scores: plays, index: i, mode, beatmap, mapData }));
 
     let description = "";
     const playResults = await Promise.all(playsTemp);

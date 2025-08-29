@@ -1,7 +1,7 @@
 import { parseOsuArguments } from "@utils/args";
 import { client } from "@utils/initalize";
 import { UserType } from "@type/commandArgs";
-import { EmbedBuilderType } from "@type/embedBuilders";
+import { EmbedBuilderType } from "@type/builders";
 import { cardBuilder } from "@builders/card";
 import { Mode } from "@type/osu";
 import { EmbedType } from "lilybird";

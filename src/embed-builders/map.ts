@@ -4,7 +4,7 @@ import { getEntry } from "@utils/database";
 import { rulesets } from "@utils/constants";
 import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
-import type { MapBuilderOptions } from "@type/embedBuilders";
+import type { MapBuilderOptions } from "@type/builders";
 import type { Embed } from "lilybird";
 
 export async function mapBuilder({ beatmapId, mods }: MapBuilderOptions): Promise<Array<Embed.Structure>> {

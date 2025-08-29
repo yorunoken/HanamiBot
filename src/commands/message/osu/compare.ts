@@ -5,7 +5,7 @@ import { compareBuilder } from "@builders/compare";
 import { Mode } from "@type/osu";
 import { UserType } from "@type/commandArgs";
 import { getBeatmapIdFromContext } from "@utils/osu";
-import { EmbedBuilderType } from "@type/embedBuilders";
+import { EmbedBuilderType } from "@type/builders";
 import { createPaginationActionRow } from "@utils/pagination";
 import { ButtonStateCache } from "@utils/cache";
 import { EmbedType } from "lilybird";

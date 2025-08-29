@@ -1,6 +1,6 @@
 import { getCommandArgs } from "@utils/args";
 import { getBeatmapIdFromContext } from "@utils/osu";
-import { EmbedBuilderType } from "@type/embedBuilders";
+import { EmbedBuilderType } from "@type/builders";
 import { backgroundBuilder } from "@builders/index";
 import { client } from "@utils/initalize";
 import { ApplicationCommandOptionType, EmbedType } from "lilybird";

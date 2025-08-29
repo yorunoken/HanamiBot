@@ -1,5 +1,5 @@
 import { browser } from "index";
-import type { CardBuilderOptions } from "@type/embedBuilders";
+import type { CardBuilderOptions } from "@type/builders";
 import type { MessageReplyOptions } from "@lilybird/transformers";
 
 export async function cardBuilder({ user }: CardBuilderOptions): Promise<MessageReplyOptions> {

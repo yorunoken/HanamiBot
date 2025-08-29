@@ -4,12 +4,12 @@ import { client } from "@utils/initalize";
 import { playBuilder } from "@builders/plays";
 import { Mode, PlayType } from "@type/osu";
 import { UserType } from "@type/commandArgs";
-import { EmbedBuilderType } from "@type/embedBuilders";
+import { EmbedBuilderType } from "@type/builders";
 import { createPaginationActionRow } from "@utils/pagination";
 import { ButtonStateCache } from "@utils/cache";
 import { EmbedType } from "lilybird";
 import type { GuildTextChannel, Message } from "@lilybird/transformers";
-import type { PlaysBuilderOptions } from "@type/embedBuilders";
+import type { PlaysBuilderOptions } from "@type/builders";
 import type { MessageCommand } from "@type/commands";
 
 const modeAliases: Record<string, { mode: Mode }> = {

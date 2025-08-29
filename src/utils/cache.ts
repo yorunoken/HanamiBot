@@ -31,13 +31,7 @@ export async function initializeRedis(): Promise<void> {
     logger.info("Initializing Redis connection...");
 
     redisClient = createClient({
-        socket: {
-            host: process.env.REDIS_HOST || "localhost",
-            port: parseInt(process.env.REDIS_PORT || "6379"),
-            connectTimeout: 10000,
-        },
-        password: process.env.REDIS_PASSWORD,
-        database: parseInt(process.env.REDIS_DB || "0"),
+        url: process.env.REDIS_URL,
     });
 
     // Set up error handler before connecting

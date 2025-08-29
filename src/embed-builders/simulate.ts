@@ -6,7 +6,7 @@ import { SPACE } from "@utils/constants";
 import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
 import type { Mode } from "@type/osu";
-import type { SimulateBuilderOptions } from "@type/embedBuilders";
+import type { SimulateBuilderOptions } from "@type/builders";
 import type { Embed } from "lilybird";
 
 export async function simulateBuilder({ beatmapId, mods, options }: SimulateBuilderOptions): Promise<Array<Embed.Structure>> {

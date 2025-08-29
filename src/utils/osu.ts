@@ -1,5 +1,5 @@
-import { bulkInsertData, getEntry, insertData } from "./database";
-import { logger } from "./logger";
+import { bulkInsertData, getEntry, insertData } from "@utils/database";
+import { logger } from "@utils/logger";
 import { Mode } from "@type/osu";
 import { Tables } from "@type/database";
 import { Beatmap, BeatmapAttributesBuilder, Performance } from "rosu-pp-js";
@@ -69,7 +69,7 @@ export async function getBeatmapTopScores({ beatmapId, isGlobal, mode, mods }: {
         {
             headers: {
                 "Content-Type": "application/json",
-                Cookie: `osu_session=${process.env.ACCESS_TOKEN}`,
+                Cookie: `osu_session=${process.env.OSU_ACCESS_TOKEN}`,
             },
         },
     ).then((res) => {
@@ -80,7 +80,7 @@ export async function getBeatmapTopScores({ beatmapId, isGlobal, mode, mods }: {
     return scores;
 }
 
-export function isNewMods(mods: Array<Mod> | Array<ModOsuWeb>): mods is Array<Mod> {
+function isNewMods(mods: Array<Mod> | Array<ModOsuWeb>): mods is Array<Mod> {
     return Array.isArray(mods) && mods.every((mod) => typeof mod === "object" && "acronym" in mod);
 }
 
