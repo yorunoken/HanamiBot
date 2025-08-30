@@ -2,7 +2,7 @@ import { getCommandArgs } from "@utils/args";
 import { playBuilder } from "@builders";
 import { getUserScores } from "@utils/score-api";
 import { client } from "@utils/initalize";
-import { UserType } from "@type/commandArgs";
+import { UserType } from "@type/command-args";
 import { EmbedBuilderType } from "@type/builders";
 import { PlayType } from "@type/osu";
 import { createPaginationActionRow } from "@utils/pagination";

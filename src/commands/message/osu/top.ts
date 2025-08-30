@@ -3,7 +3,7 @@ import { getUserScores } from "@utils/score-api";
 import { client } from "@utils/initalize";
 import { playBuilder } from "@builders";
 import { Mode, PlayType } from "@type/osu";
-import { UserType } from "@type/commandArgs";
+import { UserType } from "@type/command-args";
 import { EmbedBuilderType } from "@type/builders";
 import { createPaginationActionRow } from "@utils/pagination";
 import { ButtonStateCache } from "@utils/cache";

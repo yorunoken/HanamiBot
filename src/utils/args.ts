@@ -1,9 +1,9 @@
 import { getEntry } from "./database";
 import { Mode } from "@type/osu";
-import { UserType } from "@type/commandArgs";
+import { UserType } from "@type/command-args";
 import { Tables } from "@type/database";
 import { ModsEnum } from "osu-web.js";
-import type { SlashCommandArgs, DifficultyOptions, Mods, PrefixCommandArgs, User } from "@type/commandArgs";
+import type { SlashCommandArgs, DifficultyOptions, Mods, PrefixCommandArgs, User } from "@type/command-args";
 import type { Mod } from "osu-web.js";
 import type { ApplicationCommandData, GuildInteraction, Message } from "@lilybird/transformers";
 import { slashCommandIdsCache } from "./cache";

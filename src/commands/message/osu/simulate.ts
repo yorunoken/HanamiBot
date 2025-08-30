@@ -4,7 +4,7 @@ import { Mode } from "@type/osu";
 import { EmbedBuilderType } from "@type/builders";
 import { simulateBuilder } from "@builders";
 import { EmbedType } from "lilybird";
-import type { DifficultyOptions } from "@type/commandArgs";
+import type { DifficultyOptions } from "@type/command-args";
 import type { Mod } from "osu-web.js";
 import type { GuildTextChannel, Message } from "@lilybird/transformers";
 import type { MessageCommand } from "@type/commands";

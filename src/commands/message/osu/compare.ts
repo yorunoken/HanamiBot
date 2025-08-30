@@ -3,7 +3,7 @@ import { getBeatmapUserScores } from "@utils/score-api";
 import { client } from "@utils/initalize";
 import { compareBuilder } from "@builders";
 import { Mode } from "@type/osu";
-import { UserType } from "@type/commandArgs";
+import { UserType } from "@type/command-args";
 import { getBeatmapIdFromContext } from "@utils/osu";
 import { EmbedBuilderType } from "@type/builders";
 import { createPaginationActionRow } from "@utils/pagination";

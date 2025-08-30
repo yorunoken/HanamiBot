@@ -1,6 +1,6 @@
 import { parseOsuArguments } from "@utils/args";
 import { client } from "@utils/initalize";
-import { UserType } from "@type/commandArgs";
+import { UserType } from "@type/command-args";
 import { EmbedBuilderType } from "@type/builders";
 import { cardBuilder } from "@builders";
 import { Mode } from "@type/osu";
