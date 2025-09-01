@@ -1,5 +1,4 @@
 import { getEntry, insertData } from "@utils/database";
-import { client } from "@utils/initalize";
 import { applicationCommandsCache } from "@utils/cache";
 import { logger } from "@utils/logger";
 import { ButtonStateCache } from "@utils/cache";
@@ -9,8 +8,7 @@ import { PaginationManager } from "@utils/pagination";
 import { Tables } from "@type/database";
 import { leaderboardBuilder, playBuilder, compareBuilder } from "@builders";
 import { EmbedType } from "lilybird";
-import type { Embed } from "lilybird";
-import type { DMInteraction, Interaction, InteractionReplyOptions, Message, MessageComponentData } from "@lilybird/transformers";
+import type { Interaction, InteractionReplyOptions } from "@lilybird/transformers";
 import type { Event } from "@lilybird/handlers";
 import type { EmbedBuilderOptions } from "@type/builders";
 
@@ -93,7 +91,6 @@ async function run(interaction: Interaction): Promise<void> {
 
 async function handleButton(interaction: Interaction): Promise<void> {
     if (!interaction.isMessageComponentInteraction() || !interaction.data.isButton()) return;
-    if (interaction.inDM()) return handleVerify(interaction);
     if (!interaction.inGuild()) return;
 
     const builderOptions = await ButtonStateCache.get<EmbedBuilderOptions>(interaction.message.id);
@@ -147,53 +144,4 @@ async function handleButton(interaction: Interaction): Promise<void> {
     options.components = createPaginationActionRow(updatedOptions);
 
     await interaction.editReply(options);
-}
-
-async function handleVerify(interaction: DMInteraction<MessageComponentData, Message>): Promise<void> {
-    await interaction.deferComponentReply(true);
-    const { username } = interaction.user;
-    const messageEmbed = interaction.message.embeds?.[0];
-
-    if (typeof messageEmbed === "undefined") {
-        await interaction.editReply("Something went wrong, try again dumbo");
-        return;
-    }
-
-    const { fields } = messageEmbed;
-    if (!fields) return;
-
-    const discordId = fields[0].value;
-    const osuId = fields[1].value;
-    const osuUser = await client.users.getUser(osuId);
-
-    if (!osuUser.id) {
-        await interaction.editReply("It seems like a user with this osu! ID doesn't exist.. might be a banned user...");
-        return;
-    }
-
-    insertData({ table: Tables.USER, id: discordId, data: [{ key: "banchoId", value: osuId }] });
-
-    const embed: Embed.Structure = {
-        title: "Success!",
-        description: `Successfully linked <@${discordId}> with ${osuUser.username}`,
-        thumbnail: { url: osuUser.avatar_url },
-    };
-
-    interaction
-        .editReply({ embeds: [embed], components: [] })
-        .then(async () => {
-            await logger.info(`[Private Messages] ${username} linked their osu! account`, {
-                username,
-                discordId,
-                osuId,
-                osuUsername: osuUser.username,
-            });
-        })
-        .catch(async (error: Error) => {
-            await logger.error(`[Private Messages] ${username} had an error while linking their osu! account`, error, {
-                username,
-                discordId,
-                osuId,
-            });
-        });
 }
