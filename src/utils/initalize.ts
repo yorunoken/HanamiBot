@@ -45,23 +45,35 @@ export async function loadCommands(lilyClient: LilyClient): Promise<void> {
         }
 
         // construct back the application data from `data` and push to array
-        const applicationData = { ...data.application, name: data.name, description: data.description };
-        applicationCommands.push(applicationData);
+        // only include commands that have application command support
+        if (typeof command.runApplication === "function") {
+            const applicationData = {
+                ...(data.application || {}),
+                name: data.name,
+                description: data.description,
+            };
+            applicationCommands.push(applicationData);
+        }
     }
 
     // overwrite application commands
-    let commandIds: Array<ApplicationCommand.Localizations.GlobalStructure>;
     if (process.env.DEV) {
         logger.info("Processing commands as Development.");
-        commandIds = await lilyClient.rest.bulkOverwriteGlobalApplicationCommand(lilyClient.user.id, applicationCommands);
-    } else {
-        commandIds = await lilyClient.rest.bulkOverwriteGlobalApplicationCommand(lilyClient.user.id, applicationCommands);
-        logger.info("Processing commands as Production.");
-    }
+        const guildCommandIds = await lilyClient.rest.bulkOverwriteGuildApplicationCommand(lilyClient.user.id, process.env.DEV_GUILD_ID, applicationCommands);
 
-    for (const commandId of commandIds) {
-        const { name, id } = commandId;
-        slashCommandIdsCache.set(name, `</${name}:${id}>`);
+        for (const commandId of guildCommandIds) {
+            const { name, id } = commandId;
+            slashCommandIdsCache.set(name, `</${name}:${id}>`);
+        }
+    } else {
+        logger.info("Processing commands as Production.");
+        console.log({ applicationCommands });
+        const globalCommandIds = await lilyClient.rest.bulkOverwriteGlobalApplicationCommand(lilyClient.user.id, applicationCommands);
+
+        for (const commandId of globalCommandIds) {
+            const { name, id } = commandId;
+            slashCommandIdsCache.set(name, `</${name}:${id}>`);
+        }
     }
 }
 

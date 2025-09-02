@@ -57,8 +57,8 @@ async function getEmbeds(user: SuccessUser, authorId: string): Promise<MessageRe
 }
 
 export const data = {
-    name: "banner",
-    description: "Display the banner of a user.",
+    name: "card",
+    description: "Display card of a user.",
     hasPrefixVariant: true,
     application: {
         options: [

@@ -47,8 +47,8 @@ async function getEmbed(beatmapId: string | number | null, authorId: string, mod
 }
 
 export const data = {
-    name: "background",
-    description: "Display information of a beatmap.",
+    name: "beatmap",
+    description: "Display statistics of a beatmap.",
     hasPrefixVariant: true,
     application: {
         options: [
