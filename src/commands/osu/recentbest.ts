@@ -203,4 +203,7 @@ export const data = {
             },
         ],
     },
+    message: {
+        aliases: Object.keys(modeAliases),
+    },
 } satisfies CommandData;

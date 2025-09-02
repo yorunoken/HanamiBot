@@ -88,4 +88,7 @@ export const data = {
             },
         ],
     },
+    message: {
+        aliases: ["osu", "mania", "taiko", "fruits"],
+    },
 } satisfies CommandData;

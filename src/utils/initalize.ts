@@ -67,7 +67,6 @@ export async function loadCommands(lilyClient: LilyClient): Promise<void> {
         }
     } else {
         logger.info("Processing commands as Production.");
-        console.log({ applicationCommands });
         const globalCommandIds = await lilyClient.rest.bulkOverwriteGlobalApplicationCommand(lilyClient.user.id, applicationCommands);
 
         for (const commandId of globalCommandIds) {

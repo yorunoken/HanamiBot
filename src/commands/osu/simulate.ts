@@ -126,4 +126,7 @@ export const data = {
             },
         ],
     },
+    message: {
+        aliases: ["s", "sim"],
+    },
 } satisfies CommandData;
