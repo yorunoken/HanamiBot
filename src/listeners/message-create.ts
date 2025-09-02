@@ -1,5 +1,5 @@
 import { DEFAULT_PREFIX, wysiEmoji } from "@utils/constants";
-import { commandAliasesCache, messageCommandsCache } from "@utils/cache";
+import { commandAliasesCache, commandsCache } from "@utils/cache";
 import { logger } from "@utils/logger";
 import { getEntry, insertData } from "@utils/database";
 import { fuzzySearch } from "@utils/fuzzy";
@@ -8,6 +8,7 @@ import { EmbedType } from "lilybird";
 import type { Message } from "@lilybird/transformers";
 import type { Event } from "@lilybird/handlers";
 import { guildPrefixesCache, cooldownsCache } from "@utils/cache";
+import { deprecatedEmbed } from "embed-builders/deprecated-prefix";
 
 export default {
     event: "messageCreate",
@@ -57,10 +58,10 @@ async function run(message: Message): Promise<void> {
     }
 
     const alias = commandAliasesCache.get(commandName);
-    const commandDefault = alias ? messageCommandsCache.get(alias) : messageCommandsCache.get(commandName);
+    const command = alias ? commandsCache.get(alias) : commandsCache.get(commandName);
 
-    if (!commandDefault) {
-        const possibleCommands = Array.from(messageCommandsCache.values()).map((command) => command.default.name);
+    if (!command) {
+        const possibleCommands = Array.from(commandsCache.values()).map((command) => command.data.name);
         const options = fuzzySearch(commandName, possibleCommands);
 
         const nearResults = options
@@ -73,38 +74,38 @@ async function run(message: Message): Promise<void> {
         await message.reply(`It seems like ${commandName} is not a command. Did you mean: \`${nearResults}\`?`, { allowed_mentions: { replied_user: false, parse: [], roles: [], users: [] } });
         return;
     }
-    const { default: command } = commandDefault;
+
+    const { data } = command;
 
     // Check cooldown
-    try {
-        const cooldownExpiry = cooldownsCache.get(`${command.name}:${author.id}`);
+    const cooldownExpiry = cooldownsCache.get(`${data.name}:${author.id}`);
+    if (cooldownExpiry && cooldownExpiry > Date.now()) {
+        const remainingTime = cooldownExpiry - Date.now();
 
-        if (cooldownExpiry && cooldownExpiry > Date.now()) {
-            const remainingTime = cooldownExpiry - Date.now();
-
-            if (remainingTime > 0) {
-                try {
-                    await message
-                        .reply({
-                            content: `${remainingTime}ms`,
-                        })
-                        .then((msg) =>
-                            setTimeout(async () => {
-                                try {
-                                    await msg.delete();
-                                } catch (deleteError) {
-                                    logger.warn("Could not delete cooldown message", { messageId: msg.id, error: deleteError });
-                                }
-                            }, remainingTime),
-                        );
-                } catch (replyError) {
-                    logger.warn("Could not send cooldown message", { error: replyError });
-                }
-                return;
+        if (remainingTime > 0) {
+            try {
+                const sentMessage = await message.reply({
+                    content: `Please wait \`${remainingTime}ms\` before executing this command again`,
+                });
+                setTimeout(async () => {
+                    try {
+                        await sentMessage.delete();
+                    } catch (deleteError) {
+                        logger.warn("Could not delete cooldown message", { messageId: sentMessage.id, error: deleteError });
+                    }
+                }, 1000);
+            } catch (replyError) {
+                logger.warn("Could not send cooldown message", { error: replyError });
             }
+            return;
         }
-    } catch (cooldownError) {
-        logger.error("Error checking cooldown, allowing command to proceed", cooldownError as Error);
+    }
+
+    // return simple deprecation notice.
+    if (!data.hasPrefixVariant || !command.runMessage) {
+        const embed = deprecatedEmbed(data.name);
+        await message.reply({ embeds: embed });
+        return;
     }
 
     const channel = await message.fetchChannel();
@@ -114,20 +115,20 @@ async function run(message: Message): Promise<void> {
     client.rest.triggerTypingIndicator(channel.id);
 
     try {
-        await command.run({ client: client, message, args, prefix: chosenPrefix, index, commandName, channel });
+        await command.runMessage({ client: client, message, args, prefix: chosenPrefix, index, commandName, channel });
 
         const guild = await client.rest.getGuild(guildId);
-        await logger.info(`[${guild.name}] ${author.username} used prefix command \`${command.name}\``, {
+        await logger.info(`[${guild.name}] ${author.username} used prefix command \`${data.name}\``, {
             guildId,
             guildName: guild.name,
             userId: author.id,
             username: author.username,
-            command: command.name,
+            command: data.name,
             prefix: chosenPrefix,
         });
-        const docs = getEntry(Tables.COMMAND, command.name);
+        const docs = getEntry(Tables.COMMAND, data.name);
 
-        if (docs === null) insertData({ table: Tables.COMMAND, data: [{ key: "count", value: 1 }], id: command.name });
+        if (docs === null) insertData({ table: Tables.COMMAND, data: [{ key: "count", value: 1 }], id: data.name });
         else insertData({ table: Tables.COMMAND, data: [{ key: "count", value: Number(docs.count ?? 0) + 1 }], id: docs.id });
     } catch (error) {
         // handle errors
@@ -144,7 +145,7 @@ async function run(message: Message): Promise<void> {
             embeds: [
                 {
                     type: EmbedType.Rich,
-                    title: `Runtime error on command: ${command.name}`,
+                    title: `Runtime error on command: ${data.name}`,
                     fields: [
                         {
                             name: "User",
@@ -167,22 +168,20 @@ async function run(message: Message): Promise<void> {
             ],
         });
 
-        await logger.error(`[${guild.name}] ${author.username} had an error in prefix command \`${command.name}\``, err, {
+        await logger.error(`[${guild.name}] ${author.username} had an error in prefix command \`${data.name}\``, err, {
             guildId,
             guildName: guild.name,
             userId: author.id,
             username: author.username,
-            command: command.name,
+            command: data.name,
             prefix: chosenPrefix,
         });
-        const docs = getEntry(Tables.COMMAND, command.name);
+        const docs = getEntry(Tables.COMMAND, data.name);
 
-        if (docs === null) insertData({ table: Tables.COMMAND, data: [{ key: "count", value: 1 }], id: command.name });
+        if (docs === null) insertData({ table: Tables.COMMAND, data: [{ key: "count", value: 1 }], id: data.name });
         else insertData({ table: Tables.COMMAND, data: [{ key: "count", value: Number(docs.count ?? 0) + 1 }], id: docs.id });
     }
 
     // set cooldown
-    const cooldownDuration = command.cooldown || 1000; // default to 1 second if undefined
-    const cooldownExpiry = Date.now() + cooldownDuration;
-    cooldownsCache.set(`${command.name}:${author.id}`, cooldownExpiry);
+    cooldownsCache.set(`${data.name}:${author.id}`, Date.now() + (data.message?.cooldown ?? 1000));
 }

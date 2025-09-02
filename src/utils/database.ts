@@ -1,4 +1,4 @@
-import db from "@db";
+import db from "@db" with { type: "sqlite" };
 import { logger } from "./logger";
 import type { Tables, TableToArgument, TableToType } from "@type/database";
 

@@ -52,7 +52,7 @@ export interface SimulateBuilderOptions extends BuilderOptions {
     options: DifficultyOptions;
 }
 
-export interface MapBuilderOptions extends BuilderOptions {
+export interface BeatmapBuilderOptions extends BuilderOptions {
     type: EmbedBuilderType.MAP;
     beatmapId: number;
     mods: Array<Mod> | null;
@@ -102,7 +102,7 @@ export interface BannerBuilderOptions extends BuilderOptions {
 export type EmbedBuilderOptions =
     | CompareBuilderOptions
     | LeaderboardBuilderOptions
-    | MapBuilderOptions
+    | BeatmapBuilderOptions
     | PlaysBuilderOptions
     | ProfileBuilderOptions
     | AvatarBuilderOptions

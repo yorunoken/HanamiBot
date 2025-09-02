@@ -1,5 +1,5 @@
 import { getEntry, insertData } from "@utils/database";
-import { applicationCommandsCache } from "@utils/cache";
+import { commandsCache } from "@utils/cache";
 import { logger } from "@utils/logger";
 import { ButtonStateCache } from "@utils/cache";
 import { EmbedBuilderType } from "@type/builders";
@@ -23,12 +23,11 @@ async function run(interaction: Interaction): Promise<void> {
     if (interaction.isApplicationCommandInteraction() && interaction.inGuild()) {
         const { user } = interaction.member;
 
-        const commandDefault = applicationCommandsCache.get(interaction.data.name);
-        if (!commandDefault) return;
-        const { default: command } = commandDefault;
+        const command = commandsCache.get(interaction.data.name);
+        if (!command) return;
 
         try {
-            await command.run(interaction);
+            await command.runApplication({ interaction });
             const guild = await interaction.client.rest.getGuild(interaction.guildId);
             await logger.info(`[${guild.name}] ${user.username} used slash command \`${command.data.name}\`${interaction.data.subCommand ? ` -> \`${interaction.data.subCommand}\`` : ""}`, {
                 guildId: interaction.guildId,

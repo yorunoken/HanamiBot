@@ -1,13 +1,13 @@
-import db from "@db";
+import db from "@db" with { type: "sqlite" };
 import { getAccessToken } from "@utils/osu";
 import { removeEntry } from "@utils/database";
-import { guildPrefixesCache, messageCommandsCache, slashCommandIdsCache, commandAliasesCache, applicationCommandsCache } from "@utils/cache";
+import { guildPrefixesCache, commandsCache, slashCommandIdsCache, commandAliasesCache } from "@utils/cache";
 import { logger } from "@utils/logger";
 import { Tables } from "@type/database";
 import { Client as OsuClient } from "osu-web.js";
 import { readdir } from "fs/promises";
 import type { Guild } from "@type/database";
-import type { DefaultMessageCommand, DefaultSlashCommand } from "@type/commands";
+import type { CommandFileData } from "@type/commands";
 import { LilyClient, ApplicationCommand } from "lilybird";
 
 const tokenResult = await getAccessToken(+process.env.OSU_CLIENT_ID, process.env.OSU_CLIENT_SECRET, ["public"]);
@@ -17,63 +17,45 @@ if (!tokenResult) {
 const { accessToken } = tokenResult;
 export const client = new OsuClient(accessToken);
 
-export async function loadMessageCommands(): Promise<void> {
-    // Temporary array to store promises of MessageCommands
-    const temp: Array<Promise<DefaultMessageCommand>> = [];
+export async function loadCommands(lilyClient: LilyClient): Promise<void> {
+    // temp array to store promises
+    const commandDataPromises: Array<Promise<CommandFileData>> = [];
+    const applicationCommands: Array<ApplicationCommand.Create.ApplicationCommandJSONParams> = [];
 
-    const items = await readdir("./src/commands/message", { recursive: true });
+    const items = await readdir("./src/commands", { recursive: true });
     for (const item of items) {
         const [category, cmd] = item.split(process.platform === "win32" ? "\\" : "/");
         if (!category || !cmd) continue;
 
-        const command = import(`../commands/message/${category}/${cmd}`) as Promise<DefaultMessageCommand>;
-        temp.push(command);
+        const command = import(`../commands/${category}/${cmd}`) as Promise<CommandFileData>;
+        commandDataPromises.push(command);
     }
 
-    const commands = await Promise.all(temp);
+    const commands = await Promise.all(commandDataPromises);
     for (const command of commands) {
-        const { default: cmd } = command;
+        const { data } = command;
+        commandsCache.set(data.name, command); // this is for message commands, you make a key-value thing for it
 
-        // Add the command to the command map
-        messageCommandsCache.set(cmd.name, command);
-
-        const { aliases } = cmd;
-        // Check if the command has aliases and add them to the command map
+        // check for aliases
+        const { aliases } = data.message ?? {};
         if (aliases && aliases.length > 0 && Array.isArray(aliases)) {
             for (const alias of aliases) {
-                commandAliasesCache.set(alias, cmd.name);
+                commandAliasesCache.set(alias, data.name); // same thing we did with message commands
             }
         }
-    }
-}
 
-export async function loadApplicationCommands(lilyClient: LilyClient): Promise<void> {
-    const slashCommands: Array<ApplicationCommand.Create.ApplicationCommandJSONParams> = [];
-    const temp: Array<Promise<DefaultSlashCommand>> = [];
-
-    const items = await readdir("./src/commands/application", { recursive: true });
-    for (const item of items) {
-        const [category, cmd] = item.split(process.platform === "win32" ? "\\" : "/");
-        if (!category || !cmd) continue;
-        if (category === "data") continue;
-
-        const command = import(`../commands/application/${category}/${cmd}`) as Promise<DefaultSlashCommand>;
-        temp.push(command);
+        // construct back the application data from `data` and push to array
+        const applicationData = { ...data.application, name: data.name, description: data.description };
+        applicationCommands.push(applicationData);
     }
 
-    const commands = await Promise.all(temp);
-    for (const command of commands) {
-        const { default: cmd } = command;
-        slashCommands.push(cmd.data);
-        applicationCommandsCache.set(cmd.data.name, command);
-    }
-
+    // overwrite application commands
     let commandIds: Array<ApplicationCommand.Localizations.GlobalStructure>;
     if (process.env.DEV) {
         logger.info("Processing commands as Development.");
-        commandIds = await lilyClient.rest.bulkOverwriteGlobalApplicationCommand(lilyClient.user.id, slashCommands);
+        commandIds = await lilyClient.rest.bulkOverwriteGlobalApplicationCommand(lilyClient.user.id, applicationCommands);
     } else {
-        commandIds = await lilyClient.rest.bulkOverwriteGlobalApplicationCommand(lilyClient.user.id, slashCommands);
+        commandIds = await lilyClient.rest.bulkOverwriteGlobalApplicationCommand(lilyClient.user.id, applicationCommands);
         logger.info("Processing commands as Production.");
     }
 
@@ -81,8 +63,6 @@ export async function loadApplicationCommands(lilyClient: LilyClient): Promise<v
         const { name, id } = commandId;
         slashCommandIdsCache.set(name, `</${name}:${id}>`);
     }
-
-    logger.info(`Loaded ${commandIds.length} command IDs from cache`);
 }
 
 export function refreshGuildsDatabase(): void {

@@ -3,42 +3,38 @@ import type { LilyClient, ApplicationCommand } from "lilybird";
 
 type Awaitable<T> = Promise<T> | T;
 
-export interface MessageCommand {
-    name: string;
+interface MessageData {
+    cooldown?: number;
+    usage?: string;
     aliases?: Array<string>;
-    cooldown: number;
-    description: string;
     details?: string;
-    usage: string;
     flags?: string;
-    run: ({
-        client,
-        message,
-        args,
-        prefix,
-        index,
-        commandName,
-        channel,
-    }: {
-        client: LilyClient;
-        message: Message;
-        args: Array<string>;
-        prefix: string;
-        index: number | undefined;
-        commandName: string;
-        channel: GuildTextChannel;
-    }) => Awaitable<void>;
 }
 
-export interface SlashCommand {
-    data: ApplicationCommand.Create.ApplicationCommandJSONParams;
-    run: (interaction: GuildInteraction<ApplicationCommandData>) => Awaitable<any>;
+export interface CommandData {
+    name: string;
+    description: string;
+    hasPrefixVariant: boolean;
+    message?: MessageData;
+    application?: Omit<ApplicationCommand.Create.ApplicationCommandJSONParams, "name" | "description">;
 }
 
-export interface DefaultSlashCommand {
-    default: SlashCommand;
+export interface MessageCommand {
+    client: LilyClient;
+    message: Message;
+    args: Array<string>;
+    prefix: string;
+    index: number | undefined;
+    commandName: string;
+    channel: GuildTextChannel;
 }
 
-export interface DefaultMessageCommand {
-    default: MessageCommand;
+export interface ApplicationCommand {
+    interaction: GuildInteraction<ApplicationCommandData>;
+}
+
+export interface CommandFileData {
+    data: CommandData;
+    runMessage?: (ctx: MessageCommand) => Awaitable<void>;
+    runApplication: (ctx: ApplicationCommand) => Awaitable<void>;
 }

@@ -14,13 +14,13 @@ interface BaseUser {
     beatmapId: string | null;
 }
 
-interface SuccessUser extends BaseUser {
+export interface SuccessUser extends BaseUser {
     type: UserType.SUCCESS;
     banchoId: string;
     mode: Mode;
 }
 
-interface FailUser extends BaseUser {
+export interface FailUser extends BaseUser {
     type: UserType.FAIL;
     failMessage: string;
 }
