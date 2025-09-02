@@ -4,10 +4,10 @@ import { getEntry } from "@utils/database";
 import { rulesets } from "@utils/constants";
 import { Tables } from "@type/database";
 import { EmbedType } from "lilybird";
-import type { MapBuilderOptions } from "@type/builders";
+import type { BeatmapBuilderOptions } from "@type/builders";
 import type { Embed } from "lilybird";
 
-export async function mapBuilder({ beatmapId, mods }: MapBuilderOptions): Promise<Array<Embed.Structure>> {
+export async function beatmapBuilder({ beatmapId, mods }: BeatmapBuilderOptions): Promise<Array<Embed.Structure>> {
     const beatmapRequest = await client.safeParse(client.beatmaps.getBeatmap(Number(beatmapId)));
     if (!beatmapRequest.success) {
         return [
