@@ -42,7 +42,6 @@ process.on("uncaughtException", async (error: Error) => {
 });
 
 // graceful shutdown
-
 process.on("SIGINT", async () => {
     logger.info("Received SIGINT, shutting down gracefully...");
     try {
