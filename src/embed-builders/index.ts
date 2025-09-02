@@ -5,7 +5,7 @@ export * from "./card";
 export * from "./compare";
 export * from "./help";
 export * from "./leaderboard";
-export * from "./map";
+export * from "./beatmap";
 export * from "./plays";
 export * from "./profile";
 export * from "./simulate";

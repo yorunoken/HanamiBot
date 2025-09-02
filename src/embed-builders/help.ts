@@ -1,6 +1,6 @@
 import { Tables } from "@type/database";
 import { getRowCount, getRowSum } from "@utils/database";
-import { applicationCommandsCache, messageCommandsCache, commandAliasesCache } from "@utils/cache";
+import { commandsCache, commandAliasesCache } from "@utils/cache";
 import type { Embed } from "lilybird";
 
 export function helpBuilder(commandName?: string, preferSlash?: boolean): Array<Embed.Structure> {
@@ -12,13 +12,25 @@ export function helpBuilder(commandName?: string, preferSlash?: boolean): Array<
 }
 
 function displayCommandInfo(name: string, preferSlash?: boolean): Array<Embed.Structure> {
-    const slashCmd = applicationCommandsCache.get(name);
-    if (slashCmd && preferSlash) {
-        const { default: command } = slashCmd;
+    const command = commandsCache.get(name) ?? commandsCache.get(commandAliasesCache.get(name) ?? "");
+
+    if (!command) {
         return [
             {
-                title: `/${command.data.name}`,
-                description: command.data.description,
+                title: "Command Not Found",
+                description: `Unfortunately, the command \`${name}\` doesn't exist.`,
+                color: 0xff0000,
+            },
+        ];
+    }
+
+    const { data } = command;
+
+    if (preferSlash) {
+        return [
+            {
+                title: `/${data.name}`,
+                description: data.description,
                 fields: [
                     {
                         name: "Type",
@@ -27,7 +39,7 @@ function displayCommandInfo(name: string, preferSlash?: boolean): Array<Embed.St
                     },
                     {
                         name: "Options",
-                        value: command.data.options?.map((opt) => `\`${opt.name}\` - ${opt.description} ${opt.required ? "(required)" : ""}`).join("\n") ?? "No options",
+                        value: data.application?.options?.map((opt) => `\`${opt.name}\` - ${opt.description} ${opt.required ? "(required)" : ""}`).join("\n") ?? "No options",
                         inline: false,
                     },
                 ],
@@ -35,49 +47,48 @@ function displayCommandInfo(name: string, preferSlash?: boolean): Array<Embed.St
         ];
     }
 
-    const msgCmd = messageCommandsCache.get(name) ?? messageCommandsCache.get(commandAliasesCache.get(name) ?? "");
-    if (msgCmd && !preferSlash) {
-        const { default: command } = msgCmd;
-        const cooldownSecond = command.cooldown / 1000;
+    if (!data.hasPrefixVariant) {
         return [
             {
-                title: `${command.name}`,
-                description: command.description,
-                fields: [
-                    {
-                        name: "Type",
-                        value: "Message Command",
-                        inline: true,
-                    },
-                    {
-                        name: "Cooldown",
-                        value: `${cooldownSecond} second${cooldownSecond > 1 ? "s" : ""}`,
-                        inline: true,
-                    },
-                    {
-                        name: "Aliases",
-                        value: command.aliases?.join(", ") ?? "No aliases",
-                        inline: true,
-                    },
-                    {
-                        name: "Usage",
-                        value: command.usage,
-                        inline: false,
-                    },
-                    {
-                        name: "Details",
-                        value: command.details ?? "No additional details",
-                    },
-                ],
+                title: "No prefix variant",
+                description: `This command has no prefix variant, which means you can only use it with slash commands. Try \`/help\``,
+                color: 0xff0000,
             },
         ];
     }
 
+    // message commands
+    const cooldownSecond = data.message?.cooldown ?? 1000 / 1000;
     return [
         {
-            title: "Command Not Found",
-            description: `Unfortunately, the command \`${name}\` doesn't exist.`,
-            color: 0xff0000,
+            title: `${data.name}`,
+            description: data.description,
+            fields: [
+                {
+                    name: "Type",
+                    value: "Message Command",
+                    inline: true,
+                },
+                {
+                    name: "Cooldown",
+                    value: `${cooldownSecond} second${cooldownSecond > 1 ? "s" : ""}`,
+                    inline: true,
+                },
+                {
+                    name: "Aliases",
+                    value: data.message?.aliases?.join(", ") ?? "No aliases",
+                    inline: true,
+                },
+                {
+                    name: "Usage",
+                    value: data.message?.usage ?? data.name,
+                    inline: false,
+                },
+                {
+                    name: "Details",
+                    value: data.message?.details ?? "No additional details",
+                },
+            ],
         },
     ];
 }
@@ -89,16 +100,21 @@ function displayAllCommands(): Array<Embed.Structure> {
     const usedPrefixCommands = getRowSum(Tables.COMMAND);
     const usedApplicationCommands = getRowSum(Tables.COMMAND_SLASH);
 
+    const allCommands = Array.from(commandsCache.keys()).sort();
+
     // Get all command categories
-    const slashCommands = Array.from(applicationCommandsCache.keys()).sort();
-    const prefixCommands = Array.from(messageCommandsCache.keys()).sort();
+    const slashCommands = allCommands;
+    const prefixCommands = allCommands.filter((cmdName) => {
+        const cmd = commandsCache.get(cmdName);
+        return cmd?.data.hasPrefixVariant === true;
+    });
 
     // Group commands by category
     const slashCategories: Record<string, Array<string>> = {};
     const prefixCategories: Record<string, Array<string>> = {};
 
     for (const cmdName of slashCommands) {
-        const cmd = applicationCommandsCache.get(cmdName);
+        const cmd = commandsCache.get(cmdName);
         if (!cmd) continue;
 
         let category = "General";
@@ -118,7 +134,7 @@ function displayAllCommands(): Array<Embed.Structure> {
     }
 
     for (const cmdName of prefixCommands) {
-        const cmd = messageCommandsCache.get(cmdName);
+        const cmd = commandsCache.get(cmdName);
         if (!cmd) continue;
 
         let category = "General";
