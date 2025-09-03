@@ -117,7 +117,7 @@ async function getEmbeds(user: SuccessUser, authorId: string, index: number, mod
         authorDb: user.authorDb,
         plays,
         index,
-        isPage: false, // Use index mode for single play navigation
+        isPage: false,
         mods,
     };
 
@@ -127,8 +127,6 @@ async function getEmbeds(user: SuccessUser, authorId: string, index: number, mod
         components: createPaginationActionRow(embedOptions),
     };
 
-    // We need to handle caching after the message is sent, but this is a simplified version
-    // In the actual implementation, you'd need to handle this properly
     return messageOptions;
 }
 
