@@ -12,7 +12,6 @@ export const enum EmbedBuilderType {
     AVATAR = "avatarBuilder",
     BACKGROUND = "backgroundBuilder",
     BANNER = "bannerBuilder",
-    CARD = "cardBuilder",
     SIMULATE = "simulateBuilder",
 }
 
@@ -78,11 +77,6 @@ export interface ProfileBuilderOptions extends BuilderOptions {
     mode: Mode;
 }
 
-export interface CardBuilderOptions extends BuilderOptions {
-    type: EmbedBuilderType.CARD;
-    user: UserExtended;
-}
-
 export interface AvatarBuilderOptions extends BuilderOptions {
     type: EmbedBuilderType.AVATAR;
     user: UserExtended;
@@ -108,5 +102,4 @@ export type EmbedBuilderOptions =
     | AvatarBuilderOptions
     | BackgroundBuilderOptions
     | BannerBuilderOptions
-    | SimulateBuilderOptions
-    | CardBuilderOptions;
+    | SimulateBuilderOptions;

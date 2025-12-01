@@ -6,7 +6,6 @@ import { createHandler } from "@lilybird/handlers/simple";
 import { CachingDelegationType, createClient, Intents } from "lilybird";
 import { Channel, Guild, GuildVoiceChannel } from "@lilybird/transformers";
 import { $ } from "bun";
-import { chromium } from "playwright";
 
 // refresh token every hour
 setInterval(setToken, 1000 * 60 * 60);
@@ -25,15 +24,6 @@ await setToken();
 // Initialize Redis
 await initializeRedis();
 
-// make sure chromium is dead
-try {
-    await $`pkill chromium && pkill chromium-browser`;
-} catch {
-    // don't do anything
-}
-
-export const browser = await chromium.launch();
-
 process.on("unhandledRejection", async (error: Error) => {
     await logger.fatal("Unhandled promise rejection", error);
 });
@@ -45,8 +35,6 @@ process.on("uncaughtException", async (error: Error) => {
 process.on("SIGINT", async () => {
     logger.info("Received SIGINT, shutting down gracefully...");
     try {
-        await browser.close();
-        logger.info("Browser closed");
         await closeRedis();
         await logger.flush();
         process.exit(0);
@@ -59,8 +47,6 @@ process.on("SIGINT", async () => {
 process.on("SIGTERM", async () => {
     logger.info("Received SIGTERM, shutting down gracefully...");
     try {
-        await browser.close();
-        logger.info("Browser closed");
         await closeRedis();
         await logger.flush();
         process.exit(0);

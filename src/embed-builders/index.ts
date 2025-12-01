@@ -1,7 +1,6 @@
 export * from "./avatar";
 export * from "./background";
 export * from "./banner";
-export * from "./card";
 export * from "./compare";
 export * from "./help";
 export * from "./leaderboard";

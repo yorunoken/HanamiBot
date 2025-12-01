@@ -120,7 +120,7 @@ function displayAllCommands(): Array<Embed.Structure> {
         let category = "General";
         if (
             cmdName.includes("osu") ||
-            ["profile", "recent", "top", "compare", "map", "link", "unlink", "avatar", "banner", "background", "card", "simulate", "leaderboard", "recentbest", "recentlist"].includes(cmdName)
+            ["profile", "recent", "top", "compare", "map", "link", "unlink", "avatar", "banner", "background", "simulate", "leaderboard", "recentbest", "recentlist"].includes(cmdName)
         ) {
             category = "osu!";
         } else if (["help", "ping", "invite", "vote", "config", "prefix"].includes(cmdName)) {
@@ -140,7 +140,7 @@ function displayAllCommands(): Array<Embed.Structure> {
         let category = "General";
         if (
             cmdName.includes("osu") ||
-            ["profile", "recent", "top", "compare", "map", "link", "unlink", "avatar", "banner", "background", "card", "simulate", "leaderboard", "recentbest", "recentlist"].includes(cmdName)
+            ["profile", "recent", "top", "compare", "map", "link", "unlink", "avatar", "banner", "background", "simulate", "leaderboard", "recentbest", "recentlist"].includes(cmdName)
         ) {
             category = "osu!";
         } else if (["help", "ping", "invite", "vote", "config", "prefix"].includes(cmdName)) {
