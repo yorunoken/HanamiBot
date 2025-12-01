@@ -5,7 +5,6 @@ import { initializeRedis, closeRedis } from "@utils/cache";
 import { createHandler } from "@lilybird/handlers/simple";
 import { CachingDelegationType, createClient, Intents } from "lilybird";
 import { Channel, Guild, GuildVoiceChannel } from "@lilybird/transformers";
-import { $ } from "bun";
 
 // refresh token every hour
 setInterval(setToken, 1000 * 60 * 60);
