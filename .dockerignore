@@ -5,4 +5,4 @@ dist
 build
 npm-debug.log
 Dockerfile
-docker-compose.yml
+data.db
